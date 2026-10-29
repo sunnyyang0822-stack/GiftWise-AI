@@ -1,0 +1,307 @@
+{
+  "scope": "PM 独立构造离线探针，不代表模型或工作流验收",
+  "passed": 8,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "exact_budget_and_time",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "passed",
+      "expected_code": null,
+      "actual": {
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "one_cent_over",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.89\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "failed",
+      "expected_code": "OVER_BUDGET",
+      "actual": {
+        "status": "failed",
+        "all_passed": false,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": false,
+            "errors": [
+              {
+                "code": "OVER_BUDGET",
+                "path": "candidates[0].estimated_total",
+                "message": "估算总费用超过预算"
+              }
+            ],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "third_candidate_empty_tags",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "failed",
+      "expected_code": "INVALID_TYPE",
+      "actual": {
+        "status": "failed",
+        "all_passed": false,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": false,
+            "errors": [
+              {
+                "code": "INVALID_TYPE",
+                "path": "candidates[2].tags",
+                "message": "候选类别至少需要一个已知标签"
+              }
+            ],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "normalized_forbidden_tag",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\" ＡＬＣＯＨＯＬ \"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "failed",
+      "expected_code": "FORBIDDEN_TAG",
+      "actual": {
+        "status": "failed",
+        "all_passed": false,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": false,
+            "errors": [
+              {
+                "code": "FORBIDDEN_TAG",
+                "path": "candidates[1].tags[0]",
+                "message": "候选包含明确禁止的类别"
+              }
+            ],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "unknown_user_tag",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"unmapped\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "needs_input",
+      "expected_code": "UNKNOWN_TAG",
+      "actual": {
+        "status": "needs_input",
+        "all_passed": false,
+        "errors": [
+          {
+            "code": "UNKNOWN_TAG",
+            "path": "request.forbidden_tags[0]",
+            "message": "未知禁忌标签，请确认禁忌类别"
+          }
+        ],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": false,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": false,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": false,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "parse_priority",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{",
+      "expected_status": "error",
+      "expected_code": "INVALID_JSON",
+      "actual": {
+        "status": "error",
+        "all_passed": false,
+        "errors": [
+          {
+            "code": "MISSING_FIELD",
+            "path": "request.budget_amount",
+            "message": "缺少必填字段"
+          },
+          {
+            "code": "INVALID_JSON",
+            "path": "candidates_json",
+            "message": "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+          }
+        ],
+        "candidate_results": [],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "duplicate_content",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [{\"id\": \"u1\", \"text\": \"喜欢阅读\"}], \"forbidden_tags\": [\"alcohol\"], \"forbidden_terms\": [\"烈酒\"], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [\"u1\"], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "failed",
+      "expected_code": "DUPLICATE_CANDIDATE_CONTENT",
+      "actual": {
+        "status": "failed",
+        "all_passed": false,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": false,
+            "errors": [
+              {
+                "code": "DUPLICATE_CANDIDATE_CONTENT",
+                "path": "candidates[0]",
+                "message": "不同候选的名称和描述标准化后重复"
+              }
+            ],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": false,
+            "errors": [
+              {
+                "code": "DUPLICATE_CANDIDATE_CONTENT",
+                "path": "candidates[1]",
+                "message": "不同候选的名称和描述标准化后重复"
+              }
+            ],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "unknown_preferences_and_empty_optional_arrays",
+      "request_json": "{\"recipient_relation\": \"朋友\", \"occasion\": \"生日\", \"budget_amount\": \"88.88\", \"currency\": \"CNY\", \"available_days\": 2, \"facts\": [], \"forbidden_tags\": [], \"forbidden_terms\": [], \"notes\": \"\"}",
+      "candidates_json": "{\"candidates\": [{\"id\": \"c1\", \"name\": \"书签\", \"description\": \"纸质书签\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c2\", \"name\": \"阅读灯\", \"description\": \"小型阅读灯\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [], \"inferences\": [], \"unknowns\": []}, {\"id\": \"c3\", \"name\": \"手账\", \"description\": \"空白手账\", \"estimated_total\": \"88.88\", \"currency\": \"CNY\", \"estimated_preparation_days\": 2, \"tags\": [\"other\"], \"reason\": \"依据用户明确提供的阅读兴趣，其他适配仍需确认\", \"fact_refs\": [], \"inferences\": [], \"unknowns\": []}]}",
+      "expected_status": "passed",
+      "expected_code": null,
+      "actual": {
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c2",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": []
+          }
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    }
+  ]
+}

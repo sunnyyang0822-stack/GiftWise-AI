@@ -1,0 +1,125 @@
+{
+  "started_at": "2026-10-29T19:07:28.808115+08:00",
+  "finished_at": "2026-10-29T19:07:29.222061+08:00",
+  "timezone": "Asia/Shanghai",
+  "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise",
+  "python": "3.12.12 (main, Oct 10 2025, 15:08:20)  [GCC 15.2.0 64 bit (AMD64)]",
+  "executable": "D:\\msys64\\mingw64\\bin\\python.exe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "command": "python tests/acceptance/stage_b/run_acceptance.py",
+  "commands": [
+    {
+      "argv": [
+        "D:\\msys64\\mingw64\\bin\\python.exe",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Python 3.12.12\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "c64286c077ae0ef1623e601cafd843985e5c4731\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "branch",
+        "--show-current"
+      ],
+      "exit_code": 0,
+      "stdout": "main\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exit_code": 0,
+      "stdout": "?? docs/pm-reviews/\n?? docs/test-reports/\n?? tests/\n?? validator/\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "review": "C:\\Users\\lenovo\\Desktop\\giftwise\\docs\\pm-reviews\\val-001-rereview-2026-10-29.md",
+  "expected_sha256": {
+    "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+    "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+  },
+  "before_sha256": {
+    "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+    "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+  },
+  "after_sha256": {
+    "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+    "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+  },
+  "hashes_match_review": true,
+  "delivered_files_unchanged": true,
+  "case_count": 254,
+  "tests_run": 260,
+  "counts": {
+    "passed": 260
+  },
+  "exit_code": 0,
+  "group_counts": {
+    "T01": 1,
+    "T02_T11": 12,
+    "T11": 46,
+    "T02": 2,
+    "T04_T11": 16,
+    "T04": 3,
+    "T05_T10": 16,
+    "T05_PM_VAL_001": 1,
+    "PM_VAL_001": 3,
+    "T10_T13": 24,
+    "T10": 25,
+    "T09": 2,
+    "T06": 16,
+    "C1": 13,
+    "T06_C1": 10,
+    "C3": 9,
+    "T12_C3": 1,
+    "T12": 9,
+    "C2": 5,
+    "T03_C2": 1,
+    "T03": 6,
+    "C4": 3,
+    "C6": 22,
+    "C1_C6": 3,
+    "T07_T08": 3,
+    "PURE": 1,
+    "T15_local_only": 1
+  },
+  "test_asset_sha256": {
+    "tests\\acceptance\\stage_b\\build_cases.py": "cc71eddeae7b45fa3e086faa086fbbb8097571c928360f4de3a70f20bc72f752",
+    "tests\\acceptance\\stage_b\\cases.json": "c26f1eaf5df174f678aa51a3df8061c4480d7a1a8c4e5ac93e0d0c568b65cba5",
+    "tests\\acceptance\\stage_b\\run_acceptance.py": "cb74c2240adcdf4d7e2849e825d2ff211a6abc9c9f2f6f7e33cfa5dfc42f81e4",
+    "tests\\acceptance\\stage_b\\test_validator_acceptance.py": "e0125a1fa2bc8f4c776af32ab4d6d32b0238c8ec69bbe1446792a70f4dff25e1"
+  },
+  "independence_limit": "\u53e6\u5efa\u5951\u7ea6\u7528\u4f8b\u4e0e\u65ad\u8a00\uff0c\u4e0d\u8bfb\u53d6\u5f00\u53d1 fixture\uff1b\u672c\u804a\u5929\u6b64\u524d\u53c2\u4e0e\u5f00\u53d1\uff0c\u5e76\u975e\u4eba\u5458\u9694\u79bb\u9a8c\u6536\u3002",
+  "scope": "\u4ec5\u672c\u5730\u79bb\u7ebf\u6821\u9a8c\uff1b\u4e0d\u8bc1\u660e Dify\u3001\u771f\u5b9e\u6a21\u578b\u4fee\u8ba2\u3001\u524d\u7aef\u3001\u5305\u88c5\u6216\u4e91\u90e8\u7f72\u3002"
+}

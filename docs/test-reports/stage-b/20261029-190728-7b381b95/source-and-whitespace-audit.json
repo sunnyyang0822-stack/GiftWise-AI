@@ -1,0 +1,24 @@
+{
+  "source_import_scan": [
+    {
+      "file": "validator/__init__.py",
+      "import_modules": [
+        "rules"
+      ],
+      "direct_sensitive_builtin_calls": []
+    },
+    {
+      "file": "validator/rules.py",
+      "import_modules": [
+        "json",
+        "re",
+        "unicodedata",
+        "decimal"
+      ],
+      "direct_sensitive_builtin_calls": []
+    }
+  ],
+  "acceptance_assets_checked": 4,
+  "whitespace_issues": [],
+  "scope_note": "AST \u68c0\u67e5\u53ea\u8bc1\u660e\u6240\u5217\u6e90\u7801\u7684\u9759\u6001\u626b\u63cf\u7ed3\u679c\uff1b\u5916\u90e8\u8d44\u6e90\u9694\u79bb\u53e6\u6709\u516c\u5f00\u63a5\u53e3 deny_io \u7528\u4f8b\u3002"
+}

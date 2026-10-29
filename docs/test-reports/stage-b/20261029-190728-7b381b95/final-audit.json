@@ -1,0 +1,12 @@
+{
+  "delivered_sha256": {
+    "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+    "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+  },
+  "matches_review": true,
+  "broken_report_links": [],
+  "report_sha256": "cb2f2a7698b8f2a2e1bcd4eef214180072bbec201bc291850156a037ea7d76ee",
+  "report_bytes": 7664
+}
