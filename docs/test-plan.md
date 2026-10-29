@@ -1,50 +1,58 @@
-# Reproducible test plan — no results yet
+# 可复现测试计划：尚无执行结果
 
-Status: proposed tests only. No validator, Dify gift-workflow run, test success rate, latency, or cost has been measured. Documentation checks are not business-function tests.
+更新日期：2026-10-29（亚洲／上海）。定位以[统一说明](product-positioning.md)为准。当前只有测试设计，没有业务测试、Dify 礼赠运行、成功率、延迟或成本数据。文档检查不等于业务测试。
 
-## Fixtures and execution protocol
+## 数据与执行方式
 
-Use the request in [workflow-spec](../workflow/workflow-spec.md) as base: CNY 200, two days, fact f1 (coffee), forbidden alcohol / literal term 酒. Build three distinct valid candidates c1/c2/c3 with estimated totals 150/120/80, preparation 1/2/1 days, permitted tags, correct fact references, and separate inference / unknown arrays. Values are synthetic, not real product information.
+按[工作流规范](../workflow/workflow-spec.md)构造虚构基线：青年用户为同事送生日礼物，预算 CNY 200、准备两天、事实 f1 为喜欢咖啡、禁止酒类及字面词“酒”。三个不同合格方案 c1/c2/c3，估算总费用 150/120/80、准备天数 1/2/1，合法标签和事实引用，推断和未知信息独立。不是商品报价或真实用户数据。
 
-The first coding task must store this full base fixture and each mutation in `tests/test_cases.json`; case IDs below are stable. Each test starts from a fresh deep copy. Fixed offline outputs make checks reproducible; they do not prove a model actually repaired anything. For integrated tests, retain the actual model outputs and code traces from the same request.
+编码时在 `tests/test_cases.json` 保存完整基线与变体，每例使用新深拷贝。固定修订前后快照只证明校验结果，不证明模型真实修订。集成测试保留实际模型输出及代码轨迹。
 
-Run future offline tests with `python -m unittest discover -s tests -v` once implemented. Record Python version, Git SHA, command, timestamp with timezone, exit status, and per-case observed / expected result. No packages or test command are currently supplied as a working application.
+待实现后运行 `python -m unittest discover -s tests -v`，记录 Python 版本、Git SHA、命令、带时区时间、退出码和逐项结果。当前该命令尚无测试实现。
 
-| ID | Layer / reproducible change | Expected result |
+| 编号 | 可复现操作 | 预期结果 |
 | --- | --- | --- |
-| T01 normal | Base fixture | All three pass, repair count 0 in live flow |
-| T02 budget | Set c1 total to 200.01 | c1 fails OVER_BUDGET; 200.00 boundary passes |
-| T03 restriction | Set c1 tags to alcohol; separately place 酒 in description | FORBIDDEN_TAG / FORBIDDEN_TERM respectively; passing a tag check alone is insufficient |
-| T04 preparation | Set c1 preparation to 3 days | PREPARATION_TOO_LONG; 2 days passes |
-| T05 insufficient information | Remove budget; separately empty facts only | Missing budget → needs_input; empty facts with no references → valid with unknown preferences, no fabricated facts |
-| T06 invalid JSON | Feed truncated candidates JSON | INVALID_JSON; no unchecked success; repeated malformed output after one live repair stops |
-| T07 repair succeeds | First snapshot c1=250; fixed repaired snapshot c1=180; others unchanged | First validation fails, second passes; offline pair only tests the validator; live test requires one actual N5 invocation and N6 trace |
-| T08 repair fails | First snapshot c1=250; repaired snapshot c1=230 | Both fail; live flow ends after one repair, reports unresolved issue and never retries |
-| T09 currencies | c1 currency USD; separately request currency USD | CURRENCY_MISMATCH / UNSUPPORTED_CURRENCY; no implicit conversion |
-| T10 fields / evidence | Remove reason; separately use nonexistent fact f99 | MISSING_FIELD / UNKNOWN_FACT_REF; no false pass |
-| T11 numeric / type edges | Negative amount, NaN/Infinity, boolean days, numeric amount rather than string | Controlled rejection; no crash or truthy-number coercion |
-| T12 batch integrity | Two candidates, duplicate candidate IDs, duplicate fact IDs | Explicit batch / identifier failure |
-| T13 parser / limits | Duplicate JSON keys, null root, wrong arrays, oversized payload, unknown tags | Controlled error at correct field; no silent acceptance |
-| T14 workflow preservation | Repair changes previously passing c2, or tries to change budget | Workflow rejects unauthorized state changes; immutable original request still governs validation |
-| T15 infrastructure | Actual provider / Code error; optional API timeout if API exists | Honest error status, no unchecked success, no infinite retries |
+| T01 正常 | 基线 | 三项通过，第一阶段修订 0 次 |
+| T02 超预算 | c1 总额 200.01；另测 200.00 | 前者 OVER_BUDGET，边界通过 |
+| T03 禁忌 | c1 标签 alcohol；另在描述写“酒” | 分别 FORBIDDEN_TAG、FORBIDDEN_TERM |
+| T04 时间 | c1 准备 3 天；另测 2 天 | 前者 PREPARATION_TOO_LONG，边界通过 |
+| T05 信息不足 | 删除预算；另仅清空事实和引用 | 缺预算需补充；偏好未知可继续，不编造事实 |
+| T06 无效 JSON | 截断候选 JSON | INVALID_JSON；修订后仍无效就停止 |
+| T07 修订成功 | 初始 c1=250，固定修订后 180，其他不变 | 初检失败、复检通过；真实工作流另需一次真实修订轨迹 |
+| T08 修订失败 | 初始 c1=250，修订后 230 | 两次失败，停止并显示未解决问题 |
+| T09 币种 | 候选 USD；另测请求 USD | CURRENCY_MISMATCH／UNSUPPORTED_CURRENCY，不换汇 |
+| T10 字段证据 | 删理由；另引用 f99 | MISSING_FIELD／UNKNOWN_FACT_REF |
+| T11 数值类型 | 负数、NaN/Infinity、布尔天数、数字型金额 | 明确拒绝，不崩溃、不错误转换 |
+| T12 批次 | 两候选、重复候选 ID、重复事实 ID | 明确批次或标识错误 |
+| T13 解析限制 | 重复键、null 根、错误数组、超长、未知标签 | 对应字段失败，不静默通过 |
+| T14 修订保护 | 改已通过 c2 或原始预算 | 拒绝未经授权修改，原始约束仍有效 |
+| T15 基础设施 | 模型／Code 失败；API 存在后测超时 | 中文错误，不标为通过、不无限重试 |
+| T16 未选择 | 获得三项后不选择 | 不触发赠送设计，不提前生成三份包装 |
+| T17 选择 | 选通过 c2；另选失败项、不存在或旧版 ID | 前者进入第二阶段；后者拒绝或刷新；不自动替选 |
+| T18 可信边界 | 篡改前端 passed 或候选内容 | 可信来源校验加必要的规则重检拦截，不信任前端标记；仅重检不能证明来源和已用修订次数 |
+| T19 赠送完整性 | 用户选择一项后生成 | 包装步骤、配色、贺卡、赠送方式齐全且对应选定礼物 |
+| T20 增量约束 | 礼物 190 加包装 20；另测新增时间超限 | 按全部费用和时间失败，不能沿用裸礼物通过结果 |
+| T21 全局一次修订 | 首阶段已修订，次阶段再失败；另测首阶段未修订 | 前者如实失败；后者最多使用剩余一次并复检，不跨阶段重置 |
+| T22 简体中文 | 检查导航、输入、按钮、空状态、加载、错误、报告、贺卡 | 默认简体中文；技术代码有中文解释，不直接暴露英文异常 |
+| T23 人群场景 | 青年职场／亲朋／朋友／恋人／追求对象、青少年朋友、中年职场 | 不限制为同事生日；不把群体假设当个人事实；青少年场景不成人化 |
 
-Run at least T01–T08 both at their applicable offline layer and in the configured workflow before claiming the complete MVP works. T14–T15 require workflow integration; do not count them as covered by pure validator tests. Do not manipulate live tests to claim naturally occurring model behavior: use a clearly labeled test-only fixture injection branch to demonstrate deterministic violations if needed; keep it separate from normal generation.
+宣称完成前执行 T01–T08 的适用离线和实际工作流测试，并完成 T16–T22 选择与赠送闭环。涉及工作流、页面或可信状态的测试不能用纯校验器单测替代。稳定演示错误时可用明确标注的测试注入，与正常生成分离，不伪装为模型自然出错。
 
-## Metrics and denominators
+## 指标定义
 
-| Metric | Definition and method |
+| 指标 | 方法与分母 |
 | --- | --- |
-| Hard-constraint satisfaction | Final candidates independently satisfying all applicable hard rules / all final candidates emitted in valid-request, completed test runs. Evaluate failed candidates too; separately count errors and no-output runs. Never exclude failures to inflate the rate. |
-| Forbidden-item interception | Deliberately prohibited candidates correctly blocked / all deliberately prohibited candidates. Use labeled tag and literal-term fixtures; count benign candidates wrongly blocked separately. This measures implemented rules, not all semantic prohibitions. |
-| Repair success | Runs needing repair that pass all rules after exactly one actual repair / all valid-request runs entering repair, including timeout or persistent failures. Fixed offline snapshot pairs are reported separately. |
-| End-to-end latency | Monotonic elapsed time from submission to final output or error; show count, raw timings, median, and range, split repair / no-repair. Use p95 only with an adequate sample count and state method. |
-| Model calls | Actual generation / repair invocations per run, including failed calls and retries; expected MVP maximum two. Do not infer calls solely from repair count. |
-| Model cost | Sum measured token categories × actual contemporaneous provider rate for each call; record model, rate date, currency, cached-token treatment, and billing source. Missing usage or rates → unknown, not zero. Cloud cost is separate. |
+| 硬性约束满足率 | 有效请求且完成运行中，最终候选满足全部适用规则数／全部最终候选数；失败项计入，错误和无输出另报。第二阶段另检查礼物加包装的总费用、时间及禁忌。 |
+| 禁忌拦截率 | 正确拦截的已知禁忌候选／全部刻意构造的禁忌候选；标签和字面词分开，正常项误拦截另报。不能代表所有语义禁忌。 |
+| 修订成功率 | 跨两阶段使用一次实际自动修订后通过的任务／进入修订的有效请求任务，包含超时和持续失败。固定快照不混入真实模型指标。 |
+| 响应延迟 | 提交到候选报告、确认选择到赠送指南分别用单调时钟测量；不计用户思考时间。报告原始值、样本数、中位数及范围；足量后说明 p95 方法。 |
+| 模型调用次数 | 实际生成、修订、赠送设计与失败调用逐项记录。完整任务通常两次基础生成，最多再加一次修订；未选择只有第一阶段调用。MVP 不自动重试模型。 |
+| 调用成本 | 各类实际计费用量乘当时对应费率求和，记录模型、日期、币种、缓存处理及账单依据。缺数据记未知，不填零；云费用另计。 |
 
-Acceptance: all documented offline expected results match actual results, no unchecked candidate is marked passed, actual workflow traces show at most one repair and revalidation, and honest error reports exist. No latency or monetary target is claimed until measured and agreed with the owner.
+验收：承诺的测试实际结果符合预期；未校验内容不标通过；选择后才生成赠送设计；跨阶段最多一次修订；错误中文如实反馈。未实测并确认前不承诺延迟和成本目标。
 
-## Result record template
+## 结果记录
 
-For each run store: case ID, layer (offline / live Dify / deployed API), synthetic fixture revision, Git SHA, actual model identifier and settings when applicable, Dify version / hosting type, timestamp, expected result, observed result, pass/fail, error codes, repair count, model call count, elapsed milliseconds, token counts / cost basis, sanitized trace location, and known limitations. Current value for every business test: **not run**.
+每次保存案例编号、测试层次（离线／Dify／部署 API／页面）、虚构数据版本、Git SHA、模型设置、Dify 版本与托管类型、时间、预期与实际、通过与否、错误代码、请求和候选版本、选定 ID、阶段、全局修订次数、调用数、耗时、用量、费率依据、脱敏轨迹和局限。所有业务测试当前均为：**未执行**。
 
-Use fictional data and redact secrets, private addresses, and recipient information. Recheck the deployed API separately if introduced; local tests do not demonstrate cloud reachability or container health.
+使用虚构数据，不记录凭证、私有地址、真实收礼人资料。部署后独立实测 API 可达性与容器健康，不能用本地结果替代。

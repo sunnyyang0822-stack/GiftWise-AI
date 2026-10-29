@@ -1,66 +1,51 @@
-# Product requirements — proposed MVP
+# 产品需求：MVP 设计
 
-Updated: 2026-10-29 (Asia/Shanghai). Status: specification; implementation and user validation pending.
+更新时间：2026-10-29（北京时间）。状态：设计，待实现与验证。产品定位以[公开 Issue #1](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/1)正文为准；应用字段以[工作流规范](../workflow/workflow-spec.md)为准。
 
-## Background, user, and scenario
+## 背景与目标用户
 
-GiftWise AI is an individual hackathon project for the owner-reported UCloud × Shanghai University competition, October 30–November 1, 2026. Official technical requirements and submission cutoff still require confirmation.
+GiftWise AI 为独立黑客松项目。主要服务初入社会的青年在职场、亲朋、朋友、恋人及追求对象等关系中的送礼决策；次要关注青少年朋友送礼和中年职场送礼。用户从“不知道送什么、怕选错产生负面效果”出发，希望获得有理由的选择与合适的送出形式。群体需求强度与价值均属于待验证假设。
 
-Target user: someone choosing a birthday gift for a friendly colleague they do not know particularly well. The user lacks inspiration, fears an inappropriate gift, and needs a decision within budget and time limits. These pain points are product hypotheses, not interview findings.
+第一验收案例：青年给关系不错但不太熟悉的同事送生日礼物，预算 200 元、两天准备、喜欢咖啡且不送酒。此案例是切口，不限制整个产品。
 
-Example fictional request: colleague birthday, CNY 200 maximum total, two days preparation, known interest in coffee, no alcohol. The tool must not infer that a coffee interest proves a particular taste or that an item is available locally.
+## 输入
 
-## Inputs
+| 字段 | 要求与含义 |
+| --- | --- |
+| recipient_relation / occasion | 必填，双方关系与送礼场合；不收集真实姓名 |
+| budget_amount / currency | 必填，包含全部估算费用的预算；首版 CNY |
+| available_days | 必填，可用准备天数，不是送达承诺 |
+| facts | 可空，用户已知的风格、爱好、职业等，按事实 ID 保存 |
+| forbidden_tags / forbidden_terms | 可空，明确禁忌类别和字面词；无法可靠理解时澄清 |
+| notes | 可选补充说明，不得覆盖硬约束 |
 
-The authoritative proposed contract is in [workflow-spec](../workflow/workflow-spec.md).
+未知信息允许留空；缺预算等必要约束应提示补充，不让模型编造。不把职业或年龄推断成确定爱好。
 
-| Field | Requirement | Meaning |
-| --- | --- | --- |
-| recipient_relation | Required nonempty string | Relationship, without real names |
-| occasion | Required nonempty string | Birthday in the first scenario |
-| budget_amount | Required decimal string | Maximum total, including declared extras |
-| currency | Required; MVP CNY only | No implicit conversion |
-| available_days | Required nonnegative integer | Available preparation duration, not a delivery promise |
-| facts | Array; may be empty | User facts with stable IDs; interests optional |
-| forbidden_tags | Array; may be empty | Explicit confirmed categories, e.g. alcohol |
-| forbidden_terms | Array; may be empty | Explicit literal restrictions for transparent text matching |
-| notes | Optional string | Additional context; cannot silently override hard constraints |
+## 两阶段输出
 
-Unprovided required constraints cause a needs-input result; never invent budget, deadline, or a prohibition. Unknown preferences may remain unknown. Free-text restrictions that cannot be mapped reliably need user confirmation rather than a universal compliance claim.
+阶段一输出恰好三个不同方案，分别提供理由、用户事实引用、模型推断、未知信息、全量估算费用、币种、准备时间与规则检查结果。最多一次自动修订并重检；部分失败就说明失败，不标为全部通过。
 
-## Output
+用户自行选择合格项，阶段一不自动替选。阶段二提供该项的包装材料、步骤、配色、可用贺卡、赠送时机和话术；重新检查新增费用、准备时间和材料禁忌。不承诺对方一定喜欢，不捏造双方关系。可信状态与总修订额度跨阶段保持。
 
-A report includes a status (`passed`, `failed`, `needs_input`, or `error`), three candidates if generation succeeded, per-candidate validation, and zero or one repair attempt. Each candidate includes a description, all-in estimated cost and currency, estimated preparation days, restriction tags, recommendation reason, references to user facts, inferences, unknowns, and an optional presentation suggestion. Keep the original and repaired candidates and validation results in the run record.
+## P0 必须实现
 
-The final selection may use only candidates with a passing rule result. If none passes, say no compliant recommendation is available. If some fail after repair, expose their failures; do not label the overall run passed. Relationship suitability is a subjective risk note, not an objective check. Business-data verification remains `not_verified`.
+1. 中文表单收集必要约束与可选已知信息，服务端保管凭证。
+2. 三个有依据的不同候选，分离事实、推断和未知信息。
+3. 独立代码检查预算、币种、明确禁忌、字段、事实引用与准备时间。
+4. 同一任务跨推荐与包装阶段合计最多一次自动业务修订，并执行相同规则复核。
+5. 中文三方案比较，用户明确选择已通过的一项，不信任前端伪造状态。
+6. 选择后才生成基础包装、配色、贺卡和赠送方式，并复核全量约束。
+7. 如实处理缺信息、无效 JSON、超时、未通过与无法选择状态。
+8. 至少八类核心案例的真实结果，另验收选择、呈现和中文闭环。
 
-## Priorities
+## P1 与范围边界
 
-P0 acceptance:
+可选增强：精致视觉和动效、更多案例、完善日志和性能分析、必要时独立 FastAPI / Docker / UCloud 部署。成本和调用记录先做最简版。比赛若强制某项架构，提升为必须完成，尚不能认定 Code 节点满足全部赛题要求。
 
-1. Accept structured user constraints and preserve original facts.
-2. Generate exactly three distinct ideas in the agreed schema.
-3. Separate facts, inferences, and unknowns.
-4. Execute independent code checks for required fields, budget, currency, explicit restrictions, preparation time, and fact references.
-5. Route failing candidates through at most one model repair and run the same validator again; preserve valid candidates.
-6. Return an honest report on success, partial availability, invalid input, and persistent failure.
-7. Execute and record at least the eight specified reproducible scenarios, including live repair traces for end-to-end claims.
+暂不开发账号、长期记忆、复杂数据库、多 Agent 产品能力、购物支付、实时商品源和不必要的容器编排。前端基础操作与清晰中文反馈属于核心；视觉精修后置。
 
-P1, after the closed loop works: optional packaging / color / card copy; API timeouts; structured redacted logs; cost and latency measurement; FastAPI + Docker + UCloud if needed. Organizer-mandated deployment is promoted to P0 once confirmed.
+## 完成标准与未验证假设
 
-Out of scope: accounts, payments, shopping or inventory integration, real-time delivery claims, long-term memory, multiple agents, databases, Kubernetes unless mandatory, and a bespoke polished frontend.
+真实运行从输入、三方案、校验与一次修订到用户选择、赠送指南的完整闭环；代码检查和模型调用有可追溯记录；关键测试有实际结果；文档与演示如实反映运行状态。无商品源时，实时价格、库存和送达均未验证。Dify 导入和云部署只在实测后标为完成。
 
-## MVP definition of done
-
-The actual Dify workflow runs against a configured provider; rule results come from executed code; at most one repair occurs; all eight scenarios have expected and observed results; a revision-stable workflow export has been sanitized and import-tested before any importability claim; setup documentation and a four-minute demonstration reflect reality. Public source and known limitations accompany the result. Cloud deployment is required only if confirmed by rules or chosen as a committed deliverable.
-
-## Unvalidated assumptions and decisions
-
-- Users value traceable constraints more than a generic list of gifts.
-- Three ideas and one repair provide sufficient choice within tolerable latency.
-- User-entered category tags can represent the important explicit restrictions.
-- Estimated costs and preparation times are useful without merchant integration.
-- Current Dify sandbox can run the selected standard-library code; verify before integration.
-- Organizer rules permit this architecture, model source, and hosting arrangement.
-
-The owner confirms product direction and experiences; Codex implements a bounded task and reports real results; PM checks evidence before marking work complete.
+需验证：青年是否需要该决策链；三项选择是否足够；理由与不确定性是否提升信任；包装建议是否可执行；延迟和费用是否可接受；不同关系场景是否需不同话术。不得把假设写成用户研究结论。

@@ -1,51 +1,69 @@
-# Workflow design specification v0.1
+# 工作流设计规范 v0.2
 
-Status: design only, 2026-10-29. The inspected local export has only Start → LLM → End and a connection-test prompt. None of the nodes below beyond that baseline has been confirmed configured or run. No importable DSL is generated here. A later DSL must come from the actual environment and undergo sanitized import and execution checks.
+更新日期：2026-10-29。状态：设计规范，尚未配置或运行验证。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。
 
-## Authoritative proposed data contract
+## 产品流程与语言
 
-These are application fields, not a claim about native Dify DSL syntax. The first implementation must follow them or propose a documented change before coding. Dify boundary values `request_json`, `candidates_json`, and `validation_json` are strings containing JSON; status / branch outputs are shallow scalar fields. Declare their types in the actual node UI.
+主要面向初入社会的青年，覆盖职场、亲朋、朋友、恋人及追求对象的送礼需求；次要面向青少年的朋友送礼和中年人的职场送礼。首个验收案例仍采用青年给同事送生日礼物，不把产品限制为同事场景。
 
-Example synthetic request:
+用户不知道送什么 → 输入对方风格、爱好、职业等已知信息及约束 → 生成三个不同思路并说明理由 → 独立代码校验，必要时最多修订一次并重检 → 展示方案供用户选择 → 用户明确选择一个合格方案 → 提供详细包装、配色、贺卡及赠送方式。
+
+推荐阶段不自动替用户选第一项，也不提前生成三套详细包装方案。选择后的基础包装与贺卡能力属于 P0；视觉精修属于 P1。导航、表单、按钮、操作提示、状态反馈、模型正文和错误解释统一使用简体中文；JSON 字段、错误代码、库名等机器标识符保留英文。
+
+## 推荐阶段的数据契约
+
+以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 节点边界使用 JSON 字符串 `request_json`、`candidates_json`、`validation_json`，另提供浅层状态字段；实际 UI 必须声明对应类型。
+
+虚构用户输入示例：
 
 ```json
 {
-  "recipient_relation": "Friendly colleague, not very close",
-  "occasion": "Birthday",
+  "recipient_relation": "关系不错但不太熟悉的同事",
+  "occasion": "生日",
   "budget_amount": "200.00",
   "currency": "CNY",
   "available_days": 2,
-  "facts": [{"id": "f1", "text": "Enjoys coffee"}],
+  "facts": [
+    {"id": "f1", "text": "喜欢咖啡"},
+    {"id": "f2", "text": "偏好简约风格"},
+    {"id": "f3", "text": "从事设计工作"}
+  ],
   "forbidden_tags": ["alcohol"],
   "forbidden_terms": ["酒"],
-  "notes": "Keep it professional"
+  "notes": "希望表达祝福，不造成关系压力"
 }
 ```
 
-Start collects the budget and time as explicit fields; never let the LLM replace these authoritative values. Optional notes and arrays may be empty. Missing required fields stop with `needs_input`; no preferences is acceptable. Restriction vocabulary v0.1: `alcohol`, `food`, `fragrance`, `jewelry`, `plant`, `other`; unknown nonempty tags require clarification. An empty forbidden list means no supplied restriction, not universal safety. Do not silently translate ambiguous free text into a supposedly exhaustive category policy.
+风格、爱好、职业是可选已知信息，进入 `facts` 并保留稳定事实 ID，无需新增校验器必填字段；用户未提供时保持未知，不能从职业推导成确定偏好。关系、场合、预算、币种、准备时间为必填约束。预算与时间来自用户，不允许模型修改。可选备注和数组可以为空；没有偏好信息不等于输入无效。明确禁忌必须保留原意；不能可靠映射的自然语言限制应请求确认。
 
-Generation returns an object with `candidates`, exactly three objects with IDs `c1`, `c2`, `c3`. This single object illustrates one candidate's shape; duplicate the shape with distinct IDs and ideas in a valid full response:
+禁忌类别 v0.1：`alcohol`、`food`、`fragrance`、`jewelry`、`plant`、`other`。前端显示中文类别。未知非空标签需要澄清；空禁忌列表仅表示未提供限制，不代表普遍安全。
+
+模型输出为包含 `candidates` 的对象，必须有三个不同思路，ID 为 `c1`、`c2`、`c3`。下例仅说明单个候选结构，完整输出必须包含三个候选：
 
 ```json
 {
   "id": "c1",
-  "name": "Coffee-themed desk kit",
-  "description": "A mug and a reusable coaster",
+  "name": "咖啡主题桌面小套装",
+  "description": "简约马克杯与可重复使用的杯垫",
   "estimated_total": "150.00",
   "currency": "CNY",
   "estimated_preparation_days": 1,
   "tags": ["other"],
-  "reason": "Connects to the stated interest without assuming a preferred roast",
-  "fact_refs": ["f1"],
-  "inferences": ["A practical desk gift may suit a colleague"],
-  "unknowns": ["Preferred style", "Current local availability"],
-  "presentation": "Optional neutral wrapping and a short birthday card"
+  "reason": "呼应已知咖啡兴趣及简约风格，不假定对方偏爱某种咖啡豆",
+  "fact_refs": ["f1", "f2"],
+  "inferences": ["实用桌面用品可能适合同事关系"],
+  "unknowns": ["对方是否已有同类杯具", "本地实际供应情况"],
+  "presentation": "可采用简洁中性包装；详细方案待用户选择后生成"
 }
 ```
 
-`estimated_total` includes all declared gift, packaging, and shipping costs; it is a model estimate, not a merchant quote. Require a finite nonnegative decimal string with at most two decimal places. CNY only in v0.1; reject mixed or unsupported currencies, no conversion. Preparation and available days are nonnegative JSON integers, excluding booleans. Name, description, reason, and ID are nonempty strings. `tags` is a nonempty list from the vocabulary; `fact_refs`, `inferences`, `unknowns` are required string arrays and may be empty. Fact IDs must be nonempty and unique. Candidate facts are references to the authoritative request, not rewritten factual claims. Resolve facts from the original request in the report. This validates attribution structure, not semantic truth of model reasoning. Presentation is optional.
+`estimated_total` 包含礼物、基础包装、贺卡和配送等全部已声明费用，并预留所述基础呈现方式的估算；它不是商家报价。金额为有限、非负、至多两位小数的十进制字符串。第一版只支持 CNY，拒绝混合币种和隐式换汇。准备天数与可用天数为非负 JSON 整数，排除布尔值。名称、描述、理由和 ID 为非空字符串。`tags` 为词表中的非空字符串数组；`fact_refs`、`inferences`、`unknowns` 为必填字符串数组，可为空。事实 ID 非空且唯一。
 
-Proposed pure validator interface: `validate(request_json: str, candidates_json: str) -> dict`. It never calls a model or modifies inputs. Response shape:
+事实必须引用原始输入，在报告中按 ID 解析原文；不得把模型重写后的话冒充用户事实。字段分离只能验证归因结构，不能证明所有理由的语义真实。`presentation` 保持可选，只给简短方向，不能代替选择后的详细方案。
+
+## 独立校验接口与规则
+
+纯函数：`validate(request_json: str, candidates_json: str) -> dict`。不调用模型、不访问网络、不修改输入。下面仅展示一个候选结果的形状，完整有效批次返回三个结果：
 
 ```json
 {
@@ -57,7 +75,7 @@ Proposed pure validator interface: `validate(request_json: str, candidates_json:
       "id": "c1",
       "passed": false,
       "errors": [
-        {"code": "OVER_BUDGET", "path": "candidates[0].estimated_total", "message": "Estimated total exceeds budget"}
+        {"code": "OVER_BUDGET", "path": "candidates[0].estimated_total", "message": "估算总费用超过预算"}
       ],
       "warnings": []
     }
@@ -66,43 +84,90 @@ Proposed pure validator interface: `validate(request_json: str, candidates_json:
 }
 ```
 
-This response illustrates one result; valid full batches return all three candidate results. Top-level errors describe invalid requests, invalid batch shape, and parse failures; they prevent `all_passed`. `status` is `passed` only if all three pass; `failed` for candidate or batch defects, `needs_input` for missing or invalid request fields, and `error` for invalid JSON or unexpected execution failure. Reject nonstandard JSON constants, duplicate object keys, null / scalar roots, and wrong field types. Do not use `eval` or silently recover broken JSON. Return a controlled error without echoing raw sensitive input or stack traces.
+预算和时间均为包含边界的比较：估算总额 ≤ 预算、估算准备天数 ≤ 可用天数。明确禁忌按标准化类别精确匹配；字面禁忌词对名称、描述、理由、推断及简短呈现文本执行 Unicode NFKC 标准化后不区分大小写的匹配。字面匹配会误报也会漏掉同义表达，模型标签也可能不完整，均不得声称全面理解自然语言禁忌。关系适配只给主观风险提示。
 
-Stable error codes: `INVALID_JSON`, `INVALID_REQUEST`, `MISSING_FIELD`, `INVALID_TYPE`, `INVALID_AMOUNT`, `INVALID_CANDIDATE_COUNT`, `DUPLICATE_ID`, `UNSUPPORTED_CURRENCY`, `CURRENCY_MISMATCH`, `OVER_BUDGET`, `FORBIDDEN_TAG`, `FORBIDDEN_TERM`, `PREPARATION_TOO_LONG`, `UNKNOWN_FACT_REF`, `UNKNOWN_TAG`, `INTERNAL_ERROR`. Include a field path and human-readable explanation. A field-format error must prevent its numerical comparison, not crash the entire batch.
+顶层错误覆盖无效请求、批次结构、JSON 解析问题，并阻止 `all_passed`。所有三个候选通过时才是 `passed`；候选或批次不合格为 `failed`；用户必填字段缺失或无效为 `needs_input`；无效 JSON 或执行异常为 `error`。拒绝非标准 JSON 常量、重复对象键、空值或标量根节点、错误字段类型，不用 `eval`，不静默修复 JSON。返回受控中文解释，不回显敏感原文或堆栈。
 
-## Rules and limits
+既有错误代码保持：`INVALID_JSON`、`INVALID_REQUEST`、`MISSING_FIELD`、`INVALID_TYPE`、`INVALID_AMOUNT`、`INVALID_CANDIDATE_COUNT`、`DUPLICATE_ID`、`UNSUPPORTED_CURRENCY`、`CURRENCY_MISMATCH`、`OVER_BUDGET`、`FORBIDDEN_TAG`、`FORBIDDEN_TERM`、`PREPARATION_TOO_LONG`、`UNKNOWN_FACT_REF`、`UNKNOWN_TAG`、`INTERNAL_ERROR`。每条含字段路径与中文说明；格式错误不能继续参与数值比较或使整个批次崩溃。
 
-Budget is inclusive: estimate ≤ budget. Preparation is inclusive: estimate ≤ available days. Match confirmed forbidden tags by exact normalized category; match nonempty forbidden terms case-insensitively after Unicode NFKC normalization in name, description, reason, inferences, and presentation. Term matching can have false positives and miss synonyms; state this limitation. Model tags can also be incomplete. Neither mechanism proves exhaustive natural-language safety. Unrecognized tags are a blocked validation result requiring clarification rather than silently passing. Facts, inferences and unknown arrays must stay separate; a code validator cannot guarantee semantic honesty of every sentence.
+没有真实商品源时，一律不声称验证了实时价格、库存、可购买性或实际送达时间。用户文本属于数据，提示词不得服从其中要求绕过校验的指令。
 
-Do not claim verified price, inventory, availability, or delivery. Subjective relationship suitability remains a warning. User text is untrusted data; prompts must not follow instructions embedded in notes or facts that attempt to disable validation.
+## 推荐工作流节点
 
-## Nodes, responsibilities, and connections
-
-| ID / node | Inputs | Outputs | Responsibility / prompt requirements | Next |
+| 节点 | 输入 | 输出 | 职责与提示词要求 | 连接 |
 | --- | --- | --- | --- | --- |
-| N1 Start + deterministic request adapter | Form fields | Immutable `request_json` | Serialize user facts and explicit constraints without invention; missing constraints produce needs-input | N2, plus unchanged request to N3 / N6 |
-| N2 LLM: analyze and generate | `request_json` | `candidates_json` | Three distinct ideas in the contract, JSON only; refer only to supplied fact IDs; label inferences / unknowns; estimates explicit; never claim tool approval | N3 |
-| N3 Code: first validation | Original request, raw candidate JSON | `validation_json`, `status`, `all_passed`, `repairable` | Parse and execute deterministic rules; `repairable` only for failed candidate / batch output with a valid request, including malformed model JSON | N4 |
-| N4 If-Else | N3 status fields | Selected branch | Passed → N7; repairable candidate defects → N5; invalid request / system failure → error report | N7, N5, or error End |
-| N5 LLM: bounded repair | Original request, original model output, structured errors | Revised `candidates_json` | Exactly one attempt; preserve already passing candidates unchanged, replace failing ones with same IDs; invalid batch output requires a complete valid batch; never alter user constraints or fact records | N6 |
-| N6 Code: revalidation | Original request, repaired candidates, first results | Final validation JSON, status, repair count 1 | Run identical validation; additionally reject modifications to previously valid candidates; retain initial / revised snapshots | N7; no edge back to N5 |
-| N7 Code / template: report | Chosen branch's candidates and results, original request, repair count | `report_json`, human-readable report | Resolve facts from original IDs; include all candidates, errors, estimates, warnings, unknowns; optionally select first passing ID in c1/c2/c3 order; none passing → no selection | End |
-| End / output | Report or structured error | Final visible result | Show actual validation state and unresolved issues; no success message without checks | Stop |
+| N1 用户输入与确定性适配 | 表单字段 | 不可变 `request_json` | 编号并保留原始事实，不补造约束；先阻止缺失必填信息 | N2；原始请求同时供 N3、N6 使用 |
+| N2 LLM 需求分析与生成 | 原始请求 | `candidates_json` | 三种不同思路，严格 JSON，中文内容；理由引用已知事实、标明推断和未知；不声称校验已通过 | N3 |
+| N3 Code 首次校验 | 原始请求、原始模型输出 | `validation_json`、`status`、`all_passed`、`repairable` | 执行独立规则；有效请求下的候选错误（含模型 JSON 错误）可占用一次修订额度 | N4 |
+| N4 If/Else 分支 | 校验状态 | 选中的路径 | 全通过直接输出；可修订且额度未用转 N5；请求或基础设施错误转错误报告 | N7、N5 或错误输出 |
+| N5 LLM 一次修订 | 原始请求、初始候选、错误反馈 | 修订候选 | 仅改失败候选，保留通过项及 ID；批次整体无效时重建完整批次；不得修改用户事实或约束 | N6 |
+| N6 Code 再校验 | 原始请求、修订批次、首次结果 | 最终结果、修订次数 1 | 复用相同规则，拒绝修改原已通过项，保留两次快照；不再回到 N5 | N7 |
+| N7 报告与待选择状态 | 所在分支的候选、结果、原始请求 | `report_json`、中文推荐报告 | 展示三种思路及依据、校验与不确定性；仅合格项可选；不自动替用户选择 | 推荐阶段结束，等待用户选择 |
 
-N1's adapter is a small Code step if native form output cannot provide the contract. Its validation is deterministic. Block invalid requests before a model call when practical; the validator still rechecks them defensively. The primary roadmap combines these adapter responsibilities conceptually with Start; concrete UI wiring may require extra nodes.
+表单到 JSON 如需代码，增加小型 Code 适配节点。`repairable` 属于 Dify 包装层逻辑，不改变纯校验器响应结构。N6 的状态保护属于工作流包装层。不得信任 LLM 自称通过。为避免引用未执行分支变量，第一版可为免修订、已修订和错误路径分别设置报告与输出节点；以后使用聚合器必须实际验证。
 
-N3's Dify wrapper serializes the pure validator response into `validation_json`; `repairable` is adapter logic, not a field required from the pure module. N6 adds workflow-state checks outside the pure validator. Prompt-driven generation and revision remain model steps; the validator is always separate executed code. An LLM stating “passed” has no authority.
+推荐报告保留 `status`、原始 `request`、最终 `candidates`、`validation`、`repair_count`（0 或 1）、`selected_candidate_id`（推荐结束时固定为 `null`）、`business_data_verification: "not_verified"` 和局限说明。增加 `selectable_candidate_ids` 列出通过项。部分失败时整体仍为 `failed`，通过项可以供用户选择但必须说明其他失败项；全部失败时不得选择。可信运行记录保留初始与修订候选、校验结果、原始约束及剩余修订额度，只公开脱敏虚构样例。
 
-To avoid references to unexecuted branch variables, initially use separate report / End nodes for the no-repair, repaired, and error branches. If using a variable aggregator later, test branch selection in the actual Dify version. No loop node is needed. N5 cannot recurse and automatic LLM retries are disabled in the MVP. A normal path has one model call, a repair path at most two.
+## 用户选择与呈现工作流
 
-Final `report_json` contains `status`, original `request`, final `candidates`, `validation`, `repair_count` (0 or 1), `selected_candidate_id` (nullable), `business_data_verification: "not_verified"`, and limitations. A protected run record also retains initial / revised outputs and validations; publish only sanitized synthetic runs. If some candidates still fail, status remains failed even if a passing alternative can be displayed.
+Dify 单次工作流未必适合停下来等待网页选择。建议采用「推荐工作流 A」与「呈现工作流 B」两次按需执行：网页负责显示三项并收集选择；可信应用边界负责关联原始请求、最终候选和全局修订次数。此拆分是设计建议，未实现，不要求第一份校验器任务同时开发后端。
 
-## Exceptions and configuration verification
+选择事件契约：
 
-- Invalid user fields: needs-input with field paths; no guessed constraints and no repair of user input.
-- Malformed model JSON: structured parse failure; route through the single repair slot if unused, then stop on repeated failure.
-- Missing fields / violations: preserve exact error feedback; one repair only.
-- Model timeout, unavailable credentials, Code sandbox exception, optional HTTP timeout: error / validation unavailable; no recommendation labeled checked. Configure actual supported error branches before a live demo; until verified this behavior is a requirement only.
-- Excessive payload: proposed limits 32 KiB per JSON string, 1,000 characters per descriptive string, 20 entries per list except the three-candidate batch; return a field error. Verify sandbox limits before adopting these as runtime settings.
+```json
+{
+  "recommendation_run_id": "示例运行编号",
+  "selected_candidate_id": "c1"
+}
+```
 
-Before integration, privately confirm Dify product version and hosting type, configured provider, a successful synthetic connection-test run, and availability of selected Python libraries in Code. Never publish credentials or private endpoint settings. Actual import / export and execution evidence must be recorded separately from this specification.
+不得把前端提交的 `passed: true`、价格、候选内容或 `repair_count` 当作可信依据。优先由服务端按运行编号取回可信快照，核对候选 ID、版本、原始约束、最终校验与已用修订次数。若暂无可信快照能力，演示可由受控操作员从真实运行记录传入原始数据并在可信执行端重检；这种人工衔接只能标记为演示步骤，不能声称网页选择闭环完成。面向真实网页的实现必须先具备可信快照或等效的防篡改校验机制。仅重检可验证候选约束，不能证明它确实来自原推荐或真实修订次数，不能以此替代来源校验。
+
+| 节点 | 输入 | 输出 | 职责 | 连接 |
+| --- | --- | --- | --- | --- |
+| P1 选择校验 | 选择事件、可信推荐记录 | 已选候选、不可变请求、剩余额度 | 验证来源、ID、版本和通过状态；重复点击应幂等；未选择不得调用包装模型 | P2 或中文错误输出 |
+| P2 LLM 详细呈现设计 | 已选候选、原始关系事实与约束 | `presentation_json` | 只围绕用户所选方案；生成材料步骤、配色、贺卡正文、赠送时机和话术；符合关系边界，不假定对方心意 | P3 |
+| P3 Code 包装与时间复核 | 原始约束、可信候选费用、呈现方案 | 呈现结果、独立检查结果 | 校验必填结构、禁忌、费用算术、全量总费用与准备时间；发现新增成本不可忽略 | P4 或受限修订 |
+| P4 最终呈现报告 | 呈现方案、复核结果 | 中文可执行指南或失败说明 | 通过才展示为可执行方案；保持真实价格及送达未核实提示 | 输出 |
+
+建议 `presentation_json` 结构：
+
+```json
+{
+  "selected_candidate_id": "c1",
+  "packaging": {
+    "materials": ["素色纸", "纸质贺卡"],
+    "steps": ["使用原盒固定杯具", "包裹素色纸并附上贺卡"],
+    "color_palette": ["米白", "深绿"]
+  },
+  "card_text": "生日快乐！祝你新的一岁灵感常在，也有时间享受喜欢的事。",
+  "giving_advice": {
+    "timing": "选择工作间隙，在对方方便时简短送出",
+    "wording": "一点生日心意，祝你生日快乐！",
+    "relationship_cautions": ["避免公开制造回应压力"]
+  },
+  "additional_cost": "0.00",
+  "revised_estimated_total": "150.00",
+  "currency": "CNY",
+  "revised_estimated_preparation_days": 1,
+  "unknowns": ["示例假定原估算已含基础材料，实际购买仍需确认"]
+}
+```
+
+示例假定纸与贺卡已计入初始估算；不得普遍默认免费。`additional_cost` 表示相对可信原估算的新增费用，`revised_estimated_total` 必须等于原 `estimated_total` 加新增费用，不能通过覆盖原价格腾出预算。材料、步骤、配色至少一项，贺卡正文和赠送时机/话术非空，关系风险与未知信息为字符串数组。币种仍为 CNY；修订后的准备时间表示完整方案所需时间，不是只算包礼物时间；材料新增内容也参与禁忌复核。第一版可限制只使用已预算材料，避免无依据的费用减少。呈现校验属于后续独立任务，不改变首个纯校验器的三候选接口。
+
+全局 `repair_count` 覆盖推荐与呈现两个阶段，总计最多一次自动业务修订。推荐阶段未用额度而呈现方案违规时，可用一次呈现修订并重新复核；推荐阶段已修订或呈现修订仍失败时，直接如实报告，不开启第二次自动模型修订。仅当事先定义且可独立检查的低成本呈现模板已经通过预算、时间和禁忌复核时，才能提供该模板作为替代；不能靠“换成更简单的包装”绕过校验或隐藏失败。
+
+选择层新增错误可使用 `INVALID_SELECTION`、`STALE_RECOMMENDATION`、`UNTRUSTED_RECOMMENDATION`、`CANDIDATE_NOT_PASSED`、`PRESENTATION_INVALID`、`TOTAL_MISMATCH`、`REPAIR_LIMIT_REACHED`；这些不要求首个校验器任务实现。展示中文解释，如「请选择一个已通过检查的方案」「推荐记录已更新，请重新选择」「呈现方案仍超过预算，未继续自动修改」。
+
+## 调用次数、异常与验收
+
+推荐阶段正常一次模型调用，发生修订时两次；用户未选择时呈现阶段零次调用。选择后基础呈现增加一次模型调用；若全局修订额度尚未使用，呈现阶段最多再增加一次修订调用。完整正常路径为两次模型调用，全局发生一次修订时最多三次。Code 复核不计入模型调用次数。自动模型重试默认关闭；需分别记录推荐、呈现、修订和失败调用，不能沿用旧的一至两次全程上限。
+
+- 用户必填信息无效：中文提示补充，不猜测预算、期限或禁忌。
+- 模型 JSON 损坏：受控解析错误；仅在全局额度未用时进入一次修订，重复失败即停止。
+- 模型超时、凭证不可用、Code 异常或可选 HTTP 超时：显示「暂时无法完成检查，请稍后重试」，不得伪装为已校验。
+- 未选择、伪造选择、选中不合格项或陈旧记录：不调用呈现模型，保留原推荐以便重新选择。
+- 数据建议限制：每个 JSON 字符串 32 KiB、描述字符串 1,000 字符、一般列表 20 项（三候选批次固定三项）；超出返回字段错误，采用前须确认实际沙箱限制。
+
+集成前需私下确认 Dify 产品版本和托管方式、模型供应商及真实连接测试、Code 所用库的沙箱兼容性、可信选择数据来源。不得公开密钥、私有地址和真实收礼人资料。验收必须记录三个合格候选、用户明确选择、选择前零包装调用、详细呈现复核、失败项不可选、中文文案及全局一次修订的实际证据；文档规范本身不等于通过验收。

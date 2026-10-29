@@ -1,84 +1,59 @@
 # GiftWise AI
 
-An AI gift decision agent designed to offer evidence-based recommendations, independent constraint validation, and one bounded repair attempt.
+帮助用户从“不知道送什么”走到“知道为什么选、怎么送”的 AI 礼赠决策助手。
 
-**Status: In Development.** This repository currently contains project specifications only. The gift workflow, validator, tests, and deployment are not implemented or verified.
+**项目状态：开发中。** 当前已完成基础仓库和设计文档；推荐、校验器、网站、Dify 礼赠闭环及云部署尚未实现或验证。
 
-中文简介：帮助用户在预算、偏好、明确禁忌和准备时间约束下选择礼物；第一版聚焦为一位关系不错、但不太熟悉的同事挑选生日礼物。
+## 所有协作 Agent 从这里开始
 
-## Problem and target users
+先阅读 [产品定位 Issue #1](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/1)，再阅读 [协作规范](AGENTS.md)。产品定位以该 Issue 正文为准，需求和技术文档负责细化实现，避免多处维护不同版本。
 
-People buying a gift for a colleague often have incomplete preference information, a limited budget, and a deadline. A plausible recommendation alone does not demonstrate that constraints were checked. GiftWise aims to make the reasoning and remaining uncertainty visible.
+## 用户和问题
 
-This is a hackathon MVP for an individual participant with limited programming experience. Product value and user demand remain hypotheses; no market validation or real-user results are claimed.
+主要面向初入社会的青年，覆盖同事、亲朋、朋友、恋人及追求对象送礼。他们缺少灵感，也担心不合适的礼物造成尴尬或负面效果。次要用户是重视朋友真实偏好的青少年，以及有一定经验、可能存在职场需求的中年人。以上为当前产品假设，尚未经过市场验证。
 
-## Planned workflow
+## 目标体验
 
-User requirements → structured analysis and three candidates → independent code validation → one repair of failing candidates → revalidation → final decision report.
+输入对方风格、爱好、职业、关系等已知信息，以及预算、禁忌和时间 → 三个不同的礼物方案与理由 → 独立代码校验 → 必要时一次修订与重检 → 用户选择一个合格方案 → 详细包装、配色、贺卡和赠送方式。
 
-Planned differentiators:
+事实、推断、未知信息分开呈现。用户自主选择；不提前生成三份详细包装。包装等新增费用和时间同样受原始约束约束，同一任务跨阶段最多一次自动业务修订。没有商品数据源时，价格、供应和送达均未核实。
 
-- Separate user-provided facts, model inferences, and unknown information.
-- Validate declared budget, currency, explicit restrictions, required fields, and estimated preparation time with code.
-- Preserve validation failures and allow at most one automatic repair.
-- Add optional packaging, color, and greeting-card suggestions after the core flow works.
+网站默认简体中文，导航、按钮、操作提示、状态反馈、错误说明和生成内容均使用中文。GitHub 首页、文档、Issue 和协作说明也以中文为主；技术标识符保留原名。
 
-Without a live product data source, prices and preparation times are estimates. Stock, current prices, and actual delivery dates are **not verified**. Passing a rule check only means the supplied data satisfies the implemented rules.
+## 技术栈和实际状态
 
-## Technology and verified state
-
-| Component | Purpose | State |
+| 技术 | 用途 | 实际状态 |
 | --- | --- | --- |
-| GitHub | Public source control and documentation | This repository |
-| Dify | Workflow orchestration and model calls | Local export inspected: Start → LLM → End; live execution unverified |
-| Python | Deterministic constraint validation | Planned; start with a Code-node-compatible module |
-| FastAPI | Optional independent validator API | Conditional; not implemented |
-| Docker | Package an optional API service | Conditional; not implemented |
-| UCloud | Deployment if resources and competition rules require it | Account reported by owner; resources unverified |
+| GitHub | 公开源码、文档和协作 | 仓库已初始化并推送 |
+| Dify | 模型调用与工作流 | 本地三节点连接测试导出已检查；真实调用未验证 |
+| Python | 确定性校验 | 待开发，优先兼容 Code 节点 |
+| 中文 Web 前端 | 需求表单、三方案比较、选择、赠送指南 | 待开发，先模拟数据再接真实接口 |
+| 薄服务端接入层 | 保管凭证、调用 Dify、维护可信任务状态 | 待开发；不将 API Key 放浏览器 |
+| FastAPI | 必要时独立校验 API | 按实际需求引入，不与前端接入层盲目重复建设 |
+| Docker / UCloud | 后端容器化和部署 | 资源及赛题强制要求待核实 |
 
-The inspected export contains a connection-test prompt, not a gift agent. Its DSL schema version is not proof of the running Dify product version. No Kubernetes, database, or separate frontend is planned for the initial MVP.
+当前无可运行网站、业务安装命令、在线演示或已验证的可导入 DSL。`.env.example` 仅示意，不会启动程序。原始 `.ifpkg` 已保留在本地并排除提交。
 
-## Repository layout
+## 文档导航
 
-```text
-.
-├── README.md
-├── .gitignore
-├── .env.example
-├── docs/
-│   ├── product-requirements.md
-│   ├── architecture.md
-│   ├── test-plan.md
-│   └── demo-script.md
-└── workflow/
-    └── workflow-spec.md
-```
+| 文件 | 用途 |
+| --- | --- |
+| [产品定位入口](docs/product-positioning.md) | 指向唯一权威 Issue |
+| [产品需求](docs/product-requirements.md) | 范围、输入输出与验收 |
+| [开发流程](docs/development-process.md) | 四线并行、文件归属、依赖与交付 |
+| [架构](docs/architecture.md) | 最小架构、信任边界与条件性云部署 |
+| [工作流规范](workflow/workflow-spec.md) | 节点、数据契约及两阶段流程 |
+| [测试计划](docs/test-plan.md) | 用例、指标和真实结果记录方式 |
+| [演示脚本](docs/demo-script.md) | 四分钟演示草稿，未实现步骤明确标注 |
 
-Product scope is in [requirements](docs/product-requirements.md); implementation boundaries are in [architecture](docs/architecture.md); the canonical proposed data contract is in [workflow specification](workflow/workflow-spec.md). [Test plan](docs/test-plan.md) defines reproducible acceptance checks. [Demo script](docs/demo-script.md) is a draft, with unimplemented steps marked.
+## 开发与体验
 
-## Run or try locally
+日期以北京时间为准。10 月 29 日完成定位与契约，10 月 30 日四线并行并尽早跑通推荐闭环，10 月 31 日接通用户选择后的赠送指南并做回归，11 月 1 日冻结版本、录屏和排练。确切提交截止时间须向主办方核实。
 
-There is no executable application, installation command, hosted demo, or verified importable DSL yet. Copying `.env.example` does not start anything. The original local `.ifpkg` export is preserved outside version control for review.
+第一验收场景为青年给同事挑选生日礼物，不限制产品只服务同事。前端先用标记清楚的模拟数据，不能把页面原型当真实模型闭环。详细分工见开发流程。
 
-To verify the existing connection yourself in Dify: open Studio → the Giftwise workflow → Test Run, enter a fictional colleague relation, then inspect the LLM and End outputs. The current test prompt requests `GiftWise 模型连接成功。`. Save the run status and duration; seeing this text in the prompt alone does not prove success. If the run fails, inspect the node error and provider configuration privately; do not share credentials.
+如需验证现有模型连接，在 Dify 工作室打开 Giftwise → 测试运行，填虚构关系，检查 LLM 和输出节点。当前提示词要求回复“GiftWise 模型连接成功。”，但提示词存在不等于调用成功。失败时私下检查节点错误和供应商配置，不公开密钥。
 
-## Delivery plan
+## 安全与真实性
 
-All dates are in Asia/Shanghai; the stated competition window is supplied by the project owner, not independently confirmed official rules.
-
-| ID | Target | Owner | Estimate | Dependency | Deliverable / acceptance | State / risk |
-| --- | --- | --- | --- | --- | --- | --- |
-| INIT-001 | Oct 29: repository baseline | PM | 1 hour | GitHub access | Eight reviewed files committed and pushed | In progress until remote SHA verified |
-| VAL-001 | Oct 30: offline validator | Codex; PM reviews | 2–3 hours | Specifications | Deterministic module and actual fixture results | Not started; input contract errors |
-| WF-001 | Oct 30: Dify connection and core flow | Owner operates Dify; Codex supplies code | 3–4 hours | VAL-001; provider access | Three candidates, rule check, bounded repair trace | Not started; model access / sandbox compatibility |
-| QA-001 | Oct 31: acceptance and measurements | Codex; owner reviews outputs | 2–3 hours | WF-001 | Eight scenarios, raw results, latency / usage logs | Not started; live failures |
-| CLOUD-001 | Oct 31: conditional API and deployment | Codex; owner provisions account resources | 3–5 hours | Rules confirmed; resources available | Optional API, container, cloud smoke test | Not started; required status and costs unknown |
-| DEMO-001 | Nov 1: freeze and rehearse | Owner; PM reviews evidence | 2 hours | QA-001; applicable cloud work | Four-minute demo, backup recording, honest limitations | Not started; submission cutoff unknown |
-
-Confirm containerization / Kubernetes requirements, use of hosted Dify and external models, provided UCloud resources, budget, and submission cutoff with organizers before treating cloud work as optional. If mandated, promote that work into the critical path. Cut decorative UI before cutting core validation or required deployment.
-
-## Development and safety
-
-Implement one bounded task at a time. Preserve owner files. Keep credentials, private endpoints, real recipient data, and unreviewed workflow exports out of public commits. Use fictional test cases; review staged files and logs before every push. `.gitignore` is a safeguard, not a secret scanner. If a secret enters history, revoke or rotate it before arranging history cleanup.
-
-Record commands and observed results. Distinguish offline fixtures, actual Dify execution, and cloud deployment evidence. Never label planned functionality as complete. No business tests have been run for this documentation-only baseline.
+不提交密钥、私有地址、真实个人信息和未经审查的导出。前端不保存 Dify 或模型密钥，不信任浏览器提交的 passed 标记。所有业务测试目前未执行；本地、Dify、云端证据分开记录。赛题是否强制容器或 Kubernetes、是否允许托管 Dify 与外部模型、云资源和截止时间均待确认，不虚构要求。

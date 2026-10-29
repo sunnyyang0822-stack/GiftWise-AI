@@ -1,21 +1,23 @@
-# Four-minute demonstration — draft
+# 四分钟演示脚本：初稿
 
-Status: rehearsal plan only. Every functional step below is **pending implementation and verification**. The inspected Dify export is a connection-test skeleton. Do not present a planned screen or fixture as a working production feature.
+更新日期：2026-10-29（亚洲／上海）。定位以[统一说明](product-positioning.md)为准。所有功能环节均**待实现、待验证**。当前只有文档和已检查的连接测试骨架，不能把设计或演示数据说成已运行能力。
 
-| Time | Talk track | Screen / evidence | State |
+| 时间 | 讲述内容 | 画面与证据 | 当前状态 |
 | --- | --- | --- | --- |
-| 0:00–0:30 | “A colleague's birthday is near. I know a little about their interests, but I have a budget, a deadline, and things to avoid. A persuasive suggestion still needs checks.” | One fictional scenario; no market-validation claims | Script ready; user-value hypothesis unvalidated |
-| 0:30–1:00 | “I enter CNY 200, two days, coffee as a known interest, and no alcohol.” | Actual Dify input form; explain estimates, no shopping integration | Pending |
-| 1:00–1:40 | “The workflow creates three distinct ideas. This fact came from the user; this suitability judgment is an inference; preferences and availability remain unknown.” | Actual candidate JSON / report; resolve fact f1 from input | Pending |
-| 1:40–2:15 | “A separate code tool checks declared costs, currency, restrictions, required fields, and preparation duration.” | Executed validation results with error codes; show code boundary | Pending |
-| 2:15–3:00 | “Here is a deliberately failing synthetic case. The workflow uses that feedback to revise once, then executes the same checks again. A second failure stays visible.” | Labeled controlled fixture or authentic failure; original/revised snapshots, two validation traces, repair count 1 | Pending |
-| 3:00–3:35 | “The report preserves uncertainty and only selects from passing candidates. Optional wrapping and card ideas add personality.” | Actual final report; omit presentation extras if not implemented | Pending |
-| 3:35–4:00 | “Here is what actually runs, the tests we executed, measured duration and cost, and what remains unfinished.” | Public GitHub revision, verified architecture, real test records; cloud endpoint only if deployed and tested | Docs baseline only; execution evidence pending |
+| 0:00–0:25 | “刚进入社会，给同事、亲友、朋友或恋人送礼，常常不知道送什么，又怕选错让关系尴尬。GiftWise 从你已经了解的对方出发，帮助做决定。” | 中文场景说明；需求是产品假设，不宣称市场验证 | 文案初稿 |
+| 0:25–0:50 | “今天以给同事送生日礼物为例：喜欢咖啡、风格简洁，预算两百元，两天准备，不送酒类。” | 实际中文表单；关系、风格、爱好、职业仅填已知内容 | 待实现 |
+| 0:50–1:25 | “三个不同方向都解释了理由。喜欢咖啡是用户事实；桌面礼物可能合适是推断；具体款式和库存仍未知。” | 实际三个选项与事实、推断、未知信息 | 待实现 |
+| 1:25–2:05 | “独立代码核对预算、禁忌、字段和准备时间。这个标注的测试案例超预算，系统按反馈修订一次，再用相同规则校验；仍失败就保留问题。” | 原始与修订快照、真实两次校验轨迹、全局修订次数；注明测试注入或录屏 | 待实现 |
+| 2:05–3:10 | “由我选择通过校验的第二项。现在才生成怎么送：包装材料和步骤、配色、可直接用的贺卡，以及自然的赠送方式。新增费用和时间也重新检查。” | 点击中文“选择这个方案”，展示仅针对选中项生成的中文赠送指南和可信复核 | 待实现 |
+| 3:10–3:35 | “我们不承诺对方一定喜欢，也不声称验证过实时价格、库存或送达。依据、未知信息和检查结果都可见，最终由你选择。” | 最终报告与限制提示，不把关系判断当客观事实 | 待实现 |
+| 3:35–4:00 | “这是实际架构、公开源码、真实测试、耗时和成本，以及尚未完成的部分。” | 实际提交和测试记录；只有部署实测后才展示云入口 | 当前仅文档基线 |
 
-## Rehearsal and fallback
+## 排练与备用方案
 
-Before Nov 1 (Asia/Shanghai), replace pending rows with exact verified behavior or remove them. Verify organizer cutoff and presentation limits. Choose a successful three-candidate run and a deterministic repair example; a successful fixed fixture is not evidence of successful model repair. Label any injected scenario and prerecorded footage clearly.
+11 月 1 日前按真实进度更新脚本，确认主办方截止时间与展示时长。首验收场景为青年用户给同事送生日礼物，它是切口，不限制产品其他关系。
 
-Capture a sanitized recording of a real completed run plus screenshots of validation and failure handling. No backup exists yet. If a provider fails during the presentation, acknowledge it and play the labeled recording; without a recording, show the specifications and state that execution is unavailable. Do not fabricate live results.
+录制实际三候选、一次修订、用户选择和后续包装贺卡的完整运行。固定快照不证明模型修订，测试注入、预录画面、手动衔接均应说明。没有实现选择阶段时，明确闭环未完成，不能用讲解代替功能证据。
 
-Keep keys, provider configuration, private addresses, and personal data off screen. Report actual sample sizes, cost basis, and limitations; do not invent performance figures or live prices / inventory / delivery verification. Update the architecture diagram to show only implemented components when describing engineering achievements.
+准备脱敏真实录屏和截图；目前尚无备份。现场模型故障就说明情况，播放标注“预录演示”的录像；没有录像则展示设计和已完成成果，说明无法执行，不伪造输出。
+
+导航、按钮、加载、错误、推荐理由、赠送指南及贺卡默认简体中文。不得展示密钥、提供商配置、私有地址或真实资料。只报告实际样本与成本依据；规划中的 Docker 或 UCloud 服务不能当作已部署成果。

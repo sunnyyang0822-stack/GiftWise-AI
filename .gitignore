@@ -1,4 +1,4 @@
-# Secrets and local configuration
+# 密钥与本地配置
 .env
 .env.*
 !.env.example
@@ -8,10 +8,10 @@ id_rsa*
 id_ed25519*
 credentials*.json
 secrets.*
-# Raw workflow exports need review before publication
+# 原始工作流导出须审查后再公开
 *.ifpkg
 workflow/private/
-# Python
+# Python 缓存与构建产物
 __pycache__/
 .venv/
 venv/
@@ -24,7 +24,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-# Editors, OS caches and local logs
+# 编辑器、系统缓存与本地日志
 .idea/
 .vscode/
 .DS_Store
