@@ -91,7 +91,7 @@ docker build -t giftwise-validator:latest -f deploy/Dockerfile .
 
 # 2) 运行（只绑回环，供本机演示）
 docker run -d --name gw-val -p 127.0.0.1:8000:8000 giftwise-validator:latest
-# 实测：启动到 /healthz 返回 200 耗时 0.750–0.939 s；运行内存 14.45–17.08 MiB；CPU 0.01–0.02%
+# 实测：启动到 /healthz 返回 200 耗时 0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值）；运行内存 14.45–17.08 MiB；CPU 0.01–0.02%
 
 # 3) 健康检查（打到容器）
 curl -sS http://127.0.0.1:8000/healthz
@@ -103,7 +103,7 @@ curl -sS http://127.0.0.1:8000/healthz
 
 容器内错误路径 5 项**全部符合契约**：非法 JSON → `400 INVALID_JSON`；载荷类型错误 → `400 INVALID_PAYLOAD`；未知路径 → `404 NOT_FOUND`；**无 `Content-Length`（原始 socket 写入）→ `413 REQUEST_TOO_LARGE`**；超长请求体 → `413 REQUEST_TOO_LARGE`。
 
-镜像内容与安全：镜像内文件树仅 **9 行**，不含 `.git`／`tests`／`docs`／`workflow`／`web`／`deploy/evidence`；`docker history` 对 `sk-`／`gho_`／`PRIVATE KEY` **零命中**；容器以**非 root（uid 10001）**运行。
+镜像内容与安全：镜像内文件树：10-30 基线修复 I-1 后 **6 行**；**交付镜像 `/app` 13 个文件**，不含 `.git`／`tests`／`docs`／`workflow`／`web`／`deploy/evidence`；`docker history` 对 `sk-`／`gho_`／`PRIVATE KEY` **零命中**；容器以**非 root（uid 10001）**运行。
 
 完整 9/9 汇总见 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)；24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志）文件见 [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)。
 
@@ -197,7 +197,7 @@ curl -sS 'http://127.0.0.1:8765/metrics?format=json'   # 新增：同一份指�
 9. **镜像已真实构建并成功运行（2026-10-30 晚）**：`docker build -t giftwise-validator:latest -f deploy/Dockerfile .` 成功；
    冷构建 **1.72 s**（`--no-cache`，归档 `deploy/evidence/raw/docker-2026-10-30/d9-coldbuild.txt`）、热构建 0.6 s；`docker images` **178 MB**（inspect 177,582,258 字节＝**169.36 MiB**）；
    基础镜像 `python:3.12-slim` digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`。
-10. **容器内端点矩阵真实通过**：`/healthz` 200（启动到可接受连接 **0.750–0.939 s**）、`/validate` 与本机纯函数**逐字节一致**、
+10. **容器内端点矩阵真实通过**：`/healthz` 200（启动到可接受连接 **0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值）**）、`/validate` 与本机纯函数**逐字节一致**、
     5 项错误路径符合契约、容器以**非 root（uid 10001）**运行；运行内存 **14.45–17.08 MiB**、CPU 0.01–0.02%；
     镜像内文件树仅 9 行，`docker history` 对密钥模式零命中。
     证据：[`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)（9/9）＋ [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志））。
@@ -289,7 +289,7 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
 
 - **2026-10-30 晚新增（容器化，真实执行）**：Docker Desktop 29.9.2 安装成功（经 DISM + 官方离线 MSI 绕过 Store 的 `禁止(403)`）
   → `docker build` 成功（镜像 `giftwise-validator:latest`，178 MB＝169.36 MiB；冷 1.72 s／热 0.6 s）
-  → 容器内 `/healthz` 200（启动 0.750–0.939 s）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
+  → 容器内 `/healthz` 200（启动 0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值））、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
   完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志））。
 - 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
   （**2026-10-30 晚更正**：交付物 3 中"如实记录未构建"的部分已由上述真实构建取代，该记录按纪律保留。）

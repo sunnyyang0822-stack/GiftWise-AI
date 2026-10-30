@@ -280,7 +280,7 @@ curl -sS http://127.0.0.1:8000/healthz
 > `docs/demo/pack/shots/` = **24 张 PNG、合计 5,791,928 B**；`docs/demo/pack/MANIFEST.md` 生成于 **2026-10-31 02:16:53**；
 > 另有 `docs/demo/pack/terminal/` 9 份真实终端输出。
 > ⚠️ **照旧稿念「素材还没做」是自伤** —— 素材已经在了，而且逐张可复现（`node docs/demo/pack/capture.mjs`）。
-> 本包覆盖 **D2 / D4 / D5 / D8 / D9 / D10**；**D1 / D3 / D6 / D7 确实没有**（需要 Dify 控制台登录态，见 `pack/MISSING.md`），**这 4 项要如实说没有，不要美化**。
+> 本包覆盖 **D2 / D4 / D5 / D8 / D9 / D10**；**D1 / D1b / D3 / D4、D5 的 Dify 侧 / D6 / D7 确实没有**（需要 Dify 控制台登录态，见 `pack/MISSING.md`），**这 6 项要如实说没有，不要美化**。
 > 录屏仍未录制（分镜 §七 已就绪）。
 
 | 编号 | 素材 | 对应归档证据 | 状态 |
