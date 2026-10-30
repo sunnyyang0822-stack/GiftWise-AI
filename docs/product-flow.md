@@ -61,7 +61,7 @@ flowchart TD
 7. **模拟模式标识**：模拟模式必须显著标识；浏览器与仓库不得持有真实凭证（AC-I-07）。
 8. **窄屏与键盘属 P0**（AC-I-11、AC-I-12）。
 
-> **诚实标注**：第 1、8 条与第 4 条的**界面控件行为当前不可核查**——`web/` 中有实现（进度与返回按钮文案「返回第一步」「返回第二步」见 `web/public/app.js`；响应式断点与 `prefers-reduced-motion` 见 `web/public/styles.css`），但仓库没有 DOM／浏览器自动化，前端也未在真实浏览器走查。原因与解除条件见 [`acceptance-criteria.md`](acceptance-criteria.md) §6 A-04／A-05／A-06。
+> **诚实标注**：第 1、8 条与第 4 条的**界面控件行为当前不可核查**——`web/` 中有实现（进度与返回按钮文案「返回第一步」「返回第二步」见 `web/public/app.js`；响应式断点与 `prefers-reduced-motion` 见 `web/public/styles.css`），且**仓库已有 DOM／浏览器自动化** `web/tools/browser-check.mjs`（CDP 真实 Chromium，**100 项 / 0 失败**，已覆盖 390/320 窄屏、44px 触控目标、「暂时不知道」与 12 项兴趣互斥置灰）；**仍未覆盖的是「返回上一步后已填内容不丢失」与键盘 Tab 走查**。原因与解除条件见 [`acceptance-criteria.md`](acceptance-criteria.md) §6 A-04／A-05／A-06。
 
 ## 页面状态
 
@@ -123,7 +123,7 @@ flowchart LR
 
 恋人文案可以表达亲密和纪念，但仍不能承诺对方反应。追求对象文案必须保留选择空间，避免公开制造回应压力、默认告白或暗示双方已确定关系。朋友和其他关系使用相应的熟悉程度与场合语气。
 
-第三优先级关系（职场上司、亲戚家人、同学、老师／导师、客户／合作伙伴）**MVP 不单独覆盖**（D-6／D-7）：机器值保留在 8 项枚举内，流程不做专门分支，也不为其单独编写验收案例。
+第三优先级关系（职场上司、亲戚家人、同学、老师／导师、客户／合作伙伴）**MVP 不单独覆盖**（D-6／D-7）：其中 `family`／`classmate`／`mentor`／`client_partner` 的机器值保留在枚举内（`workflow/labels.py:RELATIONS` 共 **10 键** = 产品面 8 项 + `colleague` 技术回归 + `unknown`），**职场上司无任何机器值**，流程不做专门分支，也不为其单独编写验收案例。
 
 ---
 
