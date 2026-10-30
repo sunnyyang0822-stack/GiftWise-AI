@@ -1,0 +1,17 @@
+{
+  "sources_sha256": {
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "workflow/labels.py": "333ad9761d9278c7421c0cdd1c8d43ebbef7b6a6c164dfc54896ec653520d916",
+    "workflow/intake.py": "16eb24bd03f7ff223a5bc1a04785a1aaa24c811e88f78ea126849cf450906b9d",
+    "workflow/runtime.py": "eda2b4174702ac964a90a1d8f100aff1fe18fd4da16124e3e52c5bb51f3feba4"
+  },
+  "artifacts_sha256": {
+    "code_node.py": "a87ffce8ba002df14a036a6c408b8bfed23fb0cab1a051dd6791aa586337cd5b",
+    "intake_node.py": "ee75337304d45123cc7a990ed80533ce229f4aed4573ce76534dda2cabc4a958",
+    "check_node.py": "de4355cf5392444f50c9e882e25c392969b1293672f007af5549248214374039",
+    "recheck_node.py": "8c5c0c42696b2c83839b65c09f41e162c03885a72a27ebccfaa8d484da26b7e3",
+    "report_node.py": "eca29c81082f8743802e7f5d66630e678b25aad49684250f14fd8a1b3ee5ad2d"
+  },
+  "format": "python-source-not-dsl",
+  "cloud_verified": false
+}
