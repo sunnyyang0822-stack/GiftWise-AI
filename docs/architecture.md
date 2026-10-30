@@ -485,7 +485,7 @@ flowchart TD
 
 | 编号 | 问题 | 影响 | 归属／建议 |
 | --- | --- | --- | --- |
-| A-1 | **`deploy/README.md` 记载的本地验证命令 `python deploy/server.py` 实测失败**：`ModuleNotFoundError: No module named 'validator'`（`sys.path[0]` 变为 `deploy/`）。而 `python -m deploy.server`（Dockerfile CMD 的写法）成功。**2026-10-30 21:5x 在部署线并发改动后的 README 上复核，结论不变**（`deploy/README.md:38` 仍写该命令） | 评委按 README 复现会直接失败 | **报 PM／部署线（CLOUD-001）**。我未修改 `deploy/`。建议 README 改为 `python -m deploy.server`，或把 `deploy/__init__.py` 一并 COPY 并在 README 说明 |
+| A-1 | **`deploy/README.md` 记载的本地验证命令 `python deploy/server.py` 实测失败**：`ModuleNotFoundError: No module named 'validator'`（`sys.path[0]` 变为 `deploy/`）。而 `python -m deploy.server`（Dockerfile CMD 的写法）成功。**2026-10-30 21:5x 在部署线并发改动后的 README 上复核，结论不变**（`deploy/README.md:38` 仍写该命令）。**→ 2026-10-31 收口复核：本缺陷已闭合** —— `deploy/README.md:37` 现写 `python -m deploy.server`，`:41-42` 显式警告文件方式会失败；根 `README.md:92-93` 同样已写。（本行保留作为缺陷留痕） | 评委按 README 复现会直接失败（**已消除**） | ~~报 PM／部署线（CLOUD-001）~~ **已修** |
 | A-2 | **Dockerfile 未 COPY `deploy/__init__.py`**，`CMD ["python","-m","deploy.server"]` 依赖隐式命名空间包 | 镜像构建后能否启动**未验证** | 报部署线；构建时实测 |
 | A-3 | **接入层真实路径不会触发自动修订**：`pipeline.mjs` 的 `repairable` 仅在 `mode === "mock"` 时计算 | 真实模型输出违规时不会走一次修订，与 SC-7 语义不符 | 报前端线／PM；需在 dify 模式下补齐 |
 | A-4 | **规则两套实现**（Python 权威 + JS 镜像），一致性靠用例而非编译期保证 | 长期语义漂移风险 | 架构建议见 §4.2；收敛方案未实现 |

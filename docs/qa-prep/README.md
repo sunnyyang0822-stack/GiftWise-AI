@@ -37,7 +37,7 @@
 | 项 | 实测值 | 命令 |
 | --- | --- | --- |
 | 交付镜像 | `giftwise-validator:submission-20261101` **=** `latest` **=** `d9a4a35763ee`，Created **2026-10-31 01:13:59 +08:00**，**177,918,474 B ＝ 169.676 MiB**（原记 `169.36 MiB` 是**重建前**值） | `docker inspect giftwise-validator:submission-20261101 --format '{{.Id}} {{.Created}} {{.Size}}'` |
-| 冷构建 | **两个合法值**：10-30 基线 **1.720 s**、01:13:59 重建版 **3,662 ms**。⚠️ 两次**是否同口径未确认**，故**不得**宣称"变慢了" | `deploy/evidence/raw/d9-coldbuild.txt`、`deploy/evidence/raw/image-rebuild-n1n4/build-timing.txt` |
+| 冷构建 | **两个合法值**：10-30 基线 **1.720 s**、01:13:59 重建版 **3,662 ms**。⚠️ 两次**是否同口径未确认**，故**不得**宣称"变慢了" | `deploy/evidence/raw/docker-2026-10-30/d9-coldbuild.txt`、`deploy/evidence/raw/image-rebuild-n1n4/build-timing.txt` |
 | `/healthz` 规则哈希 | `1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500`，**与本机 `validator/rules.py` 一致** | `verify_delivery_claims.py` |
 | 半开正文（I-2） | **10.02 s** → `HTTP/1.0 408 Request Timeout`，**服务端主动关闭** | 同上 |
 | `/metrics` | **HTTP 404**（默认不暴露） | 同上 |
@@ -52,7 +52,7 @@
 | HTTP 冒烟 | **59 项检查 / 失败 0 项** | `node web/tools/smoke-http.mjs` |
 | **真实浏览器自查**（🆕 前端集成后） | **100 项检查 / 失败 0 项**（退出码 0，68.06 s）；服务一致性自检 `/landing.css=24981B /=20724B` | `docs/verification/runs/20261031T015908+0800/browser_check.out` |
 | **首屏字节数**（🆕） | desktop 1280 = **486,540 B**（10 请求，原 **4,190,755 B**，**−88.4%**）；390/320 = **367,274 B**（9 请求，原 4,190,755 B）——**2026-10-31 02:02:51 CSS 加固后 +449 B；486,091 / 366,825 是 02:02 冻结口径** | 同上（`note` 行「首屏请求 N 条，累计 N 字节」） |
-| **渲染阻塞 CSS / 内联图**（🆕） | `landing.css` **24,981 B**（原 4,104,653 B）；内联 `data:image` **0 处**（原 2 处）；3 张外置 WebP 共 **348,480 B** | `ls -l web/public/img/`；`grep -c "data:image" web/public/index.html` |
+| **渲染阻塞 CSS / 内联图**（🆕） | `landing.css` **24,981 B**（原 4,104,653 B）；内联 `data:image` **0 处**（原 2 处）｜⚠️ **口径注**：`4,104,653 B` 是**探针解码量**；同文件的磁盘备份为 `4,116,066 B`（相差 11,413 B，**来源不同、不可混用**）；3 张外置 WebP 共 **348,480 B** | `ls -l web/public/img/`；`grep -c "data:image" web/public/index.html` |
 | 测试总量（🆕 口径提醒） | **329 + 275 + 39 + 45 ＝ 688**，四条**互不包含**；`discover -s tests` **只覆盖第一条** | 四个套件分别 `discover` |
 | 交付镜像内的 Python | `Server: GiftWiseValidator/0.1 **Python/3.12.16**`（N-3 版本泄露**仍存在**） | 同上探针 |
 | **规则门否定语义缺陷**（🆕，未修） | `validator/rules.py:212` 纯字面子串匹配：`不含酒精 / 无酒 / 不含酒类` **被拒**；`陈年佳酿` **通过**；`无酒精啤酒` **仍被拒**（残留假阳性） | `python docs/qa-prep/tools/probe_negation.py`（本线探针，7/7 命中预期） |
@@ -76,7 +76,7 @@
 | # | 红项 | 事实 | 性质与归属 |
 | --- | --- | --- | --- |
 | 1 | `js_range_parity`（**唯一 FAIL**） | 验证指南的**独立 14 条网格**：**1/14 分歧**，唯一一条是 **`days=10**20`** —— Python = `needs_input ['LIMIT_EXCEEDED']`，JS = `error ['INVALID_JSON']` | **两侧都拒绝**，只是错误码与层级不同。真正缺陷只剩这 1 条极端值分歧。⚠️ 该值**不在** parity 74 组网格内（网格天数只到 366），**不要说成"74 组里有 1 项分歧"** |
-| — | ~~`declared_rules_hash`~~ | **已于 01:5x 闭合 → PASS**：`docs/competition/材料清单与自查.md:93` 与 `docs/acceptance-criteria.md:264` 现均声明 `1f389dad…`，与本机一致 | 发布线已修，本条**不再是红项** |
+| — | ~~`declared_rules_hash`~~ | **已于 01:5x 闭合 → PASS**：`docs/competition/材料清单与自查.md:97` 与 `docs/acceptance-criteria.md:264` 现均声明 `1f389dad…`，与本机一致 | 发布线已修，本条**不再是红项** |
 | — | ~~`browser_check`~~ | **已闭合 → PASS**：`browser-check` **100 项 / 0 失败**（自有端口，退出码 0，耗时 68.06 s） | 前端集成完成，本条**不再是红项** |
 | SKIP | `dify_publish_state` | 该检查被跳过（不消耗 Dify 额度） | 不是失败，但**也不能当作"已验证"** |
 
@@ -118,7 +118,7 @@ node web/tools/parity-check.mjs
 
 | # | 隐患 | 影响 | 建议归属 |
 | --- | --- | --- | --- |
-| H-1 | **材料清单声明哈希过期**（见第 3 节 #1） | 评委用 `/healthz` 一测即穿；且与已重建镜像彼此矛盾 | 发布线 / PM：把 `:92/:93` 与 `:216` 重钉为 `1f389dad…` |
+| H-1 | ~~材料清单声明哈希过期~~ → **已闭合（2026-10-31 01:5x）**：`docs/competition/材料清单与自查.md:97` 已重钉为 `1f389dad4c2589fb…`，`python tools/verify_all.py --only declared_rules_hash` 现在 **PASS** | — | 无需动作 |
 | H-2 | **`COPY deploy /app/deploy` 把内部文档与脚本打进了交付镜像** | 实测 `/app/deploy/` 里有 `security-review.md`、`preprod-plan.md`、`observability-collection.md`、`publish-to-uhost.ps1`、`Dockerfile`、`.dockerignore`。**这不是密钥泄露**，但评委会问"你的镜像里为什么有部署脚本和内部安全评审？"，且 `security-review.md` 可能自曝弱点 | 部署线：`.dockerignore` 排除 `deploy/*.md`、`deploy/*.ps1`，或改为逐个 `COPY` 需要的 `.py` |
 | H-3 | **N-3 版本泄露仍在**：新镜像 `Server: GiftWiseValidator/0.1 Python/3.12.16` | 信息泄露（低危）；且与文档写的 `3.12.12` 不一致 | 部署线：要么改写 `Server` 头，要么把文档改成 3.12.16 |
 | H-4 | **服务器讲 `HTTP/1.0`**（`BaseHTTPRequestHandler` 默认 `protocol_version`） | 意味着**每个响应后关闭连接、无 keep-alive**。评委若问"你这服务能扛多少并发"，这是必须先说清的前提 | 规则/部署线：知情即可；若要改需评估（`HTTP/1.1` 会引入 keep-alive 与半开连接的新语义） |
