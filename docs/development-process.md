@@ -28,7 +28,7 @@ PM 确定定位与接口 → 前端、规则、工作流、测试四线并行 �
 | QA-001 | 集成与验收 | 四条套件 329/275/39/45 = 688 全通过；容器 14 项通过 |
 | GIFT-001 | P0 / 前端、规则、工作流各守边界 | 2–4 小时 | 推荐主线 | 可信选择、按需呈现、费用时间复核、全局一次修订 | 已落地并实测（真实链路 `repair_count=1`；`web/` 已实现「可信选择→四段呈现」） |
 | CLOUD-001 | 容器化与云 | 容器化已实测 14 项；**预发与云部署未执行（无云资源授权）** |
-| DEMO-001 | P0 / 产品负责人、PM、测试 | 2 小时 | 集成验收 | 四分钟演示、真实备份、未完成清单 | **已排练并归档**：`docs/demo/demo-rehearsal-record.md`、`docs/demo/分镜计时表-3min.md`、`docs/demo/runbook-T10-checklist.md`、`docs/competition/答辩PPT-GiftWise-修订版-2026-10-31.pptx` |
+| DEMO-001 | P0 / 产品负责人、PM、测试 | 2 小时 | 集成验收 | 四分钟演示、真实备份、未完成清单 | **已按 DEMO-001 预演并归档（**真人朗诵未排练**；口播时长为 TTS 音轨解析）**：`docs/demo/demo-rehearsal-record.md`、`docs/demo/分镜计时表-3min.md`、`docs/demo/runbook-T10-checklist.md`、`docs/competition/答辩PPT-GiftWise-修订版-2026-10-31.pptx` |
 
 以上估时包含 AI 辅助，不是承诺。按北京时间计划：10 月 29 日统一契约，30 日四线并行并集成推荐主线，31 日选择后呈现和回归，11 月 1 日冻结和排练。不要把所有线拖到最后才首次集成。
 
