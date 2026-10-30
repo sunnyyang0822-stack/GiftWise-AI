@@ -82,6 +82,24 @@ VAL-001 契约固定，本轮同时改它会污染"证据对应哪一份代码"�
   两处都不触碰 `/validate` 契约，但会改变 `Server` 响应头与慢连接行为，需与测试验收 Agent 同步后再改。
 - **本轮不要动**：S-7（查询串匹配），因为它会改变既有 404 行为，属于契约变更。
 
+## 2026-10-30 晚：阶段 14 新入口对以上条目的影响
+
+新入口 `deploy/observable_server.py`（**不改** `deploy/server.py`）落地了其中几条低风险项，
+但**没有改变默认行为**——`python -m deploy.server` 这条路径的一切结论仍然成立：
+
+| 条目 | 新入口的处理 | 证据 |
+| --- | --- | --- |
+| S-4（`Server` 头暴露 Python 版本） | 提供开关 `GIFTWISE_HIDE_PY_VERSION=1` 时才清空 `sys_version`；**默认关闭**，保持与冻结实现一致 | 代码路径存在；**未出实测证据**（已登记为未完成） |
+| S-9（日志并发粘连、无耗时、不 flush） | **已修**：改用 `logging`（自带锁 + flush）写单行 JSON，含 `request_id`/`duration_ms`/状态码 | 154 行零交错、强杀/优雅退出均不丢；见 `evidence/observability-2026-10-30.md` |
+| S-9 衍生（日志注入） | **已修**：`path` 字段剔除控制字符并限长，恶意路径无法伪造/截断 JSONL 行 | 实测 `/a\x1bb` → 记录为 `/a?b` |
+| 指标被打爆（新面） | **已防**：指标标签只取已知路由，未匹配归 `__unmatched__`（基数保护） | `route_label()` 与 4096 上限的采样窗口 |
+| S-1 / S-2 / S-3（默认监听、无鉴权、公网暴露） | **未处理**：新入口沿用 `GIFTWISE_BIND` 默认 `0.0.0.0`，同样无鉴权；容器验证时只绑 `127.0.0.1` | 仍需产品负责人决策 |
+| S-5（`Handler.timeout` 未设置） | **未处理**（改它会改变慢连接行为，需与测试验收同步） | —— |
+| S-7（查询串匹配） | **未处理**（契约变更） | —— |
+
+> 提醒：`/metrics` 是**无鉴权**的只读端点，会暴露请求量、错误率、路由与进程内存。
+> 一旦公网可达（S-3），它同样需要靠安全组限制来源；**不要**把它当成"内部端点所以安全"。
+
 ---
 
 ## 当前进度 / 未完成清单 / 阻塞
@@ -94,14 +112,24 @@ VAL-001 契约固定，本轮同时改它会污染"证据对应哪一份代码"�
 - `powershell -File deploy\publish-to-uhost.ps1 -Host … -KeyPath …` → **exit 1，`VariableNotWritable`**（S-10 复现）。
 - `powershell -File deploy\publish-to-uhost.ps1 -Host … -KeyPath … -DryRun` → **exit 0**，输出 `-p 0.0.0.0:8000:8000`（S-10/S-11 修复验证）。
 - `grep -rniE "api[_-]?key|secret|token|password|PRIVATE KEY" deploy/` → 无命中；`deploy/` 内无 `.env`、无密钥文件。
+- **2026-10-30 晚新增（阶段 14）**：`python deploy/evidence/ps1_static_check.py` → **17/17 通过**
+  （硬编码凭证扫描 0 命中；IP 字面量仅 `0.0.0.0` 与 RFC 5737 文档网段；`-DryRun` 在首个 ssh/scp 之前 `exit 0`；
+  另实测本机 `LocalMachine=Restricted`，不加 `-ExecutionPolicy Bypass` 会被拒）。
+  以及 `observability_check.py`（39/39）与 `observability_container_check.py`（24/24）——
+  其中"S-9 已修""日志注入已防""指标基数保护"三条即由此取得实测证据。
 
 **未完成清单（计划，未执行）**：
 
-1. S-1/S-4/S-5/S-6/S-7 的代码修改（**故意未改**，等 PM 决策与测试验收同步）。
+1. S-1/S-4/S-5/S-6/S-7 在原入口的代码修改（**故意未改**，等 PM 决策与测试验收同步）。
+   其中 S-4 与 S-9 已在**新入口**落地，但默认入口仍是 `python -m deploy.server`，
+   所以"整个服务已修复 S-4/S-9"这一表述**不成立**。
 2. 无认证/无限流场景下的真实压测（例如 1 万次调用是否会拖垮演示机）。
 3. 安全组与公网可达性的真实验证（需要云主机）。
 4. TLS 前置方案（若决定公网长期开放）。
 5. `deploy/server.py` 改动后的 `/validate` 契约回归（应由测试验收 Agent 独立复核）。
+6. `/metrics` 暴露面的处置（与 S-3 绑定：公网可达时必须靠安全组限制来源）。
 
 **阻塞**：S-1/S-2 的最终处置取决于是否上云、以及演示时是否公网可达，这需要产品负责人先回答
 `preprod-plan.md` 里的确认事项；无云主机时无法验证安全组与公网暴露面。
+**2026-10-30 晚新增**：`deploy/server.py` 与 `deploy/Dockerfile` 处于 QA 复核冻结期，
+因此 S-1/S-4/S-5/S-7 在原入口的修复**本轮不能做**；新入口已落地的 S-4/S-9 也**尚未成为默认入口**。
