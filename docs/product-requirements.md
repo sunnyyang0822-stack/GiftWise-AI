@@ -94,7 +94,7 @@ GiftWise AI 面向主要青年用户，解决“不知道送什么、担心不�
 1. **一次送礼任务 = 一个运行标识**：`recommendation_run_id` 由**服务端生成**，浏览器不得自定义；选择事件只允许携带 `{recommendation_run_id, selected_candidate_id}`。
 2. **候选版本可区分**：必须能区分“首检候选”与“修订后候选”，否则无法核验“最多一次修订”与失败项保护。
 3. **校验输出必须双层可读**：批次级 `errors[]` 与逐候选 `candidate_results[].passed` 必须同时记录（只读顶层 `errors` 会把失败误判为“无错误”，此为已实测的易错点）。
-4. **修订计数与错误码分层**：记录 `repair_count`／`remaining_repairs` 与分层错误码（`INTAKE_*`／规则 18 码／包装 3 码／`DIFY_*`／HTTP 码），不得混为一码。
+4. **修订计数与错误码分层**：记录 `repair_count`／`remaining_repairs` 与分层错误码（`INTAKE_*`／规则 **19** 码／包装 3 码／`DIFY_*`／HTTP 码），不得混为一码。
 5. **调用记录分阶段计数**：`recommend`／`recommend_revision`／`presentation`／`presentation_revision` 必须分别记录；**用户选择前呈现阶段调用数必须为 0**。
 6. **结论必须绑定版本指纹**：`rules_source_sha256`、`sources_sha256`、`artifacts_sha256` 使任何一次“校验通过”可归因到确切规则版本。
 7. **数据来源必须显式披露**：`mode` 取 `mock`／`dify`，不得让模拟数据冒充真实；`business_data_verification` 固定为 `not_verified`。
@@ -153,7 +153,7 @@ P1 包括视觉精修、动效、更精致移动端与进度体验、更多关�
 - **Dify 未发布**：`toolPublished: false`、`version: "draft"`；平台级 `trace-runs` 为 `not_collected`（该租户无平台追踪）。
 - **`web/` 为 mock**：四段呈现为模拟数据，须显著标注；不得表述为“已与真实模型端到端联调通过”。
 - **价格、库存、送达未核实**：`business_data_verification` 恒为 `not_verified`；所有费用与准备时间只能读作估算。无真实商品数据源。
-- **前端未在真实浏览器验证**：parity 为样例级等价，非全域等价；渲染、交互与可访问性未经走查。
+- **前端已验证到浏览器级，但仍有未验证面**：`node web/tools/browser-check.mjs` **100 项 / 0 失败**（真实 Chromium；desktop/390/320）已覆盖渲染与主流程交互；**键盘 Tab 可达性与真实用户可用性仍未验证**；parity 为样例级等价，非全域等价。原「渲染、交互与可访问性未经走查」的表述已作废：parity 为样例级等价，非全域等价；渲染、交互与可访问性未经走查。
 - **60 秒目标未测**：无真实用户计时数据。
 
 ## 未决项现状登记（OPEN-5…OPEN-8）
