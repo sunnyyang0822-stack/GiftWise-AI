@@ -154,7 +154,7 @@ PM 夜间指令要求一次修四件事并逐条复测，全部完成（完整�
 | ④ | N-4 并发日志粘连 | `server.py`：裸 `print()` → `_LOG_LOCK` + `_log_line()`（整行一次 write + flush） | 60 并发：修复前 **7 行粘连** → 修复后 **0 行** ✅（`raw/log-interleave-20261031-011548/`） |
 
 **六项复测汇总**：① 规则哈希一致 ✅ ② 408 + 关闭（首字节 10.01 s）✅ ③ 容器 Threads **1 → 10 → 1** ✅（`raw/slowbody-20261031-011814/`，43/43）
-④ `/app` 含两个可观测模块 ✅ ⑤ 粘连 0 行 ✅ ⑥ tag `submission-20261101`(=latest) / 178 MB = **169.66 MiB** / 冷构建 **3,662 ms** ✅。
+④ `/app` 含两个可观测模块 ✅ ⑤ 粘连 0 行 ✅ ⑥ tag `submission-20261101`(=latest) / 178 MB = ****169.676 MiB**（177,918,474 B；原 `169.66` 为截断）** / 冷构建 **3,662 ms** ✅。
 另：端点矩阵 **10/10 逐字节一致**；`ps1_static_check.py` **17/17**；`container_layout_dryrun.py` 两种文件树都含可观测入口且 `/healthz` 200、HEALTHCHECK exit 0。
 
 **口径（四处更正，已落到 `deploy/**` 全部相关文档）**
