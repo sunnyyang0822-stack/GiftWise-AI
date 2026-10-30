@@ -1,0 +1,23 @@
+已完成注入：validator.rules → rulefix/variant/rules_negfix.py
+  variant.validate 指纹 = validator.rules
+  validator.validate 现指向 = validator.rules
+
+--- tests（主套件，即对外口径的 329）
+    Ran 329  failures=0  errors=0  → OK
+--- tests/acceptance/stage_b（275）
+    Ran 275  failures=0  errors=0  → OK
+--- tests/acceptance/stage_c（39）
+    Ran 39  failures=0  errors=0  → OK
+--- tests/acceptance/boundary（45）
+    Ran 45  failures=0  errors=0  → OK
+
+======================================================================
+汇总（变体注入后）
+======================================================================
+  tests（主套件，即对外口径的 329）: Ran 329, failures=0, errors=0, OK
+  tests/acceptance/stage_b（275）: Ran 275, failures=0, errors=0, OK
+  tests/acceptance/stage_c（39）: Ran 39, failures=0, errors=0, OK
+  tests/acceptance/boundary（45）: Ran 45, failures=0, errors=0, OK
+
+说明：stage_b 的失败项若仍是 test_hash_1/2/3，那是**钉住的是生产文件哈希**，
+      与本次变体无关（生产文件未被本脚本改动）。

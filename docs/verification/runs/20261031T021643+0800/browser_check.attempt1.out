@@ -1,0 +1,44 @@
+检查: browser_check
+分组: fast
+说明: 浏览器自查（web 线自带，多视口 + 主流程）
+开始: 2026-10-31T02:16:52.627991+08:00
+尝试: 第 1 次
+
+==============================================================================
+## 浏览器自查（web 线自带，多视口 + 主流程点击；复用已在监听的 Chrome CDP）
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]
+## 退出码: 2
+## 判定: 退出码 2（非 0 即判据不满足）
+==============================================================================
+✅ 服务一致性自检通过：/landing.css=24981B / /=20724B
+浏览器：Chrome/156.0.8078.79
+目标站点：http://127.0.0.1:8787
+
+=== 主流程 @ desktop 1280×900 ===
+PASS  [desktop] 首屏无横向溢出
+PASS  [desktop] 吸顶「模拟数据」标识已渲染
+PASS  [desktop] 吸顶标识在首屏内可见
+PASS  [desktop] 首屏数据来源说明可见
+      · 截图 .tmp\browser\shots\01-landing-desktop.png
+PASS  [desktop] 首屏无外部/CDN 请求
+      · 首屏请求 10 条，累计 486540 字节
+PASS  [desktop] 第一步无横向溢出
+PASS  [desktop] 第一步无 44px 以下触控目标
+PASS  [desktop] 界面不出现「同事」
+      · 截图 .tmp\browser\shots\02-step1-desktop.png
+PASS  [desktop] 未确认预算/天数时被拦住（不静默补默认值）
+PASS  [desktop] 被拦后仍停在第一步
+PASS  [desktop] 第二步无横向溢出
+      · 截图 .tmp\browser\shots\03-step2-desktop.png
+PASS  [desktop] 只有「明确知道」计入事实（提示 1 条）
+PASS  [desktop] 「暂时不知道」与 12 项兴趣互斥（全部置灰）
+PASS  [desktop] 第三步无横向溢出
+      · 截图 .tmp\browser\shots\04-step3-desktop.png
+PASS  [desktop] 待澄清禁忌在提交前就说明
+
+[stderr]
+浏览器自查异常：Error: 等待超时：推荐结果
+    at Page.waitFor (file:///C:/Users/lenovo/Desktop/giftwise/web/tools/browser-check.mjs:198:11)
+    at async main (file:///C:/Users/lenovo/Desktop/giftwise/web/tools/browser-check.mjs:490:5)
+
+[本工具] 本次尝试判定：FAIL（退出码 2（非 0 即判据不满足））；耗时 34.81s

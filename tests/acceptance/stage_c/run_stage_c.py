@@ -163,6 +163,10 @@ def main():
     lines = [
         "# 阶段 C 逐例证据（QA-001 独立复核）",
         "",
+        # 时点说明：PM 追加项 ② 要求历史报告注明"数字为某时点真值"。
+        # 本文件是**生成物**，故说明必须由生成器产出——否则下次重新生成时说明会被覆盖丢失。
+        f"> 本报告数字为 {record['started_at'][:10]} 时点真值；后续变更见 `docs/acceptance-criteria.md` 第 13 节。",
+        "",
         f"- 运行时间：{record['started_at']} → {record['finished_at']}（Asia/Shanghai）",
         f"- 命令：`{record['command']}`",
         f"- Git HEAD：`{record['git_head']}`（工作区有 {record['git_worktree']['changed_count']} 项未提交改动，逐项见 JSON）",

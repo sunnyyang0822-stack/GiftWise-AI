@@ -1,0 +1,21 @@
+{
+ "schema_version": 1,
+ "channel": "github-rest-api",
+ "collector": "GiftWise research agent (Issue #26 / RESEARCH-001)",
+ "captured_at": "2026-10-30T16:51:17.926089+00:00",
+ "batch": "issues-Paul-633_price-compare-tool",
+ "batch_title": "Paul-633/price-compare-tool issue 列表（一手，判断项目是否还能用）",
+ "method": "HTTP GET https://api.github.com/repos/<repo>/issues?state=<state>&per_page=30&sort=updated, unauthenticated; body stored verbatim.",
+ "records": [
+  {
+   "state": "open",
+   "raw_response_sha256_len": 5,
+   "raw_response": "[\n\n]\n"
+  },
+  {
+   "state": "closed",
+   "raw_response_sha256_len": 5,
+   "raw_response": "[\n\n]\n"
+  }
+ ]
+}

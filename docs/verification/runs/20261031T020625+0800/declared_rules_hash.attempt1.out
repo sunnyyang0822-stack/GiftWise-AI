@@ -1,0 +1,19 @@
+检查: declared_rules_hash
+分组: fast
+说明: 对外材料声明的规则哈希 / 版本指纹
+开始: 2026-10-31T02:09:16.438990+08:00
+尝试: 第 1 次
+当前 validator/rules.py sha256 = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+当前 git HEAD = ae0ea580006c3bc90f6ddeec57abe02732446edd
+
+--- docs/competition/材料清单与自查.md ---
+  第 93 行声明 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500 → 一致
+--- docs/acceptance-criteria.md ---
+  第 264 行声明 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500 → 一致
+
+--- workflow/generated/manifest.json ---
+  sources_sha256['validator/rules.py'] = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500 → 一致
+
+共核对 2 处对外声明哈希。
+
+[本工具] 本次尝试判定：PASS（对外声明的规则哈希与当前实现一致）；耗时 0.08s

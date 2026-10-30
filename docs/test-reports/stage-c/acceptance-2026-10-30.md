@@ -1,5 +1,7 @@
 # QA-001 独立复核报告：Dify Code 节点、阶段 C 测试与契约／文档一致性
 
+> 本报告数字为 2026-10-30 时点真值；后续变更见 `docs/acceptance-criteria.md` 第 13 节。
+
 - 日期：2026-10-30（北京时间，Asia/Shanghai +08:00）
 - 复核人：**GiftWise｜测试验收 Agent**
 - 依据：[Issue #1](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/1)（定位唯一权威）、[Issue #3](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/3)、[Issue #4](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/4)、`AGENTS.md`、[`docs/requirements-analysis.md`](../requirements-analysis.md)（SC-1…SC-9／OPEN-1…OPEN-9）、[`docs/pm-reviews/stage-2-acceptance-checklist-2026-10-30.md`](../pm-reviews/stage-2-acceptance-checklist-2026-10-30.md)、[`docs/pm-reviews/contract-decisions-draft-2026-10-30.md`](../pm-reviews/contract-decisions-draft-2026-10-30.md)、[`docs/intake-contract.md`](../intake-contract.md)、[`docs/acceptance-criteria.md`](../acceptance-criteria.md)

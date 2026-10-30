@@ -1,0 +1,8 @@
+{
+  "data": "HTTP/1.0 408 Request Timeout\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 17:15:37 GMT\r\nContent",
+  "code": 408,
+  "closed": true,
+  "elapsed": 10.014999999999418,
+  "err": null,
+  "status_line": "HTTP/1.0 408 Request Timeout"
+}

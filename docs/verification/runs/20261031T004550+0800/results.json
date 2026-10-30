@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-10-31T00:45:54.983638+08:00",
+  "tier": "fast",
+  "run_dir": "docs/verification/runs/20261031T004550+0800",
+  "python": "3.12.12",
+  "node": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE",
+  "docker": "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+  "head": "351330da346f7382d86d34d822bd000b7228c3c2",
+  "passed": 1,
+  "failed": 0,
+  "skipped": 0,
+  "model_calls": 0,
+  "notes": [],
+  "rows": [
+    {
+      "name": "i2_local",
+      "group": "fast",
+      "what": "I-2 半开正文（本机工作区代码）",
+      "status": "PASS",
+      "seconds": 3.985,
+      "command": "GIFTWISE_PORT=8799 GIFTWISE_READ_TIMEOUT=3 python -m deploy.server + 原始 socket",
+      "raw_output": "docs/verification/runs/20261031T004550+0800/i2_local.out",
+      "note": "408 且连接关闭（3.03s）",
+      "retry": "",
+      "related_mtimes": {
+        "deploy/server.py": "2026-10-30 23:19:59",
+        "validator/rules.py": "2026-10-30 23:11:21"
+      }
+    }
+  ]
+}

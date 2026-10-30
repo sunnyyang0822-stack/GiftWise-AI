@@ -1,0 +1,1 @@
+user=giftwise|image=sha256:fecb72ab0b0e84d92066ce7079660b9db74c7ba913838418f78be45622f0011f|ports=map[8000/tcp:[{127.0.0.1 8792}]]

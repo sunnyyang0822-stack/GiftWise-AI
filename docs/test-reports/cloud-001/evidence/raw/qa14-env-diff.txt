@@ -1,0 +1,7 @@
+=== 环境差异：本机 vs 容器 ===
+host python   : 3.12.12 | impl CPython
+host unicodedata: 15.0.0
+host decimal  : 3.12/decimal.py
+cont python   : 3.12.16 | impl CPython
+cont unicodedata: 15.0.0
+cont PYTHONHASHSEED: None

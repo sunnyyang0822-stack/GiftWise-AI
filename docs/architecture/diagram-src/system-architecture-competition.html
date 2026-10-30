@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>GiftWise AI 系统架构（赛道 B）</title>
+<!--
+  GiftWise AI · 系统架构（赛道 B）—— 赛道 B 强制提交件的**可编辑源**。
+
+  为什么存在这个文件：docs/competition/架构图-GiftWise.png（1680×1170）原先**没有可编辑源**，
+  且带有已被推翻的文字（"草稿未发布"）与一批过时数字（322 单测、10 次/34,127、5 个哈希、9/9 项）。
+  自 2026-10-31 起，本文件 + render_competition_diagram.py 是这张图的**唯一事实源**。
+
+  渲染：python docs/architecture/diagram-src/render_competition_diagram.py
+  产物：docs/architecture/rendered/system-architecture-competition.png（1680×1170）
+
+  约束：
+  - **零外部依赖**：无 CDN、无 web font、无图片、无 JS。离线可渲染（headless Chrome 直接截图）。
+  - 画布固定 1680×1170，html/body overflow:hidden，保证截图尺寸稳定。
+  - 颜色语义（与正文 §0.1 证据等级对齐）：
+      蓝/绿实线 = 已实现 / 已核实（E1）
+      黄实线   = 已实现且已实测，但**未进默认入口 / 未上云**（可观测入口已随镜像交付，CMD 仍为 deploy.server，/metrics 默认 404 且未鉴权）
+      灰虚线   = 目标设计 / 未实现；橙虚线 = 如实登记的缺口
+  - 数字口径：凡出现在本图的数字，均须能在仓库内追到出处；未实测的一律写"未核实"。
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1680px; height: 1170px; overflow: hidden; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+    background: #ffffff;
+    color: #1c2530;
+    -webkit-font-smoothing: antialiased;
+  }
+  .canvas { width: 1680px; height: 1170px; padding: 24px 40px 0; position: relative; }
+
+  /* ---------- 页头与图例 ---------- */
+  .head { display: flex; justify-content: space-between; align-items: flex-start; }
+  h1 { font-size: 40px; font-weight: 800; letter-spacing: 0.5px; color: #101822; }
+  .sub { font-size: 17px; color: #4a5765; margin-top: 6px; }
+  .legend {
+    border: 2px solid #b9cdea; border-radius: 10px; background: #f7faff;
+    padding: 10px 14px; width: 588px; flex: 0 0 588px;
+  }
+  .legend .row { display: flex; align-items: center; font-size: 13px; color: #2a3644; margin-bottom: 6px; }
+  .legend .row:last-of-type { margin-bottom: 0; }
+  .legend .lt { white-space: nowrap; }
+  .sample { width: 42px; height: 0; margin-right: 10px; flex: 0 0 42px; }
+  .sample.solid { border-top: 4px solid; }
+  .sample.b-blue { border-color: #2f6fdd; }
+  .sample.b-yellow { border-color: #e0a800; }
+  .sample.dashed { border-top: 3px dashed #9aa3ad; }
+  .legend .note { font-size: 11.5px; color: #6b7887; margin-top: 7px; line-height: 1.35; }
+
+  /* ---------- 分层 ---------- */
+  .layers { margin-top: 18px; display: flex; flex-direction: column; gap: 27px; }
+  .layer { display: flex; gap: 16px; align-items: stretch; }
+  .lbl { flex: 0 0 190px; width: 190px; padding-top: 3px; }
+  .lbl .t { font-size: 22px; font-weight: 800; color: #16202b; line-height: 1.15; }
+  .lbl .c { font-size: 12.5px; color: #6a7683; margin-top: 5px; line-height: 1.45; }
+  .row { flex: 1; display: flex; gap: 15px; }
+
+  .box {
+    flex: 1; min-width: 0; border: 2px solid #2f6fdd; border-radius: 10px;
+    background: linear-gradient(180deg, #f3f8ff 0%, #eaf2ff 100%);
+    padding: 13px 15px; display: flex; flex-direction: column; justify-content: flex-start;
+  }
+  .box .bt { font-size: 17px; font-weight: 800; color: #1b4fa8; line-height: 1.25; }
+  .box .bd { font-size: 14px; color: #33414f; margin-top: 7px; line-height: 1.52; }
+  .box .bd b { color: #16202b; }
+  .box code { font-family: Consolas, "Courier New", monospace; font-size: 13px; color: #1b4fa8; }
+
+  .box.green { border-color: #2f9e6b; background: linear-gradient(180deg, #f1fbf6 0%, #e7f7ef 100%); }
+  .box.green .bt { color: #1c7a51; }
+  .box.green code { color: #1c7a51; }
+
+  .box.yellow { border-color: #e0a800; background: linear-gradient(180deg, #fffbec 0%, #fff4d6 100%); }
+  .box.yellow .bt { color: #8a6100; }
+  .box.yellow code { color: #8a6100; }
+
+  .box.orange { border-color: #e8940c; background: linear-gradient(180deg, #fffaf2 0%, #fff3e2 100%); }
+  .box.orange .bt { color: #a45f08; }
+
+  .box.dash { border-style: dashed; border-color: #9aa3ad; background: #f8f9fa; }
+  .box.dash .bt { color: #5a6672; }
+  .box.dash .bd { color: #5f6b78; }
+  .box.dash.orange { border-color: #e8940c; background: #fffaf2; }
+  .box.dash.orange .bt { color: #a45f08; }
+
+  /* ---------- 页脚 ---------- */
+  .foot { position: absolute; left: 40px; right: 40px; bottom: 16px; }
+  .foot p { font-size: 12.6px; color: #3b4753; line-height: 1.6; }
+  .foot p.red { color: #c62828; font-weight: 700; }
+  .foot p.dim { color: #6a7683; }
+</style>
+
+<div class="canvas">
+
+  <div class="head">
+    <div>
+      <h1>GiftWise AI · 系统架构（赛道 B）</h1>
+      <div class="sub">青年送礼决策 Agent：模型生成 + 独立确定性校验 + 服务端可信状态</div>
+    </div>
+    <div class="legend">
+      <div class="row"><span class="sample solid b-blue"></span><span class="lt">实线（蓝/绿）：<b>已实现 / 已核实</b></span></div>
+      <div class="row"><span class="sample solid b-yellow"></span><span class="lt">实线（黄）：已实现且已实测，但<b>未进默认入口 / 未上云</b></span></div>
+      <div class="row"><span class="sample dashed"></span><span class="lt">虚线（灰）：<b>目标设计 / 未实现</b>；橙虚＝如实登记的缺口</span></div>
+      <div class="note">截至 <b>2026-10-31</b>。本图数字均可在仓库内追到出处；未实测的一律写"未核实"，不填 0。</div>
+    </div>
+  </div>
+
+  <div class="layers">
+
+    <!-- ① 用户层 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">① 用户层</div>
+        <div class="c">面向青年；默认简体中文</div>
+      </div>
+      <div class="row">
+        <div class="box">
+          <div class="bt">中文 Web 页面（界面预览）</div>
+          <div class="bd">三步输入：关系 / 熟悉度 / 场合<br>预算/时间、兴趣与可信度、禁忌</div>
+        </div>
+        <div class="box">
+          <div class="bt">三方案比较与明确选择</div>
+          <div class="bd">事实 / 推断 / 未知 分开呈现<br>失败项不可选；不替用户选</div>
+        </div>
+        <div class="box dash">
+          <div class="bt">选择后四段呈现（目标设计 · 未实现）</div>
+          <div class="bd">①配色 ②包装 ③贺卡与装饰 ④赠送时机话术<br><b>整块未实现</b>，不得与已落地阶段混读</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 接入层 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">② 接入层</div>
+        <div class="c">薄服务端；不把密钥交给浏览器</div>
+      </div>
+      <div class="row">
+        <div class="box">
+          <div class="bt">凭证与模式边界</div>
+          <div class="bd">Dify Key 只在服务端环境变量<br>mock / dify 模式显式披露</div>
+        </div>
+        <div class="box">
+          <div class="bt">可信任务状态</div>
+          <div class="bd">运行 ID、候选版本、修订计数<br>不信任前端 passed 标记</div>
+        </div>
+        <div class="box">
+          <div class="bt">HTTP 接口（零依赖）</div>
+          <div class="bd"><code>/api/config</code>、<code>/api/intake/validate</code>、<code>/api/recommendations</code><br><code>/api/presentations</code>、<code>/api/runs/{id}</code>（前缀 <code>/api/runs/</code>）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 编排层 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">③ 编排层 Dify</div>
+        <div class="c">11 节点 11 边<br><b>已发布并创建版本（当前 v2）</b><br>平台 1.18.0（实读，本轮未复核）</div>
+      </div>
+      <div class="row">
+        <div class="box">
+          <div class="bt">N1 开始 / 输入</div>
+          <div class="bd">intake-v1 请求<br>真实运行 5 用例</div>
+        </div>
+        <div class="box">
+          <div class="bt">N2 生成 LLM</div>
+          <div class="bd">真实 DeepSeek 调用<br>4.5–6.0 s</div>
+        </div>
+        <div class="box">
+          <div class="bt">N3 Code 校验</div>
+          <div class="bd">真实沙箱执行成功<br>0.067–0.238 s</div>
+        </div>
+        <div class="box">
+          <div class="bt">N4 分支</div>
+          <div class="bd">通过 / 可修订已命中<br>ELSE 无运行证据</div>
+        </div>
+        <div class="box">
+          <div class="bt">N5→N6→N7</div>
+          <div class="bd">真实修订 3.0–3.1 s<br>全局最多一次</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 确定性规则层 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">④ 确定性规则层</div>
+        <div class="c">独立于模型；同一份规则多路复用</div>
+      </div>
+      <div class="row">
+        <div class="box green">
+          <div class="bt">validator/rules.py（唯一真源）</div>
+          <div class="bd">预算、币种、禁忌、必填、时间<br>纯标准库；正则防全角绕过</div>
+        </div>
+        <div class="box green">
+          <div class="bt">→ Dify Code 节点源码</div>
+          <div class="bd"><code>workflow/generated/*.py</code><br><code>manifest.json</code> 记 <b>9 个哈希</b>（4 源 + 5 生成物）</div>
+        </div>
+        <div class="box green">
+          <div class="bt">→ deploy 校验 API</div>
+          <div class="bd">本机与<b>交付镜像</b>均通过<br><code>/validate</code> <b>9/9 组逐字节一致</b>（含越界）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑤ 证据与可观测性 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">⑤ 证据与可观测性</div>
+        <div class="c">运行记录、真实测试与指标入口</div>
+      </div>
+      <div class="row">
+        <div class="box orange">
+          <div class="bt">本地真实证据</div>
+          <div class="bd"><b>46 探针 / 329 单测 / 39 阶段 C</b><br>JS 与 Python 语义 <b>74 组</b>一致</div>
+        </div>
+        <div class="box orange">
+          <div class="bt">真实 Dify 记录</div>
+          <div class="bd"><b>主批次 10 次 / 34,127 tokens<br>累计 13 次 / 38,326 tokens</b><br>服务端 0.587–0.888 s（注入轮）</div>
+        </div>
+        <div class="box yellow">
+          <div class="bt">可观测入口（已实现 · 已实测）</div>
+          <div class="bd"><code>observable_server.py</code> + <code>observability.py</code>：<code>/metrics</code>、<code>/readyz</code>、JSONL 结构化日志<br>本机 <b>39/39</b>、容器内 <b>24/24</b>、脚本静态 <b>17/17</b>（出处 <code>deploy/evidence/observability-2026-10-30.md</code>；<b>架构线 2026-10-31 复跑三项全通过</b>）<br><b>已随镜像交付</b>，但<b>非默认入口</b>（CMD 仍 <code>deploy.server</code>）；<b><code>/metrics</code> 默认 404 且未鉴权</b>；<b>未上云</b></div>
+        </div>
+        <div class="box dash orange">
+          <div class="bt">缺口（如实登记）</div>
+          <div class="bd">无自然 <code>OVER_BUDGET</code> / <code>FORBIDDEN_TAG</code><br>触发证据；N4 ELSE 未命中</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 部署 -->
+    <div class="layer">
+      <div class="lbl">
+        <div class="t">⑥ 部署</div>
+        <div class="c">容器已验证；云端从未发生</div>
+      </div>
+      <div class="row">
+        <div class="box">
+          <div class="bt">Docker 容器（已实测）</div>
+          <div class="bd"><b>178 MB（十进制）/ 169.36 MiB</b>；<b>14 项通过</b><br>冷构建 <b>1.720 s</b>、热构建 0.6 s</div>
+        </div>
+        <div class="box dash">
+          <div class="bt">UCloud UHost + EIP</div>
+          <div class="bd">未开通、未采购、未上传</div>
+        </div>
+        <div class="box dash">
+          <div class="bt">K8s / 弹性伸缩 / 分布式状态</div>
+          <div class="bd">未实现；镜像未推仓库</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <p>设计理由：模型负责给出有依据的方向；硬约束（预算/币种/禁忌/字段/准备时间）由独立代码判定，校验失败项不可选，跨两阶段合计最多一次自动修订。</p>
+    <p>状态留在服务端最小实现，浏览器只提交输入与选择，避免篡改；当前为单机、无数据库、无账号的最小实现，未做弹性伸缩与故障恢复演练。</p>
+    <p>成本口径：模型 token 取服务端 <code>workflow_finished.total_tokens</code>（主批次 10 次合计 34,127；含演示与发布验收累计 13 次 / 38,326）；供应商单价未取得真实账单，一律记「未核实」。</p>
+    <p class="red">事实边界：包装/配色/贺卡阶段未实现；价格与库存未核实；云端未部署、镜像未推仓库；可观测入口已随镜像交付但<b>非默认入口</b>（<code>/metrics</code> 默认 404 且未鉴权）、未上云。虚线部分为目标设计，不得读作已完成。</p>
+    <p class="dim">生成时间 2026-10-31（北京时间）；依据 WF-003-2026-10-30.md、WF-003-2026-10-31-publish-v2/README.md、docker-2026-10-30.md、observability-2026-10-30.md、cost-performance-metrics.md。</p>
+  </div>
+
+</div>

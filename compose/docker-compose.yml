@@ -1,0 +1,151 @@
+# GiftWise 云原生可扩展性实验 · 本地多副本拓扑
+#
+# ⚠️ 这是**实验用**编排，不是交付物，不是生产配置。
+#    - 交付物仍然是单容器 `deploy/Dockerfile`（CMD python -m deploy.server）。
+#    - 本文件只用于在**单机 Docker** 上模拟「多副本 + 负载均衡」，以取得真实测量数据。
+#    - 它**从未**在任何 K8S 集群 / 公有云上运行；只在开发机 Docker Desktop 上跑过。
+#
+# 拓扑：
+#   client ──HTTP/1.0──> lb (python:3.12-slim, 纯标准库轮询)
+#                          ├──HTTP/1.0──> validator-a (giftwise-validator:submission-20261101)
+#                          └──HTTP/1.0──> validator-b (同一镜像，第二个副本)
+#
+# 为什么两个副本用**同一个镜像**：这样「分发」这件事才可证伪——
+# 两个副本的二进制完全相同，因此响应差异只可能来自「谁处理的」，而不是版本差异。
+# 为了区分谁处理的，实验里用 `X-GiftWise-Upstream` 响应头（由 LB 注入）。
+#
+# 用法（在仓库根目录）：
+#   docker compose -f compose/docker-compose.yml up -d --build
+#   docker compose -f compose/docker-compose.yml ps
+#   docker compose -f compose/docker-compose.yml down -v
+#
+# 指标实验（可观测入口，非默认入口）用 profile 单独起：
+#   docker compose -f compose/docker-compose.yml --profile metrics up -d
+
+name: giftwise-cloudnative-lab
+
+services:
+  validator-a:
+    image: giftwise-validator:submission-20261101
+    # 默认入口 = deploy.server（有 I-2 读超时 + N-4 加锁日志）。
+    # 这里显式写出，避免后续改镜像 CMD 时本实验被静默改变语义。
+    command: ["python", "-m", "deploy.server"]
+    environment:
+      GIFTWISE_BIND: "0.0.0.0"
+      GIFTWISE_PORT: "8000"
+    # 不发布到宿主机：所有流量必须经过 LB，否则无法证明分发。
+    expose:
+      - "8000"
+    # 覆盖镜像自带的 HEALTHCHECK(interval=30s)，让实验期间状态更快收敛。
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 2s
+    restart: "no"
+
+  validator-b:
+    image: giftwise-validator:submission-20261101
+    command: ["python", "-m", "deploy.server"]
+    environment:
+      GIFTWISE_BIND: "0.0.0.0"
+      GIFTWISE_PORT: "8000"
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 2s
+    restart: "no"
+
+  lb:
+    # 故意用与验证器**同一个基础镜像**：环境里已有，无需联网拉取新镜像。
+    image: python:3.12-slim
+    # 挂载宿主机上的 LB 源码。LB 是纯标准库，不需要 install 任何东西。
+    volumes:
+      - ./lb:/app/lb:ro
+    command: ["python", "/app/lb/round_robin_lb.py"]
+    environment:
+      GIFTWISE_UPSTREAMS: "validator-a:8000,validator-b:8000"
+      GIFTWISE_LB_BIND: "0.0.0.0"
+      GIFTWISE_LB_PORT: "8080"
+      GIFTWISE_LB_TIMEOUT: "15"
+      GIFTWISE_LB_HEALTH_INTERVAL: "2"
+    ports:
+      # 只绑回环：本实验不应对外暴露。
+      - "127.0.0.1:18080:8080"
+    depends_on:
+      validator-a:
+        condition: service_healthy
+      validator-b:
+        condition: service_healthy
+    restart: "no"
+
+  # ------------------------------------------------------------------
+  # profile: metrics —— 用「可观测入口」起两个副本。
+  # 目的：证明**非默认入口**带有进程内状态（Metrics 计数器），
+  #       而默认入口 deploy.server 没有。这是「无状态」结论的对照组。
+  # ------------------------------------------------------------------
+  validator-obs-a:
+    profiles: ["metrics"]
+    image: giftwise-validator:submission-20261101
+    command: ["python", "-m", "deploy.observable_server"]
+    environment:
+      GIFTWISE_BIND: "0.0.0.0"
+      GIFTWISE_PORT: "8000"
+    expose:
+      - "8000"
+    # 单独发布到宿主机，便于分别抓取**每个副本自己**的 /metrics，
+    # 从而证明「计数器是每进程独立的」。
+    ports:
+      - "127.0.0.1:19101:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 2s
+    restart: "no"
+
+  validator-obs-b:
+    profiles: ["metrics"]
+    image: giftwise-validator:submission-20261101
+    command: ["python", "-m", "deploy.observable_server"]
+    environment:
+      GIFTWISE_BIND: "0.0.0.0"
+      GIFTWISE_PORT: "8000"
+    expose:
+      - "8000"
+    ports:
+      - "127.0.0.1:19102:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 2s
+    restart: "no"
+
+  lb-obs:
+    profiles: ["metrics"]
+    image: python:3.12-slim
+    volumes:
+      - ./lb:/app/lb:ro
+    command: ["python", "/app/lb/round_robin_lb.py"]
+    environment:
+      GIFTWISE_UPSTREAMS: "validator-obs-a:8000,validator-obs-b:8000"
+      GIFTWISE_LB_BIND: "0.0.0.0"
+      GIFTWISE_LB_PORT: "8080"
+      GIFTWISE_LB_TIMEOUT: "15"
+      GIFTWISE_LB_HEALTH_INTERVAL: "2"
+    ports:
+      - "127.0.0.1:18081:8080"
+    depends_on:
+      validator-obs-a:
+        condition: service_healthy
+      validator-obs-b:
+        condition: service_healthy
+    restart: "no"

@@ -1,0 +1,83 @@
+{
+  "checkedAtUtc": "2026-10-30T15:05:01.943Z",
+  "checkedAtShanghai": "2026-10-30 23:05:01 +08:00",
+  "appId": "5abdb13c-a633-4a9c-96c3-dabd44072511",
+  "modelCallsMade": 0,
+  "draft": {
+    "updatedAt": 1793372663,
+    "updatedAtShanghai": "2026-10-30 23:04:23 +08:00",
+    "hash": "c6a2c5f3bdba999660746948f7b1b31487571bee72d0b138233e199eceedd926",
+    "version": "draft",
+    "versionNumber": null,
+    "toolPublished": false,
+    "markedName": "",
+    "markedComment": "",
+    "environmentVariables": 0,
+    "conversationVariables": 0,
+    "nodeCount": 11,
+    "edgeCount": 11,
+    "nodeTypes": [
+      "start",
+      "code",
+      "llm",
+      "code",
+      "if-else",
+      "llm",
+      "code",
+      "code",
+      "code",
+      "end",
+      "end"
+    ],
+    "hasLlmNode": true,
+    "endOutputs": [
+      {
+        "title": "End A 未修订输出",
+        "vars": [
+          "status",
+          "all_passed",
+          "repair_count",
+          "report_json",
+          "report_text"
+        ]
+      },
+      {
+        "title": "End B 修订后输出",
+        "vars": [
+          "revised_status",
+          "revised_all_passed",
+          "revised_repair_count",
+          "revised_report_json",
+          "revised_report_text"
+        ]
+      }
+    ]
+  },
+  "versionEndpoints": [
+    {
+      "url": "/console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/draft/versions",
+      "status": 404,
+      "preview": null
+    },
+    {
+      "url": "/console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/versions",
+      "status": 405,
+      "preview": null
+    },
+    {
+      "url": "/console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/publish",
+      "status": 401,
+      "preview": null
+    },
+    {
+      "url": "/console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/draft/publish",
+      "status": 404,
+      "preview": null
+    }
+  ],
+  "ui": {
+    "headerText": "跳转到主要内容 | / | 工作室 | 🤖 | GiftWise｜推荐工作流开发草稿 | 工作流 | 编排 | 访问入口 | 日志 | 监测 | D | Dify | 账户 | 查看缓存",
+    "hasUnpublishedLabel": false,
+    "hasPublishedLabel": true
+  }
+}

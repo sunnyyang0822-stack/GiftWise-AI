@@ -1,0 +1,45 @@
+# 检查：parity
+# 最终判定：PASS
+# 尝试记录：第1次 PASS（parity.attempt1.out）
+# 本文件 = 最终尝试（parity.attempt1.out）的内容副本；各次尝试的原始输出独立保留，未被覆盖。
+检查: parity
+分组: fast
+说明: JS↔Python parity（样例级）
+开始: 2026-10-31T02:21:07.070302+08:00
+尝试: 第 1 次
+
+==============================================================================
+## JS↔Python parity（**样例级**等价，非全域等价） — ① 生成样例（JS 侧夹具）
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current\node.EXE web/tools/gen-parity-fixtures.mjs
+## 退出码: 0
+## 判定: 退出码 0
+==============================================================================
+已写出 C:\Users\lenovo\Desktop\giftwise\.tmp\web-parity\fixtures.json
+  intake 用例 27 条
+  候选批次 26 批 + 请求侧越界/格式 17 条 + 损坏样例 4 条
+
+==============================================================================
+## JS↔Python parity（**样例级**等价，非全域等价） — ② 生成 Python 参考结果
+## 命令: C:\Users\lenovo\AppData\Local\Programs\Python\Python312\python.exe -X utf8 web/tools/parity-reference.py
+## 退出码: 0
+## 判定: 退出码 0
+==============================================================================
+已写出 C:\Users\lenovo\Desktop\giftwise\.tmp\web-parity\python-out.json
+  intake 参考结果 27 条；校验参考结果 47 条
+
+==============================================================================
+## JS↔Python parity（**样例级**等价，非全域等价） — ③ 逐项比对
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current\node.EXE web/tools/parity-check.mjs
+## 退出码: 0
+## 判定: 退出码 0
+==============================================================================
+JS↔Python 语义比对：共 74 组样例（intake 27 条 / 候选批次 26 条 / **请求侧越界与格式** 17 条 / 损坏样例 4 条）
+  请求侧覆盖：越界网格 15 组（预算{0,1,10000,10000.01,10001} × 天数{0,365,366}）+ 格式优先 2 组
+参考实现：python: workflow/intake.py + validator/rules.py（Python 3.12.10）
+追求对象契约开关：PURSUIT_CONTRACT_READY=true
+结果：全部一致（0 处语义差异）
+
+附加检查（把契约开关当作未落地）：错误码 PURSUIT_CONTRACT_NOT_READY；未生成请求：true
+附加检查：通过（拒绝且不静默映射）
+
+[本工具] 本次尝试判定：PASS（退出码 0）；耗时 0.50s

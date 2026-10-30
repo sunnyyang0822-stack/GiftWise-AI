@@ -1,0 +1,20 @@
+===== 2d. 当前镜像内 somaxconn 与 listen 相关 sysctl（用一次性容器读取，读完即删）=====
+--- 容器 id ---
+2f9ca0e0158fc59f8645106f0346b0d9e40d34cba2f09dc60b9f31fdc4011873
+--- /proc/sys/net/core/somaxconn ---
+4096
+--- /proc/sys/net/ipv4/tcp_max_syn_backlog ---
+512
+--- 容器内 python 看到的默认值 ---
+TCPServer.request_queue_size = 5
+ThreadingHTTPServer.request_queue_size = 5
+--- 容器内 python 版本 ---
+Python 3.12.16
+--- 容器内 deploy/server.py 哈希 ---
+130cb065db6868c897308cbb79ef5cce16fcd323c94d958524aaf3e960c71076  /app/deploy/server.py
+--- 本机 deploy/server.py 哈希 ---
+130cb065db6868c897308cbb79ef5cce16fcd323c94d958524aaf3e960c71076 *deploy/server.py
+--- 容器内当前 backlog 实证：从宿主机看 listen 队列（ss 不可用则跳过）---
+(镜像内无 ss)
+--- 清理 ---
+gwtune-sysctl

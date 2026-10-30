@@ -1,0 +1,401 @@
+# 引用 validator/rules.py 旧 sha256 1f389dad… 的全部文件（grep -rn，排除 .git/.tmp）
+README.md
+bench/runs/perf-tune-20261031T0140/04-build.txt
+bench/runs/perf-tune-20261031T0140/04c-image-content-delta.txt
+bench/runs/perf-tune-20261031T0140/05-reacceptance.txt
+bench/runs/perf-tune-20261031T0140/07-container-parity-newtag.txt
+compose/evidence/halfopen-main.json
+deploy/evidence/image-audit-2026-10-31.md
+deploy/evidence/image-rebuild-n1n4-2026-10-31.md
+deploy/evidence/raw/artifact-manifest.json
+deploy/evidence/raw/container-layout-dryrun-latest.json
+deploy/evidence/raw/container-layout-dryrun-repo_copy-20261031-011736.log
+deploy/evidence/raw/container-layout-dryrun-upload_minimal-20261031-011736.log
+deploy/evidence/raw/image-matrix-20261031-010353/host/host.log
+deploy/evidence/raw/image-matrix-20261031-010418/container-endpoint-matrix.json
+deploy/evidence/raw/image-matrix-20261031-010418/host-endpoint-matrix.json
+deploy/evidence/raw/image-matrix-20261031-010905/container-endpoint-matrix.json
+deploy/evidence/raw/image-matrix-20261031-010905/host-endpoint-matrix.json
+deploy/evidence/raw/image-matrix-20261031-011609/container-endpoint-matrix.json
+deploy/evidence/raw/image-matrix-20261031-011609/host-endpoint-matrix.json
+deploy/evidence/raw/image-parity-20261031-005451/01-giftwise-validator_latest-file-hashes.json
+deploy/evidence/raw/image-parity-20261031-005451/image-source-parity.json
+deploy/evidence/raw/image-parity-20261031-005612/01-giftwise-validator_submission-20261101-file-hashes.json
+deploy/evidence/raw/image-parity-20261031-005612/console.txt
+deploy/evidence/raw/image-parity-20261031-005612/image-source-parity.json
+deploy/evidence/raw/image-parity-20261031-005705/01-giftwise-validator_candidate-observable-file-hashes.json
+deploy/evidence/raw/image-parity-20261031-005705/console.txt
+deploy/evidence/raw/image-parity-20261031-005705/image-source-parity.json
+deploy/evidence/raw/image-parity-20261031-010844/01-giftwise-validator_submission-20261101-file-hashes.json
+deploy/evidence/raw/image-parity-20261031-010844/console.txt
+deploy/evidence/raw/image-parity-20261031-010844/image-source-parity.json
+deploy/evidence/raw/image-parity-20261031-011520/01-giftwise-validator_submission-20261101-file-hashes.json
+deploy/evidence/raw/image-parity-20261031-011520/console.txt
+deploy/evidence/raw/image-parity-20261031-011520/image-source-parity.json
+deploy/evidence/raw/image-parity-candidate/observable-in-image-accesslog.txt
+deploy/evidence/raw/image-parity-candidate/observable-in-image.txt
+deploy/evidence/raw/local-check-20261030-231353.json
+deploy/evidence/raw/local-check-20261030-232154.json
+deploy/evidence/raw/local-check-latest.json
+deploy/evidence/raw/log-interleave-20261031-011439/修复前（裸 print）-docker-logs.txt
+deploy/evidence/raw/log-interleave-20261031-011439/修复后1-docker-logs.txt
+deploy/evidence/raw/log-interleave-20261031-011548/修复前（裸 print）-docker-logs.txt
+deploy/evidence/raw/log-interleave-20261031-011548/修复后1-docker-logs.txt
+deploy/evidence/raw/observability-20261030-231351/access.jsonl
+deploy/evidence/raw/observability-20261030-231351/console.txt
+deploy/evidence/raw/observability-20261030-231351/frozen-server.log
+deploy/evidence/raw/observability-20261030-231351/metrics-prometheus.txt
+deploy/evidence/raw/observability-20261030-231351/metrics-summary-after-concurrency.json
+deploy/evidence/raw/observability-20261030-231351/metrics-summary.json
+deploy/evidence/raw/observability-20261030-231351/observability-check.json
+deploy/evidence/raw/observability-20261030-231351/observable-server.log
+deploy/evidence/raw/observability-20261030-232152/access.jsonl
+deploy/evidence/raw/observability-20261030-232152/console.txt
+deploy/evidence/raw/observability-20261030-232152/frozen-server.log
+deploy/evidence/raw/observability-20261030-232152/metrics-prometheus.txt
+deploy/evidence/raw/observability-20261030-232152/metrics-summary-after-concurrency.json
+deploy/evidence/raw/observability-20261030-232152/metrics-summary.json
+deploy/evidence/raw/observability-20261030-232152/observability-check.json
+deploy/evidence/raw/observability-20261030-232152/observable-server.log
+deploy/evidence/raw/observability-20261031-011807/access.jsonl
+deploy/evidence/raw/observability-20261031-011807/console.txt
+deploy/evidence/raw/observability-20261031-011807/frozen-server.log
+deploy/evidence/raw/observability-20261031-011807/metrics-prometheus.txt
+deploy/evidence/raw/observability-20261031-011807/metrics-summary-after-concurrency.json
+deploy/evidence/raw/observability-20261031-011807/metrics-summary.json
+deploy/evidence/raw/observability-20261031-011807/observability-check.json
+deploy/evidence/raw/observability-20261031-011807/observable-server.log
+deploy/evidence/raw/observability-20261031-012022/access.jsonl
+deploy/evidence/raw/observability-20261031-012022/console.txt
+deploy/evidence/raw/observability-20261031-012022/frozen-server.log
+deploy/evidence/raw/observability-20261031-012022/metrics-prometheus.txt
+deploy/evidence/raw/observability-20261031-012022/metrics-summary-after-concurrency.json
+deploy/evidence/raw/observability-20261031-012022/metrics-summary.json
+deploy/evidence/raw/observability-20261031-012022/observability-check.json
+deploy/evidence/raw/observability-20261031-012022/observable-server.log
+deploy/evidence/raw/observability-container-20261030-231347/console.txt
+deploy/evidence/raw/observability-container-20261030-231347/container-access.jsonl
+deploy/evidence/raw/observability-container-20261030-231347/container-logs-full.txt
+deploy/evidence/raw/observability-container-20261030-231347/container-metrics.json
+deploy/evidence/raw/observability-container-20261030-231347/container-stdout.txt
+deploy/evidence/raw/observability-container-20261030-231347/observability-container-check.json
+deploy/evidence/raw/observability-container-20261030-232002/console.txt
+deploy/evidence/raw/observability-container-20261030-232002/container-access.jsonl
+deploy/evidence/raw/observability-container-20261030-232002/container-logs-full.txt
+deploy/evidence/raw/observability-container-20261030-232002/container-metrics.json
+deploy/evidence/raw/observability-container-20261030-232002/container-stdout.txt
+deploy/evidence/raw/observability-container-20261030-232002/observability-container-check.json
+deploy/evidence/raw/observability-container-20261031-011054/console.txt
+deploy/evidence/raw/observability-container-20261031-011054/container-access.jsonl
+deploy/evidence/raw/observability-container-20261031-011054/container-logs-full.txt
+deploy/evidence/raw/observability-container-20261031-011054/container-metrics.json
+deploy/evidence/raw/observability-container-20261031-011054/container-stdout.txt
+deploy/evidence/raw/observability-container-20261031-011054/observability-container-check.json
+deploy/evidence/raw/observability-container-20261031-012051/console.txt
+deploy/evidence/raw/observability-container-20261031-012051/container-access.jsonl
+deploy/evidence/raw/observability-container-20261031-012051/container-logs-full.txt
+deploy/evidence/raw/observability-container-20261031-012051/container-metrics.json
+deploy/evidence/raw/observability-container-20261031-012051/container-stdout.txt
+deploy/evidence/raw/observability-container-20261031-012051/observability-container-check.json
+deploy/evidence/raw/server-8000.log
+deploy/evidence/raw/server-8765.log
+deploy/evidence/raw/slowbody-20261030-231148/A-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261030-231148/A-fixed-default.log
+deploy/evidence/raw/slowbody-20261030-231148/B-fixed-short.log
+deploy/evidence/raw/slowbody-20261030-231148/C-prefix-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261030-231148/C-prefix.log
+deploy/evidence/raw/slowbody-20261030-231148/E-access.jsonl
+deploy/evidence/raw/slowbody-20261030-231148/E-observable.log
+deploy/evidence/raw/slowbody-20261030-231148/F1-container-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261030-232005/A-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261030-232005/A-fixed-default.log
+deploy/evidence/raw/slowbody-20261030-232005/B-fixed-short.log
+deploy/evidence/raw/slowbody-20261030-232005/C-prefix-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261030-232005/C-prefix.log
+deploy/evidence/raw/slowbody-20261030-232005/E-access.jsonl
+deploy/evidence/raw/slowbody-20261030-232005/E-observable.log
+deploy/evidence/raw/slowbody-20261030-232005/F1-container-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-010913/A-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-010913/A-fixed-default.log
+deploy/evidence/raw/slowbody-20261031-010913/B-fixed-short.log
+deploy/evidence/raw/slowbody-20261031-010913/C-prefix-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-010913/C-prefix.log
+deploy/evidence/raw/slowbody-20261031-010913/E-access.jsonl
+deploy/evidence/raw/slowbody-20261031-010913/E-observable.log
+deploy/evidence/raw/slowbody-20261031-010913/F1-container-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011626/A-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011626/A-fixed-default.log
+deploy/evidence/raw/slowbody-20261031-011626/B-fixed-short.log
+deploy/evidence/raw/slowbody-20261031-011626/C-prefix-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011626/C-prefix.log
+deploy/evidence/raw/slowbody-20261031-011626/E-access.jsonl
+deploy/evidence/raw/slowbody-20261031-011626/E-observable.log
+deploy/evidence/raw/slowbody-20261031-011626/F1-container-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011814/A-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011814/A-fixed-default.log
+deploy/evidence/raw/slowbody-20261031-011814/B-fixed-short.log
+deploy/evidence/raw/slowbody-20261031-011814/C-prefix-endpoint-matrix.json
+deploy/evidence/raw/slowbody-20261031-011814/C-prefix.log
+deploy/evidence/raw/slowbody-20261031-011814/E-access.jsonl
+deploy/evidence/raw/slowbody-20261031-011814/E-observable.log
+deploy/evidence/raw/slowbody-20261031-011814/F1-container-endpoint-matrix.json
+docs/acceptance-criteria.md
+docs/architecture/adr/ADR-003-cloud-native-tradeoffs.md
+docs/architecture/evidence/container-parity-2026-10-31-run2.txt
+docs/architecture/evidence/container-parity-2026-10-31.txt
+docs/architecture/evidence/observability-container-24-2026-10-31.txt
+docs/architecture/evidence/observability-host-39-2026-10-31.txt
+docs/architecture/observability.md
+docs/competition/qa-bank/_evidence/数字核对.md
+docs/competition/材料清单与自查.md
+docs/demo/demo-rehearsal-record.md
+docs/demo/fallback-verification.md
+docs/demo/replay/offline-replay.html
+docs/demo/snapshot/demo-snapshot.json
+docs/performance/关键数字.json
+docs/performance/性能与容量基准-2026-10-31.md
+docs/pm-reviews/数字口径统一-2026-10-31.md
+docs/pm-reviews/晨间简报-2026-10-31.md
+docs/qa-prep/README.md
+docs/qa-prep/evidence/verify-delivery-claims-20261031T013035+0800.txt
+docs/rulefix/规则门语义缺陷-复现与修复提案.md
+docs/test-plan.md
+docs/test-reports/boundary-001/acceptance-2026-10-31.md
+docs/test-reports/boundary-001/evidence/container-rules-diff.txt
+docs/test-reports/boundary-001/evidence/container-sync.json
+docs/test-reports/boundary-001/evidence/container-sync.txt
+docs/test-reports/boundary-001/evidence/rebuilt-image-verify.txt
+docs/test-reports/boundary-001/evidence/run-verify-local.txt
+docs/test-reports/boundary-001/rebuilt-image-2026-10-31.md
+docs/test-reports/stage-b/20261031-012055-9826d617/results.json
+docs/test-reports/stage-b/20261031-012055-9826d617/summary.json
+docs/test-reports/stage-b/20261031-012318-df303324/results.json
+docs/test-reports/stage-b/20261031-012318-df303324/summary.json
+docs/verification/runs/20261031T004530+0800/environment.json
+docs/verification/runs/20261031T004530+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T004530+0800/range_contract.out
+docs/verification/runs/20261031T004550+0800/environment.json
+docs/verification/runs/20261031T004602+0800/environment.json
+docs/verification/runs/20261031T004602+0800/probe46.attempt1.out
+docs/verification/runs/20261031T004602+0800/probe46.out
+docs/verification/runs/20261031T004602+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T004602+0800/range_contract.out
+docs/verification/runs/20261031T004602+0800/stage_b.attempt1.out
+docs/verification/runs/20261031T004602+0800/stage_b.attempt2.out
+docs/verification/runs/20261031T004602+0800/stage_b.out
+docs/verification/runs/20261031T004647+0800/container_check.attempt1.out
+docs/verification/runs/20261031T004647+0800/container_check.out
+docs/verification/runs/20261031T004647+0800/environment.json
+docs/verification/runs/20261031T004647+0800/i2_image.attempt1.out
+docs/verification/runs/20261031T004647+0800/i2_image.out
+docs/verification/runs/20261031T004647+0800/image_latest_stale.attempt1.out
+docs/verification/runs/20261031T004647+0800/image_latest_stale.out
+docs/verification/runs/20261031T004647+0800/probe46.attempt1.out
+docs/verification/runs/20261031T004647+0800/probe46.out
+docs/verification/runs/20261031T004647+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T004647+0800/range_contract.out
+docs/verification/runs/20261031T004647+0800/stage_b.attempt1.out
+docs/verification/runs/20261031T004647+0800/stage_b.attempt2.out
+docs/verification/runs/20261031T004647+0800/stage_b.out
+docs/verification/runs/20261031T004916+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T004916+0800/declared_rules_hash.out
+docs/verification/runs/20261031T004916+0800/dify_publish_state.attempt1.out
+docs/verification/runs/20261031T004916+0800/dify_publish_state.out
+docs/verification/runs/20261031T004916+0800/environment.json
+docs/verification/runs/20261031T004945+0800/container_check.attempt1.out
+docs/verification/runs/20261031T004945+0800/container_check.out
+docs/verification/runs/20261031T004945+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T004945+0800/declared_rules_hash.attempt2.out
+docs/verification/runs/20261031T004945+0800/declared_rules_hash.out
+docs/verification/runs/20261031T004945+0800/dify_publish_state.attempt1.out
+docs/verification/runs/20261031T004945+0800/dify_publish_state.out
+docs/verification/runs/20261031T004945+0800/environment.json
+docs/verification/runs/20261031T004945+0800/i2_image.attempt1.out
+docs/verification/runs/20261031T004945+0800/i2_image.out
+docs/verification/runs/20261031T004945+0800/image_latest_stale.attempt1.out
+docs/verification/runs/20261031T004945+0800/image_latest_stale.out
+docs/verification/runs/20261031T004945+0800/probe46.attempt1.out
+docs/verification/runs/20261031T004945+0800/probe46.out
+docs/verification/runs/20261031T004945+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T004945+0800/range_contract.out
+docs/verification/runs/20261031T004945+0800/stage_b.attempt1.out
+docs/verification/runs/20261031T004945+0800/stage_b.attempt2.out
+docs/verification/runs/20261031T004945+0800/stage_b.out
+docs/verification/runs/20261031T005152+0800/container_check.attempt1.out
+docs/verification/runs/20261031T005152+0800/container_check.out
+docs/verification/runs/20261031T005152+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T005152+0800/declared_rules_hash.out
+docs/verification/runs/20261031T005152+0800/dify_publish_state.attempt1.out
+docs/verification/runs/20261031T005152+0800/dify_publish_state.out
+docs/verification/runs/20261031T005152+0800/environment.json
+docs/verification/runs/20261031T005152+0800/i2_image.attempt1.out
+docs/verification/runs/20261031T005152+0800/i2_image.out
+docs/verification/runs/20261031T005152+0800/image_latest_stale.attempt1.out
+docs/verification/runs/20261031T005152+0800/image_latest_stale.out
+docs/verification/runs/20261031T005152+0800/probe46.attempt1.out
+docs/verification/runs/20261031T005152+0800/probe46.out
+docs/verification/runs/20261031T005152+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T005152+0800/range_contract.out
+docs/verification/runs/20261031T005152+0800/stage_b.attempt1.out
+docs/verification/runs/20261031T005152+0800/stage_b.attempt2.out
+docs/verification/runs/20261031T005152+0800/stage_b.out
+docs/verification/runs/20261031T005437+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T005437+0800/declared_rules_hash.out
+docs/verification/runs/20261031T005437+0800/dify_publish_state.attempt1.out
+docs/verification/runs/20261031T005437+0800/dify_publish_state.out
+docs/verification/runs/20261031T005437+0800/environment.json
+docs/verification/runs/20261031T005437+0800/probe46.attempt1.out
+docs/verification/runs/20261031T005437+0800/probe46.out
+docs/verification/runs/20261031T005437+0800/range_contract.attempt1.out
+docs/verification/runs/20261031T005437+0800/range_contract.out
+docs/verification/runs/20261031T005437+0800/stage_b.attempt1.out
+docs/verification/runs/20261031T005437+0800/stage_b.attempt2.out
+docs/verification/runs/20261031T005437+0800/stage_b.out
+docs/verification/runs/20261031T011739+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T011739+0800/declared_rules_hash.out
+docs/verification/runs/20261031T011739+0800/environment.json
+docs/verification/runs/20261031T011739+0800/image_latest_stale.attempt1.out
+docs/verification/runs/20261031T011739+0800/image_latest_stale.out
+docs/verification/runs/20261031T012415+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T012415+0800/declared_rules_hash.out
+docs/verification/runs/20261031T012415+0800/environment.json
+docs/verification/runs/20261031T013620+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T013620+0800/declared_rules_hash.out
+docs/verification/runs/20261031T013620+0800/environment.json
+docs/verification/runs/20261031T013913+0800/declared_rules_hash.attempt1.out
+docs/verification/runs/20261031T013913+0800/declared_rules_hash.out
+docs/verification/runs/20261031T013913+0800/environment.json
+docs/verification/发现的问题.md
+docs/verification/复核指南-2026-10-31.md
+rulefix/apply-package/evidence/apply-run.txt
+rulefix/apply-package/evidence/post-revert-sha256.txt
+rulefix/apply-package/evidence/pre-run-sha256.txt
+rulefix/apply-package/evidence/revert-run.txt
+rulefix/apply-package/manifest.json
+rulefix/apply-package/repin-plan.md
+tests/acceptance/stage_b/pinned_hashes.json
+web/.tmp/demo-rehearsal/_last.out
+web/.tmp/demo-rehearsal/out-verify_nopipe.txt
+web/.tmp/demo-rehearsal/rehearsal-rules-layer.json
+web/.tmp/demo-rehearsal/rules-final.txt
+web/.tmp/demo-rehearsal/servers/val-final.log
+web/.tmp/demo-rehearsal/servers/validator.log
+web/.tmp/demo-rehearsal/start-out.txt
+web/.tmp/demo-rehearsal/test-battery.log
+workflow/evidence/WF-003-2026-10-30.md
+workflow/evidence/WF-003-2026-10-31-publish-v2/README.md
+workflow/evidence/local-2026-10-29/results.json
+workflow/evidence/local-2026-10-29/runs/20261030T234804+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261030T234806+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261030T235548+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T002926+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T003545+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T003554+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T003608+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T003629+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T003842+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004217+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004334+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004603+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004627+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004649+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T004947+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T005110+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T005154+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T005439+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T005540+0800/results.json
+workflow/evidence/local-2026-10-29/runs/20261031T010302+0800/results.json
+workflow/generated/manifest.json
+workflow/tools/tmp/pr-rules-range.md
+workflow/tools/tmp/section14.md
+
+# 含 rules.py:NNN 行号引用的文件
+docs/bossfix/提案-boss关系缺口-2026-10-31.md:96:| `validator/rules.py:124-125` | 只要求 `recipient_relation` �
+docs/demo/failure-modes.md:433:**原因**（`validator/rules.py:205-207`）：
+docs/intake-contract.md:18:| budget_amount | 十进制 string | 推荐必填；草稿可 null | 明确的全量预算上
+docs/intake-contract.md:20:| deadline_days | 非负 JSON integer | 推荐必填；草稿可 null | 原样映射 availabl
+docs/intake-contract.md:68:预算格式沿用 PM：`(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?`，如 `200.00`；拒绝空白、
+docs/intake-contract.md:83:| INVALID_TYPE | 适配层 `intake.py:41`、`:67`、`:88`、`:98`、`:105`，以及原校验�
+docs/intake-contract.md:84:| INVALID_AMOUNT | 原校验器 `rules.py:93` | 金额非合法 ASCII 十进制字符串：�
+docs/intake-contract.md:85:| UNSUPPORTED_CURRENCY | 原校验器 `rules.py:131` | 币种非 `CNY`（大小写敏感，`c
+docs/intake-contract.md:86:| LIMIT_EXCEEDED | 适配层 `intake.py:70`、`:107`，以及原校验器 `rules.py:41`、`:5
+docs/intake-contract.md:87:| DUPLICATE_ID | 适配层 `intake.py:78`，以及原校验器 `rules.py:146`、`:233` | 同�
+docs/intake-contract.md:88:| UNKNOWN_TAG | 原校验器 `rules.py:152`（候选 `tags` 见 `rules.py:191`） | 转换后
+docs/intake-contract.md:133:| `budget_amount` | 十进制 string；推荐必填；含包装/贺卡/配送；不能是区
+docs/intake-contract.md:135:| `deadline_days` | 非负 JSON integer，排除 bool；原样映射 `available_days` | ✅ 
+docs/intake-contract.md:149:| `budget_amount: "0"` | **裁决禁止**（[1, 10000]，**修订** VAL-001 §5 原「零预
+docs/intake-contract.md:151:| `budget_amount` 超大 | **裁决 [1, 10000]（含端点）** | `"10000.01"`/`"10001"`/100
+docs/intake-contract.md:155:| `deadline_days` 超大 | **裁决 [0, 365]（含端点）** | `366`/`10^20` → `needs_inp
+docs/intake-contract.md:215:- **数值范围契约 1 条（含 1 处修订，已落地）**：`budget_amount` ∈ [1, 10
+docs/pm-reviews/contract-decisions-draft-2026-10-30.md:19:| 校验器**不校验关系枚举**，只要求非空字符�
+docs/pm-reviews/contract-decisions-draft-2026-10-30.md:37:**问题：** `workflow/intake.py:117` 只把关系写成中�
+docs/pm-reviews/contract-decisions-draft-2026-10-30.md:72:**问题：** `docs/intake-contract.md:11` 要求关系是**�
+docs/pm-reviews/contract-decisions-draft-2026-10-30.md:84:2. `validator/rules.py:181` 的 `INVALID_CANDIDATE_ID`、`:242
+docs/pm-reviews/contract-decisions-draft-2026-10-30.md:112:| DEC-1b | 选 **A**：`request` 新增 `recipient_relation_i
+docs/pm-reviews/晨间简报-2026-10-31.md:108:`validator/rules.py:212`：
+docs/pm-reviews/晨间简报-2026-10-31.md:118:- **对我方口径的更正**：场景线原写「扫 `reason`/`inferenc
+docs/pm-reviews/晨间简报-2026-10-31.md:164:3. **Q8 自建复现连续失败两次**：第一次字段名用错（真
+docs/rulefix/规则门语义缺陷-复现与修复提案.md:33:| `validator/rules.py:211-213` | `for text_path, text in 
+docs/test-plan.md:290:`docs/intake-contract.md:60` **已自述**"`validator/rules.py:119–157` 对 `request` 无字段�
+docs/test-plan.md:449:- **`_amount` 静默 `None` 分支**（`rules.py:96–97`，`len > 1000` 时不报错即返回 Non
+docs/test-reports/boundary-001/acceptance-2026-10-31.md:289:| 规则层兜底 | `validator/rules.py:270–273` | `status
+docs/test-reports/boundary-001/acceptance-2026-10-31.md:338:`validator/rules.py:96–97`：
+docs/test-reports/contract-001/acceptance-2026-10-30.md:84:**性质**：`docs/intake-contract.md:60` **已自述**"`vali
+docs/test-reports/contract-001/acceptance-2026-10-30.md:239:3. ~~**`INTERNAL_ERROR` 是唯一"已实现但我无法由�
+docs/test-reports/contract-001/acceptance-2026-10-30.md:330:| 规则层兜底 | `validator/rules.py:270–273` | `status
+docs/test-reports/contract-001/tools/probe_doc_parity.py:86:    这样既能抓到 `validator/rules.py:181`，也能抓�
+docs/validator-contract-decisions.md:48:> **2026-10-30 修订（CONTRACT-001 裁决，已落地）**：新增**请求预
+docs/validator-contract-decisions.md:71:| `INVALID_TYPE` | `rules.py:33`、`:74`、`:81`、`:90`、`:102`、`:140`、`:1
+docs/validator-contract-decisions.md:72:| `INVALID_JSON` | `rules.py:38`、`:47` | 无法编码为合法 UTF-8、损坏 
+docs/validator-contract-decisions.md:73:| `LIMIT_EXCEEDED` | `rules.py:41`、`:57`、`:60`、`:132`、`:134` | 参数字
+docs/validator-contract-decisions.md:74:| `MISSING_FIELD` | `rules.py:69`、`:223` | `request` 或候选缺必填字段�
+docs/validator-contract-decisions.md:75:| `INVALID_AMOUNT` | `rules.py:93` | 金额非 ASCII 全匹配格式（见第 5 
+docs/validator-contract-decisions.md:76:| `INVALID_REQUEST` | `rules.py:121` | `request` 根节点非对象 | `needs_inp
+docs/validator-contract-decisions.md:77:| `UNSUPPORTED_CURRENCY` | `rules.py:136` | `request.currency` 非 `CNY`（大�
+docs/validator-contract-decisions.md:78:| `DUPLICATE_ID` | `rules.py:151`、`:238` | `request.facts` 的 ID 重复、候
+docs/validator-contract-decisions.md:79:| `UNKNOWN_TAG` | `rules.py:157`、`:196` | 请求 `forbidden_tags` 或候选 `t
+docs/validator-contract-decisions.md:80:| `INVALID_CANDIDATE_ID` | `rules.py:186` | 候选 ID 为字符串但不是 `c1`
+docs/validator-contract-decisions.md:81:| `OVER_BUDGET` | `rules.py:200` | 候选估算总额超过请求预算（`>`，
+docs/validator-contract-decisions.md:82:| `PREPARATION_TOO_LONG` | `rules.py:202` | 候选估算准备天数超过可用
+docs/validator-contract-decisions.md:83:| `CURRENCY_MISMATCH` | `rules.py:204` | 候选币种与请求币种不一致 | 
+docs/validator-contract-decisions.md:84:| `FORBIDDEN_TAG` | `rules.py:207` | 候选 `tags` 命中请求 `forbidden_tags`
+docs/validator-contract-decisions.md:85:| `UNKNOWN_FACT_REF` | `rules.py:210` | 候选 `fact_refs` 引用了原始请求
+docs/validator-contract-decisions.md:86:| `FORBIDDEN_TERM` | `rules.py:213` | 候选文本命中请求 `forbidden_terms`
+docs/validator-contract-decisions.md:87:| `INVALID_CANDIDATE_COUNT` | `rules.py:230` | 候选数量不是恰好 3；**�
+docs/validator-contract-decisions.md:88:| `DUPLICATE_CANDIDATE_CONTENT` | `rules.py:247` | 不同候选的 `name`+`descr
+docs/validator-contract-decisions.md:89:| `INTERNAL_ERROR` | `rules.py:276` | 未预期执行异常兜底，`path` 为 `
+docs/validator-contract-decisions.md:91:> **行号基准（截至 2026-10-31 00:09 复核）**：本表对应 `validator
+workflow/evidence/WF-003-2026-10-30.md:137:已实测 `validator/rules.py:119–157` 的 `_request()` 确无字段白名�
+workflow/evidence/WF-003-2026-10-30.md:174:| 错误码清单 | 补 `INVALID_CANDIDATE_ID`（`validator/rules.py:181`）�
+workflow/evidence/WF-003-2026-10-30.md:1245:  `validator/rules.py:41`（参数字符串超 32768 UTF-8 字节）、`:57`
+workflow/tools/apply-local-corrections.py:111:| DEC-1b | 选 **A**：`request` 新增 `recipient_relation_id`（机器�
+workflow/tools/create-stage-issues.py:79:5. **A 方案**：`request` 新增稳定字段 `recipient_relation_id`（机器
+workflow/tools/create-stage-issues.py:87:5. `workflow/workflow-spec.md`：把"同事生日"首场景改为恋人/追求�
+workflow/tools/tmp/c2t.md:18:`_amount`（`rules.py:88`）与 `_days`（`rules.py:100`）被**请求侧（`:124`/`:125`�
+workflow/tools/tmp/c6b.md:19:- `rules.py:131–132` = 预算范围、`:133–134` = 天数范围 —— **逐字命中**
+workflow/tools/tmp/c6b.md:36:`docs/intake-contract.md:60` 的 `validator/rules.py:119–157` **偏短**：
+workflow/tools/tmp/c6r.md:33:你报的两处更正（`runtime.py` 实发 **3** 码而非 4；`INTERNAL_ERROR` 已实际�
+workflow/tools/tmp/c7a.md:4:**缺 `LIMIT_EXCEEDED`**（该码已定义、且 `validator/rules.py:41/:57/:60` 实发）�
+workflow/tools/tmp/c7c.md:15:现在那行清单仍是 **18 个**码，缺 `LIMIT_EXCEEDED`（`validator/rules.py:41/:57/
+workflow/tools/tmp/c7e.md:13:**其后的所有行号整体 +5**。你第 96 行里 `INVALID_CANDIDATE_ID`（原写 `vali
+workflow/tools/tmp/c7e.md:14:与 `DUPLICATE_CANDIDATE_CONTENT`（原写 `validator/rules.py:242`）都要改成 `:186` �
+workflow/tools/tmp/c7e.md:17:我核过现状：`validator/rules.py:186` = `_error(errors, "INVALID_CANDIDATE_ID", ...)`�
+workflow/tools/tmp/c8q.md:8:  范围只约束请求侧。`_amount`（rules.py:88）与 `_days`（:100）是**请求与�
+workflow/tools/tmp/c8q.md:16:  （`rules.py:271→$`、`intake.py:134–135→intake`），应从"未核实"移出
+workflow/tools/tmp/pr-rules-range.md:23:加在 `_request()` 的**调用点**（`rules.py:130-134`），`_amount`(:88) / 
+workflow/tools/tmp/pr-rules-range.md:125:   ① `validator/rules.py:130-134` 是否真的只在调用点（`_amount`/`_d
+workflow/tools/tmp/section13.md:6:  `validator/rules.py:41`（参数字符串超 32768 UTF-8 字节）、`:57`（单字�
+workflow/workflow-spec.md:96:既有错误代码保持 **19 个**（2026-10-30 与 `validator/rules.py` 逐条对账；�
+
+# 声明 329 / 688 的文件
+README.md
+docs/acceptance-criteria.md
+docs/competition/qa-bank/README.md
+docs/competition/qa-bank/_evidence/issue-28.html
+docs/competition/qa-bank/_evidence/issue-28.md
+docs/competition/qa-bank/_evidence/数字核对.md
+docs/competition/qa-bank/发现的问题.md
+docs/competition/qa-bank/评委问答-2026-10-31.md
+docs/competition/材料清单与自查.md
+docs/competition/答辩PPT骨架.md
+docs/test-plan.md

@@ -1,0 +1,37 @@
+{
+  "probe": "INTERNAL_ERROR 故障注入触达",
+  "note": "注入仅在进程内生效，finally 还原",
+  "baseline": {
+    "validator_status": "passed",
+    "validator_codes": [],
+    "intake_status": "ready",
+    "intake_codes": []
+  },
+  "injected": {
+    "fault": "validator.rules._norm 被替换为抛 RuntimeError 的函数",
+    "validator_status": "error",
+    "validator_all_passed": false,
+    "validator_codes": [
+      [
+        "INTERNAL_ERROR",
+        "$"
+      ]
+    ],
+    "validator_business_data_verification": "not_verified",
+    "validator_has_traceback": false,
+    "intake_status": "needs_input",
+    "intake_codes": [
+      [
+        "INTERNAL_ERROR",
+        "intake"
+      ]
+    ],
+    "intake_request_json_released": false
+  },
+  "after_restore": {
+    "validator_status": "passed",
+    "validator_codes": [],
+    "norm_is_original": true
+  },
+  "reached_both_paths": true
+}

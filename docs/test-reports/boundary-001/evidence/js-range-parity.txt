@@ -1,0 +1,22 @@
+node v24.21.0
+探针 js-range-parity
+
+用例                                Python                                  JS                                      判定
+------------------------------------------------------------------------------------------------------------------------
+budget=0（越界，Python 须拒）             Python=needs_input ['LIMIT_EXCEEDED']           JS=needs_input ['LIMIT_EXCEEDED']           一致
+budget=0.00（越界，Python 须拒）          Python=needs_input ['LIMIT_EXCEEDED']           JS=needs_input ['LIMIT_EXCEEDED']           一致
+budget=1（端点，本身不报范围错）               Python=failed      ['OVER_BUDGET']              JS=failed      ['OVER_BUDGET']              一致
+budget=10000（端点，须通过）               Python=passed      []                           JS=passed      []                           一致
+budget=10000.01（越界，Python 须拒）      Python=needs_input ['LIMIT_EXCEEDED']           JS=needs_input ['LIMIT_EXCEEDED']           一致
+budget=10001（越界，Python 须拒）         Python=needs_input ['LIMIT_EXCEEDED']           JS=needs_input ['LIMIT_EXCEEDED']           一致
+days=0（端点，本身不报范围错）                 Python=failed      ['PREPARATION_TOO_LONG']     JS=failed      ['PREPARATION_TOO_LONG']     一致
+days=365（端点，须通过）                   Python=passed      []                           JS=passed      []                           一致
+days=366（越界，Python 须拒）             Python=needs_input ['LIMIT_EXCEEDED']           JS=needs_input ['LIMIT_EXCEEDED']           一致
+days=10**20（越界，Python 须拒）          Python=needs_input ['LIMIT_EXCEEDED']           JS=error       ['INVALID_JSON']             **分歧**
+格式 -1（须 INVALID_AMOUNT）            Python=needs_input ['INVALID_AMOUNT']           JS=needs_input ['INVALID_AMOUNT']           一致
+格式 01.00（须 INVALID_AMOUNT）         Python=needs_input ['INVALID_AMOUNT']           JS=needs_input ['INVALID_AMOUNT']           一致
+候选 20000（只应 OVER_BUDGET）           Python=failed      ['OVER_BUDGET']              JS=failed      ['OVER_BUDGET']              一致
+候选 prep=0（须通过）                     Python=passed      []                           JS=passed      []                           一致
+
+分歧用例数：1/14
+分歧清单：["days=10**20（越界，Python 须拒）"]

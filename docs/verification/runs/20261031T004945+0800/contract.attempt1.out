@@ -1,0 +1,186 @@
+检查: contract
+分组: fast
+说明: 契约探针（19 码/边界/双向对账）
+开始: 2026-10-31T00:49:46.448091+08:00
+尝试: 第 1 次
+
+==============================================================================
+## 契约探针（19 码触达 + 边界矩阵 + 文档双向对账）
+## 命令: D:/msys64/mingw64/bin/python.exe -X utf8 docs/test-reports/contract-001/tools/run_all.py
+## 退出码: 0
+## 判定: 退出码 0，且命中 2 条关键输出
+==============================================================================
+CONTRACT-001 契约探针套件
+仓库根：C:/Users/lenovo/Desktop/giftwise
+
+==========================================================================
+CONTRACT-001 探针 1/3：错误码全量清点与动态触发
+仓库根：C:/Users/lenovo/Desktop/giftwise
+  validator/rules.py: 19 个静态码
+  workflow/intake.py: 9 个静态码
+  workflow/runtime.py: 3 个静态码
+
+=== validator/rules.py ===
+静态声明：19 个码  ["CURRENCY_MISMATCH", "DUPLICATE_CANDIDATE_CONTENT", "DUPLICATE_ID", "FORBIDDEN_TAG", "FORBIDDEN_TERM", "INTERNAL_ERROR", "INVALID_AMOUNT", "INVALID_CANDIDATE_COUNT", "INVALID_CANDIDATE_ID", "INVALID_JSON", "INVALID_REQUEST", "INVALID_TYPE", "LIMIT_EXCEEDED", "MISSING_FIELD", "OVER_BUDGET", "PREPARATION_TOO_LONG", "UNKNOWN_FACT_REF", "UNKNOWN_TAG", "UNSUPPORTED_CURRENCY"]
+  [触达] INVALID_TYPE                 request 参数不是字符串
+  [触达] INVALID_JSON                 request 参数损坏 JSON
+  [触达] LIMIT_EXCEEDED               request 参数 32769 UTF-8 字节（上限+1）
+  [触达] MISSING_FIELD                request 缺 occasion
+  [触达] INVALID_AMOUNT               预算前导零（0200）
+  [触达] INVALID_REQUEST              request 根节点非对象
+  [触达] UNSUPPORTED_CURRENCY         币种 USD
+  [触达] DUPLICATE_ID                 request.facts 的 ID 重复
+  [触达] UNKNOWN_TAG                  forbidden_tags 含词表外类别
+  [触达] INVALID_CANDIDATE_ID         候选 ID 为 c4
+  [触达] OVER_BUDGET                  候选估算超过预算
+  [触达] PREPARATION_TOO_LONG         候选准备天数超过可用天数
+  [触达] CURRENCY_MISMATCH            候选币种与请求不一致
+  [触达] FORBIDDEN_TAG                候选命中请求禁忌类别
+  [触达] UNKNOWN_FACT_REF             候选引用不存在的事实 ID
+  [触达] FORBIDDEN_TERM               候选文本命中禁忌字面词
+  [触达] INVALID_CANDIDATE_COUNT      候选只有 2 个
+  [触达] DUPLICATE_CANDIDATE_CONTENT  两候选名称与描述完全相同
+  [触达] INTERNAL_ERROR               校验器内部异常兜底（注入 _request 抛错）
+动态触达：19/19
+
+=== workflow/intake.py ===
+静态声明：9 个码  ["DUPLICATE_ID", "INTAKE_CLARIFICATION_REQUIRED", "INTAKE_CONFIDENCE_MISMATCH", "INTAKE_INVALID_JSON", "INTAKE_UNKNOWN_FIELD", "INTAKE_UNKNOWN_LABEL", "INTERNAL_ERROR", "INVALID_TYPE", "LIMIT_EXCEEDED"]
+  [触达] INTAKE_INVALID_JSON          损坏 JSON
+  [触达] INVALID_TYPE                 根节点非对象
+  [触达] INTAKE_UNKNOWN_FIELD         注入未声明字段
+  [触达] INTAKE_CLARIFICATION_REQUIRED 缺 recipient_relation
+  [触达] INTAKE_UNKNOWN_LABEL         未声明关系值 boss
+  [触达] DUPLICATE_ID                 interests 重复标签
+  [触达] LIMIT_EXCEEDED               gift_styles 21 项
+  [触达] INTAKE_CONFIDENCE_MISMATCH   可信度值 unknown
+  [触达] INTERNAL_ERROR               复核返回 status=error
+动态触达：9/9
+
+=== workflow/runtime.py ===
+静态声明：3 个码  ["PASSED_CANDIDATE_CHANGED", "REPAIR_NOT_ALLOWED", "WORKFLOW_INPUT_ERROR"]
+  [触达] REPAIR_NOT_ALLOWED           额度已用仍再次修订
+  [触达] PASSED_CANDIDATE_CHANGED     修订篡改已通过项
+  [触达] WORKFLOW_INPUT_ERROR         main payload 无效
+动态触达：3/3
+
+=== 汇总 ===
+validator/rules.py   19/19
+workflow/intake.py   9/9（另有 UNKNOWN_TAG 由 validator 透传，适配层可达 10 个）
+workflow/runtime.py  3/3
+结论：validator 19/19 全部触达 ✅
+
+==========================================================================
+CONTRACT-001 探针 2/3：边界值矩阵实测
+仓库根：C:/Users/lenovo/Desktop/giftwise
+relations（10 个）：["classmate", "client_partner", "colleague", "family", "friend", "mentor", "other", "partner", "pursuit", "unknown"]
+
+--- 请求预算 ---
+  [ok  ] "0"（下界-1）                          status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] "0.00"                             status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] "1"（下界）                            status=failed       codes=["OVER_BUDGET"]
+  [ok  ] "200.00"                           status=passed       codes=[]
+  [ok  ] "10000"（上界）                        status=passed       codes=[]
+  [ok  ] "10000.00"（上界）                     status=passed       codes=[]
+  [ok  ] "10000.01"（上界+0.01）                status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] "10001"                            status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] 1000 位数字串                          status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] "-1"                               status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] "0200"（前导零）                        status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] "1e3"（指数）                          status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] "２００"（全角）                          status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] "1,000"（千位分隔）                      status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] "200😀"                             status=needs_input  codes=["INVALID_AMOUNT"]
+  [ok  ] " 200"（前后空白）                       status=needs_input  codes=["INVALID_AMOUNT"]
+--- 可用天数 ---
+  [ok  ] 0（下界，当天）                           status=failed       codes=["PREPARATION_TOO_LONG"]
+  [ok  ] 1                                  status=failed       codes=["PREPARATION_TOO_LONG"]
+  [ok  ] 365（上界）                            status=passed       codes=[]
+  [ok  ] 366（上界+1）                          status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] 10^20                              status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] -1                                 status=needs_input  codes=["INVALID_TYPE"]
+  [ok  ] True（bool）                         status=needs_input  codes=["INVALID_TYPE"]
+  [ok  ] 1.0（float）                         status=needs_input  codes=["INVALID_TYPE"]
+  [ok  ] "3"（字符串）                           status=needs_input  codes=["INVALID_TYPE"]
+--- 候选侧 ---
+  [ok  ] estimated_total "0.00"             status=passed       codes=[]
+  [ok  ] estimated_total "0"                status=passed       codes=[]
+  [ok  ] estimated_total "1000000.00"       status=failed       codes=["OVER_BUDGET"]
+  [ok  ] estimated_preparation_days 99999   status=failed       codes=["PREPARATION_TOO_LONG"]
+--- 上限 ---
+  [ok  ] 字段 1000 码点                         status=passed       codes=[]
+  [ok  ] 字段 1001 码点                         status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] 数组 20 项                            status=passed       codes=[]
+  [ok  ] 数组 21 项                            status=needs_input  codes=["LIMIT_EXCEEDED"]
+  [ok  ] 候选 21 个                            status=failed       codes=["DUPLICATE_ID", "INVALID_CANDIDATE_COUNT"]
+  [ok  ] 参数 32768 字节（=上限）                   status=needs_input  codes=["INVALID_REQUEST"]
+  [ok  ] 参数 32769 字节（上限+1）                  status=needs_input  codes=["LIMIT_EXCEEDED"]
+--- 解析 ---
+  [ok  ] 嵌套 2000 层                          status=needs_input  codes=["MISSING_FIELD"]
+  [ok  ] 嵌套 3000 层                          status=error        codes=["INVALID_JSON"]
+  [ok  ] 参数含真实孤立代理字符                        status=error        codes=["INVALID_JSON"]
+  [ok  ] JSON 转义孤立代理（ASCII 文本）              status=passed       codes=[]
+--- 适配层 ---
+  [ok  ] interests 空数组                      status=ready        codes=[]
+  [ok  ] colleague（技术回归值）                   status=ready        codes=[]
+  [ok  ] 注入 recipient_relation_id           status=needs_input  codes=["INTAKE_UNKNOWN_FIELD"]
+  [ok  ] tags ["ALCOHOL"]（精确匹配）             status=needs_input  codes=["INTAKE_UNKNOWN_LABEL"]
+  [ok  ] tags [1]（非字符串）                     status=needs_input  codes=["INTAKE_UNKNOWN_LABEL", "INVALID_TYPE"]
+  [ok  ] tags ["nonsense"]（词表外）             status=needs_input  codes=["INTAKE_UNKNOWN_LABEL", "UNKNOWN_TAG"]
+  [ok  ] interest_confidence unknown        status=needs_input  codes=["INTAKE_CONFIDENCE_MISMATCH"]
+
+=== 汇总 ===
+边界场景 47/47 通过
+结论：全部符合 2026-10-30 契约 ✅
+
+==========================================================================
+CONTRACT-001 探针 3/3：契约文档与实现的清单对账
+仓库根：C:/Users/lenovo/Desktop/giftwise
+
+=== 1. intake 字段白名单 vs 文档字段表 ===
+代码白名单（11）：["additional_context", "budget_amount", "closeness", "currency", "deadline_days", "gift_styles", "hard_exclusions", "interest_confidence", "interests", "occasion", "recipient_relation"]
+文档字段表（11）：["additional_context", "budget_amount", "closeness", "currency", "deadline_days", "gift_styles", "hard_exclusions", "interest_confidence", "interests", "occasion", "recipient_relation"]
+仅代码有：[]
+仅文档有：[]
+recipient_relation_id 是否被误列入白名单：否 ✅
+
+=== 2. 词表规模 vs 文档枚举记载 ===
+  labels.CLOSENESS      5 项  ["familiar", "limited", "unfamiliar", "unknown", "very_familiar"]
+  labels.EXCLUSIONS     6 项  ["alcohol", "food", "fragrance", "jewelry", "other", "plant"]
+  labels.GIFT_STYLES    7 项  ["design", "experiential", "memorable", "personalized", "practical", "surprising", "understated"]
+  labels.INTERESTS     12 项  ["coffee_food", "design_art", "experiences_activities", "fashion_accessories", "games_anime", "home_living", "music_movies", "plants_nature", "reading_learning", "sports_outdoors", "tech_digital", "travel_exploration"]
+  labels.OCCASIONS      7 项  ["anniversary", "birthday", "festival", "graduation_promotion", "other", "thanks", "unknown"]
+  labels.RELATIONS     10 项  ["classmate", "client_partner", "colleague", "family", "friend", "mentor", "other", "partner", "pursuit", "unknown"]
+
+=== 3. 错误码双向对账 ===
+实现 validator/rules.py（19）：["CURRENCY_MISMATCH", "DUPLICATE_CANDIDATE_CONTENT", "DUPLICATE_ID", "FORBIDDEN_TAG", "FORBIDDEN_TERM", "INTERNAL_ERROR", "INVALID_AMOUNT", "INVALID_CANDIDATE_COUNT", "INVALID_CANDIDATE_ID", "INVALID_JSON", "INVALID_REQUEST", "INVALID_TYPE", "LIMIT_EXCEEDED", "MISSING_FIELD", "OVER_BUDGET", "PREPARATION_TOO_LONG", "UNKNOWN_FACT_REF", "UNKNOWN_TAG", "UNSUPPORTED_CURRENCY"]
+实现 workflow/intake.py（9）
+文档 intake-contract 适配边界表（12）：["DUPLICATE_ID", "INTAKE_CLARIFICATION_REQUIRED", "INTAKE_CONFIDENCE_MISMATCH", "INTAKE_INVALID_JSON", "INTAKE_UNKNOWN_FIELD", "INTAKE_UNKNOWN_LABEL", "INTERNAL_ERROR", "INVALID_AMOUNT", "INVALID_TYPE", "LIMIT_EXCEEDED", "UNKNOWN_TAG", "UNSUPPORTED_CURRENCY"]
+文档 VAL-001 §7 全量清单（19）
+文档 workflow-spec.md 出现的码（28）
+
+[必须为空] validator 实发 - VAL-001 §7 = []
+[必须为空] VAL-001 §7 - validator 实发 = []
+[他人文件线] validator 实发 - workflow-spec.md = []
+[必须为空] workflow-spec.md 里的预留码是否已被实现 = []
+
+=== 4. VAL-001 §7 行号引用对账 ===
+基准：validator/rules.py 共 278 行（splitlines 计数）
+  ✅ 19 个码的行号引用与实现完全一致
+
+=== 5. 跨文件行号引用对账（workflow/workflow-spec.md）===
+  workflow-spec.md 引用 rules.py 行号 5 个：[41, 57, 60, 181, 242]
+  ❌ 过期引用 :181 → 位移 +5 后应为 :186（该行号有效）
+  ❌ 过期引用 :242 → 位移 +5 后应为 :247（该行号有效）
+  ⚠️  属 workflow-spec.md 文件线，本探针只报不判失败
+
+=== 汇总 ===
+  ✅ 字段白名单、VAL-001 §7 全量清单与实现双向一致
+
+==========================================================================
+汇总：
+  [PASS] probe_error_codes
+  [PASS] probe_boundaries
+  [PASS] probe_doc_parity
+结论：全部通过 ✅
+
+[本工具] 本次尝试判定：PASS（退出码 0，且命中 2 条关键输出）；耗时 0.58s

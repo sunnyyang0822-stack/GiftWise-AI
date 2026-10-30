@@ -1,0 +1,26 @@
+检查: range_contract
+分组: fast
+说明: 请求侧范围契约（内置纯函数探针）
+开始: 2026-10-31T00:52:17.009866+08:00
+尝试: 第 1 次
+声明：请求侧 budget_amount ∈ [1,10000]、available_days ∈ [0,365]；候选侧不受该范围约束。
+被检实现：validator/rules.py  sha256=1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+
+  [ok  ] 预算 0 拒绝（LIMIT_EXCEEDED @ request.budget_amount）  —— status=needs_input errors=[('LIMIT_EXCEEDED', 'request.budget_amount')]
+  [ok  ] 预算 0.99 拒绝（LIMIT_EXCEEDED @ request.budget_amount）  —— status=needs_input errors=[('LIMIT_EXCEEDED', 'request.budget_amount')]
+  [ok  ] 预算 1 允许  —— status=passed errors=[]
+  [ok  ] 预算 10000 允许  —— status=passed errors=[]
+  [ok  ] 预算 10000.01 拒绝（LIMIT_EXCEEDED @ request.budget_amount）  —— status=needs_input errors=[('LIMIT_EXCEEDED', 'request.budget_amount')]
+  [ok  ] 预算 10001 拒绝（LIMIT_EXCEEDED @ request.budget_amount）  —— status=needs_input errors=[('LIMIT_EXCEEDED', 'request.budget_amount')]
+  [ok  ] 天数 -1 走格式错误（INVALID_TYPE，不是范围码）  —— status=needs_input errors=[('INVALID_TYPE', 'request.available_days')]
+  [ok  ] 天数 0 允许（0=当天）  —— status=passed errors=[]
+  [ok  ] 天数 1 允许（0=当天）  —— status=passed errors=[]
+  [ok  ] 天数 365 允许（0=当天）  —— status=passed errors=[]
+  [ok  ] 天数 366 拒绝（LIMIT_EXCEEDED @ request.available_days）  —— status=needs_input errors=[('LIMIT_EXCEEDED', 'request.available_days')]
+  [ok  ] 候选侧零估算（0/0.0/0.00）+ 零准备天数仍通过  —— status=passed all_passed=True errors=[]
+  [ok  ] 候选 estimated_total=10001 → OVER_BUDGET（不是 LIMIT_EXCEEDED）  —— candidate errors=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('PREPARATION_TOO_LONG', 'candidates[0].estimated_preparation_days')]
+  [ok  ] 候选 estimated_preparation_days=400 → PREPARATION_TOO_LONG（不是 LIMIT_EXCEEDED）  —— candidate errors=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('PREPARATION_TOO_LONG', 'candidates[0].estimated_preparation_days')]
+
+合计 14/14 项符合预期。
+
+[本工具] 本次尝试判定：PASS（14/14 项符合预期）；耗时 0.03s

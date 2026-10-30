@@ -45,9 +45,13 @@ class ValidatorTests(unittest.TestCase):
         self.assertEqual([], output["errors"])
 
     def test_decimal_boundary_ignores_context_rounding(self):
+        # 请求预算上界为 10000，越界预算会先被 LIMIT_EXCEEDED 拦下并抑制候选侧上下文，
+        # 因此改为在上界处验证十进制比较不按浮点取整。
         case = copy.deepcopy(CASES["T01_normal"])
-        case["request"]["budget_amount"] = "123456789012345678901234567890.01"
-        case["candidate_batch"]["candidates"][0]["estimated_total"] = "123456789012345678901234567890.02"
+        case["request"]["budget_amount"] = "10000"
+        case["candidate_batch"]["candidates"][0]["estimated_total"] = "10000.00"
+        self.assertTrue(run_case(case)[0]["candidate_results"][0]["passed"])
+        case["candidate_batch"]["candidates"][0]["estimated_total"] = "10000.01"
         self.assertIn("OVER_BUDGET", [e["code"] for e in errors(run_case(case)[0])])
 
     def test_deep_json_and_non_string_arguments_controlled(self):

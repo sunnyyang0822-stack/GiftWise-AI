@@ -9,7 +9,7 @@
 import { strictParse, dump } from "./jsonstrict.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
 import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError } from "./checker.mjs";
-import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure } from "./mock-model.mjs";
+import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
 import { GIFT_STYLE_TABLE, CLOSENESS_TABLE } from "./labels.mjs";
 import { requestCandidates, requestPresentation } from "./dify.mjs";
 import { createRun, getRun, publicReport } from "./store.mjs";
@@ -107,6 +107,12 @@ export async function runRecommendation(input) {
     callCounts.recommend += 1;
     candidatesJson = built.candidates_json;
     notices.push(built.notice);
+  } else if (demo === "stress") {
+    // 前端破版自查专用：结构不变，只把文案拉到极端长度并夹入 emoji 与不可断行长串。
+    const built = buildMockStressCandidates(request);
+    callCounts.recommend += 1;
+    candidatesJson = built.candidates_json;
+    notices.push(built.notice);
   } else {
     const built = buildMockCandidates(request);
     callCounts.recommend += 1;
@@ -186,6 +192,7 @@ export async function runRecommendation(input) {
     notices,
   });
   run.call_counts = callCounts;
+  run.demo = demo;
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];
   run.initial_candidate_ids = initialValidation.candidate_results.map((r) => r.id);
 
@@ -366,7 +373,7 @@ export async function runPresentation(input) {
       forceOverBudgetFirst: demo === "presentation_over_budget",
     });
     run.call_counts.presentation += 1;
-    presentation = built.presentation;
+    presentation = run.demo === "stress" || demo === "stress" ? stressifyPresentation(built.presentation) : built.presentation;
   }
 
   let recheck = checkPresentation(run.request, candidate, presentation);

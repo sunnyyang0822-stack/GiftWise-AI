@@ -1,0 +1,28 @@
+{
+  "checkedAtLocal": "2026-10-30T13:03:41.176Z",
+  "deepseek": {
+    "systemEnabled": false,
+    "customStatus": "no-configure"
+  },
+  "deepseekCredentialKeys": [],
+  "deepseekCredentialConfigured": false,
+  "deepseekModelStatus": [
+    "deepseek-flash=no-configure",
+    "deepseek-v4-flash=no-configure",
+    "deepseek-v4-flash-vision-exp=no-configure",
+    "deepseek-v4-pro=no-configure"
+  ],
+  "draft": {
+    "updatedAt": 1793365077,
+    "hash": "d9bed7478d5962c57566894b7b7d372e39b99b1f2fcf07f7586a1325705b15fb",
+    "toolPublished": false,
+    "version": "draft",
+    "versionNumber": null,
+    "markedName": "",
+    "nodeCount": 11,
+    "edgeCount": 11,
+    "nodeTypes": "start,code,code,code,if-else,code,code,code,code,end,end",
+    "hasLlmNode": false
+  },
+  "_STALE_WARNING": "本文件是 2026-10-30 21:03 的过期快照：当时 N2/N5 仍是占位 Code 节点、DeepSeek 尚未配置（custom_status=no-configure）。它早于 21:10 后的 LLM 节点替换与 21:16 的真实运行。当前有效状态见 dify-final-state-after-last-change-2026-10-30T2240+0800.json。请勿把本文件当作最终态。"
+}

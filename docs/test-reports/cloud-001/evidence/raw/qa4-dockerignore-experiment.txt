@@ -1,0 +1,13 @@
+=== 实验1：.dockerignore 写 __pycache__ 与 *.pyc（= 仓库当前写法）===
+/ctx/.dockerignore
+/ctx/keep.txt
+/ctx/sub
+/ctx/sub/__pycache__
+/ctx/sub/__pycache__/mod.cpython-312.pyc
+/ctx/sub/mod.py
+---
+=== 实验2：改成 **/__pycache__ 与 **/*.pyc ===
+/ctx/.dockerignore
+/ctx/keep.txt
+/ctx/sub
+/ctx/sub/mod.py

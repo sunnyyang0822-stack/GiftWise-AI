@@ -1,0 +1,84 @@
+[
+  {
+    "case": "demo_forbidden_term_chocolate",
+    "expect": "N2 真实生成 → N3 校验；若含「巧克力」则 N4[repairable] → N5 真实修订 → N6；全通过则 N7a/End A",
+    "startedAtUtc": "2026-10-30T15:06:48.882Z",
+    "httpStatus": 200,
+    "browserElapsedMs": 5469,
+    "N2_raw_text_chars": 1257,
+    "N2_elapsed_s": 4.43872,
+    "N3_status": "passed",
+    "N3_all_passed": true,
+    "N3_codes": [],
+    "N3_per_candidate": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N3_preserved": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "N4_case": "true",
+    "N5_ran": false,
+    "N5_elapsed_s": null,
+    "N5_raw_text_chars": null,
+    "N6_status": null,
+    "N6_all_passed": null,
+    "N6_per_candidate": [],
+    "N6_repair_count": null,
+    "workflow_status": "succeeded",
+    "workflow_elapsed_s": 4.908794604009017,
+    "total_tokens": 1487,
+    "end_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 0
+    },
+    "selectable_candidate_ids": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "selected_candidate_id": null,
+    "candidate_names": [
+      [
+        "c1",
+        "咖啡主题小礼盒",
+        "168.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c2",
+        "美食体验小组合",
+        "150.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c3",
+        "简约咖啡器具小物",
+        "190.00",
+        [
+          "other"
+        ]
+      ]
+    ]
+  }
+]

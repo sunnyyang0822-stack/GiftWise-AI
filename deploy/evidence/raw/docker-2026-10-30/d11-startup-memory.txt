@@ -1,0 +1,10 @@
+run1 startup_s=0.939 http=200 mem=17.08MiB / 7.618GiB | 0.01%
+  healthz={"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}
+run2 startup_s=0.816 http=200 mem=15.86MiB / 7.618GiB | 0.01%
+  healthz={"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}
+run3 startup_s=0.812 http=200 mem=15.95MiB / 7.618GiB | 0.01%
+  healthz={"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}
+run4 startup_s=0.800 http=200 mem=15.5MiB / 7.618GiB | 0.02%
+  healthz={"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}
+run5 startup_s=0.786 http=200 mem=16.03MiB / 7.618GiB | 0.01%
+  healthz={"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}

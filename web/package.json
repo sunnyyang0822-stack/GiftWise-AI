@@ -7,6 +7,9 @@
   "scripts": {
     "start": "node server/server.mjs",
     "test": "node tests/access-layer.test.mjs",
+    "check:http": "node tools/smoke-http.mjs",
+    "check:probe": "node tools/page-probe.mjs",
+    "check:browser": "node tools/browser-check.mjs",
     "check:parity": "node tools/parity-check.mjs",
     "fixtures": "node tools/gen-parity-fixtures.mjs"
   },

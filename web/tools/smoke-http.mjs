@@ -2,13 +2,19 @@
  * HTTP 冒烟验证（可复现证据，替代零散 curl）。
  *
  * 前置：先启动接入层 `node web/server/server.mjs`（默认 http://127.0.0.1:8787）。
+ *   跑检查前会先做**服务身份自检**（比对服务返回的 /landing.css 与 / 字节数是否等于本工作区
+ *   web/public 的磁盘字节数）：不一致则非零退出（防止静默测到别的工作区）；
+ *   未显式指定 GW_BASE 且默认端口不可用/不一致时，会在空闲端口自起独占服务。
  * 运行： node web/tools/smoke-http.mjs   （任一检查失败时退出码 1）
  *
  * 覆盖：配置与标签、篡改拒绝、三候选与选择门槛、四段呈现顺序、
  * 呈现复核、全局最多一次修订的两种走向、幂等重放、超时、模拟标识。
  */
 
-const BASE = process.env.GW_BASE || "http://127.0.0.1:8787";
+import { ensureLocalServer, stopOwnServer } from "./server-identity.mjs";
+
+// 未显式指定 GW_BASE 时，下面的自检可能把 BASE 改指向自起的独占服务，因此用 let。
+let BASE = process.env.GW_BASE || "http://127.0.0.1:8787";
 const EXAMPLE_INTAKE = {
   recipient_relation: "pursuit",
   closeness: "limited",
@@ -57,6 +63,9 @@ async function api(path, body, options = {}) {
 const intake = (patch = {}, demo = null) => ({ intake: { ...EXAMPLE_INTAKE, ...patch }, demo });
 
 async function main() {
+  // 开工前服务身份自检（与 browser-check / page-probe 共用同一模块）：
+  // 防止静默测到别的工作区的服务；必要时在本工作区自起独占端口。
+  BASE = await ensureLocalServer(BASE, { explicit: (process.env.GW_BASE || "").trim().length > 0 });
   /* 1. 配置与标签 */
   const cfg = await api("/api/config");
   check("GET /api/config 返回 200", cfg.status === 200, `http=${cfg.status}`);
@@ -171,7 +180,7 @@ async function main() {
   } catch (err) {
     timedOut = err.name === "AbortError" || err.code === "ABORT_ERR";
   }
-  check("超时路径：客户端可中止并显示中文超时状态", timedOut);
+  check("超时路径：客户端可在 3 秒时中止请求（不校验文案）", timedOut);
 
   /* 13. 运行记录可查 */
   const runInfo = await api(`/api/runs/${runId}`);
@@ -183,6 +192,7 @@ async function main() {
     process.stdout.write(`${item.ok ? "PASS" : "FAIL"}  ${item.name}${item.ok ? "" : `\n        ↳ ${item.detail}`}\n`);
   }
   process.stdout.write(`\n合计 ${results.length} 项检查，失败 ${failures} 项；目标服务 ${BASE}\n`);
+  stopOwnServer();
   process.exit(failures === 0 ? 0 : 1);
 }
 

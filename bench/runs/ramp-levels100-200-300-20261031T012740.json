@@ -1,0 +1,165 @@
+{
+  "url": "http://127.0.0.1:18903",
+  "container": "__none__",
+  "levels": [
+    {
+      "url": "http://127.0.0.1:18903",
+      "concurrency": 100,
+      "requests_per_worker": 60,
+      "requests_total": 6000,
+      "wall_seconds": 6.215,
+      "throughput_rps": 965.41,
+      "throughput_ok_rps": 965.41,
+      "status_counts": {
+        "200": 6000
+      },
+      "ok_200": 6000,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 311,
+      "client_time_wait_after": 310,
+      "latency": {
+        "n": 6000,
+        "min_ms": 23.11,
+        "mean_ms": 102.06,
+        "p50_ms": 101.255,
+        "p90_ms": 114.38,
+        "p95_ms": 121.984,
+        "p99_ms": 134.425,
+        "p999_ms": 152.091,
+        "max_ms": 158.26,
+        "tail": {
+          "over_50ms": 5966,
+          "over_100ms": 3384,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 56.4
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18903",
+      "concurrency": 200,
+      "requests_per_worker": 60,
+      "requests_total": 12000,
+      "wall_seconds": 14.8974,
+      "throughput_rps": 805.51,
+      "throughput_ok_rps": 802.29,
+      "status_counts": {
+        "200": 11952
+      },
+      "ok_200": 11952,
+      "http_408": 0,
+      "error_count": 48,
+      "error_kinds": {
+        "ConnectionRefusedError": 48
+      },
+      "error_samples": [
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 310,
+      "client_time_wait_after": 327,
+      "latency": {
+        "n": 12000,
+        "min_ms": 1.406,
+        "mean_ms": 227.472,
+        "p50_ms": 123.414,
+        "p90_ms": 610.944,
+        "p95_ms": 1091.646,
+        "p99_ms": 2025.528,
+        "p999_ms": 2329.561,
+        "max_ms": 2366.834,
+        "tail": {
+          "over_50ms": 11762,
+          "over_100ms": 9385,
+          "over_500ms": 1262,
+          "over_1000ms": 604,
+          "over_100ms_pct": 78.21
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18903",
+      "concurrency": 300,
+      "requests_per_worker": 60,
+      "requests_total": 18000,
+      "wall_seconds": 28.7957,
+      "throughput_rps": 625.09,
+      "throughput_ok_rps": 613.88,
+      "status_counts": {
+        "200": 17677
+      },
+      "ok_200": 17677,
+      "http_408": 0,
+      "error_count": 323,
+      "error_kinds": {
+        "ConnectionRefusedError": 323
+      },
+      "error_samples": [
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 327,
+      "client_time_wait_after": 335,
+      "latency": {
+        "n": 18000,
+        "min_ms": 2.56,
+        "mean_ms": 433.864,
+        "p50_ms": 162.934,
+        "p90_ms": 1209.476,
+        "p95_ms": 1768.508,
+        "p99_ms": 2229.959,
+        "p999_ms": 2534.913,
+        "max_ms": 2829.995,
+        "tail": {
+          "over_50ms": 17908,
+          "over_100ms": 17302,
+          "over_500ms": 4989,
+          "over_1000ms": 2562,
+          "over_100ms_pct": 96.12
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    }
+  ],
+  "requests_per_worker": 60,
+  "client_linger0": true,
+  "baseline": null,
+  "kind": "ramp",
+  "label": "levels100-200-300",
+  "recorded_at": "2026-10-31T01:27:40+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

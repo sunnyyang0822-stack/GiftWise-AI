@@ -1,0 +1,17 @@
+# validate() 纯 CPU 成本实测（宿主）
+# 平台: Windows-11-10.0.26200-SP0  Python: 3.12.10
+# 载荷: request_json=289 B, candidates_json=1030 B
+
+  trial1: 5000 次 -> 184.88 us/次
+  trial2: 5000 次 -> 169.16 us/次
+  trial3: 5000 次 -> 159.97 us/次
+  trial4: 5000 次 -> 170.16 us/次
+  trial5: 5000 次 -> 170.83 us/次
+  trial6: 5000 次 -> 162.25 us/次
+  trial7: 5000 次 -> 157.54 us/次
+
+最佳 = 157.54 us/次
+单核理论上限 = 6347.7 次/秒
+
+# 用途：把它当作「每请求 CPU 预算」，与 docker stats 实测 CPU% 对照，
+#       判断验证器是 CPU 瓶颈还是别的瓶颈。

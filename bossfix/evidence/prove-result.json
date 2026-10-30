@@ -1,0 +1,404 @@
+{
+  "s1_enum_before": {
+    "file": "workflow/labels.py",
+    "relations_lineno": 8,
+    "count": 10,
+    "table": {
+      "friend": "朋友",
+      "colleague": "同事",
+      "partner": "恋人",
+      "pursuit": "追求对象",
+      "family": "家人",
+      "classmate": "同学",
+      "mentor": "老师/导师",
+      "client_partner": "客户/合作伙伴",
+      "other": "其他",
+      "unknown": "关系暂不确定"
+    },
+    "boss_semantic_values": {},
+    "comment_mentions": []
+  },
+  "s2_boss_accepted": {
+    "frozen": {
+      "status": "needs_input",
+      "codes": [
+        "INTAKE_UNKNOWN_LABEL",
+        "INVALID_TYPE"
+      ]
+    },
+    "variant": {
+      "status": "ready",
+      "codes": []
+    },
+    "variant_request_recipient_relation": "职场上司",
+    "variant_request_recipient_relation_id": "boss",
+    "branch_turned_on": true
+  },
+  "s3_regression": {
+    "compared_values": 10,
+    "changed": [],
+    "all_identical": true,
+    "detail": [
+      {
+        "relation": "friend",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "colleague",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "partner",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "pursuit",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "family",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "classmate",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "mentor",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "client_partner",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "other",
+        "frozen_status": "ready",
+        "variant_status": "ready",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      },
+      {
+        "relation": "unknown",
+        "frozen_status": "needs_input",
+        "variant_status": "needs_input",
+        "status_identical": true,
+        "errors_identical": true,
+        "request_json_identical": true,
+        "identical": true
+      }
+    ]
+  },
+  "s4_branching": {
+    "boss_vs_other_diff_keys": [
+      "recipient_relation",
+      "recipient_relation_id"
+    ],
+    "boss_vs_other_diff_count": 2,
+    "validator_consumes_relation": false,
+    "prompts_enumerate_relations": false,
+    "web_mock_model_has_boss_flavor": false,
+    "web_proof": {
+      "w1_original_product_relations": {
+        "count": 8,
+        "ids": [
+          "partner",
+          "pursuit",
+          "friend",
+          "family",
+          "classmate",
+          "mentor",
+          "client_partner",
+          "other"
+        ],
+        "relations_full_count": 10
+      },
+      "w2_variant_product_relations": {
+        "count": 9,
+        "ids": [
+          "partner",
+          "pursuit",
+          "friend",
+          "family",
+          "boss",
+          "classmate",
+          "mentor",
+          "client_partner",
+          "other"
+        ],
+        "relations_full_count": 11,
+        "boss_zh": "职场上司"
+      },
+      "w3_access_layer_assertions": {
+        "note": "对原版 labels.mjs 与变体 labels.mjs 各重放一次；pass=false 即该断言会被新值打破",
+        "original": [
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 32,
+            "source": "assert.equal(PRODUCT_RELATIONS.length, 8);",
+            "expected": 8,
+            "actual": 8,
+            "pass": true
+          },
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 34,
+            "source": "assert.deepEqual(PRODUCT_RELATIONS.map((x) => x.id), [\"partner\",\"pursuit\",\"friend\",\"family\",\"classmate\",\"mentor\",\"client_partner\",\"other\"]);",
+            "expected": [
+              "partner",
+              "pursuit",
+              "friend",
+              "family",
+              "classmate",
+              "mentor",
+              "client_partner",
+              "other"
+            ],
+            "actual": [
+              "partner",
+              "pursuit",
+              "friend",
+              "family",
+              "classmate",
+              "mentor",
+              "client_partner",
+              "other"
+            ],
+            "pass": true
+          },
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 37,
+            "source": "assert.ok(!PRODUCT_RELATIONS.some((x) => x.id === \"colleague\" || x.zh === \"同事\"));",
+            "expected": false,
+            "actual": false,
+            "pass": true
+          }
+        ],
+        "variant": [
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 32,
+            "source": "assert.equal(PRODUCT_RELATIONS.length, 8);",
+            "expected": 8,
+            "actual": 9,
+            "pass": false
+          },
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 34,
+            "source": "assert.deepEqual(PRODUCT_RELATIONS.map((x) => x.id), [\"partner\",\"pursuit\",\"friend\",\"family\",\"classmate\",\"mentor\",\"client_partner\",\"other\"]);",
+            "expected": [
+              "partner",
+              "pursuit",
+              "friend",
+              "family",
+              "classmate",
+              "mentor",
+              "client_partner",
+              "other"
+            ],
+            "actual": [
+              "partner",
+              "pursuit",
+              "friend",
+              "family",
+              "boss",
+              "classmate",
+              "mentor",
+              "client_partner",
+              "other"
+            ],
+            "pass": false
+          },
+          {
+            "file": "web/tests/access-layer.test.mjs",
+            "line": 37,
+            "source": "assert.ok(!PRODUCT_RELATIONS.some((x) => x.id === \"colleague\" || x.zh === \"同事\"));",
+            "expected": false,
+            "actual": false,
+            "pass": true
+          }
+        ]
+      },
+      "w4_relation_branching": {
+        "note": "mock-model.mjs 的 relationFlavor() 有 pursuit/partner/friend/family/classmate/mentor/client_partner/other 共 8 个键，没有 boss 键",
+        "boss_equals_other_presentation": true,
+        "boss_differs_from_pursuit": true,
+        "boss_card_text": "生日快乐！一点心意，祝一切顺利。",
+        "boss_relationship_cautions": [
+          "关系信息有限，保持中性表达"
+        ],
+        "conclusion": "boss 落入 other 的中性话术：除 intake 白名单外，没有任何『职场分寸』专属分支生效"
+      }
+    },
+    "js_proof_ran": true
+  },
+  "s5_test_impact": {
+    "breaking": [
+      {
+        "file": "tests/acceptance/boundary/test_cross_layer_gate.py",
+        "lines": "163-165",
+        "assertion": "self.assertEqual({\"partner\",\"pursuit\",\"friend\",\"family\",\"classmate\",\"mentor\",\"client_partner\",\"other\"}, product_ids, ...)",
+        "expected": [
+          "classmate",
+          "client_partner",
+          "family",
+          "friend",
+          "mentor",
+          "other",
+          "partner",
+          "pursuit"
+        ],
+        "actual_with_11_values": [
+          "boss",
+          "classmate",
+          "client_partner",
+          "family",
+          "friend",
+          "mentor",
+          "other",
+          "partner",
+          "pursuit"
+        ],
+        "pass": false,
+        "fix": "期望集合加入 \"boss\"（共 9 个产品值）"
+      },
+      {
+        "file": "tests/acceptance/boundary/test_cross_layer_gate.py",
+        "lines": "168-169",
+        "assertion": "self.assertEqual(10, len(RELATIONS), \"枚举总数应为 10（8 产品 + colleague + unknown）\")",
+        "expected": 10,
+        "actual_with_11_values": 11,
+        "pass": false,
+        "fix": "总数 10 → 11，说明改为「9 产品 + colleague + unknown」"
+      },
+      {
+        "file": "tests/acceptance/contract/run_contract.py",
+        "lines": "89-90",
+        "assertion": "add(\"REL-UNDECLARED\", ..., intake=dict(BASE, recipient_relation=\"boss\"), expect_codes=[\"INTAKE_UNKNOWN_LABEL\"], expect_status=\"needs_input\")",
+        "expected_codes": [
+          "INTAKE_UNKNOWN_LABEL"
+        ],
+        "actual_codes_with_11_values": [],
+        "expected_status": "needs_input",
+        "actual_status_with_11_values": "ready",
+        "pass": false,
+        "fix": "样本字面值由 \"boss\" 换为仍未声明的值（建议 \"supervisor\"）"
+      },
+      {
+        "file": "web/tests/access-layer.test.mjs",
+        "lines": "32",
+        "assertion": "assert.equal(PRODUCT_RELATIONS.length, 8);",
+        "expected": 8,
+        "actual_with_11_values": 9,
+        "pass": false,
+        "fix": "8 → 9"
+      },
+      {
+        "file": "web/tests/access-layer.test.mjs",
+        "lines": "34-36",
+        "assertion": "assert.deepEqual(PRODUCT_RELATIONS.map((x) => x.id), [...8 个...]);",
+        "expected": [
+          "partner",
+          "pursuit",
+          "friend",
+          "family",
+          "classmate",
+          "mentor",
+          "client_partner",
+          "other"
+        ],
+        "actual_with_11_values": [
+          "partner",
+          "pursuit",
+          "friend",
+          "family",
+          "boss",
+          "classmate",
+          "mentor",
+          "client_partner",
+          "other"
+        ],
+        "pass": false,
+        "fix": "期望数组插入 \"boss\"（放在 \"family\" 之后）"
+      }
+    ],
+    "unaffected": [
+      "tests/acceptance/stage_c/test_stage_c_workflow.py:133-145（total_ids 仅观察字段，不在 ok 内）",
+      "tests/test_validator.py（validator 不消费关系枚举）",
+      "tests/acceptance/stage_c/fixtures/labels_before_pursuit.py（固定夹具，sha256 不变）"
+    ],
+    "is_there_an_assertion_requiring_exactly_10": true,
+    "exactly_10_assertion": {
+      "file": "tests/acceptance/boundary/test_cross_layer_gate.py",
+      "lines": "168-169",
+      "verbatim": "self.assertEqual(10, len(RELATIONS), f\"枚举总数应为 10（8 产品 + colleague + unknown），实际={sorted(RELATIONS)}\")"
+    }
+  },
+  "s6_artifacts": {
+    "frozen_labels_sha256": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+    "manifest_declared_labels_sha256": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+    "manifest_matches_frozen": true,
+    "variant_labels_sha256": "37d500aefc6cfd5e73089d311dea555e55f1e9ed00522897beb8e2f758ca40e6",
+    "regenerate_required": [
+      "workflow/generated/code_node.py",
+      "workflow/generated/intake_node.py",
+      "workflow/generated/check_node.py",
+      "workflow/generated/recheck_node.py",
+      "workflow/generated/report_node.py"
+    ],
+    "rebuild_command": "python workflow/build_code_node.py"
+  },
+  "summary": {
+    "frozen_relation_count": 10,
+    "boss_semantic_count": 0,
+    "boss_accepted_in_variant": true,
+    "regression_all_identical": true,
+    "new_dedicated_branches": 0,
+    "breaking_assertions": 5,
+    "regenerate_required": 5
+  }
+}

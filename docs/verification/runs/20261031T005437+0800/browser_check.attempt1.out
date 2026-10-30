@@ -1,0 +1,30 @@
+检查: browser_check
+分组: fast
+说明: 浏览器自查（web 线自带，多视口 + 主流程）
+开始: 2026-10-31T00:54:47.337644+08:00
+尝试: 第 1 次
+
+==============================================================================
+## 浏览器自查（web 线自带，多视口 + 主流程点击；复用已在监听的 Chrome CDP）
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]
+## 退出码: 2
+## 判定: 退出码 2（非 0 即判据不满足）
+==============================================================================
+浏览器：Chrome/156.0.8078.79
+目标站点：http://127.0.0.1:8787
+
+=== 主流程 @ desktop 1280×900 ===
+PASS  [desktop] 首屏无横向溢出
+PASS  [desktop] 吸顶「模拟数据」标识已渲染
+PASS  [desktop] 吸顶标识在首屏内可见
+PASS  [desktop] 首屏数据来源说明可见
+      · 截图 .tmp\browser\shots\01-landing-desktop.png
+PASS  [desktop] 首屏无外部/CDN 请求
+      · 首屏请求 10 条，累计 4190755 字节
+
+[stderr]
+浏览器自查异常：Error: 找不到 button「填写三步需求」；可选：开始选礼物 / 开始选礼物 / 下一步：兴趣与风格
+    at Page.click (file:///C:/Users/lenovo/Desktop/giftwise/web/tools/browser-check.mjs:194:27)
+    at async main (file:///C:/Users/lenovo/Desktop/giftwise/web/tools/browser-check.mjs:389:5)
+
+[本工具] 本次尝试判定：FAIL（退出码 2（非 0 即判据不满足））；耗时 1.77s

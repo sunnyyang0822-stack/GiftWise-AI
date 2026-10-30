@@ -1,0 +1,225 @@
+{
+  "label": "direct-1replica-conc8",
+  "run_at": "2026-10-31 01:43:10 +0800",
+  "target": "127.0.0.1:19001",
+  "concurrency": 8,
+  "seconds": 20.0,
+  "requests": 11224,
+  "ok": 11224,
+  "wall_s": 20.602,
+  "throughput_rps": 544.8,
+  "cpu_us_per_validate_assumed": 170.87,
+  "predicted_cpu_perc_of_one_core": 9.309,
+  "samples": [
+    {
+      "t": 0.01,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "159.58%",
+          "mem": "19.26MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "37.72%",
+          "mem": "27.98MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.26%",
+          "mem": "15.32MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.02%",
+          "mem": "21.05MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 2.32,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "112.32%",
+          "mem": "18.67MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.10%",
+          "mem": "16.7MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.21%",
+          "mem": "15.32MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.45%",
+          "mem": "20.8MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 4.55,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "118.15%",
+          "mem": "18.95MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.10%",
+          "mem": "16.67MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.25%",
+          "mem": "15.32MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.11%",
+          "mem": "20.79MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 6.56,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "135.81%",
+          "mem": "25.08MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "31.93%",
+          "mem": "27.75MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.35%",
+          "mem": "15.42MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.18%",
+          "mem": "20.79MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 8.59,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "118.03%",
+          "mem": "18.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.25%",
+          "mem": "16.34MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.21%",
+          "mem": "14.86MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.17%",
+          "mem": "20.59MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 10.65,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "171.51%",
+          "mem": "19.54MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "55.08%",
+          "mem": "16.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.87%",
+          "mem": "14.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "2.03%",
+          "mem": "20.34MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 12.66,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "121.67%",
+          "mem": "19.39MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.14%",
+          "mem": "16.64MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.07%",
+          "mem": "14.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.22%",
+          "mem": "20.34MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 14.7,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "150.76%",
+          "mem": "19.33MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "35.36%",
+          "mem": "17.45MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.02%",
+          "mem": "14.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "1.56%",
+          "mem": "20.61MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 16.73,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "108.26%",
+          "mem": "19.43MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.02%",
+          "mem": "17.44MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.01%",
+          "mem": "14.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.12%",
+          "mem": "20.61MiB / 7.618GiB"
+        }
+      }
+    },
+    {
+      "t": 18.78,
+      "stats": {
+        "giftwise-cloudnative-lab-validator-a-1": {
+          "cpu_perc": "151.19%",
+          "mem": "19.07MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-validator-b-1": {
+          "cpu_perc": "0.01%",
+          "mem": "16.51MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-1": {
+          "cpu_perc": "0.01%",
+          "mem": "14.8MiB / 7.618GiB"
+        },
+        "giftwise-cloudnative-lab-lb-one-1": {
+          "cpu_perc": "0.21%",
+          "mem": "20.61MiB / 7.618GiB"
+        }
+      }
+    }
+  ]
+}

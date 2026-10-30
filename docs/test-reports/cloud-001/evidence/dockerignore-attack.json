@@ -1,0 +1,492 @@
+{
+  "suite": "CLOUD-001 攻击实验：.dockerignore 误排除",
+  "dockerfile": "deploy/Dockerfile",
+  "note": "复用真实 deploy/Dockerfile，仅替换构建上下文为我自建的同构目录；未修改 deploy/**。",
+  "copy_sources": [
+    "validator/rules.py",
+    "validator/__init__.py",
+    "deploy/server.py"
+  ],
+  "E-A_per_pattern": [
+    {
+      "pattern": "*.exe",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "*.log",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "*.msi",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "*.pyc",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "*.pyo",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": ".dockerignore",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": ".env",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": ".git",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": ".gitignore",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": ".tmp",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "__pycache__",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "deploy/evidence",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "docs",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "tests",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "web",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    },
+    {
+      "pattern": "workflow",
+      "build_rc": 0,
+      "build_error": "",
+      "surviving_copy_sources": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      },
+      "excludes_any_copy_source": false,
+      "files_kept": 5,
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ]
+    }
+  ],
+  "E-A_conclusion": {
+    "patterns_tested": 16,
+    "any_pattern_excludes_a_copy_source": []
+  },
+  "E-C_two_files": {
+    "root": {
+      "build_rc": 0,
+      "build_error": "",
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ],
+      "copy_sources_present": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      }
+    },
+    "deploy": {
+      "build_rc": 0,
+      "build_error": "",
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ],
+      "copy_sources_present": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      }
+    },
+    "none": {
+      "build_rc": 0,
+      "build_error": "",
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ],
+      "copy_sources_present": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      }
+    },
+    "union": {
+      "build_rc": 0,
+      "build_error": "",
+      "files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ],
+      "copy_sources_present": {
+        "validator/rules.py": true,
+        "validator/__init__.py": true,
+        "deploy/server.py": true
+      }
+    }
+  },
+  "E-C_conclusion": {
+    "root_and_deploy_same_for_copy_sources": true,
+    "root_files": [
+      "/app/deploy/server.py",
+      "/app/validator/__init__.py",
+      "/app/validator/__pycache__/__init__.cpython-312.pyc",
+      "/app/validator/__pycache__/rules.cpython-312.pyc",
+      "/app/validator/rules.py"
+    ],
+    "deploy_files": [
+      "/app/deploy/server.py",
+      "/app/validator/__init__.py",
+      "/app/validator/__pycache__/__init__.cpython-312.pyc",
+      "/app/validator/__pycache__/rules.cpython-312.pyc",
+      "/app/validator/rules.py"
+    ]
+  },
+  "E-B_failure_mode": {
+    "B1_exclude_rules_py": {
+      "patterns": [
+        "validator/rules.py"
+      ],
+      "build_rc": 0,
+      "build_error": "",
+      "image_files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc"
+      ],
+      "service": {
+        "started": true,
+        "seconds_to_health": null,
+        "healthz": null,
+        "attempts": 23,
+        "container_state": "exited exit=1",
+        "logs_tail": "    from validator.rules import validate |   File \"/app/validator/__init__.py\", line 3, in <module> |     from .rules import validate | ModuleNotFoundError: No module named 'validator.rules'"
+      }
+    },
+    "B2_exclude_whole_validator": {
+      "patterns": [
+        "validator"
+      ],
+      "build_rc": 1,
+      "build_error": "  14 |      | -------------------- | ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref pl06rs7a0smvdn9h2ekhwdtvu::rbm3ebccl33wd6z58eai6ik96: \"/validator\": not found",
+      "image_files": null
+    },
+    "B3_exclude_server_py": {
+      "patterns": [
+        "deploy/server.py"
+      ],
+      "build_rc": 1,
+      "build_error": "  15 |     RUN useradd --create-home --uid 10001 giftwise \\ | -------------------- | ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref pl06rs7a0smvdn9h2ekhwdtvu::x0ua30z4cull4hdbp5k9dxjvf: \"/deploy/server.py\": not found",
+      "image_files": null
+    },
+    "B4_exclude_deploy_dir": {
+      "patterns": [
+        "deploy"
+      ],
+      "build_rc": 1,
+      "build_error": "  15 |     RUN useradd --create-home --uid 10001 giftwise \\ | -------------------- | ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref pl06rs7a0smvdn9h2ekhwdtvu::xqd8kcwzzs5ay76f562lgrlqi: \"/deploy/server.py\": not found",
+      "image_files": null
+    },
+    "B5_root_rules_ignore_only": {
+      "patterns": [
+        ".env",
+        ".git",
+        ".gitignore",
+        "__pycache__",
+        "*.pyc",
+        "*.pyo",
+        "tests",
+        "workflow",
+        "docs",
+        "web",
+        ".tmp",
+        "deploy/evidence",
+        "*.log",
+        "*.msi",
+        "*.exe"
+      ],
+      "build_rc": 0,
+      "build_error": "",
+      "image_files": [
+        "/app/deploy/server.py",
+        "/app/validator/__init__.py",
+        "/app/validator/__pycache__/__init__.cpython-312.pyc",
+        "/app/validator/__pycache__/rules.cpython-312.pyc",
+        "/app/validator/rules.py"
+      ],
+      "service": {
+        "started": true,
+        "seconds_to_health": 0.75,
+        "healthz": "{\"status\":\"ok\",\"service\":\"giftwise-validator\",\"rules_source_sha256\":\"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\"}",
+        "attempts": 2,
+        "container_state": "running exit=0",
+        "logs_tail": "giftwise-validator listening on 0.0.0.0:8000; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3 | 172.17.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+      }
+    }
+  },
+  "E-B_conclusion": {
+    "exclude_rules_py_build_ok": true,
+    "exclude_rules_py_service_healthy": false,
+    "exclude_whole_validator_build_rc": 1,
+    "exclude_server_py_build_rc": 1
+  }
+}

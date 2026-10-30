@@ -1,0 +1,245 @@
+{
+  "url": "http://127.0.0.1:18901",
+  "container": "gwbench-new",
+  "levels": [
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 1,
+      "requests_per_worker": 60,
+      "requests_total": 60,
+      "wall_seconds": 0.5555,
+      "throughput_rps": 108.0,
+      "throughput_ok_rps": 108.0,
+      "status_counts": {
+        "200": 60
+      },
+      "ok_200": 60,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 269,
+      "client_time_wait_after": 269,
+      "latency": {
+        "n": 60,
+        "min_ms": 1.964,
+        "mean_ms": 9.254,
+        "p50_ms": 2.701,
+        "p90_ms": 24.467,
+        "p95_ms": 26.584,
+        "p99_ms": 27.898,
+        "p999_ms": 27.898,
+        "max_ms": 27.898,
+        "tail": {
+          "over_50ms": 0,
+          "over_100ms": 0,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 22589440,
+        "mem_samples": 2,
+        "threads_peak": 2,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 10,
+      "requests_per_worker": 60,
+      "requests_total": 600,
+      "wall_seconds": 0.8979,
+      "throughput_rps": 668.26,
+      "throughput_ok_rps": 668.26,
+      "status_counts": {
+        "200": 600
+      },
+      "ok_200": 600,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 269,
+      "client_time_wait_after": 269,
+      "latency": {
+        "n": 600,
+        "min_ms": 2.038,
+        "mean_ms": 13.779,
+        "p50_ms": 11.559,
+        "p90_ms": 26.478,
+        "p95_ms": 29.451,
+        "p99_ms": 32.367,
+        "p999_ms": 34.488,
+        "max_ms": 34.488,
+        "tail": {
+          "over_50ms": 0,
+          "over_100ms": 0,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 23842816,
+        "mem_samples": 2,
+        "threads_peak": 10,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 50,
+      "requests_per_worker": 60,
+      "requests_total": 3000,
+      "wall_seconds": 4.1645,
+      "throughput_rps": 720.37,
+      "throughput_ok_rps": 720.37,
+      "status_counts": {
+        "200": 3000
+      },
+      "ok_200": 3000,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 269,
+      "client_time_wait_after": 267,
+      "latency": {
+        "n": 3000,
+        "min_ms": 11.997,
+        "mean_ms": 68.7,
+        "p50_ms": 68.482,
+        "p90_ms": 77.14,
+        "p95_ms": 79.001,
+        "p99_ms": 83.407,
+        "p999_ms": 86.593,
+        "max_ms": 87.566,
+        "tail": {
+          "over_50ms": 2967,
+          "over_100ms": 0,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 24670208,
+        "mem_samples": 7,
+        "threads_peak": 6,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 100,
+      "requests_per_worker": 60,
+      "requests_total": 6000,
+      "wall_seconds": 8.3677,
+      "throughput_rps": 717.04,
+      "throughput_ok_rps": 717.04,
+      "status_counts": {
+        "200": 6000
+      },
+      "ok_200": 6000,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 267,
+      "client_time_wait_after": 267,
+      "latency": {
+        "n": 6000,
+        "min_ms": 25.281,
+        "mean_ms": 137.874,
+        "p50_ms": 136.539,
+        "p90_ms": 155.22,
+        "p95_ms": 160.267,
+        "p99_ms": 169.351,
+        "p999_ms": 173.889,
+        "max_ms": 178.14,
+        "tail": {
+          "over_50ms": 5975,
+          "over_100ms": 5937,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 98.95
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 24936448,
+        "mem_samples": 13,
+        "threads_peak": 7,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 200,
+      "requests_per_worker": 60,
+      "requests_total": 12000,
+      "wall_seconds": 17.7303,
+      "throughput_rps": 676.81,
+      "throughput_ok_rps": 676.81,
+      "status_counts": {
+        "200": 12000
+      },
+      "ok_200": 12000,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 267,
+      "client_time_wait_after": 223,
+      "latency": {
+        "n": 12000,
+        "min_ms": 19.694,
+        "mean_ms": 292.293,
+        "p50_ms": 288.634,
+        "p90_ms": 327.66,
+        "p95_ms": 346.628,
+        "p99_ms": 362.181,
+        "p999_ms": 366.685,
+        "max_ms": 370.096,
+        "tail": {
+          "over_50ms": 11993,
+          "over_100ms": 11948,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 99.57
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 38830080,
+        "mem_samples": 26,
+        "threads_peak": 7,
+        "threads_raw_last": "Threads:\t4"
+      }
+    }
+  ],
+  "requests_per_worker": 60,
+  "client_linger0": true,
+  "baseline": {
+    "mem_bytes": 21499904,
+    "threads_raw": "Threads:\t1"
+  },
+  "kind": "ramp",
+  "label": "levels1-10-50-100-200",
+  "recorded_at": "2026-10-31T01:57:00+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

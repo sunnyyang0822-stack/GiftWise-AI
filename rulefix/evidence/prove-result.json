@@ -1,0 +1,719 @@
+{
+  "sections": {
+    "Q8_救回": [
+      {
+        "label": "S01｜名称含「无酒」",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].name"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      },
+      {
+        "label": "S03｜描述含「不含酒精」",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      },
+      {
+        "label": "S12｜描述含「不含酒类」",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      },
+      {
+        "label": "S13｜描述含「不含酒类」",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      },
+      {
+        "label": "场景线原用例 c1「无酒精饮品组合」（name+description+reason+inferences 四处否定）",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].description",
+          "candidates[0].inferences[0]",
+          "candidates[0].name",
+          "candidates[0].reason"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      }
+    ],
+    "Q7_绕过": {
+      "label": "F｜名称/描述用「陈年佳酿」等避开字面词",
+      "before_hit": false,
+      "after_hit": false,
+      "before_paths": [],
+      "after_paths": [],
+      "before": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "passed": [
+          "c1",
+          "c2",
+          "c3"
+        ]
+      },
+      "after": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "passed": [
+          "c1",
+          "c2",
+          "c3"
+        ]
+      }
+    },
+    "官方样例回归": [
+      {
+        "label": "intake.json + candidates.json",
+        "before_hit": false,
+        "after_hit": false,
+        "before_paths": [],
+        "after_paths": [],
+        "before": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "same": true
+      },
+      {
+        "label": "demo-intake-judge-forbidden-term.json + demo-candidates-clean.json",
+        "before_hit": false,
+        "after_hit": false,
+        "before_paths": [],
+        "after_paths": [],
+        "before": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "same": true
+      },
+      {
+        "label": "demo-intake-judge-forbidden-term.json + demo-candidates-violating.json",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[1].description"
+        ],
+        "after_paths": [
+          "candidates[1].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c1",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c1",
+            "c3"
+          ]
+        },
+        "same": true
+      },
+      {
+        "label": "intake-colleague.json + candidates.json",
+        "before_hit": false,
+        "after_hit": false,
+        "before_paths": [],
+        "after_paths": [],
+        "before": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        },
+        "same": true
+      }
+    ],
+    "真阳性仍被拒": [
+      {
+        "label": "description = 「礼盒内含一瓶红酒」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "name = 「茅台酒礼盒」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].name"
+        ],
+        "after_paths": [
+          "candidates[0].name"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "description = 「含酒精饮品组合」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "description = 「酒精浓度 12% 的佐餐饮品」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "reason = 「因为对方喜欢喝酒，所以选它」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].reason"
+        ],
+        "after_paths": [
+          "candidates[0].reason"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "inferences = 「该酒类礼盒可能受欢迎」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].inferences[0]"
+        ],
+        "after_paths": [
+          "candidates[0].inferences[0]"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "presentation = 「呈现时会强调酒庄故事」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].presentation"
+        ],
+        "after_paths": [
+          "candidates[0].presentation"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "description = 「不含酒精，但另配一瓶米酒」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "description = 「并非不含酒精」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      },
+      {
+        "label": "description = 「无酒精的周边，另附红酒一支」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "still_rejected": true
+      }
+    ],
+    "全量回归": {
+      "total": 320,
+      "compared": 320,
+      "changed": [],
+      "new_errors": []
+    },
+    "残留假阳性": [
+      {
+        "label": "I｜「无酒精啤酒，适合不饮酒的人」",
+        "before_hit": true,
+        "after_hit": true,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [
+          "candidates[0].description"
+        ],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        }
+      },
+      {
+        "label": "I2｜「本店招牌无醇饮品」",
+        "before_hit": true,
+        "after_hit": false,
+        "before_paths": [
+          "candidates[0].description"
+        ],
+        "after_paths": [],
+        "before": {
+          "status": "failed",
+          "all_passed": false,
+          "codes": [
+            "FORBIDDEN_TERM"
+          ],
+          "passed": [
+            "c2",
+            "c3"
+          ]
+        },
+        "after": {
+          "status": "passed",
+          "all_passed": true,
+          "codes": [],
+          "passed": [
+            "c1",
+            "c2",
+            "c3"
+          ]
+        }
+      }
+    ]
+  }
+}

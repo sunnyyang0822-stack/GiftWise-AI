@@ -1,0 +1,39 @@
+=== A. 真实实现（validator/rules.py 原样） ===
+  budget=0（越界，须拒）              status=needs_input  codes=['LIMIT_EXCEEDED']
+  budget=0.00（越界，须拒）           status=needs_input  codes=['LIMIT_EXCEEDED']
+  budget=10000（端点，须通过）         status=passed       codes=[]
+  budget=10000.01（越界，须拒）       status=needs_input  codes=['LIMIT_EXCEEDED']
+  budget=10001（越界，须拒）          status=needs_input  codes=['LIMIT_EXCEEDED']
+  days=365（端点，须通过）             status=passed       codes=[]
+  days=366（越界，须拒）              status=needs_input  codes=['LIMIT_EXCEEDED']
+  days=10**20（越界，须拒）           status=needs_input  codes=['LIMIT_EXCEEDED']
+
+=== B. 内存中移除范围校验后（不修改 validator/rules.py） ===
+  被摘除的行：
+    |     # 请求侧范围只在调用点检查：_amount/_days 与候选侧共用，范围约束不得进入共用函数。
+    |     if budget is not None and not (1 <= budget <= 10000):
+    |         _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间")
+    |     if days is not None and days > 365:
+    |         _error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间")
+  budget=0（越界，须拒）              status=failed       codes=['OVER_BUDGET']
+  budget=0.00（越界，须拒）           status=failed       codes=['OVER_BUDGET']
+  budget=10000（端点，须通过）         status=passed       codes=[]
+  budget=10000.01（越界，须拒）       status=passed       codes=[]
+  budget=10001（越界，须拒）          status=passed       codes=[]
+  days=365（端点，须通过）             status=passed       codes=[]
+  days=366（越界，须拒）              status=passed       codes=[]
+  days=10**20（越界，须拒）           status=passed       codes=[]
+
+=== C. 判别力判定 ===
+  判别用例（须拒绝的越界值）：移除范围校验后行为若改变，证明断言有牙。
+  对照用例（范围内端点）：两侧**应当相同**，它们本就该通过，不承担判别职责。
+  [判别用例] budget=0（越界，须拒）              A=needs_input/['LIMIT_EXCEEDED']  B=failed/['OVER_BUDGET']  → 符合预期
+  [判别用例] budget=0.00（越界，须拒）           A=needs_input/['LIMIT_EXCEEDED']  B=failed/['OVER_BUDGET']  → 符合预期
+  [对照用例] budget=10000（端点，须通过）         A=passed/[]  B=passed/[]  → 符合预期
+  [判别用例] budget=10000.01（越界，须拒）       A=needs_input/['LIMIT_EXCEEDED']  B=passed/[]  → 符合预期
+  [判别用例] budget=10001（越界，须拒）          A=needs_input/['LIMIT_EXCEEDED']  B=passed/[]  → 符合预期
+  [对照用例] days=365（端点，须通过）             A=passed/[]  B=passed/[]  → 符合预期
+  [判别用例] days=366（越界，须拒）              A=needs_input/['LIMIT_EXCEEDED']  B=passed/[]  → 符合预期
+  [判别用例] days=10**20（越界，须拒）           A=needs_input/['LIMIT_EXCEEDED']  B=passed/[]  → 符合预期
+
+判别用例有判别力：6/6；对照用例两侧一致：2/2

@@ -1,0 +1,37 @@
+### 服务端性能调优线 原始输出归档
+### run label: perf-tune-20261031T0140
+### started local: 2026-10-31T01:40:22+0800  utc: 2026-10-30T17:40:22Z
+
+===== 1. 调优前 latest / submission-20261101 完整 ID 与 Created =====
+latest   ID=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+latest   Created=2026-10-30T17:13:59.527621865Z
+latest   Size=177918474
+latest   RepoTags=[giftwise-validator:latest giftwise-validator:submission-20261101]
+---
+submission ID=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+submission Created=2026-10-30T17:13:59.527621865Z
+submission Size=177918474
+submission RepoTags=[giftwise-validator:latest giftwise-validator:submission-20261101]
+
+===== 2. 备份 tag（可回滚）=====
++ docker tag giftwise-validator:submission-20261101 giftwise-validator:prev-20261031T0200
++ set +x
+
+===== 3. 备份 tag 复核 =====
+prev-20261031T0200 ID=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+prev-20261031T0200 Created=2026-10-30T17:13:59.527621865Z
+prev-20261031T0200 Size=177918474
+prev-20261031T0200 RepoTags=[giftwise-validator:latest giftwise-validator:prev-20261031T0200 giftwise-validator:submission-20261101]
+
+===== 4. 全部 giftwise 镜像（调优前）=====
+giftwise-validator:obs-check|sha256:c8570d7ea9dc2a5df8c2e22d26f93cf2c9eaeda11a3c20b3c13e10ee88c05933|2026-10-31 01:20:55 +0800 CST|178MB
+giftwise-validator:slowbody-check|sha256:0652d11d85f240427c755e9e448c0511974d1e67991534a6b100d6fb612a2c6f|2026-10-31 01:19:18 +0800 CST|178MB
+giftwise-validator:latest|sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169|2026-10-31 01:13:59 +0800 CST|178MB
+giftwise-validator:prev-20261031T0200|sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169|2026-10-31 01:13:59 +0800 CST|178MB
+giftwise-validator:submission-20261101|sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169|2026-10-31 01:13:59 +0800 CST|178MB
+giftwise-validator:candidate-observable|sha256:b8d712a831556f0ab29184da72bc4f86ea6791aa835c84687dc20e94c96736f8|2026-10-31 00:57:04 +0800 CST|178MB
+giftwise-validator:verify-guide|sha256:528b1726186094a9ab21d8714d9e9c1982c057dfff99a13f71c4163f47bf725c|2026-10-30 23:20:06 +0800 CST|178MB
+giftwise-validator:log-prefix|sha256:c3c70989b940d51995037d3c69d6b2016e90bab237a5b54fa2c90d9f8b17a079|2026-10-30 23:13:07 +0800 CST|178MB
+giftwise-validator:prefix-check|sha256:67e9ef9e1b3efc593303b508f657096ce2442b28531594ea2019aedebb5b7df8|2026-10-30 23:13:07 +0800 CST|178MB
+giftwise-validator:coldbuild-20261030|sha256:ed3fbe91257159a44a1b28ffad2c872edee4c3cf788ec86d14ccbe1513fee20d|2026-10-30 22:50:36 +0800 CST|178MB
+giftwise-validator:pm-baseline-20261030|sha256:b42f408b4f07e16911a78bc7685a5a81066f9fc3d5c33674bebc3d17af4a536a|2026-10-30 22:20:54 +0800 CST|178MB

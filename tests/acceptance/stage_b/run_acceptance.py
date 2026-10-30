@@ -77,7 +77,7 @@ def main():
                "timezone": "Asia/Shanghai", "cwd": str(ROOT), "python": sys.version,
                "executable": sys.executable, "platform": platform.platform(),
                "command": "python tests/acceptance/stage_b/run_acceptance.py",
-               "commands": commands, "review": str(acceptance.REVIEW),
+               "commands": commands, "review": str(acceptance.REVIEW), "baseline": str(acceptance.BASELINE),
                "expected_sha256": acceptance.EXPECTED_HASHES, "before_sha256": before, "after_sha256": after,
                "hashes_match_review": review_matched, "delivered_files_unchanged": tests_stable,
                "case_count": len(acceptance.CASES), "tests_run": result.testsRun,
