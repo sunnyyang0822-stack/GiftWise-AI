@@ -201,7 +201,7 @@
 | 3 | 适配层对标签精确匹配（大小写敏感、不裁剪、不 NFKC），使 [VAL-001 §2](./validator-contract-decisions.md) 的 NFKC/折叠规则在真实链路上不生效 | **采纳文档口径**：在 VAL-001 §2 写明「归一化只适用于直调校验器，经适配层的输入以精确匹配为准」 | 仅文档（VAL-001 §2 已加适用范围）；不放宽校验器行为 |
 | 4 | 词表外硬禁忌标签同时产生 `INTAKE_UNKNOWN_LABEL` + `UNKNOWN_TAG`（后者由 `request.forbidden_tags` 复核得出） | **接受聚合现状**，`UNKNOWN_TAG` 补入本文错误码表 | 仅文档；不改适配层透传行为 |
 | 5 | JSON 嵌套深度无显式限制，约 3000 层触发解析递归上限并归 `INVALID_JSON` | **不写死层数**：文档表述为「深层嵌套由解析递归上限兜底并归 `INVALID_JSON`」 | 仅文档；不加显式深度限制 |
-| 6 | `workflow/workflow-spec.md:96` 的 18 码清单缺 `LIMIT_EXCEEDED` | **待 PM 派活**给该文件线补入 | 超出本轮可改边界，未改 |
+| 6 | `workflow/workflow-spec.md:96` 的 18 码清单缺 `LIMIT_EXCEEDED` | ✅ **已闭合**（2026-10-31：`workflow/workflow-spec.md:96` 已改为 **19 码**并附 18→19 对账） | 超出本轮可改边界，未改 |
 | 7 | `budget_amount` 与 `deadline_days` 均无数值上限（仅格式/非负/码点约束） | **已裁决（含端点闭区间）**：`budget_amount` ∈ **[1, 10000]**（禁 0），`deadline_days` ∈ **[0, 365]**（保留 0 = 当天）；超限复用 `LIMIT_EXCEEDED`、请求侧 `needs_input` | ✅ **已落地**：请求侧数值范围校验已于 2026-10-30 在 `validator/rules.py` 落地（`budget_amount` 见 `:131–132`、`available_days` 见 `:133–134`），范围只在请求侧调用点检查，**候选侧不受约束**；同时**修订 VAL-001 §5「零预算允许」**。PM 独立探针与 329 项单元测试均通过；**测试验收线的独立边界用例尚在进行中** |
 | 8 | JSON 转义 `\ud800` 传入的孤立代理被静默接受（**探针入库时新发现**，不在已落库的 12 条内） | **本轮不裁决行为**：如实补记；是否拒绝属解析层策略，交 PM 定性 | 仅文档（本行）；若要求拒绝须改解析层，非本 Agent 边界 |
 
