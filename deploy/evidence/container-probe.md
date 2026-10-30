@@ -13,7 +13,7 @@
 >   **口径更正（2026-10-31）**：该 ID 只是当时的 config digest；镜像从未推仓库，**没有 manifest digest**。稳定标识用 tag + 构建日期 + `/healthz` 的 `rules_source_sha256`（见 [`image-audit-2026-10-31.md`](image-audit-2026-10-31.md) §1）。
 > - 容器内 `/healthz` 200（启动 **0.75–1.01 s**）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行。
 >
-> 新的完整证据：[`docker-2026-10-30.md`](docker-2026-10-30.md)（汇总 9/9）＋ [`raw/docker-2026-10-30/`](raw/docker-2026-10-30/)（12 个原始输出文件）。
+> 新的完整证据：[`docker-2026-10-30.md`](docker-2026-10-30.md)（汇总 9/9）＋ [`raw/docker-2026-10-30/`](raw/docker-2026-10-30/)（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志）文件）。
 > 另请注意区分：`container_layout_dryrun.py` 只是**目录布局等价演练**（用同一条 HEALTHCHECK 命令跑本机进程），**不是**镜像构建，其结论不受本次修订影响。
 
 # 容器构建实测记录（CLOUD-001 任务 4）

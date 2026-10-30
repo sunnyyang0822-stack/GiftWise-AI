@@ -3,7 +3,7 @@
 - 文档状态：**阶段 2 已冻结（2026-10-30，北京时间）**
 - 本次修订：2026-10-30，Issue [#11 PRD-001](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/11)「阶段 2 收尾——低负担输入与可观测性验收项收编，四份文档定稿」
 - 收编内容：低负担输入子流程（G-1）、运行记录与可观测性流向（G-2）
-- 适用边界：以下流程是**设计约定**。`web/` 以 **mock** 运行；Dify **未发布**（`draft`，`toolPublished: false`）且**呈现阶段未实现**；**云未部署**；价格与库存**未核实**。流程各节点“是否已被真实证据验证”见 [`acceptance-criteria.md`](acceptance-criteria.md)。
+- 适用边界：以下流程是**设计约定**。`web/` 以 **mock** 运行；Dify **已发布并创建版本**（v1 2026-10-30 23:04／v2 已重发布；`toolPublished` 与 `draft` **不是**发布判据）且**呈现阶段未实现**；**云未部署**；价格与库存**未核实**。流程各节点“是否已被真实证据验证”见 [`acceptance-criteria.md`](acceptance-criteria.md)。
 
 ## 主流程
 

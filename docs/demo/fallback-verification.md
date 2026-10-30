@@ -19,7 +19,7 @@
 | 3 | 中文/箭头编码自救 | 脚本内 `reconfigure` | ✅ 崩→通过 |
 | 4 | 纯规则层演示（零模型零网络） | `python docs/demo/bin/run-rules-layer-demo.py` | ✅ 6/6 通过，515 ms |
 | 5 | 离线回放页（`file://`） | CDP 真浏览器打开 | ✅ 0 错误、0 外部引用 |
-| 6 | 单文件离线快照 | `python docs/demo/tools/build-snapshot.py` | ✅ 19 块、0 新调用、335 ms |
+| 6 | 单文件离线快照 | `python docs/demo/tools/build-snapshot.py` | ✅ 21 块、0 新调用、335 ms |
 | 7 | 404 并发判定规则 | `node docs/demo/bin/retry-on-404.mjs` ×3 | ✅ 三分支全部正确分类 |
 | 8 | 真实浏览器截图（沙箱内 Chrome 起不来） | 复用 CDP + 新建即弃 target | ✅ 截图全部产出 |
 
@@ -197,7 +197,7 @@ node web/.tmp/demo-rehearsal/shot.mjs 10-offline-replay-top \
 | 控制台错误 | ✅ **0 条** |
 | 失败请求 | ✅ **0 条**（证明真的没有外部依赖） |
 | 横向溢出 | ✅ 无（1600 / 1440 / 1024 均无） |
-| 文件大小 | ✅ 53.5 KiB（单个文件，可拷 U 盘） |
+| 文件大小 | ✅ 60,865 B（59.4 KiB，单个文件，可拷 U 盘） |
 | 需要 node / python | ✅ **都不需要** |
 | 需要网络 | ✅ **不需要** |
 
@@ -232,12 +232,12 @@ python docs/demo/tools/build-replay.py      # 244 ms
   · 提取到真实 N2 候选：修复后 3 个 / 修复前 3 个
   · 差异比对：pursuit vs partner
 
-写出 docs/demo/snapshot/demo-snapshot.json  (50.2 KiB)
-块数：{'declared_limitation': 10, 'archived_real_model': 5, 'local_real_rules': 2, 'mock_ui': 2}
+写出 docs/demo/snapshot/demo-snapshot.json  (59.5 KiB / 60,951 字节)
+块数：{'declared_limitation': 10, 'archived_real_model': 5, 'local_real_rules': 4, 'mock_ui': 2}
 本轮新模型调用：0
 ```
 
-**快照里装了什么**（19 块）：
+**快照里装了什么**（21 块）：
 | 类别 | 块数 | 代表内容 |
 | --- | --- | --- |
 | `archived_real_model` | 5 | **真实 `deepseek-v4-flash` 生成的三个候选（逐字）**；前置/后置运行汇总；真实模型修订链路；v2 两次运行；占位夹具跑（明确标注未接模型） |
@@ -378,7 +378,7 @@ GW_MODE=dify GW_PORT=8796 DIFY_API_BASE=http://10.255.255.1/v1 \
               └ 失败 →
 
 第 4 级  模式 C-3：静态截图
-         └ 已验证：docs/demo/shots/*.png 共 9 张，可直接放进 PPT
+         └ 已验证：docs/demo/shots/*.png 共 15 张（含 6 张 INPUT-*.png），可直接放进 PPT
 ```
 
 **第 4 级是"什么都不行"时的地板**：只需要一个能显示图片的程序。

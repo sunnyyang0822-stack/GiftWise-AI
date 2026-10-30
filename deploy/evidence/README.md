@@ -26,7 +26,7 @@
 | --- | --- |
 | `20261030-local-run.md` | 主报告：逐条命令、状态码、响应体、延迟、内存、日志（任务 2） |
 | `container-probe.md` | 容器/编排运行时存在性实测结论：**未构建**及原因（任务 4） |
-| `docker-2026-10-30.md` | PM 执行的容器化真实验证 D-0…D-10（9/9 通过） |
+| `docker-2026-10-30.md` | PM 执行的容器化真实验证 D-0…D-10（原文记 9/9；补采 D-9…D-13 后**合计 14 项通过**，见 §修订） |
 | `observability-2026-10-30.md` | 阶段 14：可观测性实现与真跑证据（本机 39/39、容器 24/24、ps1 静态 17/17） |
 | `slow-body-2026-10-30.md` | 缺陷 I-2（= 安全自查 S-5）：半开正文/慢连接 —— 修复前复现、修复方案、回归证据（当时 42/42；2026-10-31 加 F9b 后为 **43/43**） |
 | `pr-draft-line-deploy-cloud-001.md` | **给 PM 审的 PR 草稿**（标题/描述/证据/未做项/提交范围）；**未提交、未开 PR** |
@@ -98,7 +98,7 @@ python deploy/evidence/container_probe.py                 # 约 3 秒
 python deploy/evidence/observability_check.py             # 约 10 秒（39 项断言）
 python deploy/evidence/observability_container_check.py   # 约 90 秒（24 项断言，需 Docker）
 python deploy/evidence/ps1_static_check.py                # 约 20 秒（17 项断言，不连接任何主机）
-python deploy/evidence/slow_body_check.py                 # 约 3 分钟（42 项断言；容器阶段需 Docker）
+python deploy/evidence/slow_body_check.py                 # 约 3 分钟（43 项断言；容器阶段需 Docker）
 python deploy/evidence/artifact_manifest.py               # 约 1 秒
 ```
 
