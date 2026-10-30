@@ -1,0 +1,7 @@
+JS↔Python 语义比对：共 55 组样例（intake 27 条 / 校验批次 28 条）
+参考实现：python: workflow/intake.py + validator/rules.py（Python 3.12.12）
+追求对象契约开关：PURSUIT_CONTRACT_READY=true
+结果：全部一致（0 处语义差异）
+
+附加检查（把契约开关当作未落地）：错误码 PURSUIT_CONTRACT_NOT_READY；未生成请求：true
+附加检查：通过（拒绝且不静默映射）
