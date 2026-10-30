@@ -23,7 +23,7 @@
 ```bash
 cd <仓库根>
 
-# 0) 出问题先看这个：4.2 秒跑完，退出码 0 = 没有 FAIL
+# 0) 出问题先看这个：约 9 秒跑完（2026-10-31 复测 9,013 ms），退出码 0 = 没有 FAIL
 bash docs/demo/bin/preflight.sh
 
 # 1) 起服务（端口自动避让，不需要 timeout）
@@ -74,13 +74,13 @@ bash docs/demo/bin/servers.sh stop
 
 | 工具 | 用途 | 实测 |
 | --- | --- | --- |
-| `bin/preflight.sh` | T-10 一键自检，8 个方面 | **4183 ms**，退出码 0 |
+| `bin/preflight.sh` | T-10 一键自检 | **9,013 ms**（2026-10-31 复测；旧稿 `4183 ms` 已过期），退出码 0 |
 | `bin/servers.sh` | 起/停服务，端口自动避让 + 精确回收 | ✅ 避让 8787→8788；停服务无连带损伤 |
 | `bin/run-rules-layer-demo.py` | 纯规则层现场跑（零模型零公网） | ✅ **6/6 通过**，515 ms |
 | `bin/retry-on-404.mjs` | 判断 404 是"别人正在写"还是真问题 | ✅ 三分支全部正确分类 |
-| `tools/build-snapshot.py` | 从归档提取证据，生成离线快照 | ✅ 19 块，**0 新模型调用**，335 ms |
+| `tools/build-snapshot.py` | 从归档提取证据，生成离线快照 | ✅ **21 块**（输入阶段 I-01/I-02 已补），**0 新模型调用**，335 ms |
 | `tools/build-replay.py` | 生成自包含回放页 | ✅ 53.5 KiB，**0 外部依赖**，244 ms |
-| `shots/*.png` | 真实浏览器截图 9 张 | ✅ 0 控制台错误 |
+| `shots/*.png` | 真实浏览器截图 **15 张**（另有 `docs/demo/pack/shots/` **24 张**） | ✅ 0 控制台错误 |
 
 ---
 

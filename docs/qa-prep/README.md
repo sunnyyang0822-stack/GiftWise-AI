@@ -118,7 +118,7 @@ node web/tools/parity-check.mjs
 
 | # | 隐患 | 影响 | 建议归属 |
 | --- | --- | --- | --- |
-| H-1 | **材料清单声明哈希过期**（见第 3 节 #1） | 评委用 `/healthz` 一测即穿；且与已重建镜像彼此矛盾 | 发布线 / PM：把 `:92/:93` 与 `:216` 重钉为 `1f389dad…` |
+| H-1 | ~~材料清单声明哈希过期~~ → **已闭合（2026-10-31 01:5x）**：`docs/competition/材料清单与自查.md:95` 已重钉为 `1f389dad4c2589fb…`，`python tools/verify_all.py --only declared_rules_hash` 现在 **PASS** | — | 无需动作 |
 | H-2 | **`COPY deploy /app/deploy` 把内部文档与脚本打进了交付镜像** | 实测 `/app/deploy/` 里有 `security-review.md`、`preprod-plan.md`、`observability-collection.md`、`publish-to-uhost.ps1`、`Dockerfile`、`.dockerignore`。**这不是密钥泄露**，但评委会问"你的镜像里为什么有部署脚本和内部安全评审？"，且 `security-review.md` 可能自曝弱点 | 部署线：`.dockerignore` 排除 `deploy/*.md`、`deploy/*.ps1`，或改为逐个 `COPY` 需要的 `.py` |
 | H-3 | **N-3 版本泄露仍在**：新镜像 `Server: GiftWiseValidator/0.1 Python/3.12.16` | 信息泄露（低危）；且与文档写的 `3.12.12` 不一致 | 部署线：要么改写 `Server` 头，要么把文档改成 3.12.16 |
 | H-4 | **服务器讲 `HTTP/1.0`**（`BaseHTTPRequestHandler` 默认 `protocol_version`） | 意味着**每个响应后关闭连接、无 keep-alive**。评委若问"你这服务能扛多少并发"，这是必须先说清的前提 | 规则/部署线：知情即可；若要改需评估（`HTTP/1.1` 会引入 keep-alive 与半开连接的新语义） |

@@ -169,7 +169,7 @@ GW_MODE=mock GW_PORT=8791 node web/server/server.mjs
 | 构建快照 | `python docs/demo/tools/build-snapshot.py` | **335 ms** | `demo-snapshot.json` **50.2 KiB**，19 块，**0 新模型调用** |
 | 生成回放页 | `python docs/demo/tools/build-replay.py` | **244 ms** | `offline-replay.html` **53.5 KiB**，外部依赖 **0** |
 | 真浏览器验证 | `node web/.tmp/demo-rehearsal/shot.mjs … file:///…offline-replay.html` | — | `readyState: complete`、**console_errors: []**、**failed_requests: []**、无横向溢出 |
-| 一次性自检 | `bash docs/demo/bin/preflight.sh` | **4183 ms** | **OK 12 ｜ WARN 8 ｜ FAIL 0** |
+| 一次性自检 | `bash docs/demo/bin/preflight.sh` | **4183 ms**（00:2x 预演时点）→ **9,013 ms**（2026-10-31 复测） | **OK 12 ｜ WARN 8**（00:2x）→ **OK 14 ｜ WARN 5 ｜ FAIL 0**（复测） |
 
 **回放页从归档里逐字提取到的真实模型数据**（这是兜底里最有价值的部分）：
 ```
