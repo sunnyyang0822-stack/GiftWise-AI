@@ -179,3 +179,5 @@ $ curl -sS -o /dev/null -w '%{http_code}' http://www.baidu.com/
 **一次误操作（已修正）**：验证 404 判定规则时，一条探测命令里的
 `cp … web/public/_probe-transient.js` **真的在 `web/public/` 下建了文件**。
 已于 00:56 删除并复查目录恢复原状。详见 [`demo-rehearsal-record.md`](demo-rehearsal-record.md) §10。
+
+> ⚠️ **2026-10-31 注**：`shots/D10-1-live-ui-top-1440x900.png` 与 `shots/INPUT-20-input-step1.png` **字节完全相同**（均 421,249 B，sha256 `06e7a6af2bb72b5d…`）——是**同一张图挂了两个 ID**，**不要当成两条独立证据**计数。

@@ -1,5 +1,9 @@
 # deploy/evidence —— 运行证据索引（CLOUD-001）
 
+> **⚠️ 目录名对照（2026-10-31）**：任务书里的 `deploy/evidence/image-source-parity/**` **不存在**；实际为脚本 `deploy/evidence/image_source_parity_check.py` ＋ 归档 `deploy/evidence/raw/image-parity-<时间戳>/image-source-parity.json`（6 份）。
+>
+> **「9/9」有四种互不相同的口径，引用必须绑定对象**：① `image_source_parity`（镜像×源码一致性，脚本按 `len(results)` 计数）对重建前 `latest` **4/9** → 首跑 `submission-20261101` **8/9** → 修正后 **9/9**；② `docs/architecture/probes/verify_container_parity.py` 的 **9 组逐字节一致**；③ 容器内 `/validate` **9 组**（同名不同物）；④ 容器检查 **14 项（D-0…D-13）**（人工程表行数，非脚本计数）。
+
 > **最新一轮（2026-10-31 01:13:59）**：PM 夜间指令四修（规则同步 / I-2 / N-1 可观测入口进镜像 / N-4 日志粘连）
 > 的主报告是 [`image-rebuild-n1n4-2026-10-31.md`](image-rebuild-n1n4-2026-10-31.md)；
 > 交付镜像 `giftwise-validator:submission-20261101`（= `latest`，ID `d9a4a35763ee`，仅辅助）：

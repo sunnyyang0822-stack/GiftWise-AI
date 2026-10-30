@@ -1,4 +1,5 @@
 {
+  "_pm_note_566": "本文件的 566.5 是 c=200 的 total_rps_mean(BEFORE，含错误请求)，与文档「c=100 无错 566 rps」数值巧合、含义不同；后者的出处是 bench/runs/ramp-levels1-10-50-100-200-300-20261031T012516.json 的 c=100 throughput_ok_rps=565.72。",
   "summary": {
     "1": {
       "BEFORE": {

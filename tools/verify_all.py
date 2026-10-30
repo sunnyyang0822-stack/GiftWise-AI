@@ -684,7 +684,7 @@ def build_checks() -> list[dict]:
             return "SKIP", f"接入层未就绪且无法启动：{how}", "(未执行)", ""
         return simple(ctx, out, f"HTTP 冒烟（59 项；{how}）",
                       ctx.node("web/tools/smoke-http.mjs"), 180,
-                      exit_zero_and_contains("失败 0 项"),
+                      exit_zero_and_contains("合计 59 项检查", "失败 0 项"),
                       ["web/tools/smoke-http.mjs", "web/server/server.mjs"],
                       env={"GW_BASE": f"http://127.0.0.1:{WEB_PORT}"})
 
@@ -696,7 +696,8 @@ def build_checks() -> list[dict]:
         if not cdp_ok:
             return "SKIP", f"无可用浏览器调试端口：{cdp_how}（页面探针需要 Chrome CDP）", "(未执行)", ""
         return simple(ctx, out, f"页面探针（首帧渲染；{cdp_how}）",
-                      ctx.node("web/tools/page-probe.mjs"), 180, exit_zero,
+                      ctx.node("web/tools/page-probe.mjs"), 180,
+                        exit_zero_and_contains("首帧已渲染", "无页面异常"),
                       ["web/tools/page-probe.mjs"],
                       env={"GW_CDP": f"http://127.0.0.1:{CDP_PORT}",
                            "GW_URL": f"http://127.0.0.1:{WEB_PORT}/"})
@@ -710,7 +711,8 @@ def build_checks() -> list[dict]:
         if not cdp_ok:
             return "SKIP", f"无可用浏览器调试端口：{cdp_how}（浏览器自查需要 Chrome CDP）", "(未执行)"
         return simple(ctx, out, f"浏览器自查（web 线自带，多视口 + 主流程点击；{cdp_how}）",
-                      ctx.node("web/tools/browser-check.mjs"), 300, exit_zero,
+                      ctx.node("web/tools/browser-check.mjs"), 300,
+                        exit_zero_and_contains("合计 100 项检查", "失败 0 项"),
                       ["web/tools/browser-check.mjs"],
                       env={"GW_CDP": f"http://127.0.0.1:{CDP_PORT}",
                            "GW_URL": f"http://127.0.0.1:{WEB_PORT}/"})
@@ -718,11 +720,12 @@ def build_checks() -> list[dict]:
     # ---------- 本线补入的既有检查（同属快速档，均无需 Docker）----------
     def access_layer(ctx, out):
         return simple(ctx, out, "接入层单元测试（40 例）",
-                      ctx.node("web/tests/access-layer.test.mjs"), 180, exit_zero,
+                      ctx.node("web/tests/access-layer.test.mjs"), 180,
+                        exit_zero_and_contains("tests 40", "pass 40"),
                       ["web/tests/access-layer.test.mjs", "web/server"])
 
     def boundary(ctx, out):
-        return simple(ctx, out, "边界套件（25 例，跨层闸门/判别性）",
+        return simple(ctx, out, "边界套件（45 例，跨层闸门/判别性）",
                       ctx.python("-m", "unittest", "discover", "-s", "tests/acceptance/boundary"), 180,
                       exit_zero, ["tests/acceptance/boundary"])
 

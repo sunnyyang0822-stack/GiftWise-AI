@@ -87,7 +87,7 @@ function renderBadges() {
   const flag = $("mode-flag");
   if (flag) {
     flag.hidden = false;
-    flag.textContent = mock ? "模拟数据 · 未接真实模型" : "真实模型已接入";
+    flag.textContent = mock ? "模拟数据 · 未接真实模型" : "Dify 模式（以服务端返回为准）";
     flag.classList.toggle("mode-flag--real", !mock);
     flag.title = mock
       ? "当前接入层没有接入真实模型（未配置模型凭证），候选与呈现内容来自接入层内置模拟数据，不是模型真实输出。"
@@ -103,7 +103,7 @@ function renderBadges() {
     }
   }
   slot.append(
-    el("span", { class: "badge badge--mock", text: state.config.mode === "mock" ? "模拟数据模式" : "真实 Dify 模式" }),
+    el("span", { class: "badge badge--mock", text: state.config.mode === "mock" ? "模拟数据模式" : "Dify 模式" }),
     el("span", { class: "badge", text: `币种：${state.config.limits.currency}（首版不换汇）` }),
     el("span", { class: "badge", text: `全局自动修订上限：${state.config.limits.global_repair_limit} 次` }),
     el("span", {
