@@ -195,7 +195,7 @@ python docs/demo/bin/run-rules-layer-demo.py
 # 校验器不在 8000 时：GW_VALIDATOR_BASE=http://127.0.0.1:<实际端口> python docs/demo/bin/run-rules-layer-demo.py
 ```
 
-**2026-10-31 实测（我真跑过）**：`6 项用例 / 失败 0 项 / exit 0 / 497 ms`，输出里含
+**2026-10-31 实测（我真跑过）**：`6 项用例 / 失败 0 项 / exit 0 / 515 ms`（含 Python 启动；与 `docs/demo/demo-rehearsal-record.md:145` 一致），输出里含
 `OVER_BUDGET`、`FORBIDDEN_TERM`、`FORBIDDEN_TAG` 三个错误码。
 
 **现场照念话术（照读）**：
