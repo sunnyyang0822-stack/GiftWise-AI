@@ -1,0 +1,45 @@
+{
+  "suite": "CLOUD-001 启动耗时独立测量",
+  "image": "giftwise-validator:latest",
+  "method": "docker run -d 到首次 HTTP 200；每次探测 1s 超时，避免无超时 curl 的静默阻塞",
+  "rounds": [
+    {
+      "note": "round 1",
+      "docker_run_seconds": 0.219,
+      "first_http_200_seconds": 0.454,
+      "probe_attempts": 3,
+      "failed_probe_attempts": 2,
+      "container_started_at": "2026-10-30T14:39:24.674904788Z",
+      "server_log": "giftwise-validator listening on 0.0.0.0:8000; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\n172.17.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+    },
+    {
+      "note": "round 2",
+      "docker_run_seconds": 0.25,
+      "first_http_200_seconds": 0.5,
+      "probe_attempts": 3,
+      "failed_probe_attempts": 2,
+      "container_started_at": "2026-10-30T14:39:26.536945143Z",
+      "server_log": "giftwise-validator listening on 0.0.0.0:8000; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\n172.17.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+    },
+    {
+      "note": "round 3",
+      "docker_run_seconds": 0.203,
+      "first_http_200_seconds": 0.469,
+      "probe_attempts": 3,
+      "failed_probe_attempts": 2,
+      "container_started_at": "2026-10-30T14:39:28.486279825Z",
+      "server_log": "giftwise-validator listening on 0.0.0.0:8000; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\n172.17.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+    }
+  ],
+  "summary": {
+    "rounds": 3,
+    "samples": [
+      0.454,
+      0.5,
+      0.469
+    ],
+    "min": 0.454,
+    "max": 0.5,
+    "median": 0.469
+  }
+}

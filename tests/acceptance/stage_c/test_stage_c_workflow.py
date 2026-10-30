@@ -14,6 +14,7 @@
 """
 
 import copy
+import hashlib
 import json
 import os
 import subprocess
@@ -163,31 +164,48 @@ class C2ContractGaps(Recorder):
         self.observe("C2-02", "pursuit 与 partner 并列互斥且都可通过 intake", {}, expected, actual, ok)
 
     def test_c2_03_pursuit_was_rejected_before_the_change(self):
-        """用 HEAD 已提交版本的 RELATIONS 复现变更前被拒的行为，证明 PM 的 INTAKE_UNKNOWN_LABEL 声明。"""
-        tmp = Path(tempfile.mkdtemp(prefix="qa-head-labels-"))
-        target = tmp / "head-labels.py"
-        with open(target, "w", encoding="utf-8") as fh:
-            proc = subprocess.run(["git", "show", "HEAD:workflow/labels.py"], cwd=ROOT, stdout=fh,
-                                  stderr=subprocess.DEVNULL)
-        if proc.returncode != 0:
-            self.skipTest("无法从 git 读取 HEAD 版本 labels.py")
-        namespace = {}
-        exec(compile(target.read_text(encoding="utf-8"), "HEAD:workflow/labels.py", "exec"), namespace)
-        head_relations = namespace["RELATIONS"]
+        """用**逐字节固定的历史夹具**复现变更前被拒的行为，证明 PM 的 INTAKE_UNKNOWN_LABEL 声明。
+
+        安全说明：不挂 `git show HEAD`——`HEAD` 是会移动的引用，历史基线挂在其上会在他人提交后失效
+        （本用例就因此从通过变为失败过）。改为 `fixtures/labels_before_pursuit.py`，
+        出处与 sha256 见 `fixtures/PROVENANCE.md`，并断言该夹具哈希未被改动。
+        """
+        fixture_sha256_recorded = "333ad9761d9278c7421c0cdd1c8d43ebbef7b6a6c164dfc54896ec653520d916"
+        fixture = Path(__file__).with_name("fixtures") / "labels_before_pursuit.py"
+        raw = fixture.read_bytes()
+        fixture_sha256 = hashlib.sha256(raw).hexdigest()
+        namespace: dict = {}
+        exec(compile(raw.decode("utf-8"), str(fixture), "exec"), namespace)
+        before_relations = namespace["RELATIONS"]
+
         import workflow.intake as intake_module
+        import workflow.labels as labels_module
         original = intake_module.RELATIONS
         try:
-            intake_module.RELATIONS = head_relations
+            intake_module.RELATIONS = before_relations
             result = adapt_intake(dump(intake("pursuit")))
         finally:
             intake_module.RELATIONS = original
-            target.unlink(missing_ok=True)
-            os.rmdir(tmp)
-        actual = {"head_relations_has_pursuit": "pursuit" in head_relations, "status": result["status"], "codes": codes(result)}
-        expected = "HEAD 版本无 pursuit，提交 pursuit 得到 needs_input + INTAKE_UNKNOWN_LABEL"
-        ok = (not actual["head_relations_has_pursuit"] and actual["status"] == "needs_input"
-              and "INTAKE_UNKNOWN_LABEL" in actual["codes"])
-        self.observe("C2-03", "变更前 pursuit 确实被拒（HEAD 版本复现）", {}, expected, actual, ok)
+
+        # 漂移观察（不影响判定）：当前工作区版本是否已加入 pursuit
+        drift = {"current_has_pursuit": "pursuit" in labels_module.RELATIONS,
+                 "current_partner_text": labels_module.RELATIONS.get("partner"),
+                 "before_partner_text": before_relations.get("partner")}
+        actual = {
+            "fixture_sha256": fixture_sha256,
+            "fixture_sha256_as_recorded": fixture_sha256 == fixture_sha256_recorded,
+            "before_relations_has_pursuit": "pursuit" in before_relations,
+            "status": result["status"],
+            "codes": codes(result),
+            "request_json_released": result["request_json"] is not None,
+            "drift": drift,
+        }
+        expected = ("夹具 sha256 与记录一致；固定版本无 pursuit；提交 pursuit 得到 "
+                    "needs_input + INTAKE_UNKNOWN_LABEL 且不返回可用请求")
+        ok = (actual["fixture_sha256_as_recorded"] and not actual["before_relations_has_pursuit"]
+              and actual["status"] == "needs_input" and "INTAKE_UNKNOWN_LABEL" in actual["codes"]
+              and actual["request_json_released"] is False)
+        self.observe("C2-03", "变更前 pursuit 确实被拒（逐字节固定夹具复现）", {}, expected, actual, ok)
 
     def test_c2_04_unknown_confidence_rejected(self):
         data = intake("pursuit")

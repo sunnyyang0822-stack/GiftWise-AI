@@ -1,0 +1,23 @@
+=== 陈旧规则守卫验证：把 rules.py 换成旧内容，/healthz 是否报出不同哈希 ===
+  �ֿ⵱ǰ rules.py ��ϣ : 4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3
+  �¾ɾ��� /healthz ��ϣ: 45f56c552c03c745289906feb9942e60bf9fab2c0b6a811b327841342163b280
+  ��ϣ�����ܷ��ֳ¾�  : True
+
+=== 冷构建（--no-cache）vs 热构建（命中缓存）耗时，各 2 次 ===
+  --no-cache �� 1 ��:  1.541 s
+  --no-cache �� 2 ��:  1.428 s
+  hot    �� 1 ��:  1.089 s
+  hot    �� 2 ��:  1.369 s
+
+--- 全量 cold build 的分步耗时（供对照 PM 的 0.6s）---
+#1 DONE 0.0s
+#2 DONE 0.0s
+#3 DONE 0.0s
+#4 DONE 0.0s
+#5 DONE 0.0s
+#6 CACHED
+#4 DONE 0.0s
+#7 DONE 0.0s
+#8 DONE 0.0s
+#9 DONE 0.3s
+#10 DONE 0.2s

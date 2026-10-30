@@ -1,0 +1,354 @@
+{
+  "suite": "CLOUD-001 独立复核（容器规则 API）",
+  "base_url": "http://127.0.0.1:18000",
+  "container": "gw-qa (giftwise-validator:latest) 由 QA 自行启动",
+  "note": "本文件由独立测试 Agent 执行；不引用 deploy/evidence 的结论。",
+  "passed": 11,
+  "failed": 1,
+  "results": [
+    {
+      "id": "D3-01",
+      "title": "/healthz 200 且规则哈希与本机 rules.py 一致",
+      "expected": "HTTP 200；rules_source_sha256 == 本机 sha256；Content-Length 与实际字节数相符",
+      "actual": {
+        "httpStatus": 200,
+        "content_type": "application/json; charset=utf-8",
+        "server": "GiftWiseValidator/0.1 Python/3.12.16",
+        "container_rules_sha256": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+        "local_rules_sha256": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+        "content_length_header": "135",
+        "actual_body_bytes": 135
+      },
+      "passed": true
+    },
+    {
+      "id": "D4-01",
+      "title": "POST /validate 响应体与进程内 validate() 逐字节一致",
+      "expected": "server_bytes == json.dumps(validate(...), ensure_ascii=False, separators=(',',':')) 的字节",
+      "actual": {
+        "httpStatus": 200,
+        "server_body_bytes": 271,
+        "inproc_bytes": 271,
+        "identical_compact": true,
+        "identical_default_separators": false,
+        "identical_sorted_keys": false,
+        "parsed_deep_equal": true,
+        "server_prefix": "{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]"
+      },
+      "passed": true
+    },
+    {
+      "id": "D4-02",
+      "title": "逐字节比较方法有效（不是同一个 JSON 序列化两次）",
+      "expected": "必须能区分不同序列化口径：compact 版相等、默认分隔符版不等、排序键版不等",
+      "actual": {
+        "compact_equal": true,
+        "default_separators_equal": false,
+        "sorted_keys_equal": false,
+        "compact_len": 271,
+        "default_len": 303
+      },
+      "passed": true
+    },
+    {
+      "id": "D4-03",
+      "title": "改动输入后响应随之改变（排除固定/伪造响应）",
+      "expected": "把 c1 改为 999.00 后 c1 必须失败且含 OVER_BUDGET；响应仍与进程内逐字节一致",
+      "actual": {
+        "httpStatus": 200,
+        "c1_passed": false,
+        "c1_error_codes": [
+          "OVER_BUDGET"
+        ],
+        "byte_identical_after_mutation": true
+      },
+      "passed": true
+    },
+    {
+      "id": "D4-04",
+      "title": "多例一致性（正常/超预算/禁忌/时间/异常根）",
+      "expected": "5 例都 HTTP 200 且响应体逐字节等于进程内 validate()",
+      "actual": {
+        "T01_normal": {
+          "http": 200,
+          "byte_identical": true
+        },
+        "T02_amount_200.01": {
+          "http": 200,
+          "byte_identical": true
+        },
+        "T03_tag": {
+          "http": 200,
+          "byte_identical": true
+        },
+        "T04_days_2": {
+          "http": 200,
+          "byte_identical": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "D5-01",
+      "title": "状态码契约表逐行比对（deploy/README.md）",
+      "expected": "非法JSON=400 INVALID_JSON；类型/缺字段/非对象=400 INVALID_PAYLOAD；未知路径=404 NOT_FOUND；业务不通过=200；>65536=413 且 65536 本身不算超长；HEAD=501",
+      "actual": {
+        "invalid_json": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_JSON\"}"
+        },
+        "invalid_payload_types": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_PAYLOAD\",\"message\":\"request_json 和 candidates_json 必须是 JSON 字符串\"}"
+        },
+        "top_level_array": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_PAYLOAD\",\"message\":\"request_json 和 candidates_json 必须是 JSON 字符串\"}"
+        },
+        "missing_field": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_PAYLOAD\",\"message\":\"request_json 和 candidates_json 必须是 JSON 字符串\"}"
+        },
+        "null_field": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_PAYLOAD\",\"message\":\"request_json 和 candidates_json 必须是 JSON 字符串\"}"
+        },
+        "get_unknown_path": {
+          "http": 404,
+          "body": "{\"error\":\"NOT_FOUND\"}"
+        },
+        "post_unknown_path": {
+          "http": 404,
+          "body": "{\"error\":\"NOT_FOUND\"}"
+        },
+        "root": {
+          "http": 200,
+          "body": "{\"service\":\"giftwise-validator\",\"endpoints\":[\"GET /healthz\",\"POST /validate\"]}"
+        },
+        "valid_but_business_fail": {
+          "http": 200,
+          "body": "{\"status\":\"needs_input\",\"all_passed\":false,\"errors\":[{\"code\":\"MISSING_FIELD\",\"path\":\"request.recipient_relation\",\"message\":\"缺少必填字段\"},{\"code\":\"MISSING_FIELD\",\"path\":\"request.occasion\",\"message\":\"缺少必填字段\"},{\"code\":\"MISSING_FIELD\",\"path\":\"request.budget_amount\",\"message\":\"缺少必填字段\"},{\"code\":\"MISSING_FIELD\",\"path\":\"request.currency\",\"message\":\"缺少必填字段\"},{\"code\":\"MISSING_FIELD\",\"path\":\"request.available_days\",\"message\":\"缺少必填字段\"},{\"code\":\"MISSING_FIELD\",\"path\":\"candidates\",\"message\":\"缺少候选数组\"}],\"candidate_results\":[],\"business_data_verification\":\"not_verified\"}"
+        },
+        "oversized": {
+          "http": 413,
+          "body": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        },
+        "oversized_exact_boundary_65536": {
+          "http": 400,
+          "body": "{\"error\":\"INVALID_JSON\"}"
+        },
+        "oversized_boundary_65537": {
+          "http": 413,
+          "body": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        },
+        "head_method": {
+          "http": 501,
+          "body": ""
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "RAW-01",
+      "title": "无 Content-Length：立即 413 且不挂起、连接被对端关闭",
+      "expected": "6 秒内返回 413 REQUEST_TOO_LARGE；对端关闭连接（closed_by_peer=true）；无 timeout chunk",
+      "actual": {
+        "status_line": 413,
+        "elapsed": 0.0,
+        "timeout_chunks": [],
+        "closed_by_peer": true,
+        "chunk_lens": [
+          216,
+          29
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "RAW-02",
+      "title": "HTTP/1.1 keep-alive 且无 Content-Length：是否半开连接",
+      "expected": "记录实际行为：是否声明 keep-alive、是否由对端关闭、是否需要在同一 socket 上再发请求验证不同步",
+      "actual": {
+        "status_line": 413,
+        "elapsed": 0.0,
+        "closed_by_peer": true,
+        "timeout_chunks": [],
+        "response_head": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:30:57 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Contr"
+      },
+      "passed": true
+    },
+    {
+      "id": "RAW-03",
+      "title": "HTTP/1.1 + chunked 有 body 但无 Content-Length",
+      "expected": "413；且不在同一连接上留下未读 body 造成协议不同步（记录是否关闭）",
+      "actual": {
+        "status_line": 413,
+        "closed_by_peer": true,
+        "timeout_chunks": [],
+        "response_head": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:30:57 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Contr"
+      },
+      "passed": true
+    },
+    {
+      "id": "RAW-04",
+      "title": "声明 Content-Length 大于实发字节（客户端停住）",
+      "expected": "服务端应有时限或明确行为；若无限等待即为半开连接/线程占用缺陷",
+      "actual": {
+        "status_line": null,
+        "elapsed": 6.015,
+        "closed_by_peer": null,
+        "timeout_chunks": [
+          {
+            "timeout": true,
+            "after_seconds": 6.015
+          }
+        ],
+        "error": null
+      },
+      "passed": false
+    },
+    {
+      "id": "RAW-05",
+      "title": "非法 Content-Length（负数 / 非数字）",
+      "expected": "不得崩溃；按 REQUEST_TOO_LARGE 或 INVALID_JSON 明确拒绝",
+      "actual": {
+        "negative": {
+          "status_line": 413,
+          "body": "30 Oct 2026 14:31:03 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n"
+        },
+        "nonnumeric": {
+          "status_line": 413,
+          "body": "tent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "RAW-06",
+      "title": "Content-Length: 0（空 body）",
+      "expected": "400 INVALID_JSON（不是 413，也不是挂起）",
+      "actual": {
+        "status_line": 400,
+        "body": "alidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:31:03 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 24\r\nCache-Control: no-store\r\n\r\n"
+      },
+      "passed": true
+    }
+  ],
+  "raw_socket_detail": {
+    "no_content_length_http10": {
+      "sent_bytes": 44,
+      "chunks": [
+        {
+          "len": 216,
+          "at": 0.0,
+          "text": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:30:57 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n"
+        },
+        {
+          "len": 29,
+          "at": 0.0,
+          "text": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 413
+    },
+    "no_content_length_http11_keepalive": {
+      "sent_bytes": 68,
+      "chunks": [
+        {
+          "len": 216,
+          "at": 0.0,
+          "text": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:30:57 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n"
+        },
+        {
+          "len": 29,
+          "at": 0.0,
+          "text": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 413
+    },
+    "chunked_body_no_content_length": {
+      "sent_bytes": 87,
+      "chunks": [
+        {
+          "len": 216,
+          "at": 0.0,
+          "text": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:30:57 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n"
+        },
+        {
+          "len": 29,
+          "at": 0.0,
+          "text": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 413
+    },
+    "declared_longer_than_sent": {
+      "sent_bytes": 70,
+      "chunks": [
+        {
+          "timeout": true,
+          "after_seconds": 6.015
+        }
+      ],
+      "closed_by_peer": null,
+      "elapsed": 6.015,
+      "status_line": null
+    },
+    "negative_content_length": {
+      "sent_bytes": 64,
+      "chunks": [
+        {
+          "len": 216,
+          "at": 0.0,
+          "text": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:31:03 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n"
+        },
+        {
+          "len": 29,
+          "at": 0.0,
+          "text": "{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 413
+    },
+    "nonnumeric_content_length": {
+      "sent_bytes": 65,
+      "chunks": [
+        {
+          "len": 245,
+          "at": 0.0,
+          "text": "HTTP/1.0 413 Request Entity Too Large\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:31:03 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 29\r\nCache-Control: no-store\r\n\r\n{\"error\":\"REQUEST_TOO_LARGE\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 413
+    },
+    "zero_content_length": {
+      "sent_bytes": 63,
+      "chunks": [
+        {
+          "len": 203,
+          "at": 0.0,
+          "text": "HTTP/1.0 400 Bad Request\r\nServer: GiftWiseValidator/0.1 Python/3.12.16\r\nDate: Fri, 30 Oct 2026 14:31:03 GMT\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 24\r\nCache-Control: no-store\r\n\r\n"
+        },
+        {
+          "len": 24,
+          "at": 0.0,
+          "text": "{\"error\":\"INVALID_JSON\"}"
+        }
+      ],
+      "closed_by_peer": true,
+      "elapsed": 0.0,
+      "status_line": 400
+    }
+  }
+}

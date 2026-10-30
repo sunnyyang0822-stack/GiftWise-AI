@@ -1,0 +1,27 @@
+=== 用仓库根 .dockerignore 实测真实构建上下文（Dockerfile 走 stdin，不新增仓库文件）===
+构建成功
+--- 上下文总体积 ---
+196.0K	/ctx
+--- 上下文内被 .dockerignore 漏掉的产物 ---
+/ctx/deploy/__pycache__
+/ctx/deploy/__pycache__/__init__.cpython-312.pyc
+/ctx/deploy/__pycache__/server.cpython-312.pyc
+/ctx/validator/__pycache__
+/ctx/validator/__pycache__/__init__.cpython-312.pyc
+/ctx/validator/__pycache__/rules.cpython-312.pyc
+--- 上下文顶层条目（核对 validator 与 deploy 都在、docs/tests/workflow/web 都不在）---
+AGENTS.md
+Giftwise.ifpkg
+README.md
+deploy
+validator
+--- deploy 下有什么 ---
+Dockerfile
+README.md
+__init__.py
+__pycache__
+observability-collection.md
+preprod-plan.md
+publish-to-uhost.ps1
+security-review.md
+server.py

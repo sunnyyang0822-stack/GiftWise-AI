@@ -1,0 +1,819 @@
+{
+  "suite": "QA-001 阶段 C：工作流层独立验收",
+  "role": "GiftWise｜测试验收 Agent（独立复核，不采信开发方声明）",
+  "started_at": "2026-10-30T22:42:43.883631+08:00",
+  "finished_at": "2026-10-30T22:42:44.006693+08:00",
+  "timezone": "Asia/Shanghai (+08:00)",
+  "command": "python tests/acceptance/stage_c/run_stage_c.py",
+  "git_head": "46d1b48c8bbeac2ef11d4fc74405e57a76d4b92e",
+  "git_worktree": {
+    "command": "git status --porcelain",
+    "returncode": 0,
+    "changed_count": 21,
+    "entries": [
+      "M \"docs/competition/\\346\\235\\220\\346\\226\\231\\346\\270\\205\\345\\215\\225\\344\\270\\216\\350\\207\\252\\346\\237\\245.md\"",
+      " M \"docs/competition/\\346\\236\\266\\346\\236\\204\\345\\233\\276-GiftWise.png\"",
+      " M \"docs/competition/\\347\\255\\224\\350\\276\\251PPT-GiftWise.pptx\"",
+      " M \"docs/competition/\\347\\255\\224\\350\\276\\251PPT\\351\\252\\250\\346\\236\\266.md\"",
+      " M docs/demo-script.md",
+      " M docs/test-plan.md",
+      " M tests/acceptance/stage_c/test_stage_c_workflow.py",
+      " D workflow/evidence/WF-003-2026-10-30/dify-deepseek-and-draft-final-state.json",
+      " M workflow/evidence/local-2026-10-29/results.json",
+      "?? deploy/observability.py",
+      "?? docs/test-reports/cloud-001/",
+      "?? tests/acceptance/cloud-001/",
+      "?? tests/acceptance/stage_c/fixtures/",
+      "?? workflow/evidence/WF-003-2026-10-30/STALE-21-03-dify-deepseek-and-draft-final-state.json",
+      "?? workflow/evidence/WF-003-2026-10-30/demo-local-verify-output.json",
+      "?? workflow/evidence/WF-003-2026-10-30/dify-final-state-after-last-change-2026-10-30T2240+0800.json",
+      "?? workflow/evidence/WF-003-2026-10-30/dify-post-change-ui-2026-10-30T2240.png",
+      "?? workflow/examples/demo-candidates-clean.json",
+      "?? workflow/examples/demo-candidates-violating.json",
+      "?? workflow/examples/demo-intake-judge-forbidden-term.json",
+      "?? workflow/tools/"
+    ]
+  },
+  "environment": {
+    "python": "3.12.12",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "totals": {
+    "cases_recorded": 39,
+    "unittest_run": 39,
+    "passed": 39,
+    "failed": 0,
+    "errors": 0,
+    "unittest_failures": 0
+  },
+  "model_calls": 0,
+  "cloud_model_calls": 0,
+  "cloud_verified": false,
+  "metrics": {
+    "mode": "offline-fixed-snapshots-no-model",
+    "model_calls": 0,
+    "cost": "not_measured",
+    "cost_note": "无模型调用即无计费；未取得任何费率依据，缺数据记 not_measured，不填 0",
+    "cloud_verified": false,
+    "latency_clock": "time.monotonic",
+    "stages": [
+      {
+        "stage": "intake",
+        "seconds": 0.0,
+        "ok": true
+      },
+      {
+        "stage": "check_first",
+        "seconds": 0.0,
+        "ok": true
+      },
+      {
+        "stage": "recheck",
+        "seconds": 0.0,
+        "ok": true
+      },
+      {
+        "stage": "report",
+        "seconds": 0.0,
+        "ok": true
+      }
+    ],
+    "total_seconds": 0.0,
+    "dify_real_run_latency": {
+      "available": true,
+      "source": "docs/test-reports/stage-c/evidence/dify-run-evidence.json",
+      "workflow_run_id": "0cdef527-3504-4635-a338-58f985f8f216",
+      "code_node_elapsed_time_seconds": 0.094046,
+      "workflow_elapsed_time_seconds": 0.1543920770054683,
+      "total_tokens": 0,
+      "note": "无模型调用的探针耗时，不可当作业务延迟"
+    }
+  },
+  "results": [
+    {
+      "id": "C1-01",
+      "group": "C1 沙箱兼容探针",
+      "title": "本地标准库探针 compatible=true",
+      "input": {},
+      "expected": {
+        "compatible": true
+      },
+      "actual": {
+        "compatible": true,
+        "details_json": "{\"json\": true, \"re_ascii\": true, \"unicodedata_nfkc\": true, \"decimal\": true, \"mode\": \"stdlib_probe_only\"}"
+      },
+      "passed": true
+    },
+    {
+      "id": "C1-02",
+      "group": "C1 沙箱兼容探针",
+      "title": "真实 Dify Code 节点沙箱执行成功（独立捕获）",
+      "input": {
+        "evidence": "docs/test-reports/stage-c/evidence/dify-run-evidence.json"
+      },
+      "expected": {
+        "code_node_succeeded": true,
+        "code_node_error_null": true,
+        "code_node_output_compatible_true": true,
+        "details_json_all_true": true,
+        "details_json_declared_string": true,
+        "zero_tokens": true,
+        "no_exceptions": true
+      },
+      "actual": {
+        "code_node_succeeded": true,
+        "code_node_error_null": true,
+        "code_node_output_compatible_true": true,
+        "details_json_all_true": true,
+        "details_json_declared_string": true,
+        "zero_tokens": true,
+        "no_exceptions": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C1-03",
+      "group": "C1 沙箱兼容探针",
+      "title": "记录真实节点耗时与 token（不写零成本）",
+      "input": {},
+      "expected": "run_id 非空；elapsed_time 为真实浮点数；total_tokens 必须为 0（无模型调用）",
+      "actual": {
+        "run_id": "0cdef527-3504-4635-a338-58f985f8f216",
+        "code_node_elapsed_time": 0.094046,
+        "workflow_elapsed_time": 0.1543920770054683,
+        "total_tokens": 0
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-01",
+      "group": "C2 契约缺口",
+      "title": "『追求对象』已有独立机器值 pursuit",
+      "input": {},
+      "expected": "pursuit 存在且为『追求对象』；partner 为『恋人』；colleague 保留（仅技术回归）",
+      "actual": {
+        "pursuit_present": true,
+        "pursuit_text": "追求对象",
+        "partner_text": "恋人",
+        "colleague_present": true,
+        "total_ids": 10,
+        "labels_sha256": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910"
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-02",
+      "group": "C2 契约缺口",
+      "title": "pursuit 与 partner 并列互斥且都可通过 intake",
+      "input": {},
+      "expected": "两者均 ready；中文分别为『追求对象』/『恋人』；机器值 pursuit/partner 且互不相同",
+      "actual": {
+        "pursuit_status": "ready",
+        "partner_status": "ready",
+        "pursuit_relation_text": "追求对象",
+        "pursuit_relation_id": "pursuit",
+        "partner_relation_text": "恋人",
+        "partner_relation_id": "partner"
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-03",
+      "group": "C2 契约缺口",
+      "title": "变更前 pursuit 确实被拒（逐字节固定夹具复现）",
+      "input": {},
+      "expected": "夹具 sha256 与记录一致；固定版本无 pursuit；提交 pursuit 得到 needs_input + INTAKE_UNKNOWN_LABEL 且不返回可用请求",
+      "actual": {
+        "fixture_sha256": "333ad9761d9278c7421c0cdd1c8d43ebbef7b6a6c164dfc54896ec653520d916",
+        "fixture_sha256_as_recorded": true,
+        "before_relations_has_pursuit": false,
+        "status": "needs_input",
+        "codes": [
+          "INTAKE_UNKNOWN_LABEL",
+          "INVALID_TYPE"
+        ],
+        "request_json_released": false,
+        "drift": {
+          "current_has_pursuit": true,
+          "current_partner_text": "恋人",
+          "before_partner_text": "伴侣"
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-04",
+      "group": "C2 契约缺口",
+      "title": "interest_confidence=unknown 被拒",
+      "input": {},
+      "expected": "needs_input + INTAKE_CONFIDENCE_MISMATCH，且不返回可用请求",
+      "actual": {
+        "status": "needs_input",
+        "codes": [
+          "INTAKE_CONFIDENCE_MISMATCH"
+        ],
+        "request_json": null
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-05",
+      "group": "C2 契约缺口",
+      "title": "可信度多余键被拒",
+      "input": {},
+      "expected": "needs_input + INTAKE_CONFIDENCE_MISMATCH（多余键）",
+      "actual": {
+        "status": "needs_input",
+        "codes": [
+          "INTAKE_CONFIDENCE_MISMATCH"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-06",
+      "group": "C2 契约缺口",
+      "title": "interests 中的 unknown 机器值被拒",
+      "input": {},
+      "expected": "needs_input + INTAKE_UNKNOWN_LABEL（不存在 interests 的 unknown 机器值）",
+      "actual": {
+        "status": "needs_input",
+        "codes": [
+          "INTAKE_UNKNOWN_LABEL"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-07",
+      "group": "C2 契约缺口",
+      "title": "前端提交 recipient_relation_id 被拒",
+      "input": {},
+      "expected": "needs_input + INTAKE_UNKNOWN_FIELD（该字段只由服务端产出）",
+      "actual": {
+        "status": "needs_input",
+        "codes": [
+          "INTAKE_UNKNOWN_FIELD"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-08",
+      "group": "C2 契约缺口",
+      "title": "colleague 仅作技术回归仍可通过",
+      "input": {},
+      "expected": "ready；中文『同事』；机器值 colleague（仅技术回归，产品面不得出现）",
+      "actual": {
+        "status": "ready",
+        "relation_text": "同事",
+        "relation_id": "colleague"
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-09",
+      "group": "C2 契约缺口",
+      "title": "新增 recipient_relation_id 不破坏既有校验",
+      "input": {},
+      "expected": "两种请求的校验状态与错误码集合一致（validator 对 request 无字段白名单）",
+      "actual": {
+        "with_id_status": "failed",
+        "without_id_status": "failed",
+        "with_id_codes": [
+          "MISSING_FIELD"
+        ],
+        "without_id_codes": [
+          "MISSING_FIELD"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-10",
+      "group": "C2 契约缺口",
+      "title": "INTERNAL_ERROR 已补入契约错误码表",
+      "input": {},
+      "expected": "契约错误码表已补入 INTERNAL_ERROR 并标注出处",
+      "actual": {
+        "INTERNAL_ERROR_in_contract": true,
+        "INTERNAL_ERROR_in_error_table": true,
+        "has_source_reference": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C2-11",
+      "group": "C2 契约缺口",
+      "title": "契约文档与冻结关系枚举一致",
+      "input": {},
+      "expected": "契约含 pursuit；colleague 标注『仅技术回归』；partner 中文为『恋人』",
+      "actual": {
+        "pursuit_in_contract": true,
+        "colleague_marked_regression": true,
+        "partner_text_lianren": true,
+        "old_partner_wording_gone": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-01",
+      "group": "C3 候选校验",
+      "title": "正常基线：三项候选全部通过",
+      "input": {
+        "candidates": "cases.json baseline_candidates"
+      },
+      "expected": "status=passed、all_passed=true、c1/c2/c3 全通过、无错误、恰好三个候选",
+      "actual": {
+        "status": "passed",
+        "all_passed": true,
+        "passed_ids": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "error_codes": [],
+        "count": 3
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-02",
+      "group": "C3 候选校验",
+      "title": "超预算边界：200.00 通过",
+      "input": {
+        "c1.estimated_total": "200.00"
+      },
+      "expected": "预算边界恰好 200.00 应通过",
+      "actual": {
+        "boundary_total": "200.00",
+        "c1_passed": true,
+        "c1_errors": [],
+        "all_passed": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-03",
+      "group": "C3 候选校验",
+      "title": "超预算 200.01 失败且不牵连其他项",
+      "input": {
+        "c1.estimated_total": "200.01"
+      },
+      "expected": "c1 因 OVER_BUDGET 失败，c2/c3 仍通过（只失败项不可选）",
+      "actual": {
+        "total": "200.01",
+        "c1_passed": false,
+        "c1_errors": [
+          "OVER_BUDGET"
+        ],
+        "other_passed": [
+          "c2",
+          "c3"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-04",
+      "group": "C3 候选校验",
+      "title": "禁忌标签 alcohol 被拦截",
+      "input": {
+        "c1.tags": [
+          "alcohol"
+        ]
+      },
+      "expected": "FORBIDDEN_TAG",
+      "actual": {
+        "c1_passed": false,
+        "c1_errors": [
+          "FORBIDDEN_TAG"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-05",
+      "group": "C3 候选校验",
+      "title": "字面禁忌词『酒』被拦截",
+      "input": {
+        "c1.description": "…酒类饮品…"
+      },
+      "expected": "FORBIDDEN_TERM（字面词『酒』）",
+      "actual": {
+        "c1_passed": false,
+        "c1_errors": [
+          "FORBIDDEN_TERM"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-06",
+      "group": "C3 候选校验",
+      "title": "全角变体字面禁忌不被绕过",
+      "input": {
+        "c1.description": "…ＡＬＣＯＨＯＬ…"
+      },
+      "expected": "NFKC 归一化后命中 FORBIDDEN_TERM",
+      "actual": {
+        "c1_passed": false,
+        "c1_errors": [
+          "FORBIDDEN_TERM"
+        ],
+        "term": "alcohol",
+        "description": "…ＡＬＣＯＨＯＬ…（全角）"
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-07",
+      "group": "C3 候选校验",
+      "title": "候选 JSON 损坏 → 可修订的错误",
+      "input": {
+        "candidates_json": "{\"candidates\":[{\"id\":\"c1\","
+      },
+      "expected": "status=error、INVALID_JSON、repairable=true（值得一次修订）",
+      "actual": {
+        "status": "error",
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "repairable": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-08",
+      "group": "C3 候选校验",
+      "title": "请求缺必填时损坏候选也不进入修订",
+      "input": {
+        "request": "{\"currency\":\"CNY\"}",
+        "candidates": "bad-json"
+      },
+      "expected": "请求本身缺预算 → 不可修订（不拿模型修订掩盖输入问题）",
+      "actual": {
+        "repairable": false,
+        "validation_status": "error",
+        "request_codes": [
+          "INVALID_JSON",
+          "MISSING_FIELD"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C3-09",
+      "group": "C3 候选校验",
+      "title": "币种不一致拒绝且不换汇",
+      "input": {
+        "c1.currency": "USD"
+      },
+      "expected": "CURRENCY_MISMATCH，不做汇率换算、不修改金额",
+      "actual": {
+        "c1_passed": false,
+        "c1_errors": [
+          "CURRENCY_MISMATCH"
+        ],
+        "total_unchanged": "150.00"
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-01",
+      "group": "C4 修订与保护",
+      "title": "首检超预算可进入一次修订",
+      "input": {
+        "c1.estimated_total": "250.00"
+      },
+      "expected": "repairable=true、repair_count=0、保留已通过项 c2/c3",
+      "actual": {
+        "repairable": true,
+        "repair_count": 0,
+        "preserved": [
+          "c2",
+          "c3"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-02",
+      "group": "C4 修订与保护",
+      "title": "一次修订后复检通过并计入额度",
+      "input": {},
+      "expected": "复检全部通过、repair_count=1（额度已占用）、无 workflow_errors",
+      "actual": {
+        "all_passed": true,
+        "repair_count": 1,
+        "workflow_errors": []
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-03",
+      "group": "C4 修订与保护",
+      "title": "额度用尽后不可再次修订",
+      "input": {
+        "repair_count": [
+          0,
+          1
+        ]
+      },
+      "expected": "repair_count=1 时不可再修订（全局最多一次）",
+      "actual": {
+        "first_repairable": true,
+        "second_repairable": false
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-04",
+      "group": "C4 修订与保护",
+      "title": "持续失败不伪装通过且额度不重置",
+      "input": {
+        "revised c1": "230.00"
+      },
+      "expected": "持续失败：all_passed=false、remaining_repairs=0、仍可选 c2/c3、报告如实说明 1/1",
+      "actual": {
+        "all_passed": false,
+        "repair_count": 1,
+        "remaining_repairs": 0,
+        "selectable": [
+          "c2",
+          "c3"
+        ],
+        "report_status": "failed",
+        "mentions_repair_count": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-05",
+      "group": "C4 修订与保护",
+      "title": "全部失败无可选项",
+      "input": {
+        "all totals": "999.00"
+      },
+      "expected": "全部失败时无可选方案，中文如实提示人工处理",
+      "actual": {
+        "selectable": [],
+        "status": "failed",
+        "text_tail": "当前没有可选方案，请人工调整或检查错误；未继续自动修订。"
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-06",
+      "group": "C4 修订与保护",
+      "title": "修订改动已通过项被保护拒绝",
+      "input": {
+        "c2.estimated_total": "120.00 → 119.00"
+      },
+      "expected": "PASSED_CANDIDATE_CHANGED；整次修订拒绝用于选择；selectable 为空",
+      "actual": {
+        "workflow_errors": [
+          "PASSED_CANDIDATE_CHANGED"
+        ],
+        "selectable": [],
+        "status": "failed",
+        "all_passed": false
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-07",
+      "group": "C4 修订与保护",
+      "title": "JSON 键序重排不误判为篡改",
+      "input": {},
+      "expected": "键序变化不算篡改，无 PASSED_CANDIDATE_CHANGED",
+      "actual": {
+        "workflow_errors": [],
+        "all_passed": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-08",
+      "group": "C4 修订与保护",
+      "title": "无需修订时拒绝未经授权的修订",
+      "input": {},
+      "expected": "首检已全通过 → REPAIR_NOT_ALLOWED，不采用新候选",
+      "actual": {
+        "workflow_errors": [
+          "REPAIR_NOT_ALLOWED"
+        ],
+        "repairable": false
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-09",
+      "group": "C4 修订与保护",
+      "title": "报告不替用户选择且标注数据未核实",
+      "input": {},
+      "expected": "selected_candidate_id 保持 null；business_data_verification=not_verified",
+      "actual": {
+        "selected_candidate_id": null,
+        "selectable": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "business_data_verification": "not_verified"
+      },
+      "passed": true
+    },
+    {
+      "id": "C4-10",
+      "group": "C4 修订与保护",
+      "title": "禁忌项不可选但其他合格项可选",
+      "input": {
+        "c1.tags": [
+          "alcohol"
+        ]
+      },
+      "expected": "禁忌项不可选，仍可选 c2/c3",
+      "actual": {
+        "selectable": [
+          "c2",
+          "c3"
+        ],
+        "c1_errors": [
+          "FORBIDDEN_TAG"
+        ],
+        "report_marks_c1_unselectable": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C5-01",
+      "group": "C5 生成节点与仓库适配一致",
+      "title": "四个 Dify 入口节点真实执行并与仓库逻辑一致",
+      "input": {},
+      "expected": "intake=ready；check repairable；recheck 通过且 repair_count=1；report 通过且未替选",
+      "actual": {
+        "intake": "ready",
+        "check": true,
+        "recheck_all_passed": true,
+        "recheck_repair_count": 1,
+        "report_all_passed": true,
+        "report_selected_is_null": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C5-02",
+      "group": "C5 生成节点与仓库适配一致",
+      "title": "生成物与 manifest 哈希一致（无 STALE）",
+      "input": {},
+      "expected": "manifest.format=python-source-not-dsl；5 个生成物哈希全部匹配",
+      "actual": {
+        "format": "python-source-not-dsl",
+        "entries": {
+          "code_node.py": {
+            "expected": "67f2d2002e38eb91ccbd0042d39f818c42bff3ad5041447d4eced315e19f59a0",
+            "actual": "67f2d2002e38eb91ccbd0042d39f818c42bff3ad5041447d4eced315e19f59a0",
+            "match": true
+          },
+          "intake_node.py": {
+            "expected": "8bddff5fbb2cfd3d0c74f7b37c83592ba62721321a3f709db0f168d81477c892",
+            "actual": "8bddff5fbb2cfd3d0c74f7b37c83592ba62721321a3f709db0f168d81477c892",
+            "match": true
+          },
+          "check_node.py": {
+            "expected": "4a977aa47ca1ffd6ce9357ddba9759a83e67af8e9fa82d6dc103f673e920f135",
+            "actual": "4a977aa47ca1ffd6ce9357ddba9759a83e67af8e9fa82d6dc103f673e920f135",
+            "match": true
+          },
+          "recheck_node.py": {
+            "expected": "db5c823ced5d6aa877b3f8f971343f8f6776e48a14dde61da3e219f257b619fa",
+            "actual": "db5c823ced5d6aa877b3f8f971343f8f6776e48a14dde61da3e219f257b619fa",
+            "match": true
+          },
+          "report_node.py": {
+            "expected": "a5f0641f8a9f738562326fbdd29adefe01bcbdc8f4382bcf1ce2b80422fb573d",
+            "actual": "a5f0641f8a9f738562326fbdd29adefe01bcbdc8f4382bcf1ce2b80422fb573d",
+            "match": true
+          }
+        },
+        "mismatches": []
+      },
+      "passed": true
+    },
+    {
+      "id": "C5-03",
+      "group": "C5 生成节点与仓库适配一致",
+      "title": "节点入口收到空输入时不放行任何候选",
+      "input": {
+        "args": [
+          "",
+          "",
+          0
+        ]
+      },
+      "expected": "status=error、all_passed=false、repairable=false、无候选结果被放行",
+      "actual": {
+        "status": "error",
+        "all_passed": false,
+        "repairable": false,
+        "repair_count": 0,
+        "validation_codes": [
+          "INVALID_JSON"
+        ],
+        "candidate_results": []
+      },
+      "passed": true
+    },
+    {
+      "id": "C5-04",
+      "group": "C5 生成节点与仓库适配一致",
+      "title": "调度器异常为中文受控失败且不重试",
+      "input": {
+        "payload_json": "{"
+      },
+      "expected": "WORKFLOW_INPUT_ERROR 中文受控失败、不放行、repair_count 记为 1（不无限重试）",
+      "actual": {
+        "broken_payload": {
+          "status": "error",
+          "all_passed": false,
+          "repairable": false,
+          "repair_count": 1,
+          "envelope": {
+            "status": "error",
+            "errors": [
+              {
+                "code": "WORKFLOW_INPUT_ERROR",
+                "path": "$",
+                "message": "工作流变量无效或执行异常，未放行候选"
+              }
+            ]
+          }
+        },
+        "bad_action": {
+          "status": "error",
+          "envelope": {
+            "status": "error",
+            "errors": [
+              {
+                "code": "WORKFLOW_INPUT_ERROR",
+                "path": "$",
+                "message": "工作流变量无效或执行异常，未放行候选"
+              }
+            ]
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "C6-01",
+      "group": "C6 调用次数／延迟／成本记录方案",
+      "title": "记录调用次数／延迟／成本（离线真实测量）",
+      "input": {},
+      "expected": "model_calls=0（真实未调用）；每阶段有 monotonic 实测秒数；cost 记 not_measured 不填 0；cloud_verified=false",
+      "actual": {
+        "mode": "offline-fixed-snapshots-no-model",
+        "model_calls": 0,
+        "cloud_verified": false,
+        "cost": "not_measured",
+        "stages": [
+          {
+            "stage": "intake",
+            "seconds": 0.0
+          },
+          {
+            "stage": "check_first",
+            "seconds": 0.0
+          },
+          {
+            "stage": "recheck",
+            "seconds": 0.0
+          },
+          {
+            "stage": "report",
+            "seconds": 0.0
+          }
+        ],
+        "total_seconds": 0.0,
+        "all_passed": true
+      },
+      "passed": true
+    },
+    {
+      "id": "C6-02",
+      "group": "C6 调用次数／延迟／成本记录方案",
+      "title": "Dify 运行可追溯且 trace 缺口如实记录",
+      "input": {},
+      "expected": "有可追溯 run id；平台 trace 为 not_collected 需如实记录；节点 last-run 接口 200",
+      "actual": {
+        "workflow_run_id": "0cdef527-3504-4635-a338-58f985f8f216",
+        "trace_runs_status": "not_collected",
+        "node_last_run_http": 200,
+        "raw_log_present": true
+      },
+      "passed": true
+    }
+  ],
+  "raw_dify_evidence": "docs/test-reports/stage-c/evidence/dify-run-evidence.json"
+}
