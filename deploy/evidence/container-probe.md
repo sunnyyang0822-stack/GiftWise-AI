@@ -141,7 +141,8 @@ WSL 没有安装（连 Appx 与注册表项都没有），Hyper-V 的计算服�
 - `wsl --status` → **exit 50**，`未安装适用于 Linux 的 Windows 子系统。可通过运行 "wsl.exe --install" 进行安装。`
 - `python deploy/evidence/container_probe.py` → exit 0，18 条探测原始输出落盘（`raw/container-probe-*.txt`）。
 - `python deploy/evidence/container_layout_dryrun.py` → exit 0，两种布局启动成功、`/healthz` 200、`/validate` passed、HEALTHCHECK exit 0。
-- 静态统计：构建上下文 10.29 MiB → 0.05 MiB（按 `.dockerignore` 估算）。
+- 静态统计：构建上下文 10.29 MiB → 0.05 MiB（按 `.dockerignore` **估算，非构建实测**）。
+- **更正（2026-10-30 23:4x）**：真实构建实测为 **170.5 kB**（旧构建器口径）；修复 I-1（`.dockerignore` 嵌套 `__pycache__` 失效）前为 **196.0 kB**。详见 `docker-2026-10-30.md` 的 I-1 节与 `raw/d15-context-size-after-fix.txt`。
 
 **未完成清单（计划，未执行）**：
 
