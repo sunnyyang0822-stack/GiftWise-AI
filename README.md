@@ -16,8 +16,8 @@ cd GiftWise-AI
 ```
 
 - **评委应使用的确切 ref 是 `release/2026-11-01-submission`**：本文档和 [`docs/verification/复核指南-2026-10-31.md`](docs/verification/复核指南-2026-10-31.md) 里的 `python tools/verify_all.py`、`node web/tools/*.mjs`、`docs/verification/**` 命令**都以它为准**。
-- **⚠️ 默认分支可能不含 `tools/verify_all.py` 与 `docs/verification/**`，请务必带上 `-b`。** 不带 `-b` 会克隆到默认分支，照本文敲 `python tools/verify_all.py` 会直接报「找不到文件」。
-- 该分支由 PM 在收口时推送为**含全部工具链**的状态：届时仓库约 **1820** 个文件，`tools/` 与 `docs/verification/` 均非空。本节**不声称**该分支是默认分支，也**不引用任何 tag**。
+- **⚠️ 本条已修复（2026-10-31 03:0x）**：交付冻结提交（**1923 个文件**，含 `tools/` 2 个与 `docs/verification/` 512 个）**已并入默认分支 `main`**，因此现在**不带 `-b` 也能**拿到工具链。仍建议显式写 `-b release/2026-11-01-submission`，以便固定到评委当天看到的那一版。
+- 该分支由 PM 在收口时推送为**含全部工具链**的状态；本节**不引用任何 tag**，也**不声称**它是默认分支（默认分支是同内容的合并结果）。
 - （兜底）若克隆后 `tools/verify_all.py` 仍不存在，说明收口推送尚未完成：可改用 `-b snapshot/night-2026-10-31-v2`（快照，含全部工具链，但文档是该时间点的旧版），或直接向产品负责人索取含工具链的提交。
 
 > **项目状态：开发中，核心业务闭环尚未完成。**
