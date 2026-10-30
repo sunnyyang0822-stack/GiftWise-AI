@@ -130,7 +130,7 @@ curl -sS http://127.0.0.1:8000/healthz
 
 本机实测：体积 **178 MB**（= `169.676 MiB` / 177,918,474 B，十进制／二进制双口径）、**冷构建 1.720 s**（热构建 0.6 s）、启动到 `/healthz` 200 **0.668 s（均值；0.635/0.688/0.681）**（10-30 基线 0.750–0.939 s 已作废）、运行内存 **14.45–17.08 MiB**、**14 项检查通过**；容器内 `/validate` 与本机 `validator.rules.validate` **逐字节一致**；镜像内**无密钥**。
 
-> ⚠ **边界**：这是**单机基线，不是生产容量结论**；**从未推送任何镜像仓库**；交付镜像已重建并复核通过（`giftwise-validator:submission-20261101` = `latest`，`/healthz` 规则哈希与本机一致）。⚠️ 体积数字正随镜像优化重建变动，**本条暂缓刷新**。镜像标识请用 **tag + 日期 + `rules_source_sha256`**，**不要**引用 "manifest digest"（从未推 registry，`RepoDigests` 只是本地 config digest，与镜像 ID 同值，且**会随重建漂移**）。
+> ⚠ **边界**：这是**单机基线，不是生产容量结论**；**从未推送任何镜像仓库**；交付镜像已重建并复核通过（`giftwise-validator:submission-20261101` = `latest`，`/healthz` 规则哈希与本机一致）。⚠️ 体积数字正随镜像优化重建变动，**本条已刷新（见上：**177,918,474 B = 169.676 MiB**，交付镜像 `submission-20261101`）**。镜像标识请用 **tag + 日期 + `rules_source_sha256`**，**不要**引用 "manifest digest"（从未推 registry，`RepoDigests` 只是本地 config digest，与镜像 ID 同值，且**会随重建漂移**）。
 
 ## 复现命令总表
 
