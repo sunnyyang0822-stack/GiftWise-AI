@@ -1,0 +1,21 @@
+# 注意：规范构建命令的上下文是【仓库根目录】：
+#   docker build -t giftwise-validator:local -f deploy/Dockerfile .
+# Docker 只读取上下文根目录下的 .dockerignore，因此实际生效的是【仓库根 .dockerignore】。
+# 本文件仅在有人以 deploy/ 为上下文时才会被读取，而那种用法会因 Dockerfile 的
+# COPY 路径（validator、deploy/server.py）是仓库根相对路径而构建失败。
+# 保留本文件是为了记录排除意图；修正时请同时修改根 .dockerignore，勿只改一处。
+#
+# 镜像只需要 validator/ 与 deploy/server.py 两个 COPY 源；
+# 其余内容只影响传给 docker daemon 的构建上下文体积，因此一律排除。
+.env
+.git
+__pycache__
+*.pyc
+tests
+workflow
+.dockerignore
+docs
+web
+.tmp
+deploy/evidence
+*.log

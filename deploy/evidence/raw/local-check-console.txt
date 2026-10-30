@@ -1,0 +1,31 @@
+[1/6] 采集环境规格 ...
+[2/6] 探测默认监听地址（GIFTWISE_BIND 未设置）...
+[3/6] 以 GIFTWISE_BIND=127.0.0.1 GIFTWISE_PORT=8765 启动服务并请求 ...
+[4/6] 延迟与并发测量 ...
+[5/6] 日志与内存占用 ...
+[6/6] 原始结果已写入 deploy/evidence/raw/local-check-20261030-212549.json
+
+== 状态码速览 ==
+  GET /healthz                 -> 200  {"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab4849438
+  GET /                        -> 200  {"service":"giftwise-validator","endpoints":["GET /healthz","POST /validate"]}
+  GET /unknown-path            -> 404  {"error":"NOT_FOUND"}
+  GET /healthz?x=1             -> 404  {"error":"NOT_FOUND"}
+  POST /validate               -> 200  {"status":"needs_input","all_passed":false,"errors":[{"code":"MISSING_FIELD","path":"reque
+  POST /validate               -> 400  {"error":"INVALID_PAYLOAD","message":"request_json 和 candidates_json 必须是 JSON 字符串"}
+  POST /validate               -> 200  {"status":"needs_input","all_passed":false,"errors":[{"code":"MISSING_FIELD","path":"reque
+  POST /validate               -> 400  {"error":"INVALID_JSON"}
+  POST /validate               -> 400  {"error":"INVALID_PAYLOAD","message":"request_json 和 candidates_json 必须是 JSON 字符串"}
+  POST /validate               -> 400  {"error":"INVALID_PAYLOAD","message":"request_json 和 candidates_json 必须是 JSON 字符串"}
+  POST /validate               -> 400  {"error":"INVALID_JSON"}
+  POST /validate               -> 413  {"error":"REQUEST_TOO_LARGE"}
+  POST /other                  -> 404  {"error":"NOT_FOUND"}
+  HEAD /healthz                -> 501  
+  [raw] POST /validate HTTP/1.1                          -> 413
+  [raw] POST /validate HTTP/1.1                          -> 413
+  [raw] POST /validate HTTP/1.1                          -> 413
+  [raw] GET /healthz HTTP/1.0                            -> 200
+  [raw] PUT /validate HTTP/1.1                           -> 501
+
+parity byte_identical = True
+T01_normal over HTTP: status=200 all_passed=True byte_identical=True
+validate 串行中位数 = 14.96 ms; 并发 8x10 吞吐 = 128.5 rps

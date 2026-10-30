@@ -1,0 +1,14 @@
+[
+  { "action": "goto", "label": "01-open-workflow-draft", "url": "https://cloud.dify.ai/app/5abdb13c-a633-4a9c-96c3-dabd44072511/workflow" },
+  { "action": "wait", "label": "02-settle", "ms": 10000 },
+  { "action": "eval", "label": "03-install-fetch-hook", "codeFile": "hook-capture.js" },
+  { "action": "eval", "label": "04-draft-before", "codeFile": "draft-read.js" },
+  { "action": "click_role", "label": "05-click-test-run", "role": "button", "name": "测试运行", "settle": 14000 },
+  { "action": "click_sel", "label": "06-select-code-node", "selector": ".react-flow__node[data-id=\"1793357958534\"]", "settle": 3500 },
+  { "action": "click_role", "label": "07-open-last-run-tab", "role": "tab", "name": "上次运行", "settle": 5000 },
+  { "action": "eval", "label": "08-read-captured-bodies", "codeFile": "read-capture.js" },
+  { "action": "eval", "label": "09-last-run-dom", "codeFile": "last-run-read.js" },
+  { "action": "screenshot", "label": "10-shot-run2", "file": "06-run2-last-run.png", "full": true },
+  { "action": "eval", "label": "11-draft-after", "codeFile": "draft-read.js" },
+  { "action": "traffic", "label": "12-traffic", "last": 14 }
+]

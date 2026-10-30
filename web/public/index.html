@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content="GiftWise AI · 青年送礼决策助手：三步中文输入、三个有依据的思路、独立规则校验、选择后才生成包装与贺卡。当前为模拟数据演示。" />
+    <title>GiftWise AI · 找到那份刚好的心意</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#view">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="/">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 0c.6 5.6 5.8 10.8 11.4 11.4v1.2C17.8 13.2 12.6 18.4 12 24c-.6-5.6-5.8-10.8-11.4-11.4v-1.2C6.2 10.8 11.4 5.6 12 0Z" />
+          </svg>
+          <span>GiftWise AI</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航">
+          <a href="#how">怎么用</a>
+          <a href="#view">送礼场合</a>
+          <a href="#view">礼物思路</a>
+        </nav>
+        <button class="btn btn--primary btn--sm" type="button" id="cta-start">
+          开始选礼物 <span class="arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="hero" id="hero">
+      <p class="overline">青年送礼决策助手 · 简体中文</p>
+      <h1>不知道送什么，<br />先把依据摆清楚。</h1>
+      <p class="hero__sub">三个不同思路，一条一条讲清理由、事实与仍未知的部分。</p>
+      <p class="hero__note">
+        恋人与追求对象是两套独立表达：追求对象默认低压力，不假定对方已接受或存在双向好感。
+        系统不会替你选择方案，也不会在你选择前生成包装与贺卡。
+      </p>
+      <div class="hero__cta">
+        <button class="btn btn--primary" type="button" id="cta-start-2">
+          填写三步需求 <span class="arrow" aria-hidden="true">→</span>
+        </button>
+        <a class="btn btn--ghost" href="#how">看看流程</a>
+      </div>
+    </section>
+
+    <section class="how" id="how" aria-label="流程说明">
+      <div class="how__grid">
+        <article class="how__item">
+          <p class="how__num">01</p>
+          <h3>三步输入</h3>
+          <p>关系、场合、预算与准备时间都要你确认明确值；兴趣与风格可跳过，未知就是未知，不静默补默认值。</p>
+        </article>
+        <article class="how__item">
+          <p class="how__num">02</p>
+          <h3>三方案 + 独立校验</h3>
+          <p>恰好三个不同思路，逐个标注理由、事实引用、推断、未知、全量估算费用与准备时间；规则检查独立于模型，失败项不可选。</p>
+        </article>
+        <article class="how__item">
+          <p class="how__num">03</p>
+          <h3>选择后才做呈现</h3>
+          <p>按风格配色 → 包装材料与步骤 → 贺卡与装饰物 → 赠送时机与话术依次生成，并复核总费用、准备时间与禁忌。</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="badges" id="badges" role="status" aria-live="polite"></div>
+
+    <!-- 模拟数据与关系契约的显著标识：常驻页面顶部，避免误以为已联通 Dify -->
+    <div id="banner-slot" class="banner-slot" role="status" aria-live="polite"></div>
+
+    <nav class="steps" id="steps" aria-label="输入步骤"></nav>
+
+    <main id="view" class="view" tabindex="-1"></main>
+
+    <footer class="app-footer">
+      <p>
+        费用与准备时间仅为估算；未核实真实价格、库存或实际送达；不承诺对方一定喜欢。
+        全局自动业务修订总额度为 <strong>1 次</strong>，由服务端可信状态持有，浏览器不能提交或篡改。
+        「约 60 秒完成输入」是待测目标，当前没有真实用户测量数据。
+      </p>
+      <p id="footer-meta" class="app-footer__meta"></p>
+    </footer>
+
+    <div class="aria-live" id="live" role="status" aria-live="polite"></div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

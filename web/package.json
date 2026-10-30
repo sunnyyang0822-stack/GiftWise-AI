@@ -1,0 +1,18 @@
+{
+  "name": "giftwise-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GiftWise AI 中文最小可运行前端 + 最小服务端接入层（任务号 WEB-WF-001 / WEB-001）",
+  "scripts": {
+    "start": "node server/server.mjs",
+    "test": "node tests/access-layer.test.mjs",
+    "check:parity": "node tools/parity-check.mjs",
+    "fixtures": "node tools/gen-parity-fixtures.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

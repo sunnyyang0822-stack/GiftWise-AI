@@ -1,0 +1,104 @@
+%% GiftWise AI · 主系统架构图（ARCH-001，阶段 3）
+%% 图源文件：单一事实源。docs/architecture.md 内嵌同一份内容供 GitHub 直接渲染。
+%% 本地渲染：mmdc -i system-architecture.mmd -o ../rendered/system-architecture.svg
+%% 图例（颜色即证据等级，正文第 2 节有逐项对照）：
+%%   绿 = 已实测（有可复跑命令 / 服务端实读 / 哈希）
+%%   黄 = 已实现未实测（代码存在，该路径从未真实跑通）
+%%   橙 = 占位实现（接线在跑，但不产生真实结果）
+%%   灰 = 未实现 / 计划
+%%   约定：节点同时含多个证据等级时，取【较弱】等级着色，并在标签/边标签内分别注明。
+flowchart TB
+    subgraph Z1["① 不可信区｜浏览器"]
+        UI["web/public 简体中文界面<br/>三步输入 · 三方案对比 · 明确选择 · 呈现阅读"]
+    end
+
+    subgraph Z2["② 可信边界｜接入层 web/server（Node.js 单进程）"]
+        ROUTE["server.mjs 路由<br/>/api/intake/validate · /api/recommendations<br/>/api/presentations · /healthz"]
+        ADAPTER["intake.mjs 确定性适配<br/>字段白名单 · 稳定事实 ID · 未知不编造"]
+        PIPE["pipeline.mjs 任务编排<br/>生成 → 独立校验 → 最多一次修订 → 报告／呈现"]
+        STORE["store.mjs 可信任务快照（内存 Map）<br/>run_id · 两版候选 · 校验输出 · 修订计数 · 幂等选择"]
+        JCHK["checker.mjs 规则镜像（JS）<br/>与 validator/rules.py 同形同义"]
+        DCLIENT["dify.mjs Dify 客户端<br/>密钥仅服务端环境变量"]
+        MOCK["mock-model.mjs 固定模拟数据<br/>显著标注·不得冒充真实输出"]
+    end
+
+    subgraph Z3["③ 编排层｜Dify Cloud 1.18.0 草稿（未发布）"]
+        START["Start 用户输入<br/>intake_json · trusted_repair_count<br/>inject_* 仅占位期测试注入口"]
+        N1["N1 Code 确定性适配"]
+        N2["N2 需求分析与三候选<br/>占位节点：不调用模型"]
+        N3["N3 Code 首次校验"]
+        N4{"N4 If/Else 结果分支<br/>true · repairable · else"}
+        N5["N5 一次修订<br/>占位节点：不调用模型"]
+        N6["N6 Code 再校验<br/>已通过项保护"]
+        N7A["N7a 未修订报告"]
+        N7B["N7b 修订后报告"]
+        EA["End A"]
+        EB["End B"]
+    end
+
+    subgraph Z4["④ 规则层｜确定性校验（不调用模型、不访问网络）"]
+        RULES["validator/rules.py 纯函数<br/>validate(request_json, candidates_json)"]
+        RUNTIME["workflow/runtime.py 包装层<br/>check · recheck · report"]
+        BUILD["workflow/build_code_node.py<br/>把规则打包成自包含节点源码"]
+    end
+
+    subgraph Z5["⑤ 条件性独立规则 API｜deploy/（归属 CLOUD-001）"]
+        SRV["deploy/server.py<br/>GET /healthz · POST /validate"]
+        DOCKER["Dockerfile · publish-to-uhost.ps1"]
+    end
+
+    subgraph Z6["⑥ 证据与可观测（无平台级 trace，走替代路径）"]
+        EVID["workflow/evidence/ 真实运行原文<br/>SSE 节点级事件 · 节点 I/O · 哈希"]
+        HASH["generated/manifest.json<br/>源码与生成物 sha256"]
+    end
+
+    subgraph Z7["图例：颜色 = 证据等级（正文第 2 节逐项对照）"]
+        L_MEASURED["绿：已实测<br/>有可复跑命令 / 服务端实读 / 哈希"]
+        L_UNVERIFIED["黄：已实现未实测<br/>代码存在，该路径从未真实跑通"]
+        L_PLACEHOLDER["橙：占位实现<br/>接线在跑，但不产生真实结果"]
+        L_PLANNED["灰：未实现 / 计划<br/>不得对外读作已具备"]
+    end
+
+    UI -->|"intake JSON（仅界面字段）"| ROUTE
+    ROUTE --> ADAPTER
+    ADAPTER -->|"request_json<br/>含 recipient_relation_id"| PIPE
+    PIPE --> STORE
+    PIPE -->|"action=recommend<br/>String inputs"| DCLIENT
+    DCLIENT -->|"HTTPS /workflows/run"| START
+    START --> N1 --> N2 --> N3 --> N4
+    N4 -->|"true"| N7A --> EA
+    N4 -->|"repairable"| N5 --> N6 --> N7B --> EB
+    N4 -->|"else"| N7A
+    EA -->|"candidates_json / report_json"| DCLIENT
+    EB -->|"candidates_json / report_json"| DCLIENT
+    DCLIENT -->|"统一 envelope"| PIPE
+    PIPE -->|"同一份 request 与候选"| JCHK
+    JCHK -.->|"parity 比对（离线）"| RULES
+    RULES --> RUNTIME
+    BUILD -->|"打包 28.6–29 KB 自包含源码"| N1
+    BUILD --> N3
+    BUILD --> N6
+    BUILD --> N7A
+    BUILD --> N7B
+    HASH --> BUILD
+    JCHK --> HASH
+    PIPE --> EVID
+    STORE -->|"run_id + 可信快照"| EVID
+    ROUTE -.->|"选择事件<br/>{recommendation_run_id, selected_candidate_id}"| PIPE
+    MOCK -.->|"mock 模式固定数据"| PIPE
+    SRV -->|"直接复用同一纯函数"| RULES
+    DOCKER -.->|"镜像已构建 / 未上传"| SRV
+
+    classDef measured fill:#d3f9d8,stroke:#2b8a3e,color:#000
+    classDef unverified fill:#fff3bf,stroke:#e67700,color:#000
+    classDef placeholder fill:#ffe8cc,stroke:#d9480f,color:#000
+    classDef planned fill:#e9ecef,stroke:#868e96,color:#000
+
+    class RULES,RUNTIME,BUILD,N1,N3,N6,N7A,N7B,EA,EB,HASH,EVID,SRV measured
+    class ROUTE,ADAPTER,PIPE,STORE,JCHK,DCLIENT,UI unverified
+    class START,N2,N5,MOCK placeholder
+    class DOCKER planned
+    class L_MEASURED measured
+    class L_UNVERIFIED unverified
+    class L_PLACEHOLDER placeholder
+    class L_PLANNED planned

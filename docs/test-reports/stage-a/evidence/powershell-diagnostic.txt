@@ -1,0 +1,28 @@
+检查日期：2026-10-29，Asia/Shanghai
+范围：只读环境诊断；未更改策略或申请提权。
+
+原命令：powershell -NoProfile -File tests/stage-a/audit.ps1
+原退出码：1
+输出：AuthorizationManager check failed.
+CategoryInfo: SecurityError / ParentContainsErrorRecordException
+FullyQualifiedErrorId: UnauthorizedAccess
+
+当前执行会话：Get-ExecutionPolicy -List / Get-ExecutionPolicy
+MachinePolicy、UserPolicy、Process、CurrentUser: Undefined
+LocalMachine: RemoteSigned
+有效策略：RemoteSigned
+LanguageMode: FullLanguage
+
+新子进程：powershell -NoProfile -Command "Get-ExecutionPolicy -List; Get-ExecutionPolicy"
+MachinePolicy、UserPolicy、Process: Undefined
+随后 Get-ExecutionPolicy 报错：Requested registry access is not allowed.
+CategoryInfo: SecurityException
+FullyQualifiedErrorId: System.Security.SecurityException,Microsoft.PowerShell.Commands.GetExecutionPolicyCommand
+该诊断命令的外层退出码 0，不能据此判读取成功；实际错误如上。
+
+Get-AuthenticodeSignature: NotSigned。
+Zone.Identifier 查询未返回数据；不据此断言 Zone 来源。
+
+结论：子进程读取策略注册表受限，脚本授权检查失败的具体底层限制未完全定位。
+不能直接归因为用户机器禁止所有脚本，也不是 GiftWise 业务运行失败。
+替代采集：直接 PowerShell 命令成功保存 stage-a-baseline.json，不修改策略。

@@ -1,0 +1,46 @@
+{
+  "time": "2026-10-29T19:26:01.300306+08:00",
+  "checks": {
+    "python -m unittest discover -s tests -q": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "----------------------------------------------------------------------\nRan 322 tests in 0.340s\n\nOK\n"
+    },
+    "git diff --check": {
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "whitespace_issues": [],
+  "sha256": {
+    "docs/intake-contract.md": "5aa5b3b53beaa5e2b40b5e193fd23179b94bb53b44b90e34c11fd1aee63cceb8",
+    "workflow/build_code_node.py": "9af5cdd8a11e46b68ef8186607dede935c2665c651ba39eb88503b50f45f720c",
+    "workflow/dify-setup.md": "261b76c9b8dcfc9a06e5855aad21d6a66cdff019bb60798cbcc4fdc2eebcfa8b",
+    "workflow/intake.py": "16eb24bd03f7ff223a5bc1a04785a1aaa24c811e88f78ea126849cf450906b9d",
+    "workflow/labels.py": "333ad9761d9278c7421c0cdd1c8d43ebbef7b6a6c164dfc54896ec653520d916",
+    "workflow/runtime.py": "eda2b4174702ac964a90a1d8f100aff1fe18fd4da16124e3e52c5bb51f3feba4",
+    "workflow/sandbox_probe.py": "2e01a21d181a85dd204e72a93bd3fc4f737cf6707689a9491cb15b352f760a10",
+    "workflow/verify_local.py": "0b00cc7530b0bd78bd00cc87d7e1339d9c7aa192c20ee675bba5ce5641f26cde",
+    "workflow/workflow-spec.md": "3e9867a9af6d6c8257bb63b9a6d63aca1b47ed8c6eaa866aff449d65b67a0a9e",
+    "workflow/examples/candidates.json": "f44d9572ff6a5494525ccb76d183cfb89d6a105caf552129f5396a98568ff8a0",
+    "workflow/examples/intake.json": "44620ab56ebf2564a1295f95624ff721bdd02f98cc88b1b9836bb140ec078b75",
+    "workflow/generated/check_node.py": "de4355cf5392444f50c9e882e25c392969b1293672f007af5549248214374039",
+    "workflow/generated/code_node.py": "a87ffce8ba002df14a036a6c408b8bfed23fb0cab1a051dd6791aa586337cd5b",
+    "workflow/generated/intake_node.py": "ee75337304d45123cc7a990ed80533ce229f4aed4573ce76534dda2cabc4a958",
+    "workflow/generated/manifest.json": "e9bebd97ca29274a783603d526193ce84318c1a6dd1bd5f88eb4bc940a03fd96",
+    "workflow/generated/recheck_node.py": "8c5c0c42696b2c83839b65c09f41e162c03885a72a27ebccfaa8d484da26b7e3",
+    "workflow/generated/report_node.py": "eca29c81082f8743802e7f5d66630e678b25aad49684250f14fd8a1b3ee5ad2d",
+    "workflow/prompts/generate.md": "2c544d42913e898e2daf4739fc5cd377dcc76e6ac6cdc3550ad0bd3a1602dfbe",
+    "workflow/prompts/repair.md": "9e5dd8acd886d90a38eecf0127f24ea6c123597c0c4fe60f296741c215545978"
+  },
+  "unchanged_external_sources": {
+    "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+    "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+    "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+    "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+  },
+  "git_status": "?? docs/intake-contract.md\n?? docs/test-reports/stage-a/\n?? tests/acceptance/stage-a/\n?? workflow/build_code_node.py\n?? workflow/dify-setup.md\n?? workflow/evidence/\n?? workflow/examples/\n?? workflow/generated/\n?? workflow/intake.py\n?? workflow/labels.py\n?? workflow/prompts/\n?? workflow/runtime.py\n?? workflow/sandbox_probe.py\n?? workflow/tools/\n?? workflow/verify_local.py\n",
+  "git_head": "a28dc799c5cc89cbba37cb071a263415ee2be096",
+  "local_probe_count": 46
+}

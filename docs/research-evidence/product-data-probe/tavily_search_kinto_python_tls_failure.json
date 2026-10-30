@@ -1,0 +1,14 @@
+{
+  "label": "tavily_search_kinto",
+  "observed_at": "2026-10-30T01:32:05.258516+00:00",
+  "elapsed_seconds": 0.797,
+  "endpoint": "https://api.tavily.com/search",
+  "request": {
+    "query": "KINTO SCS-S03 手做陶瓷马克杯 320ml 价格 中国",
+    "max_results": 5,
+    "include_raw_content": true
+  },
+  "http_status": null,
+  "transport_error": "URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+  "response": ""
+}

@@ -1,0 +1,13 @@
+{
+  "recipient_relation": "pursuit",
+  "closeness": "limited",
+  "occasion": "birthday",
+  "budget_amount": "200.00",
+  "currency": "CNY",
+  "deadline_days": 2,
+  "interests": ["coffee_food", "design_art"],
+  "interest_confidence": {"coffee_food": "confirmed", "design_art": "inferred"},
+  "gift_styles": ["practical", "understated"],
+  "hard_exclusions": {"tags": ["alcohol"], "terms": ["酒"], "unresolved": []},
+  "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。"
+}

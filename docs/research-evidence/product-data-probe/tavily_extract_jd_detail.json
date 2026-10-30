@@ -1,0 +1,29 @@
+{
+  "label": "tavily_extract_jd_detail",
+  "observed_at": "2026-10-30T01:35:59.037808+00:00",
+  "elapsed_seconds": 4.171,
+  "endpoint": "https://api.tavily.com/extract",
+  "request": {
+    "urls": [
+      "https://item.jd.com/6454822.html",
+      "https://item.jd.com/1629498.html"
+    ]
+  },
+  "http_status": 200,
+  "transport_error": null,
+  "response": {
+    "results": [],
+    "failed_results": [
+      {
+        "url": "https://item.jd.com/1629498.html",
+        "error": "Failed to fetch url"
+      },
+      {
+        "url": "https://item.jd.com/6454822.html",
+        "error": "Failed to fetch url"
+      }
+    ],
+    "response_time": 2.49,
+    "request_id": "fb2e2522-4d29-4e48-bff8-fc1084f6d53a"
+  }
+}

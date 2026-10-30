@@ -1,0 +1,123 @@
+{
+  "generated_at": "2026-10-30T21:31:49+08:00",
+  "git_head": "89d662483febbb90ab7fd579e05052b309700b91",
+  "git_head_short": "89d6624",
+  "git_branch": "main",
+  "git_status_porcelain": [
+    "M README.md",
+    " M deploy/.dockerignore",
+    " M deploy/Dockerfile",
+    " M deploy/README.md",
+    " M deploy/publish-to-uhost.ps1",
+    " M docs/acceptance-criteria.md",
+    " M docs/architecture.md",
+    " M docs/demo-script.md",
+    " M docs/development-process.md",
+    " M docs/intake-contract.md",
+    " M docs/product-flow.md",
+    " M docs/product-requirements.md",
+    " M docs/test-plan.md",
+    " M docs/user-stories.md",
+    " M workflow/evidence/WF-002-2026-10-30.md",
+    " M workflow/examples/candidates.json",
+    " M workflow/examples/intake.json",
+    " M workflow/generated/check_node.py",
+    " M workflow/generated/code_node.py",
+    " M workflow/generated/intake_node.py",
+    " M workflow/generated/manifest.json",
+    " M workflow/generated/recheck_node.py",
+    " M workflow/generated/report_node.py",
+    " M workflow/intake.py",
+    " M workflow/labels.py",
+    " M workflow/prompts/generate.md",
+    " M workflow/prompts/repair.md",
+    " M workflow/verify_local.py",
+    " M workflow/workflow-spec.md",
+    "?? .tmp/",
+    "?? deploy/evidence/",
+    "?? deploy/observability-collection.md",
+    "?? deploy/preprod-plan.md",
+    "?? deploy/security-review.md",
+    "?? docs/architecture/",
+    "?? docs/competition/",
+    "?? docs/pm-reviews/contract-decisions-draft-2026-10-30.md",
+    "?? docs/pm-reviews/stage-2-acceptance-checklist-2026-10-30.md",
+    "?? docs/product-data-research.md",
+    "?? docs/requirements-analysis.md",
+    "?? docs/research-evidence/",
+    "?? docs/test-reports/stage-a/",
+    "?? docs/test-reports/stage-c/",
+    "?? tests/acceptance/stage-a/",
+    "?? tests/acceptance/stage_c/",
+    "?? web/",
+    "?? workflow/evidence/WF-003-2026-10-30.md",
+    "?? workflow/evidence/WF-003-2026-10-30/",
+    "?? workflow/evidence/local-2026-10-29/",
+    "?? workflow/evidence/local-2026-10-30/",
+    "?? workflow/examples/intake-colleague.json",
+    "?? workflow/tools/"
+  ],
+  "python_version": "3.12.12",
+  "files": {
+    "deploy/server.py": {
+      "exists": true,
+      "bytes": 3533,
+      "sha256": "cdc4a981b688359c00b7538dc3716f9248f11d005567294c67a23b626e865a7a"
+    },
+    "deploy/Dockerfile": {
+      "exists": true,
+      "bytes": 863,
+      "sha256": "93fac948ab1a9d1bdb8d3155e1326ff8ef997e9faf374120086d2daad287cb91"
+    },
+    "deploy/.dockerignore": {
+      "exists": true,
+      "bytes": 255,
+      "sha256": "7b533e243532d30cd78c90e5471efd529427a3170443739fb2772bf4105bfccf"
+    },
+    "deploy/publish-to-uhost.ps1": {
+      "exists": true,
+      "bytes": 4523,
+      "sha256": "cce9c8aa237480531624210a995935805c8ad2ba074bc6b8209f423849f67385"
+    },
+    "deploy/evidence/local_check.py": {
+      "exists": true,
+      "bytes": 20303,
+      "sha256": "eb3e3f1b6d5e0187e51b092646eaeefb1937b8d32b0122833b7890db53612ac0"
+    },
+    "deploy/evidence/container_layout_dryrun.py": {
+      "exists": true,
+      "bytes": 7834,
+      "sha256": "35a1648b3f4cae1a15a5d3c75e009a1097fe8a678637e4adb4e4d130328ca43b"
+    },
+    "deploy/evidence/container_probe.py": {
+      "exists": true,
+      "bytes": 7043,
+      "sha256": "6751e224ae3522e0a7e7fe993b27a7ca9e7f16b45183974e0957698a3ba41e53"
+    },
+    "validator/rules.py": {
+      "exists": true,
+      "bytes": 13626,
+      "sha256": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"
+    },
+    "validator/__init__.py": {
+      "exists": true,
+      "bytes": 102,
+      "sha256": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5"
+    },
+    "workflow/examples/intake.json": {
+      "exists": true,
+      "bytes": 555,
+      "sha256": "335c9fdffa86c8079ce2e37826429020798003dc74a871c94e336b3c3bf534f6"
+    },
+    "workflow/examples/candidates.json": {
+      "exists": true,
+      "bytes": 2277,
+      "sha256": "479d50da970f3aa52ef574617a613e17571e5cb580fb38598c83ef3f492c9978"
+    },
+    "tests/test_cases.json": {
+      "exists": true,
+      "bytes": 1357807,
+      "sha256": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+    }
+  }
+}

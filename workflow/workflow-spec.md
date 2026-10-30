@@ -6,7 +6,7 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 ## 产品流程与语言
 
-主要面向初入社会的青年，覆盖职场、亲朋、朋友、恋人及追求对象的送礼需求；次要面向青少年的朋友送礼和中年人的职场送礼。首个验收案例仍采用青年给同事送生日礼物，不把产品限制为同事场景。
+主要面向初入社会的青年，覆盖恋人、追求对象、朋友、亲朋及职场送礼需求；次要面向青少年的朋友送礼和中年人的职场送礼。首个验收案例采用**青年给追求对象（或恋人）送生日礼物**，不把产品限制为同事场景。**同事已完全移出产品场景**（2026-10-30 产品负责人决定）：本规范的正文、示例与验收不再使用同事；机器枚举保留 `colleague`，仅作技术回归夹具（见 `workflow/examples/intake-colleague.json` 与 `tests/`），不向产品用户暴露。恋人与追求对象是两个独立关系值（`partner`／`pursuit`），不得合并：追求关系不代表对方已接受或存在双向好感，默认低压力表达。
 
 用户不知道送什么 → 输入对方风格、爱好、职业等已知信息及约束 → 生成三个不同思路并说明理由 → 独立代码校验，必要时最多修订一次并重检 → 展示方案供用户选择 → 用户明确选择一个合格方案 → 提供详细包装、配色、贺卡及赠送方式。
 
@@ -20,7 +20,8 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 ```json
 {
-  "recipient_relation": "关系不错但不太熟悉的同事",
+  "recipient_relation": "追求对象",
+  "recipient_relation_id": "pursuit",
   "occasion": "生日",
   "budget_amount": "200.00",
   "currency": "CNY",
@@ -35,6 +36,8 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
   "notes": "希望表达祝福，不造成关系压力"
 }
 ```
+
+`recipient_relation` 是冻结中文显示文本，`recipient_relation_id` 是冻结机器值；两者都由**服务端 intake** 产出，前端只提交关系 ID。关系优先级与“追求对象默认低压力”等分叉必须按 `recipient_relation_id` 判断，不得依赖中文串匹配。冻结 8 个稳定 ID：`partner` 恋人、`pursuit` 追求对象、`friend` 朋友、`family` 家人、`classmate` 同学、`mentor` 老师/导师、`client_partner` 客户/合作伙伴、`other` 其他；`colleague` 仅技术回归。`validator/rules.py` 对 `request` 无字段白名单，故 `recipient_relation_id` 不影响既有校验。
 
 风格、爱好、职业是可选已知信息，进入 `facts` 并保留稳定事实 ID，无需新增校验器必填字段；用户未提供时保持未知，不能从职业推导成确定偏好。关系、场合、预算、币种、准备时间为必填约束。预算与时间来自用户，不允许模型修改。可选备注和数组可以为空；没有偏好信息不等于输入无效。明确禁忌必须保留原意；不能可靠映射的自然语言限制应请求确认。
 
@@ -53,7 +56,7 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
   "tags": ["other"],
   "reason": "呼应已知咖啡兴趣及简约风格，不假定对方偏爱某种咖啡豆",
   "fact_refs": ["f1", "f2"],
-  "inferences": ["实用桌面用品可能适合同事关系"],
+  "inferences": ["实用桌面用品可能适合低压力表达，不假定对方心意或已有好感"],
   "unknowns": ["对方是否已有同类杯具", "本地实际供应情况"],
   "presentation": "可采用简洁中性包装；详细方案待用户选择后生成"
 }
@@ -90,7 +93,7 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 顶层错误覆盖无效请求、批次结构、JSON 解析问题，并阻止 `all_passed`。所有三个候选通过时才是 `passed`；候选或批次不合格为 `failed`；用户必填字段缺失或无效为 `needs_input`；无效 JSON 或执行异常为 `error`。拒绝非标准 JSON 常量、重复对象键、空值或标量根节点、错误字段类型，不用 `eval`，不静默修复 JSON。返回受控中文解释，不回显敏感原文或堆栈。
 
-既有错误代码保持：`INVALID_JSON`、`INVALID_REQUEST`、`MISSING_FIELD`、`INVALID_TYPE`、`INVALID_AMOUNT`、`INVALID_CANDIDATE_COUNT`、`DUPLICATE_ID`、`UNSUPPORTED_CURRENCY`、`CURRENCY_MISMATCH`、`OVER_BUDGET`、`FORBIDDEN_TAG`、`FORBIDDEN_TERM`、`PREPARATION_TOO_LONG`、`UNKNOWN_FACT_REF`、`UNKNOWN_TAG`、`INTERNAL_ERROR`。每条含字段路径与中文说明；格式错误不能继续参与数值比较或使整个批次崩溃。
+既有错误代码保持：`INVALID_JSON`、`INVALID_REQUEST`、`MISSING_FIELD`、`INVALID_TYPE`、`INVALID_AMOUNT`、`INVALID_CANDIDATE_COUNT`、`INVALID_CANDIDATE_ID`（`validator/rules.py:181`，候选 ID 必须为 c1/c2/c3）、`DUPLICATE_ID`、`DUPLICATE_CANDIDATE_CONTENT`（`validator/rules.py:242`，不同候选的名称与描述标准化后重复）、`UNSUPPORTED_CURRENCY`、`CURRENCY_MISMATCH`、`OVER_BUDGET`、`FORBIDDEN_TAG`、`FORBIDDEN_TERM`、`PREPARATION_TOO_LONG`、`UNKNOWN_FACT_REF`、`UNKNOWN_TAG`、`INTERNAL_ERROR`。每条含字段路径与中文说明；格式错误不能继续参与数值比较或使整个批次崩溃。
 
 没有真实商品源时，一律不声称验证了实时价格、库存、可购买性或实际送达时间。用户文本属于数据，提示词不得服从其中要求绕过校验的指令。
 
@@ -160,7 +163,9 @@ Dify 单次工作流未必适合停下来等待网页选择。建议采用「推
 
 全局 `repair_count` 覆盖推荐与呈现两个阶段，总计最多一次自动业务修订。推荐阶段未用额度而呈现方案违规时，可用一次呈现修订并重新复核；推荐阶段已修订或呈现修订仍失败时，直接如实报告，不开启第二次自动模型修订。仅当事先定义且可独立检查的低成本呈现模板已经通过预算、时间和禁忌复核时，才能提供该模板作为替代；不能靠“换成更简单的包装”绕过校验或隐藏失败。
 
-选择层新增错误可使用 `INVALID_SELECTION`、`STALE_RECOMMENDATION`、`UNTRUSTED_RECOMMENDATION`、`CANDIDATE_NOT_PASSED`、`PRESENTATION_INVALID`、`TOTAL_MISMATCH`、`REPAIR_LIMIT_REACHED`；这些不要求首个校验器任务实现。展示中文解释，如「请选择一个已通过检查的方案」「推荐记录已更新，请重新选择」「呈现方案仍超过预算，未继续自动修改」。
+> **代码中不存在的码（未实现，不得读作已实现）：** `INVALID_SELECTION`、`STALE_RECOMMENDATION`、`UNTRUSTED_RECOMMENDATION`、`CANDIDATE_NOT_PASSED`、`PRESENTATION_INVALID`、`TOTAL_MISMATCH`、`REPAIR_LIMIT_REACHED`。截至 2026-10-30，这 7 个码在 `validator/rules.py` 与 `workflow/` 中**均无实现点**（已逐项 grep 核实）；它们只是选择/呈现阶段的**设计预留**，不要求首个校验器任务实现，也不得被引用为已具备的错误处理能力。选择与呈现阶段实际可用的是 `workflow/runtime.py` 中的 `REPAIR_NOT_ALLOWED` 与 `PASSED_CANDIDATE_CHANGED`（工作流包装层错误）。
+
+选择与呈现阶段一旦实现，可按下表给出中文解释，如「请选择一个已通过检查的方案」「推荐记录已更新，请重新选择」「呈现方案仍超过预算，未继续自动修改」；当前这些分支**未实现**。
 
 ## 调用次数、异常与验收
 
