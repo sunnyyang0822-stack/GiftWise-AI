@@ -94,4 +94,4 @@
 
 **没有**修改 `deploy/**`、`validator/**`、`web/**`、`docs/architecture/**`、
 `docs/competition/**`、`README.md`、`tests/**`、`tools/**`（均为只读）。
-两个目录在 git 中均为**未跟踪（`??`）**，证明是全新创建、未与他人的工作冲突。
+两个目录**均已纳入版本控制**（`git ls-files` 计数：`compose/**` 33、`docs/cloud-native/**` 6），系新增目录、未与他人工作冲突。

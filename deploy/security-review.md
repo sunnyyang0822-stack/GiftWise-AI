@@ -5,7 +5,7 @@
 - 方法：**真实运行探测**（`python deploy/evidence/local_check.py`，原始结果 `evidence/raw/local-check-latest.json`）
   + **静态代码/属性检查**（`evidence/raw/local-check-latest.json` 的 `server_static` 段）
   + **文本扫描**（`deploy/` 内无凭证）
-- 原则：**默认不改坏现有行为**。`deploy/server.py` 本次**一个字都没有改**，
+- 原则：**默认不改坏现有行为**。**首轮口径**：S-1/S-4/S-6/S-7 未改 `server.py`；**同日 S-5（半开正文）已改 `server.py`**，2026-10-31 01:1x 又因 N-4 日志锁再改（**现版 203 行 / sha256 `e8b40f9f…`**），
   因为它是已被独立测试引用、且 `/validate` 契约由 VAL-001 冻结的文件；下面给出的是可直接应用的最小补丁建议，
   由 PM 决定是否在本轮合入。
 

@@ -399,7 +399,7 @@ python tests/acceptance/cloud-001/startup_probe.py giftwise-validator:latest    
 > 其 intake 样例只覆盖缺预算、`"100-200"` 这类**格式**错误、非 CNY、未知关系／标签、重复兴趣、超长补充说明、超限数组。
 > 该样例集**结构性看不见**数值范围变更，parity 绿是盲区，而非同步证据。
 
-### G-6 独立发现 ②：🔴 **交付镜像未同步**（本节最严重的一项）
+### G-6 独立发现 ②：✅ **交付镜像已同步**（**2026-10-31 01:13:59 已重建并复核**；标题保留历史写法，勿再读作「未同步」）
 
 **动机**：G-1～G-4 全部是 `import validator.rules`——测的是**工作区源码**，**不是交付的镜像**。
 两者若脱节，"测试全绿"就具有欺骗性。我直接问容器。
@@ -470,7 +470,7 @@ python tests/acceptance/cloud-001/startup_probe.py giftwise-validator:latest    
 
 ### G-9 未核实
 
-- **JS 与镜像修复后的行为**：两线均未交付。修复后应重跑 `run_js_grid_probe.py`（期望接受性分歧 16 → 0）与 `probe_container_sync.py`（期望"未发现问题"）。
+- **JS 与镜像修复后的行为**：**镜像侧已于 2026-10-31 01:13:59 重建并复核**（`submission-20261101`，`/healthz` 规则哈希 `1f389dad…` 与本机一致，半开正文 10.05 s 返 408）；**JS 侧接受性分歧仍待重跑**。修复后应重跑 `run_js_grid_probe.py`（期望接受性分歧 16 → 0）与 `probe_container_sync.py`（期望"未发现问题"）。
 - **镜像重建流程是否会正确更新哈希**：我只能验证"当前镜像的哈希如实反映它是旧版"。
 - **只核查了一个镜像标签**（`latest`）：`coldbuild-20261030`／`obs-check`／`prefix-check`／`slowbody-check`／`pm-baseline-20261030` 未逐一核查，其中可能也有旧版规则。
 - **`4301` 阈值只在本机与镜像的解释器版本上实测**（3.12.12 / 3.12.16）；"换 Python ≤3.10 会改变映射"是由 `set_int_max_str_digits` 实验**推断**的，不是直接观测。

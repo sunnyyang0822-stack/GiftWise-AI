@@ -83,7 +83,7 @@ curl -sS -X POST http://127.0.0.1:8000/validate \
 ```bash
 # 1) 构建（必须在仓库根执行）
 docker build -t giftwise-validator:latest -f deploy/Dockerfile .
-# 实测：冷构建 1.72 s（--no-cache；归档 raw/d9-coldbuild.txt）；热构建 0.6 s；二次构建可复现成功
+# 实测：冷构建 1.72 s（--no-cache；归档 deploy/evidence/raw/docker-2026-10-30/d9-coldbuild.txt）；热构建 0.6 s；二次构建可复现成功
 # 镜像：giftwise-validator:latest  docker images 178 MB（inspect 177,582,258 字节 = 169.36 MiB）
 # 注意：镜像 ID / config digest 每次重建都会变，不要当一致性判据；判据用 tag + 构建日期 + rules_source_sha256 与字节数
 # 注意：镜像从未推送仓库，所以【没有】manifest digest；docker inspect 的 RepoDigests 只是本地 config digest（≡ 镜像 ID）
@@ -97,7 +97,7 @@ docker run -d --name gw-val -p 127.0.0.1:8000:8000 giftwise-validator:latest
 curl -sS http://127.0.0.1:8000/healthz
 ```
 
-`/healthz` 返回的 `rules_source_sha256` 与本机 `validator/rules.py` 的 sha256 `4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3` **一致**。
+/healthz 返回的 rules_source_sha256 与本机 validator/rules.py 一致（**2026-10-30 21:25 的转录值 `4782255b…`；现行 `1f389dad4c2589fb…`，与交付镜像 `/healthz`、`docs/competition/材料清单与自查.md:97` 三方一致**）
 
 `POST /validate` 的容器响应与**同一进程内**调用 `validator.rules.validate(...)` 的结果**逐字节一致**（`all_passed = true`）。
 
@@ -105,7 +105,7 @@ curl -sS http://127.0.0.1:8000/healthz
 
 镜像内容与安全：镜像内文件树仅 **9 行**，不含 `.git`／`tests`／`docs`／`workflow`／`web`／`deploy/evidence`；`docker history` 对 `sk-`／`gho_`／`PRIVATE KEY` **零命中**；容器以**非 root（uid 10001）**运行。
 
-完整 9/9 汇总见 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)；12 个原始输出文件见 [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)。
+完整 9/9 汇总见 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)；24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志）文件见 [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)。
 
 ## 可观测入口（阶段 14：**本机采集探针已实测 39/39 与 24/24**；代码**已随镜像交付、但不是默认入口**——`/metrics`/`/readyz` 默认不暴露且 `/metrics` 未鉴权，**采集本身未在交付镜像内实测**）
 
@@ -195,12 +195,12 @@ curl -sS 'http://127.0.0.1:8765/metrics?format=json'   # 新增：同一份指�
    `powershell -NoProfile -ExecutionPolicy Bypass -File deploy\publish-to-uhost.ps1 -Host <主机> -KeyPath <私钥> -DryRun`。
    静态校验（17 项，含凭证扫描与 DryRun 顺序）见 `evidence/observability-2026-10-30.md` §4.5 与 `evidence/ps1_static_check.py`。
 9. **镜像已真实构建并成功运行（2026-10-30 晚）**：`docker build -t giftwise-validator:latest -f deploy/Dockerfile .` 成功；
-   冷构建 **1.72 s**（`--no-cache`，归档 `raw/d9-coldbuild.txt`）、热构建 0.6 s；`docker images` **178 MB**（inspect 177,582,258 字节＝**169.36 MiB**）；
+   冷构建 **1.72 s**（`--no-cache`，归档 `deploy/evidence/raw/docker-2026-10-30/d9-coldbuild.txt`）、热构建 0.6 s；`docker images` **178 MB**（inspect 177,582,258 字节＝**169.36 MiB**）；
    基础镜像 `python:3.12-slim` digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`。
 10. **容器内端点矩阵真实通过**：`/healthz` 200（启动到可接受连接 **0.750–0.939 s**）、`/validate` 与本机纯函数**逐字节一致**、
     5 项错误路径符合契约、容器以**非 root（uid 10001）**运行；运行内存 **14.45–17.08 MiB**、CPU 0.01–0.02%；
     镜像内文件树仅 9 行，`docker history` 对密钥模式零命中。
-    证据：[`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)（9/9）＋ [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)（12 个原始输出）。
+    证据：[`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)（9/9）＋ [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志））。
 11. **阶段 14 采集已实现并真跑（2026-10-30 晚）**：`python deploy/evidence/observability_check.py` → **exit 0，39/39 断言**；
     `python deploy/evidence/observability_container_check.py` → **exit 0，24/24 断言**。要点：JSONL 每行可解析、
     并发 0 交错、**请求体 0 命中**、指标与请求账本逐键相等、`/healthz` 与 `/validate` 响应体与默认入口逐字节一致、
@@ -273,7 +273,7 @@ python deploy/evidence/container_probe.py            # 容器运行时存在性�
 python deploy/evidence/observability_check.py        # 阶段 14：双进程对照 + 39 项断言
 python deploy/evidence/observability_container_check.py  # 阶段 14：容器内 24 项断言（需 Docker）
 python deploy/evidence/ps1_static_check.py           # 发布脚本静态校验（17 项，不连接任何主机）
-python deploy/evidence/slow_body_check.py            # 缺陷 I-2/S-5：半开正文修复前对照 + 修复后回归（42 项，容器阶段需 Docker）
+（43 项，容器阶段需 Docker）
 python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha256
 ```
 
@@ -290,7 +290,7 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
 - **2026-10-30 晚新增（容器化，真实执行）**：Docker Desktop 29.9.2 安装成功（经 DISM + 官方离线 MSI 绕过 Store 的 `禁止(403)`）
   → `docker build` 成功（镜像 `giftwise-validator:latest`，178 MB＝169.36 MiB；冷 1.72 s／热 0.6 s）
   → 容器内 `/healthz` 200（启动 0.750–0.939 s）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
-  完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（12 个原始输出）。
+  完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志））。
 - 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
   （**2026-10-30 晚更正**：交付物 3 中"如实记录未构建"的部分已由上述真实构建取代，该记录按纪律保留。）
 - **2026-10-30 晚第二轮新增（阶段 14 可观测性，真实执行）**：新增 `observability.py` + `observable_server.py`
@@ -386,6 +386,6 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
 5. ~~**无当前代码的提交**~~ → 历史：本轮收集证据时工作区未提交。
    **2026-10-30 晚第二轮现状**：PM 已把此前的交付推送到分支 `release/2026-11-01-submission`
    （PR [#12](https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/12)）；
-   但**本轮（阶段 14）新增/修改的文件仍只在工作区，未提交**（按纪律不自行提交，由 PM 统一处理）。
+   但**阶段 14 文件已随 `release/2026-11-01-submission` 提交（`git status --porcelain deploy` 为空）**（按纪律不自行提交，由 PM 统一处理）。
    因此本轮全部证据对应的版本与哈希见 `evidence/raw/artifact-manifest.json`（含 git HEAD 与逐文件 sha256）。
    第 2 条「无云资源授权」**仍然成立**（未采购、未上云）。

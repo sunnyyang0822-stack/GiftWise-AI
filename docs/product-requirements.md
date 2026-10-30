@@ -163,7 +163,7 @@ P1 包括视觉精修、动效、更精致移动端与进度体验、更多关�
 | OPEN-5 | 模型**授权已满足**：产品负责人授权并自行配置 DeepSeek（`custom_configuration.status = active`，4 个模型 `active`），已完成 10 次真实调用 / 34,127 tokens。**未满足**：供应商单位费率与单任务成本未取得，成本一律写 `not_measured` | `workflow/evidence/WF-003-2026-10-30.md` §4.1／§4.2 |
 | OPEN-6 | 无真实商品数据源 → 价格、库存、送达**一律“未核实”**，不得填默认值或把估算读成实测 | `architecture/observability.md` §3.1；`product-data-research.md` |
 | OPEN-7 | `deploy/` 归属**已由 CLOUD-001（Issue #10）认领**；容器化已实测 9/9；预发与云部署仍未执行 | Issue #10 正文；`deploy/evidence/docker-2026-10-30.md`；`deploy/preprod-plan.md` |
-| OPEN-8 | 三个临时提交（`8e8bc27`、`b2ea08a`、`89d6624`）**已复核接受**，其产物被各线作为证据基线复用并已随已推送的发布分支携带；残留：`origin/main` 仍不含 `main` 的这 3 个提交 | `deploy/evidence/README.md`（「本轮证据对应的版本」）；`deploy/README.md`（`artifact_manifest.py` 输出）；`docs/competition/材料清单与自查.md`（「本地 HEAD」行）；`tests/acceptance/stage_c/fixtures/PROVENANCE.md`（「来源提交」行） |
+| OPEN-8 | 三个临时提交（`8e8bc27`、`b2ea08a`、`89d6624`）**已复核接受**，其产物被各线作为证据基线复用并已随已推送的发布分支携带；**已闭合**（2026-10-31 03:4x）：三个提交均已是 `origin/main` 的祖先（`git merge-base --is-ancestor` 实测 YES） | `deploy/evidence/README.md`（「本轮证据对应的版本」）；`deploy/README.md`（`artifact_manifest.py` 输出）；`docs/competition/材料清单与自查.md`（「本地 HEAD」行）；`tests/acceptance/stage_c/fixtures/PROVENANCE.md`（「来源提交」行） |
 
 > 上表只登记当前真实状态。阶段 1 冻结件 [`requirements-analysis.md`](requirements-analysis.md) 中 OPEN-5／OPEN-8 的表述已过时，其同步须先经产品负责人同意（该文件不在本次修订范围）。
 
