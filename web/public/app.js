@@ -70,6 +70,7 @@ const demoOptions = [
   { value: "model_error", label: "错误：模拟模型输出损坏 JSON" },
   { value: "partial_fail", label: "部分通过：一个候选修订修不好" },
   { value: "presentation_over_budget", label: "呈现：首次复核超预算" },
+  { value: "stress", label: "压力：超长文案 + emoji + 不可断行长串" },
   { value: "slow", label: "超时：服务端延迟 45 秒" },
 ];
 
@@ -79,6 +80,26 @@ function renderBadges() {
   const slot = $("badges");
   slot.replaceChildren();
   if (!state.config) return;
+  const mock = state.config.mode === "mock";
+  // 吸顶常驻标识：滚动到任何位置、任何窄屏宽度都看得见数据来源
+  const flag = $("mode-flag");
+  if (flag) {
+    flag.hidden = false;
+    flag.textContent = mock ? "模拟数据 · 未接真实模型" : "真实 Dify";
+    flag.classList.toggle("mode-flag--real", !mock);
+    flag.title = mock
+      ? "当前候选与呈现内容来自接入层内置模拟数据；Dify 礼赠工作流未发布，这不是模型真实输出。"
+      : "当前由服务端调用真实 Dify 工作流；结果仍以服务端独立规则校验为准。";
+  }
+  const heroFlag = $("hero-flag");
+  if (heroFlag) {
+    heroFlag.hidden = !mock;
+    if (mock) {
+      heroFlag.textContent =
+        "⚠ 界面预览用的是模拟数据：Dify 礼赠工作流尚未发布，下面三个方案与呈现内容都不是模型真实输出。" +
+        "独立规则校验、选择门槛与修订计数是真实实现。";
+    }
+  }
   slot.append(
     el("span", { class: "badge badge--mock", text: state.config.mode === "mock" ? "模拟数据模式" : "真实 Dify 模式" }),
     el("span", { class: "badge", text: `币种：${state.config.limits.currency}（首版不换汇）` }),
@@ -292,6 +313,7 @@ function renderStep1() {
               placeholder: "例如 200.00",
               value: f.budget_amount,
               "aria-label": "预算上限金额",
+              "data-field": "budget_amount",
               oninput: (event) => {
                 f.budget_amount = event.target.value.trim();
                 f.budget_confirmed = false;
@@ -371,6 +393,7 @@ function renderStep1() {
               placeholder: "例如 2",
               value: f.deadline_days,
               "aria-label": "可用准备天数",
+              "data-field": "deadline_days",
               oninput: (event) => {
                 f.deadline_days = event.target.value.trim();
                 f.deadline_confirmed = false;
@@ -624,6 +647,7 @@ function renderStep3() {
         placeholder: "例如：酒、香水（用顿号或逗号分隔）",
         value: f.exclusion_terms,
         "aria-label": "明确禁忌的字面词",
+        "data-field": "exclusion_terms",
         oninput: (event) => {
           f.exclusion_terms = event.target.value;
           render();
@@ -642,6 +666,7 @@ function renderStep3() {
         placeholder: "例如：不要看起来像在暗示关系（需先确认如何拦截）",
         value: f.exclusion_unresolved,
         "aria-label": "待澄清的禁忌",
+        "data-field": "exclusion_unresolved",
         oninput: (event) => {
           f.exclusion_unresolved = event.target.value;
           render();
@@ -657,6 +682,7 @@ function renderStep3() {
       el("textarea", {
         placeholder: "例如：完全虚构的演示请求；希望表达祝福，不造成关系压力。",
         "aria-label": "补充说明",
+        "data-field": "additional_context",
         oninput: (event) => {
           f.additional_context = event.target.value;
         },
@@ -703,8 +729,21 @@ function stateView(title, paragraphs, actions = [], extraNodes = []) {
   };
 }
 
-function renderGenerating() {
+/** 配置未就位时的中文等待态：表单字段全部来自接入层配置，缺配置就先去读配置。 */
+function renderWaiting() {
   return {
+    body: [
+      el("section", { class: "state" }, [
+        el("div", { class: "spinner", role: "presentation" }),
+        el("h2", { class: "state__title", text: "正在载入接入层配置…" }),
+        el("p", { text: "关系、场合、兴趣、风格与预算区间都由服务端配置下发，载入完成前不显示空表单，也不使用任何前端内置默认值。" }),
+      ]),
+    ],
+    actions: [],
+  };
+}
+
+function renderGenerating() {  return {
     body: [
       el("section", { class: "state" }, [
         el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), "正在生成三个不同思路…"]),
@@ -1102,6 +1141,37 @@ async function selectCandidate(candidateId) {
 
 /* ------------------------------------------------------------------ 组装 */
 
+/**
+ * 记录当前正在编辑的字段（用 data-field 标识，跨重绘稳定）。
+ * 没有 data-field 的元素不记录：重绘后无法安全地认回同一个节点。
+ */
+function captureFocus() {
+  const active = document.activeElement;
+  if (!active || active === document.body || !active.dataset || !active.dataset.field) return null;
+  let start = null;
+  let end = null;
+  try {
+    start = active.selectionStart;
+    end = active.selectionEnd;
+  } catch {
+    /* type=number 的输入框不支持选区 API */
+  }
+  return { field: active.dataset.field, start, end };
+}
+
+function restoreFocus(snapshot) {
+  if (!snapshot) return;
+  const node = document.querySelector(`[data-field="${snapshot.field}"]`);
+  if (!node) return;
+  if (node !== document.activeElement) node.focus({ preventScroll: true });
+  if (snapshot.start === null || snapshot.start === undefined) return;
+  try {
+    node.setSelectionRange(snapshot.start, snapshot.end);
+  } catch {
+    /* 同上：number 输入框忽略 */
+  }
+}
+
 function render() {
   renderBadges();
   renderBanners();
@@ -1109,7 +1179,10 @@ function render() {
   renderLandingVisibility();
   const view = $("view");
   let rendered;
-  if (state.busy && !state.report && !state.presentation) {
+  if (!state.config && !(state.error && state.error.kind === "error")) {
+    // 接入层配置还没到手：不渲染表单（表单字段全部来自配置，读它会空指针）。
+    rendered = renderWaiting();
+  } else if (state.busy && !state.report && !state.presentation) {
     rendered = renderGenerating();
   } else if (state.timeout) {
     rendered = stateView(
@@ -1150,6 +1223,8 @@ function render() {
   if (state.error && state.error.kind === "needs_input" && !state.timeout && !state.presentation && !state.report) {
     nodes.unshift(errorBox(state.error.errors, "提交前需要修改（服务端确定性适配）"));
   }
+  // 重绘会销毁并替换输入框节点：先记下正在编辑的字段，重绘后还原焦点与光标。
+  const focused = captureFocus();
   view.replaceChildren(...nodes);
 
   const actions = $("actions") || (() => {
@@ -1158,6 +1233,7 @@ function render() {
     return bar;
   })();
   actions.replaceChildren(...[].concat(rendered.actions || []).filter(Boolean));
+  restoreFocus(focused);
 
   $("footer-meta").textContent = state.config
     ? `模式：${state.config.mode} · 追求对象契约：${state.config.pursuit_contract_ready ? "已落地" : "未落地"} · 演示开关：${state.demo || "关闭"} · 接入层 http://${location.host}`
@@ -1185,13 +1261,17 @@ function renderDemoPanel() {
         }, { class: "chip--radio", type: "radio" }),
       ),
     ),
-    el("p", { class: "field__hint", text: "也可以在地址栏加 ?demo=slow / ?demo=model_error / ?demo=partial_fail / ?demo=presentation_over_budget。" }),
+    el("p", {
+      class: "field__hint",
+      text: "也可以在地址栏加 ?demo=slow / ?demo=model_error / ?demo=partial_fail / ?demo=presentation_over_budget / ?demo=stress。",
+    }),
   ]);
   slot.append(details);
 }
 
 async function bootstrap() {
-  render();
+  // 先绑定入口与读取配置，再渲染：渲染依赖 state.config，
+  // 顺序反了会在首帧抛 TypeError 并阻断后面的配置加载。
   for (const id of ["cta-start", "cta-start-2"]) {
     const node = $(id);
     if (node) {
@@ -1204,6 +1284,7 @@ async function bootstrap() {
       });
     }
   }
+  render();
   try {
     const response = await fetch("/api/config");
     state.config = await response.json();

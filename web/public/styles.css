@@ -94,6 +94,8 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  /* 极窄视口（320px）下品牌字标 + 模拟标识 + 按钮一行放不下，允许换行而不是撑破版 */
+  flex-wrap: wrap;
 }
 .brand {
   display: inline-flex;
@@ -106,6 +108,8 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   white-space: nowrap;
+  /* 触控目标下限 */
+  min-height: 44px;
 }
 .brand svg {
   width: 20px;
@@ -127,6 +131,44 @@ body {
 }
 .site-header .btn {
   margin-left: auto;
+}
+/* 常驻吸顶的模拟数据标识：任何滚动位置、任何视口宽度都看得见 */
+.mode-flag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex: none;
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+}
+.mode-flag--real {
+  border-color: var(--ok-line);
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+.mode-flag[hidden] {
+  display: none;
+}
+/* 首屏数据来源说明：与 hero__note 同级，但用警示底色突出 */
+.hero__flag {
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--warn-line);
+  border-left: 3px solid var(--warn-line);
+  border-radius: var(--radius-sm);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 46ch;
+}
+.hero__flag[hidden] {
+  display: none;
 }
 @media (min-width: 860px) {
   .site-nav {
