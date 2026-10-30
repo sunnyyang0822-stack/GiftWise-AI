@@ -6,6 +6,8 @@
 %%   黄 = 已实现未实测（代码存在，该路径从未真实跑通）
 %%   橙 = 占位实现（接线在跑，但不产生真实结果）
 %%   灰 = 未实现 / 计划
+%%   2026-10-30 21:11–21:17：N2/N5 已替换为真实 DeepSeek 节点（6 次运行 / 10 次调用 / 34,127 tokens），由橙改绿；
+%%   MOCK 仍为橙（定义即"在跑但不产生真实结果"）；Dockerfile 已构建但 publish-to-uhost.ps1 未上传，按"取较弱"保持灰。
 %%   约定：节点同时含多个证据等级时，取【较弱】等级着色，并在标签/边标签内分别注明。
 flowchart TB
     subgraph Z1["① 不可信区｜浏览器"]
@@ -23,12 +25,12 @@ flowchart TB
     end
 
     subgraph Z3["③ 编排层｜Dify Cloud 1.18.0 草稿（未发布）"]
-        START["Start 用户输入<br/>intake_json · trusted_repair_count<br/>inject_* 仅占位期测试注入口"]
+        START["Start 用户输入<br/>intake_json · trusted_repair_count<br/>（计数非防篡改，见正文 §3.3）"]
         N1["N1 Code 确定性适配"]
-        N2["N2 需求分析与三候选<br/>占位节点：不调用模型"]
+        N2["N2 需求分析与三候选<br/>真实 LLM：deepseek-v4-flash<br/>真实生成 6 次 · 约 4.5–6.0 s"]
         N3["N3 Code 首次校验"]
         N4{"N4 If/Else 结果分支<br/>true · repairable · else"}
-        N5["N5 一次修订<br/>占位节点：不调用模型"]
+        N5["N5 一次修订<br/>真实 LLM 修订 · 约 3.0–3.1 s<br/>真实成功 1 次／未修好 1 次"]
         N6["N6 Code 再校验<br/>已通过项保护"]
         N7A["N7a 未修订报告"]
         N7B["N7b 修订后报告"]
@@ -44,7 +46,7 @@ flowchart TB
 
     subgraph Z5["⑤ 条件性独立规则 API｜deploy/（归属 CLOUD-001）"]
         SRV["deploy/server.py<br/>GET /healthz · POST /validate"]
-        DOCKER["Dockerfile · publish-to-uhost.ps1"]
+        DOCKER["Dockerfile（镜像已构建·实测）<br/>publish-to-uhost.ps1（未上传）"]
     end
 
     subgraph Z6["⑥ 证据与可观测（无平台级 trace，走替代路径）"]
@@ -94,9 +96,9 @@ flowchart TB
     classDef placeholder fill:#ffe8cc,stroke:#d9480f,color:#000
     classDef planned fill:#e9ecef,stroke:#868e96,color:#000
 
-    class RULES,RUNTIME,BUILD,N1,N3,N6,N7A,N7B,EA,EB,HASH,EVID,SRV measured
+    class RULES,RUNTIME,BUILD,N1,N2,N3,N5,N6,N7A,N7B,EA,EB,HASH,EVID,SRV,START measured
     class ROUTE,ADAPTER,PIPE,STORE,JCHK,DCLIENT,UI unverified
-    class START,N2,N5,MOCK placeholder
+    class MOCK placeholder
     class DOCKER planned
     class L_MEASURED measured
     class L_UNVERIFIED unverified

@@ -8,7 +8,7 @@
 
 1. 赛道 B 评分包含「Docker/K8S、微服务、弹性伸缩、资源调度、分布式状态和云基础设施使用合理；**能解释取舍**」。
 2. **已实测约束**：真实负载为单用户、低频、会话式；规则计算 p50 **0.166 ms**；接入层 HTTP 往返 p50 **12.545 ms**。
-3. **未实测约束**：并发容量、限流阈值、资源消耗**全部未知**；模型未授权导致真实业务负载**未知**。
+3. **未实测约束**：并发容量与限流阈值**仍未知**；资源消耗已有容器基线（14.45–14.71 MiB 样本）；**真实模型负载已实测**（N2 4.5–6.0 s、N5 3.0–3.1 s、端到端 5.2–8.9 s、10 次调用 / 34,127 tokens），但**并发曲线仍未知**。
 4. 交付窗口约 35 小时；`deploy/` 归属刚由 CLOUD-001 认领，尚未有构建与部署实测。
 5. 主办方是否强制容器/K8S **尚未核实**（`docs/architecture.md` 初版即已列为待确认项）。
 
@@ -17,7 +17,7 @@
 | 层次 | 决策 | 当前真实状态 |
 | --- | --- | --- |
 | 确定性规则 | **内联执行**（见 ADR-001） | 已实测 |
-| 独立规则 API | **保留可运行实现，但不作为关键路径** | `deploy/server.py` 已实测可运行；未容器化、未部署 |
+| 独立规则 API | **保留可运行实现，但不作为关键路径** | `deploy/server.py` 已实测可运行；**已容器化（本机单一实例，9/9 实测）**；**未部署到云端、未推送仓库** |
 | 容器化 | **Docker 先做可复现打包（决策不变，"计划"部分已落地）** | 原记：`Dockerfile` **从未构建** → **修订（2026-10-30 晚）：已构建并完成容器内实测**，见文末「修订（2026-10-30）」 |
 | 编排平台 | **K8S 明确不采用（当前）** | 无 |
 | 微服务拆分 | **不采用** | 单一接入层 + 纯函数规则 |
@@ -46,7 +46,7 @@
 **正面**：架构面小、可验证点集中、每个组件都有实测证据或明确标注"未实现"；不会出现"文档写了 K8S 但实际没有"的落差。
 
 **负面／已知缺口**：
-- 赛道 B「云原生」维度中，**容器化、弹性伸缩、资源调度、分布式状态四项本项目均无真实验证**（**修订（2026-10-30 晚）：容器化已完成真实构建与容器内实测，见文末「修订（2026-10-30）」；弹性伸缩、资源调度、分布式状态三项仍无真实验证**）；本项得分应基于编排链路与证据完整性，而非容器化程度。
+- 赛道 B「云原生」维度中，**弹性伸缩、资源调度、分布式状态三项仍无任何真实验证**；**容器化已于 2026-10-30 晚完成真实构建与容器内实测**（见文末「修订（2026-10-30）」）。本项得分应基于编排链路、规则独立性与证据完整性，而非容器化规模（单机单实例 vs 集群）。
 - `deploy/` 与本 ADR 相关的两个真实风险已登记（见 `docs/architecture.md` §9）：
   - **A-1**：`deploy/README.md` 记载的 `python deploy/server.py` 实测失败（`ModuleNotFoundError: No module named 'validator'`），而 `python -m deploy.server` 成功。
   - **A-2**：`Dockerfile` 未 COPY `deploy/__init__.py`，`CMD ["python","-m","deploy.server"]` 依赖隐式命名空间包，**构建后能否启动未验证**。
@@ -65,11 +65,11 @@
 
 **已发生的真实变化（同一台机器，本机 Docker）**
 - Docker Desktop **29.9.2** 已安装并运行（引擎 `linux`／`overlayfs`，24 核／8.0 GiB）。
-- `docker build -t giftwise-validator:latest -f deploy/Dockerfile .` **成功**；镜像 ID `b42f408b4f07`，`docker images` **178 MB**（inspect 169.4 MB）。
-  构建：冷 **2.2 s**（含拉取 `python:3.12-slim`，digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`）／热 **0.6 s**；二次构建可复现成功。
-- 容器 `docker run -d --name gw-val -p 127.0.0.1:8000:8000`：启动到 `/healthz` 200 **0.75–1.01 s**；运行内存 **14.41–17.86 MiB**；CPU **0.01%**。
+- `docker build -t giftwise-validator:latest -f deploy/Dockerfile .` **成功**；构建时镜像 ID `b42f408b4f07`，`docker images` **178 MB**，`docker inspect` Size **177,582,258 字节＝169.4 MiB**（原文写"169.4 MB"，**单位为 MiB**）。**注**：该 ID 现已不在 `latest` 上——2026-10-30 22:5x 复核时 `latest`＝`61321052b48b`，`b42f408b4f07` 保存在 tag `pm-baseline-20261030`。
+  构建：冷 **2.2 s**（含拉取 `python:3.12-slim`，digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`）／热 **0.6 s**；二次构建可复现成功。**注**：`raw/docker-2026-10-30/` 归档的两次构建（`d1-build.txt`／`d8-rebuild.txt`）**均为全 CACHED 的热构建**，冷构建 2.2 s **无归档原始输出**；且 `deploy/evidence/docker-2026-10-30.md` D-8 写「0.6s（首次 0.6s）」，与之**自相矛盾**（见 ARCH-001 §9 A-11）。
+- 容器 `docker run -d --name gw-val -p 127.0.0.1:8000:8000`：启动到 `/healthz` 200 **0.75–1.01 s**；运行内存 **14.41–17.86 MiB**；CPU **0.01%**。**注**：归档点样本为启动 **0.7506 s**、内存 **14.45 MiB**（`d7-baseline.txt`）；区间两端 **1.01 s／14.41／17.86 MiB 在 `raw/` 中无原始输出**。ARCH-001 独立复测内存 **14.71 MiB**（落在区间内）。
 - 容器内 `/validate` 响应与同进程 `validator.rules.validate(...)` **逐字节一致**；`/healthz` 的 `rules_source_sha256` 与本机 `validator/rules.py` 一致；5 项错误路径符合契约；容器以**非 root（uid 10001）**运行。
-- 证据：`deploy/evidence/docker-2026-10-30.md`（汇总 9/9）＋ `deploy/evidence/raw/docker-2026-10-30/`（12 个原始输出文件）。
+- 证据：`deploy/evidence/docker-2026-10-30.md`（汇总 9/9）＋ `deploy/evidence/raw/docker-2026-10-30/`（**12 份 D-0…D-8 原始输出 + 5 份 Docker/WSL 安装日志，共 17 个文件**）。
 
 **本修订明确不改变的部分（仍然为"未发生"）**
 - **云部署从未发生**：无云主机、无 EIP、无安全组变更；`publish-to-uhost.ps1` **从未上传**；UCloud **未采购**。
@@ -77,3 +77,5 @@
 - A-2（命名空间包）风险已随真实构建闭合；**A-1（`python deploy/server.py` 失败、须用 `-m`）仍然有效**。
 
 **结论**：本 ADR 的取舍结论**不变**；变化仅在于"容器化"从"计划"变为"已在本机实测"。因此赛道 B「云原生架构」维度中，**容器化一项现在有可复验证据**，而**弹性伸缩／资源调度／分布式状态三项仍无证据**，不得对外读作已具备。
+
+**ARCH-001 独立复核（2026-10-30 22:5x 北京时间）**：本架构 Agent 用 Docker CLI 直接复核 `giftwise-validator:latest`，**未采信转述**——`docker version` → 29.9.2／29.9.2；起容器后 `/healthz` → **http 200** 且 `rules_source_sha256` 与本机一致；`/validate` → http 200、**271 字节、与本机 `validator.rules.validate` 逐字节一致**；`docker exec id` → **uid=10001(giftwise)**；`find /app` → **9 行**；镜像内 `grep -rIl -E "sk-|API_KEY=|password=" /app` → **命中 0**；`docker stats --no-stream` → **14.71MiB / 0.01%**；复核后已 `docker rm -f` 清理。**结论：容器化"已实测"成立**（详见 ARCH-001 §10.6）。**同时发现三处口径缺口**（镜像 ID 与 `latest` 不一致、冷构建 2.2 s 无归档、169.4 应为 MiB）——已报 PM／部署线，**本 ADR 未修改 `deploy/`**。

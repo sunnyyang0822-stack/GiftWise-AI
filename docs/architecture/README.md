@@ -62,6 +62,7 @@ mmdc -i diagrams/system-architecture.mmd -o rendered/system-architecture.svg
 | 文件 | 内容 |
 | --- | --- |
 | [`../../workflow/evidence/WF-002-2026-10-30.md`](../../workflow/evidence/WF-002-2026-10-30.md) | Dify Cloud Code 节点沙箱探针（真实执行、0 Tokens） |
-| [`../../workflow/evidence/WF-003-2026-10-30.md`](../../workflow/evidence/WF-003-2026-10-30.md) | N1–N7 接线、五类用例真实运行、DeepSeek 可用性核查 |
+| [`../../workflow/evidence/WF-003-2026-10-30.md`](../../workflow/evidence/WF-003-2026-10-30.md) | N1–N7 接线、注入轮五类用例、**真实 DeepSeek 6 次运行 / 10 次调用 / 34,127 tokens** |
+| [`../../deploy/evidence/docker-2026-10-30.md`](../../deploy/evidence/docker-2026-10-30.md) | 容器化 D-0…D-10 实测（9/9）；口径缺口见 ARCH-001 §9 A-11 |
 | [`../test-reports/stage-c/acceptance-2026-10-30.md`](../test-reports/stage-c/acceptance-2026-10-30.md) | 测试验收 Agent 独立复核（含缺陷清单与三段清单） |
 | [`../requirements-analysis.md`](../requirements-analysis.md) | 阶段 1 冻结件（SC-1…SC-9、OPEN-1…OPEN-9） |
