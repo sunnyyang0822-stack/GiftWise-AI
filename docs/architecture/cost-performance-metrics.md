@@ -204,6 +204,6 @@ python -m unittest discover -s tests/acceptance/stage_c -q
 | 阻塞 | 影响 | 解除条件 |
 | --- | --- | --- |
 | **模型未授权/未配置**（DeepSeek 在本租户 `enabled=false`、凭据为空） | 真实延迟、token、成本、修订触发率全部无法测量 | 产品负责人在 Dify 填入 Key，或授权改用平台托管模型（`openai`／`tongyi`／`gemini`／`anthropic`／`x` 当前为可用） |
-| Docker 从未构建 | 镜像与容器资源指标无法测 | 部署线执行构建 |
+| ~~Docker 从未构建~~ → **已解除（2026-10-30 晚）** | 镜像与容器资源指标**已可测**：镜像 **178 MB**（inspect 169.4 MB）；构建 **冷 2.2 s / 热 0.6 s**；容器启动到 `/healthz` 200 **0.75–1.01 s**；运行内存 **14.41–17.86 MiB**；CPU **0.01%**（Docker Desktop 29.9.2，引擎 `linux`/`overlayfs`，24 核 / 8.0 GiB） | **已完成**（2026-10-30）；来源：`deploy/evidence/docker-2026-10-30.md` 与 `deploy/evidence/raw/docker-2026-10-30/` |
 | 云资源未采购 | 云端延迟与费用无法测 | 产品负责人确认额度与预算 |
 | 前端未交付验收 | 端到端业务延迟无法测 | 前端线交付并进入联调 |

@@ -6,6 +6,7 @@
 %%   黄 = 已实现未实测（代码存在，该路径从未真实跑通）
 %%   橙 = 占位实现（接线在跑，但不产生真实结果）
 %%   灰 = 未实现 / 计划
+%%   约定：节点同时含多个证据等级时，取【较弱】等级着色，并在标签/边标签内分别注明。
 flowchart TB
     subgraph Z1["① 不可信区｜浏览器"]
         UI["web/public 简体中文界面<br/>三步输入 · 三方案对比 · 明确选择 · 呈现阅读"]
@@ -86,7 +87,7 @@ flowchart TB
     ROUTE -.->|"选择事件<br/>{recommendation_run_id, selected_candidate_id}"| PIPE
     MOCK -.->|"mock 模式固定数据"| PIPE
     SRV -->|"直接复用同一纯函数"| RULES
-    DOCKER -.->|"从未构建 / 从未上传"| SRV
+    DOCKER -.->|"镜像已构建 / 未上传"| SRV
 
     classDef measured fill:#d3f9d8,stroke:#2b8a3e,color:#000
     classDef unverified fill:#fff3bf,stroke:#e67700,color:#000

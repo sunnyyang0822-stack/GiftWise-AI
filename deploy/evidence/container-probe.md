@@ -1,3 +1,20 @@
+> ## 后续更正（2026-10-30 晚）
+>
+> **本文结论已被后续真实构建取代，但本文内容一字不改地保留**——它在采集时刻（2026-10-30 21:2x）是真实的。
+> 文中"镜像未构建／本机不具备任何容器运行时"的逐条探测结果，是当时本机环境的真实记录，**不是错误，也不得删除**。
+>
+> 后续事实（2026-10-30 晚，同一台机器）：
+> - 已安装 **Docker Desktop 29.9.2**（引擎 `linux`／`overlayfs`，24 核／8.0 GiB）。路径：提权后 `dism /online /enable-feature`
+>   启用 `Microsoft-Windows-Subsystem-Linux` 与 `VirtualMachinePlatform`（均 `操作成功完成`、**exit=3010** 成功待重启）
+>   → 因 `wsl --install --no-distribution` 经 **Store 通道返回 `禁止(403)`**，改从官方 GitHub Release 离线安装
+>   `wsl.3.0.3.0.x64.msi`（`msiexec /i ... /qn /norestart` → **exit 0**）
+>   → 重启后 `install --quiet --accept-license --backend=wsl-2`（**exit 0**）。
+> - `docker build -t giftwise-validator:latest -f deploy/Dockerfile .` **成功**；镜像 ID `b42f408b4f07`，`docker images` **178 MB**（inspect 169.4 MB）。
+> - 容器内 `/healthz` 200（启动 **0.75–1.01 s**）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行。
+>
+> 新的完整证据：[`docker-2026-10-30.md`](docker-2026-10-30.md)（汇总 9/9）＋ [`raw/docker-2026-10-30/`](raw/docker-2026-10-30/)（12 个原始输出文件）。
+> 另请注意区分：`container_layout_dryrun.py` 只是**目录布局等价演练**（用同一条 HEALTHCHECK 命令跑本机进程），**不是**镜像构建，其结论不受本次修订影响。
+
 # 容器构建实测记录（CLOUD-001 任务 4）
 
 - 采集日期：2026-10-30 21:2x（北京时间）
