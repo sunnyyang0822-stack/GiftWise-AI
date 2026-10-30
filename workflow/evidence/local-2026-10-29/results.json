@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-10-30T21:40:17.253653+08:00",
+  "timestamp": "2026-10-30T23:18:30.972718+08:00",
   "python": "3.12.12",
   "platform": "Windows-11-10.0.26200-SP0",
-  "head": "89d662483febbb90ab7fd579e05052b309700b91",
+  "head": "3be437ba469764be11c5660ab08e7c11da6731b4",
   "command": "python workflow/verify_local.py",
   "mode": "offline-fixed-snapshots-no-model",
   "model_calls": 0,
@@ -10,17 +10,17 @@
   "cloud_verified": false,
   "manifest": {
     "sources_sha256": {
-      "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+      "validator/rules.py": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
       "workflow/labels.py": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
       "workflow/intake.py": "e43b911585191ffaf7529e67e5429e2d1c8b2e1be043c58ecc413e5db02134e5",
       "workflow/runtime.py": "eda2b4174702ac964a90a1d8f100aff1fe18fd4da16124e3e52c5bb51f3feba4"
     },
     "artifacts_sha256": {
-      "code_node.py": "67f2d2002e38eb91ccbd0042d39f818c42bff3ad5041447d4eced315e19f59a0",
-      "intake_node.py": "8bddff5fbb2cfd3d0c74f7b37c83592ba62721321a3f709db0f168d81477c892",
-      "check_node.py": "4a977aa47ca1ffd6ce9357ddba9759a83e67af8e9fa82d6dc103f673e920f135",
-      "recheck_node.py": "db5c823ced5d6aa877b3f8f971343f8f6776e48a14dde61da3e219f257b619fa",
-      "report_node.py": "a5f0641f8a9f738562326fbdd29adefe01bcbdc8f4382bcf1ce2b80422fb573d"
+      "code_node.py": "4df8b4e3c595c07532e420c2ec0a5d679d29ac71ccb4bc2f21a8c455a05f2ee7",
+      "intake_node.py": "e040687a734507c952a7abf7cad67711b688c4e6794722c40e8dc3d47e4e0e8b",
+      "check_node.py": "a44653cd984a050e066d2e9bdf6a6985a6a1365fdbe154583fd531b7d8714aff",
+      "recheck_node.py": "2844a4f0989f82a7adf1ad27b4f19c3aa255628d789db9288eab5d43fea8f4c5",
+      "report_node.py": "7acf9555f9e2033db05d1e57d70180dffe8c059846d6c8a12a56b2d0a755998a"
     },
     "format": "python-source-not-dsl",
     "cloud_verified": false

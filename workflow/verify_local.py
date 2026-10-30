@@ -1,4 +1,7 @@
 """任务专属离线探针，不替代独立验收或真实模型测试。"""
+# 注意：下面第 21 行的输出目录 workflow/evidence/local-2026-10-29/ 是 WF-001 时期固定下来的历史路径，
+# 不代表内容时间戳——每次运行本脚本都会重写该目录，判断新旧请看 results.json 里的 timestamp 字段，
+# 详见该目录的 README.md。本轮刻意不改这里的路径与行为，是否调整待 PM 决定。
 
 import copy
 import hashlib
