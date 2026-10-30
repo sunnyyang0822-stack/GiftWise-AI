@@ -11,7 +11,7 @@
 | 文件 | 职责 | 真实验证状态 |
 | --- | --- | --- |
 | `server.py` | 最小 HTTP 规则 API，复用 `validator/rules.py` | **已在真实进程运行并请求**（本次未修改） |
-| `Dockerfile` | `python:3.12-slim` + 非 root 用户 + HEALTHCHECK | **已构建成功并真实运行**（2026-10-30 晚）：镜像 `giftwise-validator:latest`／ID `b42f408b4f07`／`docker images` **178 MB**；冷构建 2.2 s、热构建 0.6 s；容器内 `/healthz` 200、`/validate` 与本机纯函数逐字节一致；证据 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md) |
+| `Dockerfile` | `python:3.12-slim` + 非 root 用户 + HEALTHCHECK | **已构建成功并真实运行**（2026-10-30 晚）：镜像 `giftwise-validator:latest`／ID `b42f408b4f07`／`docker images` **178 MB**；冷构建 1.72 s（`--no-cache`，有归档）、热构建 0.6 s；容器内 `/healthz` 200、`/validate` 与本机纯函数逐字节一致；证据 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md) |
 | `.dockerignore` | 收窄构建上下文 | **已随真实构建实测生效**：Docker 只读取**构建上下文根目录**的 `.dockerignore`，因此实际生效的是**仓库根 `.dockerignore`**（本次新增：排除 `.git`、`.tmp`、`tests`、`workflow`、`docs`、`web`、`deploy/evidence`、`*.msi`、`*.exe` 等）；原 `deploy/.dockerignore` **保留**并加指向说明，仅在 context = `deploy/` 时才起作用 |
 | `publish-to-uhost.ps1` | 上传三个文件到 UHost 并远端构建启动 | **从未上传过任何主机**；本次修复两个致命缺陷并用 `-DryRun` 实测参数拼装 |
 | `evidence/` | 运行证据、探针脚本与原始输出 | 本次新增，见 `evidence/README.md` |
@@ -35,7 +35,9 @@ GIFTWISE_BIND=127.0.0.1 GIFTWISE_PORT=8765 python -m deploy.server
 # 启动即打印：giftwise-validator listening on 127.0.0.1:8765; rules=<rules.py 的 sha256>
 ```
 
-也可以直接用 `python deploy/server.py`。环境变量：
+**注意（A-1，2026-10-30 实测）**：`python deploy/server.py` **会失败**——此时 `sys.path[0]` 变成 `deploy/`，
+报 `ModuleNotFoundError: No module named 'validator'`。请一律使用 `python -m deploy.server`。
+环境变量：
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
@@ -78,13 +80,14 @@ curl -sS -X POST http://127.0.0.1:8000/validate \
 ```bash
 # 1) 构建（必须在仓库根执行）
 docker build -t giftwise-validator:latest -f deploy/Dockerfile .
-# 实测：冷构建 2.2 s（含拉取基础镜像）；热构建 0.6 s；二次构建可复现成功
-# 镜像：giftwise-validator:latest  ID b42f408b4f07  docker images 178 MB（inspect 169.4 MB）
+# 实测：冷构建 1.72 s（--no-cache；归档 raw/d9-coldbuild.txt）；热构建 0.6 s；二次构建可复现成功
+# 镜像：giftwise-validator:latest  docker images 178 MB（inspect 177,582,258 字节 = 169.36 MiB）
+# 注意：镜像 ID 每次重建都会变，不要把它当一致性判据；判据用 rules_source_sha256 与字节数
 # 基础镜像：python:3.12-slim  digest sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159
 
 # 2) 运行（只绑回环，供本机演示）
 docker run -d --name gw-val -p 127.0.0.1:8000:8000 giftwise-validator:latest
-# 实测：启动到 /healthz 返回 200 耗时 0.75–1.01 s；运行内存 14.41–17.86 MiB；CPU 0.01%
+# 实测：启动到 /healthz 返回 200 耗时 0.750–0.939 s；运行内存 14.45–17.08 MiB；CPU 0.01–0.02%
 
 # 3) 健康检查（打到容器）
 curl -sS http://127.0.0.1:8000/healthz
@@ -133,10 +136,10 @@ curl -sS http://127.0.0.1:8000/healthz
    Dockerfile 的 HEALTHCHECK 命令 exit 0（**这不是构建镜像**，详见 `evidence/container-probe.md`）。
 8. 修复后的 `publish-to-uhost.ps1 -DryRun` 可运行并打印完整计划命令，端口规格为 `0.0.0.0:8000:8000`。
 9. **镜像已真实构建并成功运行（2026-10-30 晚）**：`docker build -t giftwise-validator:latest -f deploy/Dockerfile .` 成功；
-   冷构建 2.2 s（含拉取基础镜像）、热构建 0.6 s；镜像 ID `b42f408b4f07`，`docker images` **178 MB**（inspect 169.4 MB）；
+   冷构建 **1.72 s**（`--no-cache`，归档 `raw/d9-coldbuild.txt`）、热构建 0.6 s；`docker images` **178 MB**（inspect 177,582,258 字节＝**169.36 MiB**）；
    基础镜像 `python:3.12-slim` digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`。
-10. **容器内端点矩阵真实通过**：`/healthz` 200（启动到可接受连接 **0.75–1.01 s**）、`/validate` 与本机纯函数**逐字节一致**、
-    5 项错误路径符合契约、容器以**非 root（uid 10001）**运行；运行内存 **14.41–17.86 MiB**、CPU 0.01%；
+10. **容器内端点矩阵真实通过**：`/healthz` 200（启动到可接受连接 **0.750–0.939 s**）、`/validate` 与本机纯函数**逐字节一致**、
+    5 项错误路径符合契约、容器以**非 root（uid 10001）**运行；运行内存 **14.45–17.08 MiB**、CPU 0.01–0.02%；
     镜像内文件树仅 9 行，`docker history` 对密钥模式零命中。
     证据：[`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)（9/9）＋ [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)（12 个原始输出）。
 
@@ -190,8 +193,8 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
 **当前进度**
 
 - **2026-10-30 晚新增（容器化，真实执行）**：Docker Desktop 29.9.2 安装成功（经 DISM + 官方离线 MSI 绕过 Store 的 `禁止(403)`）
-  → `docker build` 成功（镜像 `giftwise-validator:latest`，ID `b42f408b4f07`，178 MB；冷 2.2 s／热 0.6 s）
-  → 容器内 `/healthz` 200（启动 0.75–1.01 s）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
+  → `docker build` 成功（镜像 `giftwise-validator:latest`，178 MB＝169.36 MiB；冷 1.72 s／热 0.6 s）
+  → 容器内 `/healthz` 200（启动 0.750–0.939 s）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
   完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（12 个原始输出）。
 - 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
   （**2026-10-30 晚更正**：交付物 3 中"如实记录未构建"的部分已由上述真实构建取代，该记录按纪律保留。）
