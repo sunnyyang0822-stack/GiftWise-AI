@@ -15,9 +15,9 @@
 | recipient_relation | string ID | 推荐必填；草稿可 null/unknown，推荐前澄清 | 产品面**冻结 8 个稳定 ID**：`partner` 恋人、`pursuit` 追求对象、`friend` 朋友、`family` 家人、`classmate` 同学、`mentor` 老师/导师、`client_partner` 客户/合作伙伴、`other` 其他。`pursuit` 与 `partner` **并列互斥**，不得合并，也不得把追求对象落入 `other`。另有 `colleague` 同事**仅技术回归**（产品场景已完全移出，界面/导航/演示/验收不得出现，不对产品暴露）；`unknown` 只表示"关系暂不确定"，推荐前必须澄清。适配为中文关系 |
 | closeness | string ID | 可省略，默认 unknown | very_familiar 非常熟悉、familiar 比较熟悉、limited 了解不多、unfamiliar 几乎不了解、unknown 不确定；保留扩展字段，不作为事实 |
 | occasion | string ID | 推荐必填；草稿可 null/unknown，推荐前澄清 | birthday 生日、festival 节日、thanks 感谢、anniversary 纪念日、graduation_promotion 毕业/升职祝贺、other 其他、unknown 场合暂不确定（推荐前必须澄清）；适配为中文场合。枚举共 7 个键，与 `labels.py:OCCASIONS` 一致 |
-| budget_amount | 十进制 string | 推荐必填；草稿可 null | 明确的全量预算上限，不能是区间。含礼物、包装、贺卡、配送等；不替用户选择上限 |
+| budget_amount | 十进制 string | 推荐必填；草稿可 null | 明确的全量预算上限，不能是区间。含礼物、包装、贺卡、配送等；不替用户选择上限。**取值范围 [1, 10000]（含端点，2026-10-30 裁决）**：`0`/`0.00`、负数与超过 10000 的值均拒绝，错误码 `LIMIT_EXCEEDED`、请求侧 `needs_input`。该范围**尚未在代码中实现**，见文末复核 §5 第 7 项 |
 | currency | string | 必填，无默认 | 仅 CNY，不换汇 |
-| deadline_days | 非负 JSON integer | 推荐必填；草稿可 null | 原样映射 available_days，排除 bool；不推定 7 天、不用巨大数模拟无限 |
+| deadline_days | 非负 JSON integer | 推荐必填；草稿可 null | 原样映射 available_days，排除 bool；不推定 7 天、不用巨大数模拟无限。**取值范围 [0, 365]（含端点，2026-10-30 裁决）**：`0` 表示当天可用准备时间；超过 365 拒绝，错误码 `LIMIT_EXCEEDED`、请求侧 `needs_input`。该上界**尚未在代码中实现** |
 | interests | string ID[] | 可省略，默认 [] 表示未知 | 具体标签见下表；不得提交 unknown 与具体项混选。**"未知"不是机器值**，只能用空数组表示 |
 | interest_confidence | object | 可省略，默认 {} | 以已选兴趣 ID 为键，值**只允许** `confirmed`/`inferred`；未设定项默认 inferred，不能默认确认为事实；多余键报错。不存在 `unknown` 取值 |
 | gift_styles | string ID[] | 可省略，默认 [] 表示不确定 | 送礼者希望的礼物风格，不是收礼人事实 |
@@ -65,7 +65,7 @@
 
 `hard_exclusions.tags → forbidden_tags`；`terms → forbidden_terms`；原文及 unresolved 保留，但 unresolved 未解决不发真实推荐。空禁忌仅表示未提供限制。原校验器对转换后的请求再检查一次，使用同一公开函数；适配器不会另写预算比较或禁忌匹配规则。
 
-预算格式沿用 PM：`(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?`，如 `200.00`；拒绝空白、负数、前导零、浮点数值、符号和指数。**金额没有数值上限**：实测 `"0"`、`"0.0"`、`"0.00"` 与 1000 位数字串均通过（受字段字符串上限约束），`"200"` 与 `"200.00"` 等价。不把未知价格填零。原始 intake、request、candidates 各限 32768 UTF-8 字节；字段字符串最多 1000 码点、数组最多 20 项。转换造成膨胀超限也拒绝。**两层上限会互相牵制**：字段级（1000 码点）合法不代表整体合法，中文/emoji 约 3–4 字节每码点，实测把 `hard_exclusions.terms` 填满 20×1000 码点中文再加 1000 码点备注，`intake_json` 达 63,442 字节，整体按字节超限被拒且错误码是 `INTAKE_INVALID_JSON`（而非 `LIMIT_EXCEEDED`）；该场景下可接受的最大实长仅约 15 KB。外层 Code `payload_json` 运输信封单独限 262144 UTF-8 字节，不放宽内部原规则限制。
+预算格式沿用 PM：`(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?`，如 `200.00`；拒绝空白、负数、前导零、浮点数值、符号和指数。**取值范围 [1, 10000]（含端点，2026-10-30 裁决）**：`"200"` 与 `"200.00"` 等价；`"0"`/`"0.00"` 被拒（**修订**原「零预算允许」，见 [VAL-001 §5](./validator-contract-decisions.md)），`"10000.01"` 及以上同样被拒；超限一律 `LIMIT_EXCEEDED`、请求侧 `needs_input`。该范围**尚未在代码中实现**——裁决前实测 `"0"` 与 1000 位数字串均通过，仅 1001 码点才 `LIMIT_EXCEEDED`；`deadline_days` 同理只有非负检查、无 365 上界。候选 `estimated_total` 与 `estimated_preparation_days` 不受本次范围约束（仍只校验格式与非负，零估算仍允许）。不把未知价格填零。原始 intake、request、candidates 各限 32768 UTF-8 字节；字段字符串最多 1000 码点、数组最多 20 项。转换造成膨胀超限也拒绝。**两层上限会互相牵制**：字段级（1000 码点）合法不代表整体合法，中文/emoji 约 3–4 字节每码点，实测把 `hard_exclusions.terms` 填满 20×1000 码点中文再加 1000 码点备注，`intake_json` 达 63,442 字节，整体按字节超限被拒且错误码是 `INTAKE_INVALID_JSON`（而非 `LIMIT_EXCEEDED`）；该场景下可接受的最大实长仅约 15 KB。外层 Code `payload_json` 运输信封单独限 262144 UTF-8 字节，不放宽内部原规则限制。
 
 草稿可以记录预算区间、“3–7 天”“不着急”等 UI 状态；这些不属于可推荐的 intake-v1，不能混入真实请求。相对时间快捷项应按 Asia/Shanghai 展示具体日期及最终天数，经用户确认后只提交整数。`0` 天允许，表示当天可用准备时间，不保证实际送达。前端不得静默填预算或天数。
 
@@ -83,7 +83,7 @@
 | INVALID_TYPE | 适配层 `intake.py:41`、`:67`、`:88`、`:98`、`:105`，以及原校验器 `rules.py:33` 等 | 根节点非对象、标签数组非数组、可信度非对象、禁忌结构与元素类型错误；以及转换后 `request` 字段类型错误 |
 | INVALID_AMOUNT | 原校验器 `rules.py:93` | 金额非合法 ASCII 十进制字符串：负数（含 `-0`）、前导零、全角数字、空白、指数、千位分隔符、超两位小数、`.5`、`1.` |
 | UNSUPPORTED_CURRENCY | 原校验器 `rules.py:131` | 币种非 `CNY`（大小写敏感，`cny` 同样被拒）；不换汇 |
-| LIMIT_EXCEEDED | 适配层 `intake.py:70`、`:107`，以及原校验器 `rules.py:41`、`:57`、`:60` | 业务数组超 20 项、字段字符串超 1000 码点、参数字符串超 32768 字节 |
+| LIMIT_EXCEEDED | 适配层 `intake.py:70`、`:107`，以及原校验器 `rules.py:41`、`:57`、`:60` | 业务数组超 20 项、字段字符串超 1000 码点、参数字符串超 32768 字节；**以及数值超范围**（预算 ∉ [1, 10000]、可用天数 > 365，2026-10-30 裁决，尚未实现） |
 | DUPLICATE_ID | 适配层 `intake.py:78`，以及原校验器 `rules.py:146`、`:233` | 同一选择数组内标签重复；`request.facts` 的 ID 重复与候选 ID 重复沿用同一码 |
 | UNKNOWN_TAG | 原校验器 `rules.py:152`（候选 `tags` 见 `rules.py:191`） | 转换后 `request.forbidden_tags` 含词表外类别。**适配层会先发 `INTAKE_UNKNOWN_LABEL`，同一根因因此同时出现两码** |
 | INTERNAL_ERROR | 适配层 `intake.py:134–135` | 适配后送原校验器复核时，校验器自身返回 `status=error`（基础设施/内部异常）。**不是输入问题**，不泄露堆栈，不回显用户原文 |
@@ -130,9 +130,9 @@
 | `recipient_relation` 枚举 | 8 个产品 ID + `colleague`（仅技术回归）+ `unknown`，`pursuit`/`partner` 互斥 | `labels.py:RELATIONS` 10 键，完全一致；实测 `colleague` → `("同事","colleague")`、`unknown` → `needs_input` | ✅ | 保持 |
 | `closeness` | 可省略，默认 `unknown`；5 值 | 省略 → `unknown` ✅；显式 `null` → `INTAKE_UNKNOWN_LABEL`（文档未写） | ⚠️ | 文档已列；如需 null 等价于省略须改代码 |
 | `occasion` | 推荐必填；草稿可 null/unknown | 同 `recipient_relation`；非法值 2 条；`unknown` → `INTAKE_CLARIFICATION_REQUIRED` | ⚠️ | 文档枚举已补 `unknown`（原表遗漏） |
-| `budget_amount` | 十进制 string；推荐必填；含包装/贺卡/配送；不能是区间 | ✅；`"0"`/`"0.0"`/`"0.00"`/`"200"`/`"12.30"` 通过；`"-1"`/`"-0"`/`"00"`/`"01.00"`/`"1e3"`/`"200.000"`/`".5"`/`"1."`/`" 200"`/`"２００"`/`"1,000"`/`"200😀"` 全部 `INVALID_AMOUNT`；**无数值上限**，1000 位数字串仍通过，1001 码点才 `LIMIT_EXCEEDED` | ✅（文档未写上限缺失） | 文档已补「金额无数值上限」 |
+| `budget_amount` | 十进制 string；推荐必填；含包装/贺卡/配送；不能是区间 | ✅；`"0"`/`"0.0"`/`"0.00"`/`"200"`/`"12.30"` 通过；`"-1"`/`"-0"`/`"00"`/`"01.00"`/`"1e3"`/`"200.000"`/`".5"`/`"1."`/`" 200"`/`"２００"`/`"1,000"`/`"200😀"` 全部 `INVALID_AMOUNT`；**无数值上限**，1000 位数字串仍通过，1001 码点才 `LIMIT_EXCEEDED` | ⚠️ 待实现 | 2026-10-30 裁决为 [1, 10000]（**禁 0**，修订 VAL-001 §5）；当前实现只校验格式、无范围检查，须改 `validator/rules.py` |
 | `currency` | 必填无默认；仅 `CNY` | ✅；`"cny"`/`"CNY "`/`"USD"` → `UNSUPPORTED_CURRENCY`；`""` → `INVALID_TYPE`+`UNSUPPORTED_CURRENCY` | ⚠️ | 文档已补空串双码；大小写敏感已明确 |
-| `deadline_days` | 非负 JSON integer，排除 bool；原样映射 `available_days` | ✅ 完全一致；`0`/`1`/`365`/`366`/`100000`/`10^20` 通过（**无上限**）；`-1`/`True`/`False`/`1.0`/`"3"` → `INVALID_TYPE` | ✅ | 保持；文档可注明无上限 |
+| `deadline_days` | 非负 JSON integer，排除 bool；原样映射 `available_days` | ✅ 完全一致；`0`/`1`/`365`/`366`/`100000`/`10^20` 通过（**无上限**）；`-1`/`True`/`False`/`1.0`/`"3"` → `INVALID_TYPE` | ⚠️ 待实现 | 2026-10-30 裁决为 [0, 365]（**保留 0**）；当前实现只校验非负整数、缺上界，须改 `validator/rules.py` |
 | `interests` | 可省略默认 `[]`；未知用空数组；不得与 `unknown` 混选 | ✅；`[]` → `ready` 且 `facts: []`；`["unknown"]`/全角/中文/emoji/空串 → `INTAKE_UNKNOWN_LABEL`；重复 → `DUPLICATE_ID`；>20 项 → `LIMIT_EXCEEDED`；`null` → `INVALID_TYPE` | ✅（null 未写） | 文档已列 null 行为 |
 | `interest_confidence` | 可选，默认 `{}`；只允许 `confirmed`/`inferred`；未设定项默认 `inferred`；多余键报错；无 `unknown` 取值 | ✅ 全部一致；`"unknown"`/`"CONFIRMED"`/`null`/`1` → `INTAKE_CONFIDENCE_MISMATCH`；键对应被丢弃的未知兴趣时额外叠加 `INTAKE_UNKNOWN_LABEL` | ✅（叠加未写） | 文档已补聚合说明 |
 | `gift_styles` | 可省略默认 `[]`；7 值 | ✅；>20 项 → `LIMIT_EXCEEDED`（重复时同时 `DUPLICATE_ID`） | ✅ | 保持 |
@@ -146,13 +146,13 @@
 
 | 输入 | 期望行为 | 实测结果 | 是否一致 | 处置建议 |
 | --- | --- | --- | --- | --- |
-| `budget_amount: "0"` | 允许（VAL-001 §5） | `ready`；配正估算 → `OVER_BUDGET`，配 `"0.00"` 估算 → `passed` | ✅ | 保持 |
+| `budget_amount: "0"` | **裁决禁止**（[1, 10000]，**修订** VAL-001 §5 原「零预算允许」） | 当前 `ready`；配正估算 → `OVER_BUDGET`，配 `"0.00"` 估算 → `passed` | ❌ 待实现 | 须改 `validator/rules.py` 加下界；同步修订 VAL-001 §5 |
 | `budget_amount: "-1"` / `"-0"` | 拒绝 | `INVALID_AMOUNT` | ✅ | 保持 |
-| `budget_amount` 超大 | 文档未定义 | 1000 位数字串 `ready`；1001 码点 → `LIMIT_EXCEEDED`；**无业务数值上限** | ⚠️ | 文档已注明 |
-| `deadline_days: 0` | 允许，表示当天 | `ready`；配 1 天准备 → `PREPARATION_TOO_LONG`；配 0 天 → `passed` | ✅ | 保持 |
-| `deadline_days: 1` / `365` | 允许 | `ready` | ✅ | 保持 |
+| `budget_amount` 超大 | **裁决 [1, 10000]（含端点）** | 裁决前实测：1000 位数字串仍 `ready`、1001 码点才 `LIMIT_EXCEEDED`；当前**无范围检查** | ❌ 待实现 | 须改 `validator/rules.py`；超限复用 `LIMIT_EXCEEDED`、请求侧 `needs_input` |
+| `deadline_days: 0` | **裁决保留**（[0, 365]，`0` 表示当天） | `ready`；配 1 天准备 → `PREPARATION_TOO_LONG`；配 0 天 → `passed` | ✅ | 与本裁决一致，实现无需改动 |
+| `deadline_days: 1` / `365` | 允许（上界含端点） | `ready` | ✅ | 保持 |
 | `deadline_days: -1` / `True` / `1.0` / `"3"` | 拒绝（排除 bool） | `INVALID_TYPE` | ✅ | 保持 |
-| `deadline_days` 超大 | 文档未定义 | `10^20` 仍 `ready`，**无上限** | ⚠️ | 文档已注明 |
+| `deadline_days` 超大 | **裁决 [0, 365]（含端点）** | `10^20` 仍 `ready`，当前**无上界** | ❌ 待实现 | 须改 `validator/rules.py`；超限复用 `LIMIT_EXCEEDED`、请求侧 `needs_input` |
 | `interests: []` | 未知，不编造事实 | `ready`，`facts: []`，`preference_inferences: []` | ✅ | 保持 |
 | `interests: []` + `interest_confidence: {}` | 同上 | `ready` | ✅ | 保持 |
 | `interests: null` | 文档未定义 | `INVALID_TYPE`（+ 若残留键则 `INTAKE_CONFIDENCE_MISMATCH`） | ⚠️ | 文档已列 |
@@ -166,13 +166,13 @@
 | `colleague`（技术回归值） | `ready`，可适配 | `ready`，输出 `("同事","colleague")` | ✅ | 保持；不得出现在产品面 |
 | `pursuit` | `ready`，与 `partner` 互斥 | `ready`，输出 `("追求对象","pursuit")` | ✅ | 保持 |
 | `recipient_relation_id` 注入 | `INTAKE_UNKNOWN_FIELD` | `needs_input` / `INTAKE_UNKNOWN_FIELD` | ✅ | 保持（`verify_local.py:139` 断言同一行为） |
-| `hard_exclusions.tags: ["ALCOHOL"]` / 全角 | 适配层精确匹配 → 拒 | `INTAKE_UNKNOWN_LABEL`（**不做** NFKC/大小写折叠/去空白） | ⚠️ | 与 VAL-001 §2 冲突，见 §5 |
-| 直接调用 validator 传 `forbidden_tags: ["ALCOHOL"]` | VAL-001 §2：NFKC+折叠后匹配 | `passed`（归一化生效） | ⚠️ | 同一输入走完整链路被拒、直调校验器通过；见 §5 |
-| `hard_exclusions.tags: ["nonsense"]` | `INTAKE_UNKNOWN_LABEL` | 该码 + `UNKNOWN_TAG` | ❌ 表缺码 | 错误码表已补 `UNKNOWN_TAG` |
-| `hard_exclusions.tags: [1]` | VAL-001 §2：非字符串不归为未知标签 | `INTAKE_UNKNOWN_LABEL` + `INVALID_TYPE` | ❌ 跨文档冲突 | 见 §5 |
+| `hard_exclusions.tags: ["ALCOHOL"]` / 全角 | 适配层精确匹配 → 拒 | `INTAKE_UNKNOWN_LABEL`（**不做** NFKC/大小写折叠/去空白） | ✅ 已裁决 | VAL-001 §2 已限定适用范围：经适配层的输入以精确匹配为准 |
+| 直接调用 validator 传 `forbidden_tags: ["ALCOHOL"]` | VAL-001 §2：NFKC+折叠后匹配 | `passed`（归一化生效） | ✅ 已裁决 | 两层分工成立，校验器行为不放宽 |
+| `hard_exclusions.tags: ["nonsense"]` | `INTAKE_UNKNOWN_LABEL` | 该码 + `UNKNOWN_TAG` | ✅ 已裁决 | `UNKNOWN_TAG` 已补入错误码表，接受双码聚合 |
+| `hard_exclusions.tags: [1]` | VAL-001 §2：非字符串不归为未知标签 | `INTAKE_UNKNOWN_LABEL` + `INVALID_TYPE` | ✅ 已裁决 | 接受聚合现状；VAL-001 §2 已限定该归类只适用于直调校验器 |
 | `hard_exclusions.terms: [""]` | 文档未定义 | `INVALID_TYPE` | ⚠️ | 文档已注明 |
 | `hard_exclusions.unresolved: ["x"]` | 须澄清 | `INTAKE_CLARIFICATION_REQUIRED` | ✅ | 保持 |
-| JSON 嵌套约 2000 / 3000 层 | 文档未定义 | 2000 层可解析（约 12 KB）；3000 层（约 18 KB）→ `INVALID_JSON`（解析递归超限）；无显式深度限制 | ❌ 未记载 | 文档已注明；见 §5 |
+| JSON 嵌套约 2000 / 3000 层 | 文档未定义 | 2000 层可解析（约 12 KB）；3000 层（约 18 KB）→ `INVALID_JSON`（解析递归超限）；无显式深度限制 | ✅ 已裁决 | 表述为「由解析递归上限兜底并归 `INVALID_JSON`」，不写死层数、不加显式限制 |
 | 孤立代理项字符串参数 | VAL-001 §1：按 `INVALID_JSON` | `error` / `INVALID_JSON` | ✅ | 保持 |
 | 重复 `name`+`description`（全角/大小写/多空格） | VAL-001 §4：标准化二元组相同即重复 | `DUPLICATE_CANDIDATE_CONTENT`（含全角字母、全角空格、制表符、大小写折叠用例） | ✅ | 保持 |
 | `name`/`description` 仅空白存在差异（无空格 vs 有空格） | §4 只说折叠连续空白 | `passed`（折叠为空格的串不等于无空格串） | ✅ | 保持 |
@@ -191,23 +191,24 @@
 
 重点核对结论：`INTERNAL_ERROR` 在表中但**行号引用陈旧**（文档原写 `intake.py:130`，实际 `:134–135`，本轮已修）；`INVALID_CANDIDATE_ID`、`DUPLICATE_CANDIDATE_CONTENT` 不在本文的 intake 边界表中（本文表只管适配边界），已在 [VAL-001 §7](./validator-contract-decisions.md) 建全量表收录，语义与实现一致；`LIMIT_EXCEEDED` 在 validator 侧可达却漏于 `workflow-spec.md:96`，属该文件线的待修项。
 
-### 5. 待裁决事项
+### 5. 裁决事项（2026-10-30 已与产品负责人对齐）
 
-| # | 事项 | 建议 | 影响 |
+| # | 事项 | 裁决（2026-10-30，已生效） | 落地 |
 | --- | --- | --- | --- |
-| 1 | 适配层对非法关系/缺关系/缺预算产生 2–3 条同根因错误（如 `INTAKE_CLARIFICATION_REQUIRED` 与 `INTAKE_UNKNOWN_LABEL` 同时命中） | 本轮按实测如实记载，不改代码；若要一因一码须改 `workflow/intake.py` | 前端错误展示与验收用例断言 |
-| 2 | `hard_exclusions.tags` 元素非字符串时同时发 `INTAKE_UNKNOWN_LABEL`，与 [VAL-001 §2](./validator-contract-decisions.md)「非字符串不归为未知标签」口径冲突 | 建议由 `workflow/intake.py` 文件线收敛为只发 `INVALID_TYPE` | 契约一致性、测试断言 |
-| 3 | 适配层对标签精确匹配（大小写敏感、不裁剪、不 NFKC），使 [VAL-001 §2](./validator-contract-decisions.md) 的 NFKC/折叠规则在真实链路上永不生效 | 建议在 VAL-001 明确「归一化只适用于直接调用校验器的场景；经适配层的输入以精确匹配为准」，或改适配层对齐归一化 | 用户输入容错口径、两层契约边界 |
-| 4 | 词表外硬禁忌标签同时产生 `INTAKE_UNKNOWN_LABEL` + `UNKNOWN_TAG`（后者由 `request.forbidden_tags` 复核得出） | 文档已收录 `UNKNOWN_TAG`；若要单码须改适配层不再透传原始标签 | 错误展示、修订触发 |
-| 5 | JSON 嵌套深度无显式限制，约 3000 层触发解析递归上限并归 `INVALID_JSON` | 建议只写「深层嵌套由解析递归上限兜底并归 `INVALID_JSON`」，不写死层数 | 拒绝服务防护、错误语义 |
-| 6 | `workflow/workflow-spec.md:96` 的 18 码清单缺 `LIMIT_EXCEEDED` | 指派该文件线补入（超出本轮可改边界） | 文档间一致性 |
-| 7 | `budget_amount` 与 `deadline_days` 均无数值上限（仅非负/码点约束） | 若产品需要上限，须改 `validator/rules.py` 规则；否则在契约显式声明「无业务数值上限」 | 预算与工期语义、PM 决策 |
+| 1 | 适配层对非法关系/缺关系/缺预算产生 2–3 条同根因错误（如 `INTAKE_CLARIFICATION_REQUIRED` 与 `INTAKE_UNKNOWN_LABEL` 同时命中） | **接受聚合现状**：不做错误去重，文档如实记载 | 仅文档；前端按 `errors` 数组展示，验收断言按多码编写 |
+| 2 | `hard_exclusions.tags` 元素非字符串时同时发 `INTAKE_UNKNOWN_LABEL`，与 [VAL-001 §2](./validator-contract-decisions.md)「非字符串不归为未知标签」口径冲突 | **接受聚合现状**，并在 VAL-001 §2 限定该归类只适用于直调校验器 | 仅文档（VAL-001 §2 已加适用范围）；不改 `workflow/intake.py` |
+| 3 | 适配层对标签精确匹配（大小写敏感、不裁剪、不 NFKC），使 [VAL-001 §2](./validator-contract-decisions.md) 的 NFKC/折叠规则在真实链路上不生效 | **采纳文档口径**：在 VAL-001 §2 写明「归一化只适用于直调校验器，经适配层的输入以精确匹配为准」 | 仅文档（VAL-001 §2 已加适用范围）；不放宽校验器行为 |
+| 4 | 词表外硬禁忌标签同时产生 `INTAKE_UNKNOWN_LABEL` + `UNKNOWN_TAG`（后者由 `request.forbidden_tags` 复核得出） | **接受聚合现状**，`UNKNOWN_TAG` 补入本文错误码表 | 仅文档；不改适配层透传行为 |
+| 5 | JSON 嵌套深度无显式限制，约 3000 层触发解析递归上限并归 `INVALID_JSON` | **不写死层数**：文档表述为「深层嵌套由解析递归上限兜底并归 `INVALID_JSON`」 | 仅文档；不加显式深度限制 |
+| 6 | `workflow/workflow-spec.md:96` 的 18 码清单缺 `LIMIT_EXCEEDED` | **待 PM 派活**给该文件线补入 | 超出本轮可改边界，未改 |
+| 7 | `budget_amount` 与 `deadline_days` 均无数值上限（仅格式/非负/码点约束） | **已裁决（含端点闭区间）**：`budget_amount` ∈ **[1, 10000]**（禁 0），`deadline_days` ∈ **[0, 365]**（保留 0 = 当天）；超限复用 `LIMIT_EXCEEDED`、请求侧 `needs_input` | **须改 `validator/rules.py`**（本轮未改，属契约先行、代码待改）；同时**修订 VAL-001 §5「零预算允许」**。候选 `estimated_total`/`estimated_preparation_days` 不在约束内 |
 
 ### 6. 复核结论
 
 - **不一致条数：12 条**（3 条文档缺陷 + 5 条文档遗漏/措辞不准 + 2 条跨层语义冲突 + 2 条文档间差集）。
 - **文档缺陷 3 条**：错误码表缺 `UNKNOWN_TAG`；`INTERNAL_ERROR` 行号引用陈旧；`occasion` 枚举漏列 `unknown`。已在本文修正。
 - **文档遗漏/措辞 5 条**：金额与天数无数值上限；`null` 与空串在各字段的实际处置；错误聚合形态；两层上限互相牵制；嵌套深度行为。已在本文补记。
-- **跨层冲突 2 条**：标签归一化口径（VAL-001 §2 vs 适配层精确匹配）；非字符串标签归类（VAL-001 §2 vs 适配层同时发 `INTAKE_UNKNOWN_LABEL`）。见 §5 第 2、3 项。
-- **文档间差集 2 条**：`workflow-spec.md:96` 缺 `LIMIT_EXCEEDED`；`workflow-spec.md` 与本文对适配层错误码的分工未交叉引用（已在本文补链接）。
+- **跨层冲突 2 条**：标签归一化口径、非字符串标签归类 —— 均已裁决为「限定 VAL-001 适用范围、接受适配层聚合、零代码改动」，见 §5 第 2、3 项。
+- **文档间差集 2 条**：`workflow-spec.md:96` 缺 `LIMIT_EXCEEDED`（待派活）；`workflow-spec.md` 与本文对适配层错误码的分工未交叉引用（已在本文补链接）。
+- **待实现契约 1 条（含 1 处修订）**：`budget_amount` ∈ [1, 10000]（**修订** VAL-001 §5「零预算允许」，禁 0）、`deadline_days` ∈ [0, 365]（保留 0，仅新增上界）；超限复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`（§5 第 7 项）。当前实现**尚未生效**，属**契约先行、代码待改**，不得读作已实现；须由 `validator/rules.py` 文件线落地并补边界用例（含上限与上限+1）。
 - 未发现字段名、类型、必填性、默认值、枚举值与上限（含 32768 字节）本身的实质性不符；`recipient_relation_id` 不可注入、`interest_confidence` 拒绝 `unknown`、`verify_local.py:131` 严格相等断言三项均保持不变。
