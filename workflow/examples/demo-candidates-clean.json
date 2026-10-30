@@ -1,0 +1,44 @@
+{
+  "_note": "演示用候选：不含评委指定的禁忌词「巧克力」，用于对照证明同一份代码会放行合规候选。",
+  "candidates": [
+    {
+      "id": "c1",
+      "name": "挂耳咖啡小样组合",
+      "description": "选择小份挂耳咖啡与基础礼袋，方向稳妥、关系压力较低，适合在尚未确认对方具体口味时表达心意。",
+      "estimated_total": "168.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 1,
+      "tags": ["food"],
+      "reason": "对方对「咖啡与美食」有兴趣，但组内具体偏好未确认，因此选择较宽泛的冲泡方向，并保留对方自行选择的空间。",
+      "fact_refs": ["interest:coffee_food"],
+      "inferences": ["对方可能愿意尝试咖啡类小样，具体烘焙度与风味偏好未知"],
+      "unknowns": ["对方是否日常饮用咖啡", "具体购买渠道与库存"]
+    },
+    {
+      "id": "c2",
+      "name": "纸品书写套装",
+      "description": "以低负担的通用记录用品为方向，不推定其职业或阅读爱好。",
+      "estimated_total": "120.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 2,
+      "tags": ["other"],
+      "reason": "回应送礼者希望实用、精致但不张扬的要求；这是送礼者选择的风格，不是收礼人已确认的偏好。",
+      "fact_refs": [],
+      "inferences": ["了解不多时通用用品可能较稳妥，不保证适合对方"],
+      "unknowns": ["对方是否使用纸笔", "实际价格、库存与送达均未核实；估算含基础包装、贺卡和配送"]
+    },
+    {
+      "id": "c3",
+      "name": "可自主挑选的通用消费额度",
+      "description": "以保留收礼人自主选择空间为方向，具体支持渠道需购买前确认。",
+      "estimated_total": "80.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 1,
+      "tags": ["other"],
+      "reason": "具体兴趣尚不充分时，让对方自主挑选可能降低选错物品的风险。",
+      "fact_refs": [],
+      "inferences": ["自主选择可能更灵活，但额度类礼物也可能显得直接"],
+      "unknowns": ["对方对额度类礼物的接受程度", "可用范围与有效期"]
+    }
+  ]
+}
