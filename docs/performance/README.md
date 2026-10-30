@@ -31,7 +31,7 @@ docker run -d --rm --name gwbench -p 127.0.0.1:18901:8000 giftwise-validator:sub
 python bench/probe_contract.py http://127.0.0.1:18901
 
 # 3) 纯规则层基准（不经 HTTP，用于分离「HTTP 开销」与「规则计算开销」）
-python bench/bench.py rules --iterations 3000
+python bench/bench.py rules --iterations 2000
 
 # 4) 延迟/吞吐阶梯（容器）
 python -u bench/bench.py ramp --url http://127.0.0.1:18901 --container gwbench \
