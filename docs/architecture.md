@@ -54,7 +54,7 @@
 | JS 接入层与 Python 参考实现**语义一致**：**74 组**样例 0 处差异（越界与格式 17 组已覆盖；另 1 组仅**错误顺序**不同；**网格之外** 1 项 `days=10**20` 分类口径，两侧都拒绝） | 本次复跑：`node web/tools/parity-check.mjs` |
 | 本地单次确定性校验 p50 **0.166 ms**；无模型端到端固定夹具 p50 **0.640 ms** | 本次实测：`.tmp/measure_arch.py`（方法与其缺陷见 §8.2） |
 | 契约已冻结 **8 个关系 ID**（含 `pursuit`），`pursuit` 与 `partner` 并列互斥 | `docs/intake-contract.md`；`workflow/labels.py`；QA §3.2 |
-| **容器化已实测（2026-10-30 晚；2026-10-31 01:13:59 重建并复核）**：镜像 `giftwise-validator:latest` 构建成功（`docker images` **178 MB** 十进制；`docker inspect` Size **177,582,258 字节＝169.36 MiB**）；容器内 `/healthz` 200 且规则哈希与本机一致、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行、镜像内无密钥、文件树 9 行 | `deploy/evidence/docker-2026-10-30.md`（D-0…D-13 共 **14 项**；原记 9/9）；`deploy/evidence/image-audit-2026-10-31.md`、`deploy/evidence/image-rebuild-n1n4-2026-10-31.md`（**已重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`，体积 **177,918,474 字节＝169.676 MiB**，冷构建 **3,662 ms**，规则哈希 `1f389dad…` 与本机一致）；`deploy/evidence/raw/docker-2026-10-30/`（12 份原始输出 + 5 份安装日志）；**本架构 Agent 已独立复跑复核（§10.6）** |
+| **容器化已实测（2026-10-30 晚；2026-10-31 01:13:59 重建并复核）**：镜像 `giftwise-validator:latest` 构建成功（`docker images` **178 MB** 十进制；`docker inspect` Size **177,582,258 字节＝169.36 MiB**）；容器内 `/healthz` 200 且规则哈希与本机一致、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行、镜像内无密钥、文件树 9 行 | `deploy/evidence/docker-2026-10-30.md`（D-0…D-13 共 **14 项**；原记 9/9）；`deploy/evidence/image-audit-2026-10-31.md`、`deploy/evidence/image-rebuild-n1n4-2026-10-31.md`（**已重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`，体积 **177,918,474 字节＝169.676 MiB**，冷构建 **3,662 ms**，规则哈希 `1f389dad…` 与本机一致）；`deploy/evidence/raw/docker-2026-10-30/`（**19** 份 D 系原始输出 + 5 份安装日志，共 **24** 个文件）；**本架构 Agent 已独立复跑复核（§10.6）** |
 
 ### 1.2 未实现／未实测（不得读作已完成）
 
@@ -64,7 +64,7 @@
 | Dify 草稿发布 | **已发布并创建版本**（v1 于 2026-10-30 23:04 +08:00；v2 已重发布）。⚠️ `tool_published: false` 与 `version: "draft"` **不是发布状态判据**——前者只表示「是否作为工具供其他应用调用」，后者描述**当前草稿行**；原记「未发布／未创建版本」**已不成立**（WF-003 §3.2 为该时点观测） |
 | DeepSeek 在该租户的可用性 | **已配置并真实调用成功**（`custom_configuration.status = active`、4 个模型 `active`；WF-003 任务 C）。早期观测（`enabled = false`、凭据为空）**已被取代**。平台托管 `openai`／`gemini`／`tongyi`／`anthropic`／`x` **仍未使用** |
 | 选择后呈现阶段（包装／配色／贺卡／赠送方式） | 产品侧**未实现**；接入层仅有 mock 呈现（E2） |
-| 跨调用可信修订计数持久化 | **未实现**；当前 `trusted_repair_count` 由 Start 输入提供，**不是防篡改机制**（WF-003 §6.5） |
+| 跨调用可信修订计数持久化 | **未实现**；当前 `trusted_repair_count` 由 Start 输入提供，**不是防篡改机制**（WF-003 §6 第 3 条） |
 | 可信快照持久化 | **未实现**；接入层为**进程内存**（重启即丢失），见 §3.3 |
 | 云部署 | **从未发生**；`publish-to-uhost.ps1` **从未上传**；无云主机、无 EIP、无镜像仓库推送、无编排平台 |
 | 前端页面验收 | **未验收**；QA 的 14 项为 mock 模式有界冒烟，**不构成 WEB-001 验收判定** |
@@ -152,7 +152,7 @@ flowchart TB
     PIPE -->|"同一份 request 与候选"| JCHK
     JCHK -.->|"parity 比对（离线）"| RULES
     RULES --> RUNTIME
-    BUILD -->|"打包 28.6–29 KB 自包含源码"| N1
+    BUILD -->|"打包 28.6–29 KB（10-30 时点；现行 29.1–29.6 KB）自包含源码"| N1
     BUILD --> N3
     BUILD --> N6
     BUILD --> N7A
@@ -237,7 +237,7 @@ flowchart TB
 | 请求类型 | 低频、单用户、会话式；**一次送礼任务 = 1–2 次模型调用**（正常 1 次生成，触发修订时 2 次；呈现阶段另计） | `workflow/workflow-spec.md` §调用次数；`store.mjs` 的 `call_counts` |
 | 计算量 | 确定性规则极轻：单次 p50 **0.166 ms**、p95 0.362 ms（本机单进程串行） | 本次实测 §1.1 |
 | 端到端（无模型） | 固定夹具 intake→check→report p50 **0.640 ms**；Dify 工作流服务端 **0.587–0.888 s**（含 7 个 Code 节点，无模型） | 本次实测；WF-003 §3.4 |
-| 真实业务延迟（模型段） | **模型段已实测**：N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 7 个 Code 节点）**5.2–8.9 s** | WF-003 §4.7；§8.1 |
+| 真实业务延迟（模型段） | **模型段已实测**：N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 **5 个 Code 节点 + 2 个 LLM 节点**）**5.2–8.9 s** | WF-003 §4.7；§8.1 |
 | 浏览器端到端延迟 | **仍未知（U）**：接入层未接真实模型，"用户点击→三方案可用"从未端到端测过 | 见 §8.3 |
 | 并发 | **无任何并发测试**；接入层与规则 API 均无并发上限治理 | 见 §3.4 |
 
@@ -263,7 +263,7 @@ flowchart TB
 
 **明确局限（E2/E3，不得读作已解决）**：
 - 快照是**进程内存**，重启即丢失；`RUN_LIMIT`／`RUN_TTL_MS` 会淘汰旧任务。恢复路径是"重新推荐"，不是"假装可恢复"。
-- Dify 侧 `trusted_repair_count` 目前由 Start 输入提供，**只是单次执行的接线约束，不是跨调用防篡改机制**（WF-003 §6.5）。
+- Dify 侧 `trusted_repair_count` 目前由 Start 输入提供，**只是单次执行的接线约束，不是跨调用防篡改机制**（WF-003 §6 第 3 条）。
 
 ### 3.4 扩缩容（能力边界与不选 K8S 的理由）
 
@@ -300,7 +300,7 @@ flowchart TB
                                                               ↑
                                                      打包器 build_code_node.py
                                                               ↑
-                                          Dify Code 节点（自包含副本，28.6–29 KB）
+                                          Dify Code 节点（自包含副本；2026-10-30 时点 28,682–28,951 字符，现行生成物 29,073–29,557 字符）
 ```
 
 三条关键规则：
@@ -327,7 +327,7 @@ flowchart TB
 | --- | --- | --- | --- |
 | **Dify Cloud**（编排与模型网关） | **采用** | 1.18.0 版本实读；11 节点接线；Code 节点沙箱执行成功；注入轮五类用例跑通；**真实 DeepSeek 节点主批次 10 次调用 / 34,127 tokens、累计 13 次 / 38,326 tokens**；**已发布并创建版本（v1/v2）** | 配额与费率、镜像仓库 |
 | **确定性规则内联**（Code 节点 + 纯函数） | **采用（核心）** | 46 探针 / **329** 单测 / 39 阶段 C（另有 stage_b **275**、boundary **45**；四条互不包含，合计 **688**）；打包后云端执行成功；本地 p50 0.166 ms | — |
-| **Docker**（可复现打包） | **已采用（实测）** | 镜像 `giftwise-validator:latest` **178 MB** 十进制（`docker inspect` Size 177,582,258 字节＝**169.36 MiB**）；**热构建 0.6 s**（D-1／D-8，有归档）、**冷构建两个合法值**：2026-10-30 基线 **1.720 s**（D-9 `--no-cache` 有归档；原记 2.2 s **无归档**，已由部署线补采更正）、2026-10-31 重建版 **3,662 ms**（`deploy/evidence/raw/image-rebuild-n1n4/build-timing.txt`）；容器启动到 `/healthz` 200 **0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值）**（原记上限 1.01 s 无归档）；运行内存 **14.45–17.08 MiB**（原记两端 14.41／17.86 MiB 无归档；**本架构 Agent 独立复测 14.71 MiB**，落在区间内）；CPU 0.01%；容器内 `/validate` 与本机纯函数**逐字节一致**；非 root（uid 10001）。**交付镜像已于 2026-10-31 01:13:59 重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`（177,918,474 字节＝169.676 MiB），`/healthz` 规则哈希 `1f389dad…` 与本机一致 | 镜像仓库推送、多副本、编排（K8S 不采用）、云主机部署 |
+| **Docker**（可复现打包） | **已采用（实测）** | 镜像 `giftwise-validator:latest` **重建前基线** 178 MB 十进制（`docker inspect` Size 177,582,258 字节＝**169.36 MiB**）；**热构建 0.6 s**（D-1／D-8，有归档）、**冷构建两个合法值**：2026-10-30 基线 **1.720 s**（D-9 `--no-cache` 有归档；原记 2.2 s **无归档**，已由部署线补采更正）、2026-10-31 重建版 **3,662 ms**（`deploy/evidence/raw/image-rebuild-n1n4/build-timing.txt`）；容器启动到 `/healthz` 200 **0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值）**（原记上限 1.01 s 无归档）；运行内存 **14.45–17.08 MiB**（原记两端 14.41／17.86 MiB 无归档；**本架构 Agent 独立复测 14.71 MiB**，落在区间内）；CPU 0.01%；容器内 `/validate` 与本机纯函数**逐字节一致**；非 root（uid 10001）。**交付镜像已于 2026-10-31 01:13:59 重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`（177,918,474 字节＝169.676 MiB），`/healthz` 规则哈希 `1f389dad…` 与本机一致 | 镜像仓库推送、多副本、编排（K8S 不采用）、云主机部署 |
 | **独立规则 API**（`deploy/server.py`） | **已存在，已容器化，未部署** | `/healthz` 200、`/validate` 200 且与纯函数逐字段一致、400／404／413 正确；localhost 往返 p50 12.5 ms；**容器内 `/validate` 与本机逐字节一致（已实测）** | 云端部署、反向代理、并发治理、TLS、鉴权 |
 | **UCloud UHost**（托管） | **未采用，未采购** | 无：`publish-to-uhost.ps1` **从未上传** | 实例、EIP、安全组、费用 |
 | **Kubernetes** | **明确不采用（当前）** | 无，且**未做任何压测** | — |
@@ -422,7 +422,7 @@ flowchart TD
 | --- | --- | --- | --- | --- | --- |
 | 1 | **工具调用失败** | `DIFY_NOT_CONFIGURED`、`DIFY_NOT_PUBLISHED`、`DIFY_HTTP_ERROR`、`DIFY_BAD_RESPONSE`、`DIFY_REQUEST_FAILED`；独立 API 侧 `INVALID_PAYLOAD`／`NOT_FOUND`／`REQUEST_TOO_LARGE` | 明确报错并**不采用该次输出**；**绝不静默切回模拟再标成真实成功** | 中文"真实 Dify 调用未成功，未生成任何候选……" | **E2**（代码实现完整，`dify.mjs` 从未成功调用过一次）；独立 API 为 **E1** |
 | 2 | **模型输出异常** | `INVALID_JSON`（损坏／非严格 JSON／重复键／非法常量）、`INVALID_TYPE`、`MISSING_FIELD`、`INVALID_CANDIDATE_COUNT`、`INVALID_CANDIDATE_ID`、`DUPLICATE_CANDIDATE_CONTENT`、`UNKNOWN_FACT_REF` | 受控解析错误，**不修补、不剥离 Markdown、不静默修复 JSON**；额度未用则进入一次修订，重复失败即停止 | 中文失败原因 + 失败项不可选 | **E1**（规则与包装层；`case4 损坏 JSON` 已在真实 Dify 跑通"进入一次修订"） |
-| 3 | **超时** | 接入层 `DIFY_TIMEOUT`（`DIFY_TIMEOUT_MS` 默认 60000）；前端 `CLIENT_TIMEOUT_MS` 20000 → 中文"超时"状态；Dify 节点级 `elapsed_time` | 按超时处理，**不采用该次输出**；**超时同样消耗修订额度、不回滚** | 中文"暂时无法完成检查，请稍后重试"；不得伪装为已校验 | **E2**（`dify.mjs` 超时分支已实现未实测；`demo: "slow"` 45 s 故障注入用于演示超时，**未实测**） |
+| 3 | **超时** | 接入层 `DIFY_TIMEOUT`（`DIFY_TIMEOUT_MS` 默认 60000）；前端 `CLIENT_TIMEOUT_MS` 20000 → 中文"超时"状态；Dify 节点级 `elapsed_time` | 按超时处理，**不采用该次输出**；**超时同样消耗修订额度、不回滚** | 中文"暂时无法完成检查，请稍后重试"；不得伪装为已校验 | **E2**（`dify.mjs` 超时分支已实现未实测；`demo: "slow"` 45 s 故障注入用于演示超时，`dify.mjs` 的 `DIFY_TIMEOUT` 分支**仍未实测**；而 `demo: "slow"` 45 s 故障注入**已经接入层 HTTP 冒烟第 12 项实测**（客户端 3 s 中止住该请求并断言通过，见 `web/tools/smoke-http.mjs:178-184` 与 `docs/pm-reviews/web-verification-2026-10-30/4-http-smoke.txt`；冒烟 59/59 有归档）） |
 | 4 | **重试策略** | 自动**业务修订**：`repairable` 标志 + `repair_count ∈ {0,1}`；基础设施重试：**默认关闭** | ① 业务修订**全局合计最多一次**（跨推荐与呈现）；② 基础设施层**不自动重试**（避免重复计费与重复消耗额度）；③ 结果不确定时**保守占用额度** | 报告中显示"已用自动修订次数：N / 1" | **E1**（规则与包装层、`REPAIR_NOT_ALLOWED`）；**接入层真实 Dify 路径当前不会触发自动修订**（`pipeline.mjs` 的 `repairable` 仅在 mock 模式计算）——**这是已知实现缺口，见 §9** |
 | 5 | **状态恢复** | 任务态在 `store.mjs`；无持久化 | 进程内快照丢失 → **只能重新推荐**，不假装可恢复；选择幂等；用户输入可重放 | 未知运行 ID → 404；旧任务过期 → 重新输入 | **E2**（内存实现 + TTL/条数上限）；持久化恢复 **E3 未实现** |
 | 6 | **人工介入机制** | 无可信快照时的受控路径 | 受控操作员从**真实运行记录**带入原始数据，在**可信执行端重检**；**只能标记为演示步骤**，不得声称网页闭环完成 | 明确标注"人工衔接/演示步骤" | **E3/E2 之间**：机制已在契约中冻结（`workflow-spec.md` §选择与呈现），**产品侧未实现** |
@@ -432,7 +432,7 @@ flowchart TD
 - **不确定性一律向下取整为"未通过"**：宁可让用户重选，也不能放行未验证内容（SC-9）。
 - **额度即状态**：修订额度是不可回滚的状态，防止"失败换额度"（SC-7）。
 - **重试只发生在业务层且只有一次**，基础设施层不自动重试——因为模型调用可能已经计费，盲目重试会造成**成本不可解释**。
-- **错误码分层且稳定**：适配层 `INTAKE_*`、规则层（18 码）、包装层（`REPAIR_NOT_ALLOWED`／`PASSED_CANDIDATE_CHANGED`／`WORKFLOW_INPUT_ERROR`）、接入层 `DIFY_*`、传输层 HTTP 码。**用户可见文案为中文，机器码不翻译**。
+- **错误码分层且稳定**：适配层 `INTAKE_*`、规则层（**19 码**）、包装层（`REPAIR_NOT_ALLOWED`／`PASSED_CANDIDATE_CHANGED`／`WORKFLOW_INPUT_ERROR`）、接入层 `DIFY_*`、传输层 HTTP 码。**用户可见文案为中文，机器码不翻译**。
 
 ### 6.3 未实现分支（必须显式标注，避免被读作已具备）
 
@@ -467,7 +467,7 @@ flowchart TD
 | Dify 工作流服务端耗时（注入轮·无模型） | **0.587–0.888 s**（5 例） | WF-003 §3.4；**不可当作业务延迟** |
 | N1 Code 节点耗时 | **0.0667–0.2377 s**（5 次） | 同上 |
 | 模型 token 与调用次数（真实 DeepSeek 轮） | **主批次 34,127 tokens / 10 次调用**（23,704 + 7,396 + 3,027）；**累计 38,326 tokens / 13 次调用** | WF-003 §4.5；服务端 `workflow_finished.total_tokens`；模型 `deepseek-v4-flash` |
-| 模型段延迟（真实 DeepSeek 轮） | N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 7 个 Code 节点）**5.2–8.9 s** | WF-003 §4.7；6 次真实运行 |
+| 模型段延迟（真实 DeepSeek 轮） | N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 **5 个 Code 节点 + 2 个 LLM 节点**）**5.2–8.9 s** | WF-003 §4.7；6 次真实运行 |
 | 确定性检查的模型用量 | **0 Tokens**（注入轮 5 例、纯 Code 节点） | 规则在 Code 节点内执行，不消耗模型用量 |
 | 成本 | **`not_measured`** | 无计费即无费率依据，**不填 0** |
 
@@ -504,7 +504,7 @@ flowchart TD
 > **生成物哈希时点说明（2026-10-31 02:16 由 web 接入层线追加）**：下面这段是该时点的**逐字转录**，其中
 > `artifacts_sha256`（`code_node.py=67f2d200…` 等 5 个）与 `sources_sha256.rules.py=4782255b…` 都是
 > **该时点的历史值，按纪律保留不改写**。2026-10-31 02:16 `workflow/verify_local.py`（经 `tools/verify_all.py`
-> 的 probe46 调用）以当时源码重建了 `workflow/generated/*`，**现行真值**见 `workflow/generated/manifest.json`：
+> 的 probe46 调用）以当时源码重建了 `workflow/generated/*`，**现行真值**见 `workflow/generated/manifest.json`：（该目录被 `workflow/tools/.gitignore`＝`*` 整体排除，故**交付副本中不存在**）
 > `sources_sha256.rules.py=1f389dad…`；`artifacts_sha256`：`code_node.py=4df8b4e3…`、`intake_node.py=e040687a…`、
 > `check_node.py=a44653cd…`、`recheck_node.py=2844a4f0…`、`report_node.py=7acf9555…`。
 > 变化原因是这次重建把 `validator/rules.py` 的请求侧范围校验（`budget∈[1,10000]`、`days≤365`）**内嵌进了生成节点**
@@ -571,6 +571,8 @@ $ python .tmp/render_mermaid.py        # 本机 Chrome(headless) + mermaid 11
 [PASS] observability-flow.mmd  -> SVG 36790 字节
 [PASS] system-architecture.mmd -> SVG 76751 字节
 渲染校验结果：3 通过 / 0 失败（共 3 张）
+
+> **2026-10-31 时点注**：上列为 2026-10-30 首次渲染的字节数；`docs/architecture/rendered/` 现行文件为 failure-recovery.svg **89,748**、observability-flow.svg **37,373**、system-architecture.svg **78,019** 字节，另有第 4 个产物 `system-architecture-competition.png`（350,585 B），故「共 3 张」应读作「3 个 mermaid 源」。
 ```
 
 渲染产物见 [`docs/architecture/rendered/`](architecture/rendered/)（SVG，可直接放入 PPT）。判定标准：渲染后 DOM 中出现 `<svg>` 且不含 mermaid 语法错误或错误容器。
@@ -596,7 +598,7 @@ $ curl .../healthz   → http=200
 $ curl -s -X POST .../validate  （真实 request_json + candidates_json）
   → http=200；容器响应 271 字节；与本机 validator.rules.validate 逐字节一致 = True；status=passed
 $ docker exec gw-arch-verify id          → uid=10001(giftwise) gid=10001(giftwise)   ← 非 root 复现
-$ docker run --rm --entrypoint /usr/bin/find … /app | wc -l  → 9                     ← 「9 行文件树」复现
+$ docker run --rm --entrypoint /usr/bin/find … /app | wc -l  → 9                     ← 「9 行文件树」复现（**2026-10-31 口径注**：I-1 修 `.pyc` 后曾为 6 行；`COPY deploy /app/deploy` 后可观测入口入镜像，交付镜像 `/app` 计数已变，见本页 §10 的现行注）
 $ docker run --rm --entrypoint /bin/sh … 'grep -rIl -E "sk-|API_KEY=|password=" /app'  → 命中 0
 $ docker stats --no-stream gw-arch-verify → 14.71MiB / 7.618GiB | 0.01%              ← 落在文档区间内
 $ docker rm -f gw-arch-verify           → 已清理（8899 不再响应）
