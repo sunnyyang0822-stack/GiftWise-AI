@@ -1,0 +1,79 @@
+# 检查：http_smoke
+# 最终判定：PASS
+# 尝试记录：第1次 PASS（http_smoke.attempt1.out）
+# 本文件 = 最终尝试（http_smoke.attempt1.out）的内容副本；各次尝试的原始输出独立保留，未被覆盖。
+检查: http_smoke
+分组: fast
+说明: HTTP 冒烟 59 项
+开始: 2026-10-31T00:46:50.721932+08:00
+尝试: 第 1 次
+
+==============================================================================
+## HTTP 冒烟（59 项；复用已在监听的接入层）
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/smoke-http.mjs   [env: GW_BASE=http://127.0.0.1:8787]
+## 退出码: 0
+## 判定: 退出码 0，且命中 1 条关键输出
+==============================================================================
+PASS  GET /api/config 返回 200
+PASS  关系为冻结 8 项且顺序含 partner/pursuit 在前
+PASS  界面不出现「同事」
+PASS  恋人/追求对象文案各自独立
+PASS  兴趣 12 / 风格 7 / 禁忌 6
+PASS  预算区间 5 / 时间区间 4
+PASS  首版仅 CNY 且全局修订上限 1
+PASS  模拟模式标识可见
+PASS  追求对象契约开关随配置返回
+PASS  配置接口不含任何密钥字段
+PASS  GET / 返回中文首页
+PASS  首页含模拟数据标识脚本入口
+PASS  派生字段被 INTAKE_UNKNOWN_FIELD 拒绝
+PASS  被拒时不返回派生请求
+PASS  预算写成区间被拒（不静默取值）
+PASS  非 CNY 被拒且不换汇
+PASS  待澄清禁忌被要求澄清而非忽略
+PASS  推荐返回 200 且恰好三个候选
+PASS  三候选思路互不相同
+PASS  推荐阶段 selected_candidate_id 为 null
+PASS  全部可选、修订 0 / 剩余 1
+PASS  关系两层字段正确
+PASS  只有 confirmed 兴趣进入事实
+PASS  inferred 兴趣单独存为推断
+PASS  每个候选含费用/币种/天数/理由/事实/推断/未知/检查结果
+PASS  business_data_verification 为 not_verified
+PASS  未选择前呈现阶段零调用
+PASS  报告带模拟标识
+PASS  伪造候选 ID 被拒
+PASS  空选择被拒且不自动替选
+PASS  无推荐记录时返回 404（空状态可解释）
+PASS  呈现返回 200 / completed
+PASS  四段顺序为 风格配色→包装→贺卡装饰→赠送
+PASS  四段标题带 ①②③④
+PASS  追求对象话术低压力
+PASS  复核：总费用=原价+新增
+PASS  复核：总费用不超预算、天数不超可用
+PASS  复核：禁忌类别与字面词都参与
+PASS  复核通过且仍标 not_verified
+PASS  重复选择幂等且对调用方可观察
+PASS  小预算触发一次自动修订
+PASS  修订后候选落在预算内
+PASS  额度已用完时呈现失败不二次修订（409）
+PASS  失败原因含 OVER_BUDGET 与 REPAIR_LIMIT_REACHED
+PASS  失败时不展示为可执行方案（零分段）
+PASS  新运行额度完好
+PASS  呈现阶段可用唯一一次修订并复核通过
+PASS  修订前有可解释的首次失败原因
+PASS  修订后总费用回到预算内
+PASS  部分通过：失败项不在可选列表
+PASS  选择失败项被拒（CANDIDATE_NOT_PASSED）
+PASS  模型输出损坏：error 状态、零可选、不伪装完成
+PASS  恋人关系字段独立
+PASS  恋人与追求对象的贺卡/话术完全不同
+PASS  未知兴趣提交为空数组且不生成事实
+PASS  未知兴趣仍能给出三个低风险方向
+PASS  超时路径：客户端可中止并显示中文超时状态
+PASS  GET /api/runs/:id 返回可信状态
+PASS  运行记录不含密钥或内部提示
+
+合计 59 项检查，失败 0 项；目标服务 http://127.0.0.1:8787
+
+[本工具] 本次尝试判定：PASS（退出码 0，且命中 1 条关键输出）；耗时 3.36s

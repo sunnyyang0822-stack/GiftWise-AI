@@ -163,6 +163,17 @@ function request(request, errors) {
   const availableDays = Object.prototype.hasOwnProperty.call(request, "available_days")
     ? days(request.available_days, "request.available_days", errors)
     : null;
+  // 请求侧范围**只在调用点**检查：amount()/days() 与候选侧共用，范围约束不得进入共用函数
+  // （对齐 validator/rules.py:131-134 的同名注释与判定位置）。
+  // amount() 返回**分**（BigInt），故区间以分书写：1 元 = 100n，10000 元 = 1000000n。
+  // 仅在 amount()/days() 成功（非 null）时判定，与 Python 的 `is not None` 守卫一致；
+  // 放在货币检查之前，以保持与 Python 完全相同的错误顺序。
+  if (budget !== null && (budget < 100n || budget > 1000000n)) {
+    error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间");
+  }
+  if (availableDays !== null && availableDays > 365) {
+    error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间");
+  }
   if (stringValue(request.currency) && request.currency !== "CNY") {
     error(errors, "UNSUPPORTED_CURRENCY", "request.currency", "首版仅支持 CNY，不执行换汇");
   }

@@ -6,6 +6,8 @@
 - **不导入** `tests/test_validator.py`、`tests/test_cases.json`（规则开发 Agent 自测夹具）。
 - 使用本目录自建的 `cases.json` 冻结夹具，不读取其他线的例子文件作为输入。
 - 全流程 `model_calls = 0`：不调用任何模型、网络或部署服务。
+- C5-02 的期望口径来自生成器 `workflow/build_code_node.py`：`manifest.json` 只存摘要且该摘要 EOL 敏感，
+  无法只靠摘要做换行无关比较（见 `normalize_eol`／`rebuild_generated_artifacts` 注释）。
 
 运行：
     python -m unittest discover -s tests/acceptance/stage_c -v
@@ -14,6 +16,7 @@
 """
 
 import copy
+import hashlib
 import json
 import os
 import subprocess
@@ -44,6 +47,62 @@ def dump(value):
 
 def codes(result):
     return sorted({e.get("code") for e in (result.get("errors") or [])})
+
+
+def normalize_eol(raw):
+    """哈希／比对前把 CRLF、CR 统一成 LF。
+
+    哈希按 LF 归一化比较，避免 CRLF 检出造成假红（2026-10-31，PM 裁决）：
+    同一个文件在仓库里是 LF、Windows 检出后是 CRLF，逐字节摘要必然不同，但内容并没有差别。
+    归一化只抹掉换行形态，任何真实内容改动仍会改变摘要并使断言继续 FAIL。
+    """
+    return raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def rebuild_generated_artifacts(recorded_sources):
+    """按 manifest 记录的 `sources_sha256` 反推生成时的源码字节形态，再用权威生成器重算生成物。
+
+    哈希按 LF 归一化比较，避免 CRLF 检出造成假红（2026-10-31，PM 裁决）：`artifacts_sha256`
+    是生成器在 CRLF 工作区上算出的 EOL 敏感摘要（内容是 mixed EOL），只归一化文件一侧永远对不上；
+    而 manifest 只存摘要不存内容，所以改成"真的读两份内容比对"：先在临时目录按记录摘要锁定源码
+    字节（LF／CRLF／原样三选一），用 `workflow/build_code_node.py` 重算期望内容与期望摘要，
+    再由调用方与磁盘内容在 LF 归一化后逐字节比较。真实差异（源码或生成物改一个字符）仍会 FAIL。
+    """
+    import contextlib
+    import importlib.util
+    import io
+    import shutil
+    import tempfile
+
+    spec = importlib.util.spec_from_file_location(
+        "_stage_c_build_code_node", ROOT / "workflow" / "build_code_node.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not recorded_sources or set(recorded_sources) != set(module.SOURCES):
+        return None
+    tmp = Path(tempfile.mkdtemp(prefix="stage-c-regen-"))
+    for name, want in recorded_sources.items():
+        source = ROOT / name
+        raw = source.read_bytes() if source.is_file() else None
+        variants = [] if raw is None else [
+            raw, normalize_eol(raw), normalize_eol(raw).replace(b"\n", b"\r\n")]
+        matching = [v for v in variants if hashlib.sha256(v).hexdigest() == want]
+        if not matching:  # 锁不上记录摘要 ⇒ 源码真实漂移，不放行
+            shutil.rmtree(tmp, ignore_errors=True)
+            return None
+        target = tmp / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(matching[0])
+    module.ROOT = tmp
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            module.build()
+    except Exception:  # 生成器本身跑不动 ⇒ 不留下临时目录，异常照常抛出
+        shutil.rmtree(tmp, ignore_errors=True)
+        raise
+    generated = tmp / "workflow" / "generated"
+    return {"root": tmp, "dir": generated,
+            "manifest": json.loads((generated / "manifest.json").read_text(encoding="utf-8"))}
 
 
 def intake(relation="pursuit", **overrides):
@@ -163,31 +222,53 @@ class C2ContractGaps(Recorder):
         self.observe("C2-02", "pursuit 与 partner 并列互斥且都可通过 intake", {}, expected, actual, ok)
 
     def test_c2_03_pursuit_was_rejected_before_the_change(self):
-        """用 HEAD 已提交版本的 RELATIONS 复现变更前被拒的行为，证明 PM 的 INTAKE_UNKNOWN_LABEL 声明。"""
-        tmp = Path(tempfile.mkdtemp(prefix="qa-head-labels-"))
-        target = tmp / "head-labels.py"
-        with open(target, "w", encoding="utf-8") as fh:
-            proc = subprocess.run(["git", "show", "HEAD:workflow/labels.py"], cwd=ROOT, stdout=fh,
-                                  stderr=subprocess.DEVNULL)
-        if proc.returncode != 0:
-            self.skipTest("无法从 git 读取 HEAD 版本 labels.py")
-        namespace = {}
-        exec(compile(target.read_text(encoding="utf-8"), "HEAD:workflow/labels.py", "exec"), namespace)
-        head_relations = namespace["RELATIONS"]
+        """用**逐字节固定的历史夹具**复现变更前被拒的行为，证明 PM 的 INTAKE_UNKNOWN_LABEL 声明。
+
+        安全说明：不挂 `git show HEAD`——`HEAD` 是会移动的引用，历史基线挂在其上会在他人提交后失效
+        （本用例就因此从通过变为失败过）。改为 `fixtures/labels_before_pursuit.py`，
+        出处与 sha256 见 `fixtures/PROVENANCE.md`，并断言该夹具哈希未被改动。
+        """
+        fixture_sha256_recorded = "333ad9761d9278c7421c0cdd1c8d43ebbef7b6a6c164dfc54896ec653520d916"
+        fixture = Path(__file__).with_name("fixtures") / "labels_before_pursuit.py"
+        raw = fixture.read_bytes()
+        # 哈希按 LF 归一化比较，避免 CRLF 检出造成假红（2026-10-31，PM 裁决）：记录值 333ad976…
+        # 是仓库字节（LF）的摘要，同一夹具在 Windows 检出后是 CRLF（1546 B），逐字节摘要必然不同。
+        # 归一化只抹掉换行形态；夹具真实内容被改动时摘要仍会变化，C2-03 继续 FAIL。
+        normalized = normalize_eol(raw)
+        fixture_sha256 = hashlib.sha256(normalized).hexdigest()
+        namespace: dict = {}
+        exec(compile(normalized.decode("utf-8"), str(fixture), "exec"), namespace)
+        before_relations = namespace["RELATIONS"]
+
         import workflow.intake as intake_module
+        import workflow.labels as labels_module
         original = intake_module.RELATIONS
         try:
-            intake_module.RELATIONS = head_relations
+            intake_module.RELATIONS = before_relations
             result = adapt_intake(dump(intake("pursuit")))
         finally:
             intake_module.RELATIONS = original
-            target.unlink(missing_ok=True)
-            os.rmdir(tmp)
-        actual = {"head_relations_has_pursuit": "pursuit" in head_relations, "status": result["status"], "codes": codes(result)}
-        expected = "HEAD 版本无 pursuit，提交 pursuit 得到 needs_input + INTAKE_UNKNOWN_LABEL"
-        ok = (not actual["head_relations_has_pursuit"] and actual["status"] == "needs_input"
-              and "INTAKE_UNKNOWN_LABEL" in actual["codes"])
-        self.observe("C2-03", "变更前 pursuit 确实被拒（HEAD 版本复现）", {}, expected, actual, ok)
+
+        # 漂移观察（不影响判定）：当前工作区版本是否已加入 pursuit
+        drift = {"current_has_pursuit": "pursuit" in labels_module.RELATIONS,
+                 "current_partner_text": labels_module.RELATIONS.get("partner"),
+                 "before_partner_text": before_relations.get("partner")}
+        actual = {
+            "fixture_sha256": fixture_sha256,
+            "fixture_sha256_raw": hashlib.sha256(raw).hexdigest(),
+            "fixture_sha256_as_recorded": fixture_sha256 == fixture_sha256_recorded,
+            "before_relations_has_pursuit": "pursuit" in before_relations,
+            "status": result["status"],
+            "codes": codes(result),
+            "request_json_released": result["request_json"] is not None,
+            "drift": drift,
+        }
+        expected = ("夹具 sha256（按 LF 归一化）与记录一致；固定版本无 pursuit；提交 pursuit 得到 "
+                    "needs_input + INTAKE_UNKNOWN_LABEL 且不返回可用请求")
+        ok = (actual["fixture_sha256_as_recorded"] and not actual["before_relations_has_pursuit"]
+              and actual["status"] == "needs_input" and "INTAKE_UNKNOWN_LABEL" in actual["codes"]
+              and actual["request_json_released"] is False)
+        self.observe("C2-03", "变更前 pursuit 确实被拒（逐字节固定夹具复现）", {}, expected, actual, ok)
 
     def test_c2_04_unknown_confidence_rejected(self):
         data = intake("pursuit")
@@ -531,22 +612,50 @@ class C5GeneratedNodes(Recorder):
         self.observe("C5-01", "四个 Dify 入口节点真实执行并与仓库逻辑一致", {}, expected, results, ok)
 
     def test_c5_02_manifest_matches_generated_artifacts(self):
-        import hashlib
+        import shutil
         manifest = json.loads((ROOT / "workflow/generated/manifest.json").read_text(encoding="utf-8"))
         artifacts = manifest.get("artifacts_sha256") or {}
         actual = {"format": manifest.get("format"), "entries": {}, "mismatches": []}
-        for name, expected_hash in artifacts.items():
-            path = ROOT / "workflow" / "generated" / name
-            if not path.exists():
-                actual["mismatches"].append(name + ":missing")
-                continue
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
-            actual["entries"][name] = {"expected": expected_hash, "actual": digest, "match": digest == expected_hash}
-            if digest != expected_hash:
-                actual["mismatches"].append(name)
-        expected = "manifest.format=python-source-not-dsl；5 个生成物哈希全部匹配"
-        ok = actual["format"] == "python-source-not-dsl" and not actual["mismatches"] and len(actual["entries"]) == 5
-        self.observe("C5-02", "生成物与 manifest 哈希一致（无 STALE）", {}, expected, actual, ok)
+        # 哈希按 LF 归一化比较，避免 CRLF 检出造成假红（2026-10-31，PM 裁决）：manifest 的摘要口径
+        # 由生成器在与记录源码字节形态一致的前提下重算（regen_sha256 仍与记录值逐位相等），
+        # 磁盘内容再与重算内容在 LF 归一化后逐字节比对——比只比摘要更强，真实改动仍然 FAIL。
+        regen = rebuild_generated_artifacts(manifest.get("sources_sha256") or {})
+        try:
+            if regen is None:
+                actual["mismatches"].append("manifest:sources_sha256")
+            else:
+                for name, expected_hash in artifacts.items():
+                    path = ROOT / "workflow" / "generated" / name
+                    if not path.exists():
+                        actual["mismatches"].append(name + ":missing")
+                        continue
+                    raw = path.read_bytes()
+                    regen_path = regen["dir"] / name
+                    regen_raw = regen_path.read_bytes() if regen_path.is_file() else None
+                    entry = {
+                        "expected": expected_hash,
+                        "actual": hashlib.sha256(raw).hexdigest(),
+                        "actual_lf": hashlib.sha256(normalize_eol(raw)).hexdigest(),
+                        "regen_sha256": None if regen_raw is None else hashlib.sha256(regen_raw).hexdigest(),
+                        "content_equal_after_lf": (regen_raw is not None
+                                                   and normalize_eol(raw) == normalize_eol(regen_raw)),
+                    }
+                    entry["match"] = (entry["content_equal_after_lf"]
+                                      and entry["regen_sha256"] == expected_hash)
+                    actual["entries"][name] = entry
+                    if not entry["match"]:
+                        actual["mismatches"].append(name)
+                actual["manifest_hash_consistent"] = (
+                    regen["manifest"].get("artifacts_sha256") == artifacts)
+            expected = ("manifest.format=python-source-not-dsl；5 个生成物摘要与 manifest 记录一致，"
+                        "且与生成器按同一源码字节形态重算的内容在 LF 归一化后逐字节相同")
+            ok = (actual["format"] == "python-source-not-dsl" and regen is not None
+                  and len(actual["entries"]) == 5 and not actual["mismatches"]
+                  and actual.get("manifest_hash_consistent") is True)
+            self.observe("C5-02", "生成物与 manifest 哈希一致（无 STALE）", {}, expected, actual, ok)
+        finally:
+            if regen is not None:
+                shutil.rmtree(regen["root"], ignore_errors=True)
 
     def test_c5_03_node_entrypoint_rejects_empty_inputs(self):
         check_main = gen_node("check_node.py")

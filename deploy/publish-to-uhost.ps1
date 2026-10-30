@@ -43,7 +43,13 @@ $scpArgs = @("-i", $KeyPath, "-P", "$SshPort")
 $files = @(
     @{ Local = (Join-Path $repoRoot "validator/rules.py"); Remote = "$sshTarget`:$RemoteDir/validator/rules.py" },
     @{ Local = (Join-Path $repoRoot "deploy/server.py");   Remote = "$sshTarget`:$RemoteDir/deploy/server.py" },
-    @{ Local = (Join-Path $repoRoot "deploy/Dockerfile");  Remote = "$sshTarget`:$RemoteDir/deploy/Dockerfile" }
+    @{ Local = (Join-Path $repoRoot "deploy/Dockerfile");  Remote = "$sshTarget`:$RemoteDir/deploy/Dockerfile" },
+    # N-1 fix (2026-10-31): deploy/Dockerfile now does "COPY deploy /app/deploy", so the image
+    # built on the remote host must also receive the two observability modules; otherwise
+    # "observability entrypoint shipped inside the image" would not hold for this upload path.
+    # NOTE: keep this file pure ASCII - PowerShell 5.1 reads it as ANSI.
+    @{ Local = (Join-Path $repoRoot "deploy/observability.py");      Remote = "$sshTarget`:$RemoteDir/deploy/observability.py" },
+    @{ Local = (Join-Path $repoRoot "deploy/observable_server.py");  Remote = "$sshTarget`:$RemoteDir/deploy/observable_server.py" }
 )
 
 # Publish the container port explicitly as 0.0.0.0:HOSTPORT:8000. The previous revision had

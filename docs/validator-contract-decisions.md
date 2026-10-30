@@ -45,7 +45,7 @@
 
 允许 `0`、`0.0`、`0.00`、`12`、`12.3`、`12.30`；零预算或零估算允许，但不等于证明现实中免费，正估算仍不能超过零预算。
 
-> **2026-10-30 修订（CONTRACT-001 裁决，尚未实现）**：新增**请求预算取值范围 [1, 10000]（含端点）**。`request.budget_amount` 为 `0`/`0.00`、负数或超过 10000 的值一律拒绝，错误码复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。本项**修订**上一段的「零预算允许」：零预算不再可作为请求预算提交。但**候选 `estimated_total` 仍允许 `0`**（零估算不等于证明免费，正估算仍不能超过零预算），上述格式规则对请求与候选两侧继续同一套。当前 `validator/rules.py` 只做格式校验、**无范围检查**，须由该文件线落地并补上限与上限+1 的用例。
+> **2026-10-30 修订（CONTRACT-001 裁决，已落地）**：新增**请求预算取值范围 [1, 10000]（含端点）**。`request.budget_amount` 为 `0`/`0.00`、负数或超过 10000 的值一律拒绝，错误码复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。本项**修订**上一段的「零预算允许」：零预算不再可作为请求预算提交。但**候选 `estimated_total` 仍允许 `0`**（零估算不等于证明免费，正估算仍不能超过零预算），上述格式规则对请求与候选两侧继续同一套。该范围已于 2026-10-30 在 `validator/rules.py:131–132`（预算）与 `:133–134`（可用天数）落地；范围只在请求侧调用点检查，**候选侧不受约束**。PM 独立探针与 329 项单元测试均通过；**测试验收线的独立边界用例尚在进行中**。
 
 拒绝前导零（如 `00`、`01.00`）、正负号（含 `-0`）、指数、千位分隔符、币种符号、全角数字、首尾空白、`.5`、`1.`、超过两位小数和 NaN/Infinity。非字符串用 `INVALID_TYPE`，不符合格式用 `INVALID_AMOUNT`，不自动修剪、换算或舍入。未知价格不能填零来代替。
 
@@ -55,7 +55,7 @@
 - 解析后的每个字段字符串最多 1,000 个 Unicode 码点（Python `len`），不适用于外层承载 JSON 的两个参数字符串。
 - 每个输入业务数组最多 20 项；`candidates` 数量仍必须恰好 3，用 `INVALID_CANDIDATE_COUNT`，不以通用列表错误取代。
 - 超出其他任一上限新增 `LIMIT_EXCEEDED`；请求侧为 `needs_input`，候选侧为 `failed`，两侧都有时采用第 1 节优先级。错误路径指向实际参数或字段，不回显完整内容。
-- **可用天数范围 [0, 365]（含端点，2026-10-30 裁决，尚未实现）**：`request.available_days` **保留 `0`**（表示当天可用准备时间），超过 365 拒绝，错误码复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。候选 `estimated_preparation_days` 仍只要求非负 JSON 整数，其与可用天数的比较由 `PREPARATION_TOO_LONG` 承担。当前 `rules.py` 的 `_days` 只校验非负、无上界，须补。
+- **可用天数范围 [0, 365]（含端点，2026-10-30 裁决，已落地于 `:133–134`）**：`request.available_days` **保留 `0`**（表示当天可用准备时间），超过 365 拒绝，错误码复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。候选 `estimated_preparation_days` 仍只要求非负 JSON 整数，其与可用天数的比较由 `PREPARATION_TOO_LONG` 承担。范围检查加在请求侧调用点，**未下沉**到与候选侧共用的 `_days`。
 - 所有明确边界都要测试上限及上限加一。Dify 实际平台若存在更低限制，后续另做兼容性检查，不宣称该应用上限已经过沙箱实测。
 
 ## 交付与测试口径
@@ -68,25 +68,27 @@ Issue #6 CONTRACT-001 用 AST 静态提取加逐码动态探针清点，`validat
 
 | 错误码 | 代码位置 | 触发条件 | 所属状态 |
 | --- | --- | --- | --- |
-| `INVALID_TYPE` | `rules.py:33`、`:74`、`:81`、`:90`、`:102`、`:135`、`:140`、`:166`、`:177`、`:188`、`:214`、`:222` | 参数非字符串、字段类型错误、标签数组元素非字符串、候选 `tags` 为空数组 | 参数/请求侧 `needs_input`，候选侧 `failed` |
+| `INVALID_TYPE` | `rules.py:33`、`:74`、`:81`、`:90`、`:102`、`:140`、`:145`、`:171`、`:182`、`:193`、`:219`、`:227` | 参数非字符串、字段类型错误、标签数组元素非字符串、候选 `tags` 为空数组 | 参数/请求侧 `needs_input`，候选侧 `failed` |
 | `INVALID_JSON` | `rules.py:38`、`:47` | 无法编码为合法 UTF-8、损坏 JSON、重复键、非标准常量（含嵌套过深触发解析递归上限） | `error` |
-| `LIMIT_EXCEEDED` | `rules.py:41`、`:57`、`:60` | 参数字符串超 32768 UTF-8 字节、字段字符串超 1000 码点、业务数组超 20 项；**以及数值超范围**（`request.budget_amount` ∉ [1, 10000]、`request.available_days` > 365，2026-10-30 裁决，尚未实现，见第 5、6 节） | 请求侧 `needs_input`，候选侧 `failed` |
-| `MISSING_FIELD` | `rules.py:69`、`:218` | `request` 或候选缺必填字段、批次缺 `candidates` | 请求侧 `needs_input`，候选侧 `failed` |
+| `LIMIT_EXCEEDED` | `rules.py:41`、`:57`、`:60`、`:132`、`:134` | 参数字符串超 32768 UTF-8 字节、字段字符串超 1000 码点、业务数组超 20 项；**以及数值超范围**（`request.budget_amount` ∉ [1, 10000]、`request.available_days` > 365，2026-10-30 已在 `:132`／`:134` 落地，见第 5、6 节） | 请求侧 `needs_input`，候选侧 `failed` |
+| `MISSING_FIELD` | `rules.py:69`、`:223` | `request` 或候选缺必填字段、批次缺 `candidates` | 请求侧 `needs_input`，候选侧 `failed` |
 | `INVALID_AMOUNT` | `rules.py:93` | 金额非 ASCII 全匹配格式（见第 5 节） | 同字段所属侧 |
 | `INVALID_REQUEST` | `rules.py:121` | `request` 根节点非对象 | `needs_input` |
-| `UNSUPPORTED_CURRENCY` | `rules.py:131` | `request.currency` 非 `CNY`（大小写敏感） | `needs_input` |
-| `DUPLICATE_ID` | `rules.py:146`、`:233` | `request.facts` 的 ID 重复、候选 ID 重复（适配层标签重复用同一码） | 请求侧 `needs_input`，候选侧 `failed` |
-| `UNKNOWN_TAG` | `rules.py:152`、`:191` | 请求 `forbidden_tags` 或候选 `tags` 含词表外字符串 | 请求侧 `needs_input`，候选侧 `failed` |
-| `INVALID_CANDIDATE_ID` | `rules.py:181` | 候选 ID 为字符串但不是 `c1`/`c2`/`c3`（含空串、大小写变体） | `failed` |
-| `OVER_BUDGET` | `rules.py:195` | 候选估算总额超过请求预算（`>`，含零预算配正估算） | `failed` |
-| `PREPARATION_TOO_LONG` | `rules.py:197` | 候选估算准备天数超过可用天数（`>`） | `failed` |
-| `CURRENCY_MISMATCH` | `rules.py:199` | 候选币种与请求币种不一致 | `failed` |
-| `FORBIDDEN_TAG` | `rules.py:202` | 候选 `tags` 命中请求 `forbidden_tags`（标准化后匹配） | `failed` |
-| `UNKNOWN_FACT_REF` | `rules.py:205` | 候选 `fact_refs` 引用了原始请求不存在的事实 ID | `failed` |
-| `FORBIDDEN_TERM` | `rules.py:208` | 候选文本命中请求 `forbidden_terms` 字面词 | `failed` |
-| `INVALID_CANDIDATE_COUNT` | `rules.py:225` | 候选数量不是恰好 3；**不**以通用列表错误取代 | `failed` |
-| `DUPLICATE_CANDIDATE_CONTENT` | `rules.py:242` | 不同候选的 `name`+`description` 标准化二元组相同（见第 4 节） | `failed` |
-| `INTERNAL_ERROR` | `rules.py:271` | 未预期执行异常兜底，`path` 为 `$`，不暴露堆栈 | `error` |
+| `UNSUPPORTED_CURRENCY` | `rules.py:136` | `request.currency` 非 `CNY`（大小写敏感） | `needs_input` |
+| `DUPLICATE_ID` | `rules.py:151`、`:238` | `request.facts` 的 ID 重复、候选 ID 重复（适配层标签重复用同一码） | 请求侧 `needs_input`，候选侧 `failed` |
+| `UNKNOWN_TAG` | `rules.py:157`、`:196` | 请求 `forbidden_tags` 或候选 `tags` 含词表外字符串 | 请求侧 `needs_input`，候选侧 `failed` |
+| `INVALID_CANDIDATE_ID` | `rules.py:186` | 候选 ID 为字符串但不是 `c1`/`c2`/`c3`（含空串、大小写变体） | `failed` |
+| `OVER_BUDGET` | `rules.py:200` | 候选估算总额超过请求预算（`>`，含零预算配正估算） | `failed` |
+| `PREPARATION_TOO_LONG` | `rules.py:202` | 候选估算准备天数超过可用天数（`>`） | `failed` |
+| `CURRENCY_MISMATCH` | `rules.py:204` | 候选币种与请求币种不一致 | `failed` |
+| `FORBIDDEN_TAG` | `rules.py:207` | 候选 `tags` 命中请求 `forbidden_tags`（标准化后匹配） | `failed` |
+| `UNKNOWN_FACT_REF` | `rules.py:210` | 候选 `fact_refs` 引用了原始请求不存在的事实 ID | `failed` |
+| `FORBIDDEN_TERM` | `rules.py:213` | 候选文本命中请求 `forbidden_terms` 字面词 | `failed` |
+| `INVALID_CANDIDATE_COUNT` | `rules.py:230` | 候选数量不是恰好 3；**不**以通用列表错误取代 | `failed` |
+| `DUPLICATE_CANDIDATE_CONTENT` | `rules.py:247` | 不同候选的 `name`+`description` 标准化二元组相同（见第 4 节） | `failed` |
+| `INTERNAL_ERROR` | `rules.py:276` | 未预期执行异常兜底，`path` 为 `$`，不暴露堆栈 | `error` |
+
+> **行号基准（截至 2026-10-31 00:09 复核）**：本表对应 `validator/rules.py` **278 行**（`splitlines` 计数）版本。规则线新增请求侧范围校验共 5 行（`:130–134`，含 1 行注释），因此**第 130 行之后的行号较此前版本整体 +5**，第 130 行之前（`:33`–`:121`）不受影响。`LIMIT_EXCEEDED` 的既有三处（`:41`、`:57`、`:60`）未位移，该次改动另在 `:132`、`:134` 新增两处范围拒绝点，**已列入本表**。行号漂移由探针 `probe_doc_parity.py` 自动对账（当前 19 个码零偏差）。**注意**：`workflow/workflow-spec.md:96` 内另有 `validator/rules.py:181`、`:242` 两处引用未随本次位移更新（实际为 `:186`、`:247`），属该文件线，已上报。
 
 工作流包装层另有 `workflow/runtime.py` 的 `REPAIR_NOT_ALLOWED`（`:40`）、`PASSED_CANDIDATE_CHANGED`（`:53`、`:55`）、`WORKFLOW_INPUT_ERROR`（`:135`），它们属于包装层而非纯校验器，已由 `workflow/workflow-spec.md:166` 记载。`workflow/tools/verify-container.py` 的 `INVALID_PAYLOAD` 属演示 HTTP 容器，不在本契约范围。
 
@@ -104,8 +106,8 @@ Issue #6 CONTRACT-001 用 AST 静态提取加逐码动态探针清点，`validat
 | `candidates` 顶层 21 项 | 用 `INVALID_CANDIDATE_COUNT`，不以通用列表错误取代 | 只出现候选类错误码，**无** `LIMIT_EXCEEDED`；`_batch` 的 `_limits` 调用有意排除 `candidates` 键 | 一致 |
 | 候选 ID 集合合法性 | 必须恰好为 `c1`/`c2`/`c3` | 逐个校验 ID 且拒绝重复，二者的组合在 3 项约束下等价于集合相等；`c1,c2,c4` → `INVALID_CANDIDATE_ID`，`c1,c2,c2` → `DUPLICATE_ID` | 一致 |
 | 重复内容标准化 | NFKC + 大小写折叠 + 空白折叠 + 首尾去空白，二元组同时相同才判重 | 全角字母/全角空格/制表符/大小写差异均正确判 `DUPLICATE_CANDIDATE_CONTENT`；仅「无空格 vs 有空格」不判重（折叠不等于删除） | 一致 |
-| 金额边界 | 第 5 节格式允许 `0`/`0.0`/`0.00`/`12`/`12.3`/`12.30`；**2026-10-30 修订**：请求预算 ∈ [1, 10000]，候选估算仍允许 0 | 裁决前实测：两侧格式判定一致；零预算配正估算 → `OVER_BUDGET`，配 `0.00` 估算 → `passed`；1000 位数字串仍 `ready`。当前**无范围检查** | ❌ 待实现：须加请求预算下界 1 与上界 10000 |
-| 零天数与 365 上界 | 第 6 节：`0` 允许（裁决保留），上界 365 | 可用 0 天 + 准备 0 天 → `passed`；+ 准备 1 天 → `PREPARATION_TOO_LONG`；`10^20` 天仍 `ready`（当前无上界） | ❌ 待实现：须加 365 上界，`0` 保持允许 |
+| 金额边界 | 第 5 节格式允许 `0`/`0.0`/`0.00`/`12`/`12.3`/`12.30`；**2026-10-30 修订**：请求预算 ∈ [1, 10000]，候选估算仍允许 0 | 请求预算 `"0"`/`"0.00"` → `needs_input` + `LIMIT_EXCEEDED`（`:132`）；`"1"`/`"10000"`/`"10000.00"` 通过；`"10000.01"`/`"10001"` → `LIMIT_EXCEEDED`；`"-1"`/`"1e3"` 等格式错仍为 `INVALID_AMOUNT`（**格式优先于范围**）；候选 `"0"`/`"0.00"` 仍 `passed` | ✅ 已落地（`:131–132`），候选侧未受影响 |
+| 零天数与 365 上界 | 第 6 节：`0` 允许（裁决保留），上界 365 | 可用 0 天 + 准备 0 天 → `passed`；`1`/`365` → `ready`；`366`/`10^20` → `LIMIT_EXCEEDED`（`:134`）；`-1`/`True` 仍 `INVALID_TYPE` | ✅ 已落地（`:133–134`），`0` 保持允许 |
 | 无法编码为合法 UTF-8 | 按 `INVALID_JSON` | 孤立代理项参数 → `error` / `INVALID_JSON` | 一致 |
 | JSON 嵌套深度 | 第 6 节未定义 | **无显式深度限制**：约 2000 层（约 12 KB）可正常解析；约 3000 层（约 18 KB）触发 `INVALID_JSON`（捕获 `RecursionError`，错误文案含「嵌套过深」）；实测上限受 32768 字节约束，与 Python 递归限制共同决定 | 需补充：深层嵌套由解析递归上限兜底并归 `INVALID_JSON`，不写死层数 |
 | 请求侧错误与候选约束 | 请求有错误时不必执行依赖它的候选约束 | 请求错误时 `context` 为 `None`，跳过预算/天数/币种/禁忌/事实引用比较，逐候选 `passed` 为 `false`；请求侧错误不参与候选比较 | 一致 |
@@ -121,3 +123,21 @@ Issue #6 复核结论：本文第 1–6 节与实现**逐条一致**，无第 7 
 | 2 | 第 2 节规定「标签非字符串属于 `INVALID_TYPE`，不归为未知标签」，适配层对非字符串元素**同时**发 `INTAKE_UNKNOWN_LABEL` 与 `INVALID_TYPE` | `hard_exclusions.tags = [1]` → 两个码；`tags = [""]` 同样双码 | **接受聚合现状**：两码如实记录，不改 `workflow/intake.py`；前端按 `errors` 数组展示，验收断言按多码编写 |
 
 此外，`workflow/intake.py` 的错误码与本文的分工已由 [intake 契约](./intake-contract.md) 承载，两文互相交叉引用。适配层不做错误去重（同一根因可产生 2–3 条错误），属其已记载且**已裁决接受**的行为。
+
+## 10. 可复现探针套件（CONTRACT-001 复核证据，已入库）
+
+本轮复核所用探针已入库，不再依赖会话临时目录；任何人可在仓库内**一条命令**复现：
+
+```bash
+python docs/test-reports/contract-001/tools/run_all.py
+```
+
+| 探针（均位于 `docs/test-reports/contract-001/tools/`） | 单独运行 | 对账内容 | 当前结果 |
+| --- | --- | --- | --- |
+| `probe_error_codes.py` | `python docs/test-reports/contract-001/tools/probe_error_codes.py` | AST 静态清点 + 逐码动态触发 | validator **19/19**、intake **9/9**、runtime **3/3** |
+| `probe_boundaries.py` | `python docs/test-reports/contract-001/tools/probe_boundaries.py` | 边界值矩阵实测（含数值范围裁决、候选侧不受约束） | 边界场景 **47/47** |
+| `probe_doc_parity.py` | `python docs/test-reports/contract-001/tools/probe_doc_parity.py` | 字段白名单、第 7 节全量清单与**行号引用**双向对账 | 双向差集为空；仅 `LIMIT_EXCEEDED` 的 `:132`／`:134` 登记为已知豁免 |
+
+脚本只读调用公开函数，**不写仓库文件、不访问网络、不调用模型**；退出码 0 表示通过、1 表示失败，可直接作为门禁使用。
+
+> **状态口径（截至 2026-10-31 00:09）**：请求侧数值范围校验已于 2026-10-30 在 `validator/rules.py` 落地（预算 [1,10000]、可用天数 [0,365]，超出复用 `LIMIT_EXCEEDED`；范围**只在请求侧调用点检查**，见 `:131–134`，**候选侧不受约束**）。PM 独立探针与 329 项单元测试均通过；**测试验收线的独立边界用例尚在进行中**。本套件 `probe_boundaries.py` 47/47 通过，`probe_doc_parity.py` 行号对账零偏差。

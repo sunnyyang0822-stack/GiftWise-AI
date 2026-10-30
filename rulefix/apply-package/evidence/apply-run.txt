@@ -1,0 +1,156 @@
+==============================================================================
+ GiftWise AI · 规则门否定语义修复落地
+ 仓库根：/c/Users/lenovo/Desktop/giftwise
+ pinned_at：2026-10-31T09:12:00+08:00
+ 开始时刻：2026-10-31T01:46:55+08:00
+==============================================================================
+
+──── [0] 预检：开工前哈希（与 manifest.pre_state 逐条核对，不符即中止、零写入） ────
+  ✅ validator/rules.py
+      期望 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+      实际 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+  ✅ tests/test_cases.json
+      期望 07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db
+      实际 07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db
+  ✅ tests/acceptance/stage_b/pinned_hashes.json
+      期望 51f8a902fb7b00f8b048d32bdd2259c17bbe6f028f43d5c6138bfab7571222b0
+      实际 51f8a902fb7b00f8b048d32bdd2259c17bbe6f028f43d5c6138bfab7571222b0
+  ✅ docs/validator-contract-decisions.md
+      期望 e49b0a4a7b07ab1b3fc1d9ac4190b4e650be5781bf1a81354554d3ed39f66f94
+      实际 e49b0a4a7b07ab1b3fc1d9ac4190b4e650be5781bf1a81354554d3ed39f66f94
+  ✅ 4 个文件全部与 manifest.pre_state 一致，可以落地
+
+──── [1] 备份：把 4 个将被触及的生产文件完整复制到 .tmp/rulefix-apply-backup ────
+  已写出 .tmp/rulefix-apply-backup/pre-state.sha256
+  ✅ 备份已校验（4/4 副本与工作区逐字节相同）；git status 快照已存 git-status-before.txt
+
+──── [2] 应用补丁：git apply rulefix/apply-package/negation-fix.diff（validator/rules.py） ────
+  ✅ validator/rules.py 已打补丁；新 sha256 = 0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800
+
+──── [3] 加用例：6 条回归用例 → tests/test_cases.json（写盘前对真实实现逐条自检） ────
+✅ 开工前哈希一致：tests/test_cases.json = 07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db
+   换行风格 = CRLF；当前用例数 = 320
+   —— 写盘前实现自检（对当前 validator 逐条复核 expected）——
+  [OK ] RF01_negation_bu_han_jiu_jing                        status=passed  all_passed=True
+  [OK ] RF02_negation_wu_jiu_in_name                         status=passed  all_passed=True
+  [OK ] RF03_negation_bu_han_jiu_lei                         status=passed  all_passed=True
+  [OK ] RF04_KNOWN_LIMIT_wu_jiu_jing_pijiu_still_rejected    status=failed  all_passed=False
+  [OK ] RF05_true_positive_red_wine_in_description           status=failed  all_passed=False
+  [OK ] RF06_true_positive_maotai_in_name                    status=failed  all_passed=False
+   落地后用例数 = 326；落地后哈希 = a68e315551ad46116cfe8e654340f372d55f79d86db2fddab3fe89f4349fdded
+✅ 已写入 tests/test_cases.json（+6 条用例，字节哈希 a68e315551ad46116cfe8e654340f372d55f79d86db2fddab3fe89f4349fdded）
+
+──── [4] 重钉基线：tests/acceptance/stage_b/pinned_hashes.json（pinned_at=2026-10-31T09:12:00+08:00） ────
+✅ 开工前哈希一致：tests/acceptance/stage_b/pinned_hashes.json = 51f8a902fb7b00f8b048d32bdd2259c17bbe6f028f43d5c6138bfab7571222b0
+✅ 前置通过：rules.py 与 test_cases.json 已是落地后哈希，两个未参与文件未漂移
+   files 将写为：
+     validator/__init__.py        f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5
+     validator/rules.py           0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800
+     tests/test_validator.py      9c83a4c6c6341ed54c724498ca4d1bab6c196071c7809c6d144696d2339c601e
+     tests/test_cases.json        a68e315551ad46116cfe8e654340f372d55f79d86db2fddab3fe89f4349fdded
+   superseded_sha256 保持不动（4 条，与 2026-10-29 评审逐条一致）
+   落地后哈希（2026-10-31T09:12:00+08:00）= 450a0c45b8f9d5d8435dc8493dba326ec5e9ce65d9b7d8477ce244fd2cabaf43
+   canonical 复算（2026-10-31T00:00:00+08:00）= 44db6fcafc77e9b5d2d48a53c10d85964e11a4670443d5532bfe4d275c7cab75
+✅ 已写入 tests/acceptance/stage_b/pinned_hashes.json（pinned_at=2026-10-31T09:12:00+08:00，字节哈希 450a0c45b8f9d5d8435dc8493dba326ec5e9ce65d9b7d8477ce244fd2cabaf43）
+
+──── [5] 补契约段：docs/validator-contract-decisions.md 追加 §9（字面匹配的定位与责任划分） ────
+✅ 契约段字节哈希：contract-section.md = e8bfe32c125cd339ed623e41207c014d94eff9d33e0113e00fb84b69c56355d4
+✅ 开工前哈希一致：docs/validator-contract-decisions.md = e49b0a4a7b07ab1b3fc1d9ac4190b4e650be5781bf1a81354554d3ed39f66f94
+   锚点检查通过：LF、末尾有换行、无 §9、§8 存在（当前 143 行）
+   追加 10 行 → 共 154 行；落地后哈希 = 38a71102d39bd91104575d77e335d7671fd25820c225247d59441800a553e193
+✅ 已写入 docs/validator-contract-decisions.md（+§9，字节哈希 38a71102d39bd91104575d77e335d7671fd25820c225247d59441800a553e193）
+
+──── [6] 复核：落地后 4 个文件字节哈希 == manifest.post_state ────
+  ✅ validator/rules.py
+      0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800
+  ✅ tests/test_cases.json
+      a68e315551ad46116cfe8e654340f372d55f79d86db2fddab3fe89f4349fdded
+  ~ tests/acceptance/stage_b/pinned_hashes.json
+      450a0c45b8f9d5d8435dc8493dba326ec5e9ce65d9b7d8477ce244fd2cabaf43  （pinned_at=2026-10-31T09:12:00+08:00；canonical 值 44db6fcafc77e9b5d2d48a53c10d85964e11a4670443d5532bfe4d275c7cab75，由 repin.py 写盘后复算比对）
+  ✅ docs/validator-contract-decisions.md
+      38a71102d39bd91104575d77e335d7671fd25820c225247d59441800a553e193
+  ✅ 3/3 精确哈希一致；pinned_hashes.json 已按 canonical 复算通过
+
+──── [7] 全量验证（一）：四条互不包含的独立套件 ────
+    ----------------------------------------------------------------------
+    Ran 335 tests in 0.346s
+    
+    OK
+    ----------------------------------------------------------------------
+    Ran 275 tests in 0.216s
+    
+    OK
+    ----------------------------------------------------------------------
+    Ran 39 tests in 0.114s
+    
+    OK
+    ----------------------------------------------------------------------
+    Ran 45 tests in 0.023s
+    
+    OK
+
+──── [8] 全量验证（二）：JS↔Python 语义一致（web/tools/parity-check.mjs） ────
+    已写出 C:\Users\lenovo\Desktop\giftwise\.tmp\web-parity\fixtures.json
+      intake 用例 27 条
+      候选批次 26 批 + 请求侧越界/格式 17 条 + 损坏样例 4 条
+    已写出 C:/Users/lenovo/Desktop/giftwise/.tmp/web-parity/python-out.json
+      intake 参考结果 27 条；校验参考结果 47 条
+    JS↔Python 语义比对：共 74 组样例（intake 27 条 / 候选批次 26 条 / **请求侧越界与格式** 17 条 / 损坏样例 4 条）
+      请求侧覆盖：越界网格 15 组（预算{0,1,10000,10000.01,10001} × 天数{0,365,366}）+ 格式优先 2 组
+    参考实现：python: workflow/intake.py + validator/rules.py（Python 3.12.12）
+    追求对象契约开关：PURSUIT_CONTRACT_READY=true
+    结果：全部一致（0 处语义差异）
+      其中 1 组仅错误顺序不同（Python 侧集合迭代顺序随哈希种子变化，错误码/路径/文案/请求完全一致）：[intake] 浏览器伪造派生字段
+    
+    附加检查（把契约开关当作未落地）：错误码 PURSUIT_CONTRACT_NOT_READY；未生成请求：true
+    附加检查：通过（拒绝且不静默映射）
+
+──── [9] 全量验证（三）：接入层（web/tests/access-layer.test.mjs） ────
+    ℹ tests 40
+    ℹ suites 0
+    ℹ pass 40
+    ℹ fail 0
+    ℹ cancelled 0
+    ℹ skipped 0
+    ℹ todo 0
+    ℹ duration_ms 73.0125
+
+──── [10] 非判据提醒：落地后必须同步的外部位置（不参与本脚本判据，详见 sync-after-landing.md） ────
+    ⚠ 镜像 /healthz 仍返回旧哈希 1f389dad…（镜像不重建就不会变）→ 必须重建 giftwise-validator 镜像
+    ⚠ docs/competition/材料清单与自查.md §2 行 93、README.md:82 声明的是旧哈希
+    ⚠ docs/validator-contract-decisions.md §7 的 18 处 rules.py 行号引用因补丁位移（+61/+67）
+    ⚠ docs/test-reports/contract-001/tools/probe_doc_parity.py 的 :181 引用同步位移为 :242
+    ⚠ tools/verify_all.py:59-60 的 KNOWN_GAPS 文案仍写旧哈希
+    ⚠ 对外测试总量口径 329 / 688 → 335 / 694
+    ⚠ workflow/generated/manifest.json 的 sources_sha256 由 probe46 重建后覆盖
+    ⚠ 对外口径必须保留「Q7 未解决」，不得宣称禁忌拦截可靠
+
+============================================================ 汇总 ============================================================
+环节                             结果   细节
+---------------------------------- -------- --------------------------------------------------------------
+0 预检（开工前哈希）      PASS     4/4 与 manifest.pre_state 一致
+1 备份                           PASS     4/4 副本逐字节一致 → .tmp/rulefix-apply-backup
+2 应用补丁 rules.py            PASS     sha256=0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800
+3 加 6 条回归用例            PASS     tests/test_cases.json → 326 条
+4 重钉 pinned_hashes             PASS     pinned_at=2026-10-31T09:12:00+08:00
+5 补契约 §9                    PASS     docs/validator-contract-decisions.md +§9
+6 落地后哈希复核            PASS     3 精确 + 1 canonical
+7 unit（tests）                  PASS     Ran 335 tests → OK（期望 Ran 335 tests）
+7 stage_b                          PASS     Ran 275 tests → OK（期望 Ran 275 tests）
+7 stage_c                          PASS     Ran 39 tests → OK（期望 Ran 39 tests）
+7 boundary                         PASS     Ran 45 tests → OK（期望 Ran 45 tests）
+8 JS↔Python parity               PASS     结果：全部一致（0 处语义差异）
+9 接入层 access-layer           PASS     ℹ pass 40 ℹ fail 0 
+10 同步提醒                    INFO     8 处；见 rulefix/apply-package/sync-after-landing.md
+落地后 rules.py 新 sha256      INFO     0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800
+
+✅ 全部通过。落地后哈希：
+  validator/rules.py                               0a57365ba8320a441f13ca8f22e7f884b59ad2161290ad823e2bc7c683913800  [post_state 精确一致]
+  tests/test_cases.json                            a68e315551ad46116cfe8e654340f372d55f79d86db2fddab3fe89f4349fdded  [post_state 精确一致]
+  tests/acceptance/stage_b/pinned_hashes.json      450a0c45b8f9d5d8435dc8493dba326ec5e9ce65d9b7d8477ce244fd2cabaf43  [见 canonical 复算]
+  docs/validator-contract-decisions.md             38a71102d39bd91104575d77e335d7671fd25820c225247d59441800a553e193  [post_state 精确一致]
+
+回滚： bash rulefix/apply-package/revert.sh
+PM 落地单： docs/pm-reviews/规则门修复-待应用-2026-10-31.md
+
+⚠ 对外口径：Q7（用同义表达绕过字面词）仍未解决 —— 不得宣称「禁忌拦截可靠」。

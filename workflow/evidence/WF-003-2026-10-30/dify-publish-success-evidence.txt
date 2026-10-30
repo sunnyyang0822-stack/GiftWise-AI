@@ -1,0 +1,23 @@
+【发布成功证据】2026-10-30 23:04（+08:00），逐字，来自 Dify 界面与服务端实读
+
+1) 发布前检查清单徽标：'检查清单 2'（2 项阻塞）；修复并重新提交后：'检查清单'（无数字 = 0 项）
+2) 点击「发布」后的界面提示（role=dialog 文本，逐字）：
+   ---> '操作成功'
+   ---> '# 1\n·\n命名\n\nDify 发布于 几秒前\n\n已发布\nCtrl\nShift\nP\n\n已发布\n\n打开 Web 应用\n在新标签页打开已发布的应用\n访问入口\n配置 Web 应用、API、MCP 和触发器\n发布到 Marketplace\n将此应用作为模板上架\n工作流作为工具\n作为工具供其他应用调用\n需要进行配置'
+
+3) 发布菜单项状态：由可点击的「发布 Ctrl Shift P」变为「已发布 Ctrl Shift P」且 disabled=true
+   ---> {"tag": "BUTTON", "text": "发布", "placeholder": null, "disabled": false, "x": 1322, "y": 12}
+   ---> {"tag": "BUTTON", "text": "已发布\nCtrl\nShift\nP", "placeholder": null, "disabled": true, "x": 1049, "y": 117}
+   ---> {"tag": "BUTTON", "text": "发布到 Marketplace\n将此应用作为模板上架", "placeholder": null, "disabled": false, "x": 1045, "y": 289}
+
+4) 服务端与服务端实读（draft 端点）：
+   {"updatedAt": 1793372663, "updatedAtShanghai": "2026-10-30 23:04:23 +08:00", "hash": "c6a2c5f3bdba999660746948f7b1b31487571bee72d0b138233e199eceedd926", "version": "draft", "versionNumber": null, "toolPublished": false, "markedName": "", "markedComment": "", "environmentVariables": 0, "conversationVariables": 0, "nodeCount": 11, "edgeCount": 11, "nodeTypes": ["start", "code", "llm", "code", "if-else", "llm", "code", "code", "code", "end", "end"], "hasLlmNode": true, "endOutputs": [{"title": "End A 未修订输出", "vars": ["status", "all_passed", "repair_count", "report_json", "report_text"]}, {"title": "End B 修订后输出", "vars": ["revised_status", "revised_all_passed", "revised_repair_count", "revised_report_json", "revised_report_text"]}]}
+
+5) 界面状态：hasUnpublishedLabel=False, hasPublishedLabel=True
+   headerText=跳转到主要内容 | / | 工作室 | 🤖 | GiftWise｜推荐工作流开发草稿 | 工作流 | 编排 | 访问入口 | 日志 | 监测 | D | Dify | 账户 | 查看缓存
+
+6) 版本端点探测（只读，均未返回版本列表）：
+   /console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/draft/versions -> HTTP 404
+   /console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/versions -> HTTP 405
+   /console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/publish -> HTTP 401
+   /console/api/apps/5abdb13c-a633-4a9c-96c3-dabd44072511/workflows/draft/publish -> HTTP 404

@@ -1,0 +1,6 @@
+# 本次实际执行的完整命令（结果表里因排版被截断，这里给全文）
+[FAIL] browser_check: C:\Users\lenovo\scoop\apps\nodejs-lts\current\node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]
+[FAIL] js_range_parity: C:\Users\lenovo\AppData\Local\Programs\Python\Python312\python.exe -X utf8 tests/acceptance/boundary/run_js_parity_probe.py
+[PASS] stage_b: C:\Users\lenovo\AppData\Local\Programs\Python\Python312\python.exe -X utf8 -m unittest discover -s tests/acceptance/stage_b
+[FAIL] declared_rules_hash: (内置只读探针：docs/competition/材料清单与自查.md + workflow/generated/manifest.json)
+[PASS] image_latest_stale: docker run -d giftwise-validator:latest -p 127.0.0.1:<free>:8000 + /healthz 哈希 + 半开正文探针

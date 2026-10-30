@@ -1,0 +1,38 @@
+{
+  "stamp": "20261031-011548",
+  "requests": 60,
+  "phases": [
+    {
+      "phase": "修复前（裸 print）",
+      "tag": "giftwise-validator:log-prefix",
+      "ok": true,
+      "detail": {
+        "总行数": 55,
+        "正常请求日志行": 47,
+        "启动行": 1,
+        "粘连行数": 7,
+        "样例": [
+          "172.17.0.1 - \"POST /validate HTTP/1.1\" 200 -172.17.0.1 - \"POST /validate HTTP/1.1\" 200 -",
+          "172.17.0.1 - \"POST /validate HTTP/1.1\" 200 -172.17.0.1 - \"GET /nope-17 HTTP/1.1\" 404 -",
+          "172.17.0.1 - \"POST /validate HTTP/1.1\" 200 -172.17.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+        ],
+        "期望": "粘连 > 0（复现缺陷）"
+      }
+    },
+    {
+      "phase": "修复后1",
+      "tag": "giftwise-validator:submission-20261101",
+      "ok": true,
+      "detail": {
+        "总行数": 62,
+        "正常请求日志行": 61,
+        "启动行": 1,
+        "粘连行数": 0,
+        "样例": [],
+        "期望": "粘连 == 0（已修复）"
+      }
+    }
+  ],
+  "checks_passed": 2,
+  "checks_total": 2
+}

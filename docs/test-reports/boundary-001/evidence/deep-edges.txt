@@ -1,0 +1,176 @@
+====================================================================================================
+前置自检：模板必须是合法 JSON（上次探针因漏闭合括号全部误报 INVALID_JSON）
+====================================================================================================
+  OK   TMPL 基线
+  OK   DROP_BUDGET
+  OK   DROP_DAYS
+  OK   cand_json
+  → 模板自检通过
+
+====================================================================================================
+A 组：_amount 静默 None 分支（>1000 码点、格式合法的金额）是否绕过范围校验
+====================================================================================================
+
+--- budget="1"*1000（恰好 1000 码点，数值巨大、越界）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+
+--- budget="1"*1001（1001 码点 → _amount 静默 None）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.budget_amount          字段字符串超过 1000 个 Unicode 码点
+
+--- budget="9"*999（999 码点，越界）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+
+--- budget="11"（对照：在范围内，只应报候选 OVER_BUDGET）
+    status=failed  all_passed=False  bdv=not_verified
+    候选[0]    OVER_BUDGET          candidates[0].estimated_total  估算总费用超过预算
+    候选[1]    OVER_BUDGET          candidates[1].estimated_total  估算总费用超过预算
+    候选[2]    OVER_BUDGET          candidates[2].estimated_total  估算总费用超过预算
+
+====================================================================================================
+B 组：超长整数字面量是否让 json 解析异常落到 INTERNAL_ERROR
+====================================================================================================
+
+--- available_days = 4299 位整数字面量
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.available_days         可用天数须在 0 至 365 天之间
+
+--- available_days = 4300 位整数字面量
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.available_days         可用天数须在 0 至 365 天之间
+
+--- available_days = 4301 位整数字面量
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         request_json                   JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+--- available_days = 5000 位整数字面量
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         request_json                   JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+--- available_days = 20000 位整数字面量
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         request_json                   JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+--- 候选 estimated_preparation_days = 5000 位整数字面量
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         candidates_json                JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+====================================================================================================
+C 组：多个范围错误 / 范围×类型 / 范围×币种 的组合与优先级
+====================================================================================================
+
+--- budget=0 且 days=366（两个范围错误并存）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+    顶层       LIMIT_EXCEEDED       request.available_days         可用天数须在 0 至 365 天之间
+
+--- budget=0 且 days=-1（范围 + 类型）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.available_days         天数必须为非负 JSON 整数，不能为布尔值
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+
+--- budget=0 且 currency=USD（范围 + 币种）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+    顶层       UNSUPPORTED_CURRENCY request.currency               首版仅支持 CNY，不执行换汇
+
+--- budget_amount=20000（JSON 数字，非字符串）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.budget_amount          金额必须为十进制字符串
+
+--- budget_amount=0（JSON 数字，非字符串）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.budget_amount          金额必须为十进制字符串
+
+--- budget_amount 字段缺失
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       MISSING_FIELD        request.budget_amount          缺少必填字段
+
+--- available_days 字段缺失
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       MISSING_FIELD        request.available_days         缺少必填字段
+
+--- days=1e400（JSON → float inf）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.available_days         天数必须为非负 JSON 整数，不能为布尔值
+
+--- days=0.0（JSON float）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.available_days         天数必须为非负 JSON 整数，不能为布尔值
+
+--- days=true（JSON 布尔）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.available_days         天数必须为非负 JSON 整数，不能为布尔值
+
+--- days=-1 且 budget=0 且 currency=USD（三个错并存）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_TYPE         request.available_days         天数必须为非负 JSON 整数，不能为布尔值
+    顶层       LIMIT_EXCEEDED       request.budget_amount          预算须在 1 至 10000 之间
+    顶层       UNSUPPORTED_CURRENCY request.currency               首版仅支持 CNY，不执行换汇
+
+====================================================================================================
+D 组：候选侧是否被请求侧范围污染（反向断言加强）
+====================================================================================================
+
+--- 候选 estimated_total=0 且 prep=0（**字符串** "0"，须通过）
+    status=passed  all_passed=True  bdv=not_verified
+    codes=(无)
+
+--- ⚠️ 探针自身 bug 对照：候选 estimated_total=0（**JSON 数字**，应报 INVALID_TYPE）
+    status=failed  all_passed=False  bdv=not_verified
+    候选[0]    INVALID_TYPE         candidates[0].estimated_total  金额必须为十进制字符串
+
+--- 候选 estimated_total 为 1001 码点合法金额串
+    status=failed  all_passed=False  bdv=not_verified
+    候选[0]    LIMIT_EXCEEDED       candidates[0].estimated_total  字段字符串超过 1000 个 Unicode 码点
+
+--- 候选 prep = 5000 位整数
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         candidates_json                JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+--- 候选 estimated_total='9'*999（越界，须只报 OVER_BUDGET）
+    status=failed  all_passed=False  bdv=not_verified
+    候选[0]    OVER_BUDGET          candidates[0].estimated_total  估算总费用超过预算
+
+====================================================================================================
+E 组：请求 JSON 本身畸形
+====================================================================================================
+
+--- request_json 为空字符串
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         request_json                   JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+--- request_json = 'null'
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_REQUEST      request                        请求根节点必须为对象
+
+--- request_json 根为数组
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       INVALID_REQUEST      request                        请求根节点必须为对象
+
+--- request_json 含重复键 budget_amount
+    status=error  all_passed=False  bdv=not_verified
+    顶层       INVALID_JSON         request_json                   JSON 无效，可能含重复键、非标准常量或嵌套过深
+
+====================================================================================================
+F 组：4301 位阈值到底是「设计规则」还是「解释器限制」？决定性实验
+====================================================================================================
+  当前 sys.get_int_max_str_digits() = 4300（CPython 3.11+ 默认 4300）
+  假设：阈值来自 CPython 的 int↔str 转换上限，而非被测代码的规则。
+  做法：把上限临时改为 0（= 关闭该保护），重放同一条 5000 位整数请求。
+        若结果为 LIMIT_EXCEEDED（范围错）而非 INVALID_JSON，则假设成立。
+  已关闭上限：sys.get_int_max_str_digits() = 0
+
+--- available_days = 5000 位整数（**已关闭**解释器上限）
+    status=needs_input  all_passed=False  bdv=not_verified
+    顶层       LIMIT_EXCEEDED       request.available_days         可用天数须在 0 至 365 天之间
+  已还原上限：sys.get_int_max_str_digits() = 4300
+
+  关闭上限后：status=needs_input codes=[['LIMIT_EXCEEDED', 'request.available_days']]
+  默认上限时：status=error codes=[['INVALID_JSON', 'request_json']]
+
+  结论：假设成立 —— 阈值来自解释器，不是设计规则
+
+完成。结构化结果 → C:/Users/lenovo/Desktop/giftwise/docs/test-reports/boundary-001/evidence/deep-edges.json

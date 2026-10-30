@@ -32,11 +32,19 @@ CN = timezone(timedelta(hours=8))
 PY = sys.executable
 
 # 布局 1：与 Dockerfile 的 COPY 指令逐条对应（构建上下文=整个仓库）
-COPY_PLAN = [("validator", "validator", True), ("deploy/server.py", "deploy/server.py", False)]
+# 2026-10-31 起 Dockerfile 改成 `COPY deploy /app/deploy`（N-1：可观测入口要进镜像）。
+COPY_PLAN = [("validator", "validator", True), ("deploy", "deploy", True)]
 
 # 布局 2：与 deploy/publish-to-uhost.ps1 实际上传的文件完全一致
-# （只上传 validator/rules.py 与 deploy/server.py，两者都没有 __init__.py）
-UPLOAD_PLAN = [("validator/rules.py", "validator/rules.py", False), ("deploy/server.py", "deploy/server.py", False)]
+# 2026-10-31 起该清单也加上两个可观测模块（同一个 N-1），否则远端构建出的镜像同样不含它们。
+# 注意仍然没有 `__init__.py`（PEP 420 命名空间包，`python -m deploy.server` 可跑，实测见下）。
+UPLOAD_PLAN = [
+    ("validator/rules.py", "validator/rules.py", False),
+    ("deploy/server.py", "deploy/server.py", False),
+    ("deploy/Dockerfile", "deploy/Dockerfile", False),
+    ("deploy/observability.py", "deploy/observability.py", False),
+    ("deploy/observable_server.py", "deploy/observable_server.py", False),
+]
 
 HEALTHCHECK_CMD = (
     "import urllib.request; "
@@ -84,6 +92,9 @@ def run_layout(name: str, plan: list[tuple[str, str, bool]], port: int, stamp: s
         ),
         "has_deploy_init": (app / "deploy" / "__init__.py").exists(),
         "has_validator_init": (app / "validator" / "__init__.py").exists(),
+        # N-1（2026-10-31）：这份文件树是否也带上了可观测入口的两份实现
+        "has_observability_modules": all(
+            (app / rel).exists() for rel in ("deploy/observability.py", "deploy/observable_server.py")),
     }
 
     env = dict(os.environ)
@@ -167,7 +178,8 @@ def main() -> int:
         for p in layout["app_tree"]:
             print("   ", p)
         print(f"  deploy/__init__.py 存在 = {layout['has_deploy_init']}, "
-              f"validator/__init__.py 存在 = {layout['has_validator_init']}")
+              f"validator/__init__.py 存在 = {layout['has_validator_init']}, "
+              f"含可观测入口 = {layout['has_observability_modules']}")
         print(f"  启动到可接受连接 = {layout['ms_to_accept']} ms")
         print(f"  GET /healthz -> {layout['healthz']['status']}")
         print(f"  POST /validate -> HTTP {layout['validate']['http_status']}, "

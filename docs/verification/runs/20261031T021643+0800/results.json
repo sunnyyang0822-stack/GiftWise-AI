@@ -1,0 +1,277 @@
+{
+  "timestamp": "2026-10-31T02:18:45.273188+08:00",
+  "tier": "fast",
+  "run_dir": "docs/verification/runs/20261031T021643+0800",
+  "python": "3.12.12",
+  "node": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE",
+  "docker": "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+  "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd",
+  "passed": 15,
+  "failed": 1,
+  "skipped": 1,
+  "model_calls": 0,
+  "notes": [
+    "probe46 走的是 workflow/verify_local.py 的等价跑法，它会把本次证据**追加**到 workflow/evidence/local-2026-10-29/runs/<时间戳>/ 并重建 workflow/generated/* ——这是该脚本自己的追加式写入设计（不属于本工具的写入，本工具既不修改也不回滚它）。",
+    "接入层 127.0.0.1:8787 已在监听：**复用既有进程**（非本工具启动），结果反映当前工作区状态。",
+    "Chrome CDP 127.0.0.1:9333 已在监听：**复用既有浏览器**（非本工具启动）。"
+  ],
+  "rows": [
+    {
+      "name": "unit",
+      "group": "fast",
+      "what": "单元测试（规则层 + 数据驱动夹具；用例数随各线新增而变）",
+      "status": "PASS",
+      "seconds": 0.704,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/unit.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "tests/test_cases.json": "2026-10-30 23:12:49",
+        "tests/test_validator.py": "2026-10-30 23:18:22"
+      }
+    },
+    {
+      "name": "stage_c",
+      "group": "fast",
+      "what": "阶段 C 独立验收（QA-001）",
+      "status": "PASS",
+      "seconds": 0.36,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/stage_c",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/stage_c.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "tests/acceptance/stage_c": "2026-10-31 01:00:19（目录内最新：tests/acceptance/stage_c/run_stage_c.py）"
+      }
+    },
+    {
+      "name": "contract",
+      "group": "fast",
+      "what": "契约探针（19 码/边界/双向对账）",
+      "status": "PASS",
+      "seconds": 0.516,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 docs/test-reports/contract-001/tools/run_all.py",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/contract.out",
+      "note": "退出码 0，且命中 2 条关键输出",
+      "retry": "",
+      "related_mtimes": {
+        "docs/test-reports/contract-001/tools": "2026-10-31 00:12:20（目录内最新：docs/test-reports/contract-001/tools/probe_doc_parity.py）",
+        "validator/rules.py": "2026-10-30 23:11:21"
+      }
+    },
+    {
+      "name": "probe46",
+      "group": "fast",
+      "what": "本地 46 探针（离线）",
+      "status": "PASS",
+      "seconds": 0.579,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 tests/acceptance/stage_c/run_verify_local_nopipe.py",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/probe46.out",
+      "note": "退出码 0，且命中 2 条关键输出",
+      "retry": "",
+      "related_mtimes": {
+        "workflow/verify_local.py": "2026-10-30 23:47:58",
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "workflow/generated": "2026-10-31 02:16:45（目录内最新：workflow/generated/manifest.json）"
+      }
+    },
+    {
+      "name": "parity",
+      "group": "fast",
+      "what": "JS↔Python parity（样例级）",
+      "status": "PASS",
+      "seconds": 0.485,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tools/gen-parity-fixtures.mjs  &&  D:/msys64/mingw64/bin/python.exe -X utf8 web/tools/parity-reference.py  &&  C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tools/parity-check.mjs",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/parity.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "web/tools/parity-check.mjs": "2026-10-31 01:44:50",
+        "web/server/checker.mjs": "2026-10-31 01:12:08",
+        "web/server/config.mjs": "2026-10-31 01:26:05"
+      }
+    },
+    {
+      "name": "http_smoke",
+      "group": "fast",
+      "what": "HTTP 冒烟（接入层 mock 链路）",
+      "status": "PASS",
+      "seconds": 3.297,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tools/smoke-http.mjs   [env: GW_BASE=http://127.0.0.1:8787]",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/http_smoke.out",
+      "note": "退出码 0，且命中 1 条关键输出",
+      "retry": "",
+      "related_mtimes": {
+        "web/tools/smoke-http.mjs": "2026-10-31 01:48:30",
+        "web/server/server.mjs": "2026-10-30 20:55:09"
+      }
+    },
+    {
+      "name": "page_probe",
+      "group": "fast",
+      "what": "页面探针（真实浏览器首帧）",
+      "status": "PASS",
+      "seconds": 3.265,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tools/page-probe.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/page_probe.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "web/tools/page-probe.mjs": "2026-10-31 01:48:30",
+        "web/index.html": "缺失"
+      }
+    },
+    {
+      "name": "browser_check",
+      "group": "fast",
+      "what": "浏览器自查（web 线自带，多视口 + 主流程）",
+      "status": "PASS",
+      "seconds": 100.547,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/browser_check.out",
+      "note": "退出码 0",
+      "retry": "首次 FAIL（browser_check.attempt1.out）→ 重试 PASS（browser_check.attempt2.out）",
+      "related_mtimes": {
+        "web/tools/browser-check.mjs": "2026-10-31 02:13:53",
+        "web/public/app.js": "2026-10-31 01:50:32"
+      }
+    },
+    {
+      "name": "access_layer",
+      "group": "fast",
+      "what": "接入层单元测试（node:test）",
+      "status": "PASS",
+      "seconds": 0.204,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE web/tests/access-layer.test.mjs",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/access_layer.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "web/tests/access-layer.test.mjs": "2026-10-30 21:30:56",
+        "web/server": "2026-10-31 01:26:05（目录内最新：web/server/config.mjs）"
+      }
+    },
+    {
+      "name": "boundary",
+      "group": "fast",
+      "what": "边界套件（跨层闸门/判别性）",
+      "status": "PASS",
+      "seconds": 0.297,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/boundary",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/boundary.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "tests/acceptance/boundary": "2026-10-31 01:19:32（目录内最新：tests/acceptance/boundary/probe_rebuilt_image_extras.py）"
+      }
+    },
+    {
+      "name": "js_range_parity",
+      "group": "fast",
+      "what": "JS 侧范围一致性（已知缺口）",
+      "status": "FAIL",
+      "seconds": 0.516,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 tests/acceptance/boundary/run_js_parity_probe.py",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/js_range_parity.out",
+      "note": "期望 0/14，实际 1/14（退出码=0）",
+      "retry": "首次 FAIL（js_range_parity.attempt1.out）→ 重试 仍 FAIL（js_range_parity.attempt2.out）",
+      "related_mtimes": {
+        "tests/acceptance/boundary/run_js_parity_probe.py": "2026-10-31 00:30:12",
+        "web/server/checker.mjs": "2026-10-31 01:12:08"
+      }
+    },
+    {
+      "name": "stage_b",
+      "group": "fast",
+      "what": "阶段 B 契约验收（+ 版本哈希核对）",
+      "status": "PASS",
+      "seconds": 0.625,
+      "command": "D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/stage_b",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/stage_b.out",
+      "note": "退出码 0",
+      "retry": "",
+      "related_mtimes": {
+        "tests/acceptance/stage_b": "2026-10-31 01:23:10（目录内最新：tests/acceptance/stage_b/pinned_hashes.json）",
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "docs/pm-reviews/val-001-rereview-2026-10-29.md": "2026-10-31 00:59:45"
+      }
+    },
+    {
+      "name": "range_contract",
+      "group": "fast",
+      "what": "请求侧范围契约（内置纯函数探针）",
+      "status": "PASS",
+      "seconds": 0.031,
+      "command": "(内置纯函数探针：validator.rules.validate)",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/range_contract.out",
+      "note": "14/14 项符合预期",
+      "retry": "",
+      "related_mtimes": {
+        "validator/rules.py": "2026-10-30 23:11:21"
+      }
+    },
+    {
+      "name": "i2_local",
+      "group": "fast",
+      "what": "I-2 半开正文（本机工作区代码）",
+      "status": "PASS",
+      "seconds": 3.969,
+      "command": "GIFTWISE_PORT=8799 GIFTWISE_READ_TIMEOUT=3 python -m deploy.server + 原始 socket",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/i2_local.out",
+      "note": "408 且连接关闭（3.03s）",
+      "retry": "",
+      "related_mtimes": {
+        "deploy/server.py": "2026-10-31 01:42:05",
+        "validator/rules.py": "2026-10-30 23:11:21"
+      }
+    },
+    {
+      "name": "declared_rules_hash",
+      "group": "fast",
+      "what": "对外材料声明的规则哈希 / 版本指纹",
+      "status": "PASS",
+      "seconds": 0.094,
+      "command": "(内置只读探针：docs/competition/材料清单与自查.md + workflow/generated/manifest.json)",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/declared_rules_hash.out",
+      "note": "对外声明的规则哈希与当前实现一致",
+      "retry": "",
+      "related_mtimes": {
+        "docs/competition/材料清单与自查.md": "2026-10-31 01:38:09",
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "workflow/generated/manifest.json": "2026-10-31 02:16:45"
+      }
+    },
+    {
+      "name": "secret_scan",
+      "group": "fast",
+      "what": "公开材料与接入层无密钥（声明为 0 命中）",
+      "status": "PASS",
+      "seconds": 0.188,
+      "command": "(内置只读探针：密钥模式扫描 + 声明里的逐字 grep 命令)",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/secret_scan.out",
+      "note": "0 命中（33 个文件）",
+      "retry": "",
+      "related_mtimes": {
+        "web/server": "2026-10-31 01:26:05（目录内最新：web/server/config.mjs）",
+        "web/public": "2026-10-31 02:02:51（目录内最新：web/public/styles.css）",
+        "docs/competition": "2026-10-31 01:54:19（目录内最新：docs/competition/答辩PPT骨架.md）"
+      }
+    },
+    {
+      "name": "dify_publish_state",
+      "group": "fast",
+      "what": "Dify 发布状态（只读归档证据，不重跑）",
+      "status": "SKIP",
+      "seconds": 0.0,
+      "command": "(未执行；只读归档证据 workflow/evidence/WF-003-2026-10-31-publish-v2/)",
+      "raw_output": "docs/verification/runs/20261031T021643+0800/dify_publish_state.out",
+      "note": "零模型调用/不访问外部服务：发布状态由工作流线归档证据给出（见原始输出）；**发布后外部可访问性未核实**（无判据）",
+      "retry": "",
+      "related_mtimes": {
+        "workflow/evidence/WF-003-2026-10-31-publish-v2": "2026-10-31 00:28:50（目录内最新：workflow/evidence/WF-003-2026-10-31-publish-v2/materials-stale-publish-claims.md）"
+      }
+    }
+  ]
+}

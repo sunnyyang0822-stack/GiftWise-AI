@@ -1,0 +1,49 @@
+检查: container_check
+分组: full
+说明: 容器内检查（哈希一致/字节一致/非 root/无密钥）
+开始: 2026-10-31T00:52:22.420511+08:00
+尝试: 第 1 次
+
+==============================================================================
+## 前置：镜像 giftwise-validator:verify-guide 是否存在
+## 命令: docker image inspect giftwise-validator:verify-guide
+## 退出码: 0
+## 判定: 
+==============================================================================
+sha256:528b1726186094a9ab21d8714d9e9c1982c057dfff99a13f71c4163f47bf725c
+
+==============================================================================
+## 容器内检查（哈希/字节/非root/无密钥）
+## 命令: docker run -d -p 127.0.0.1:<free>:8000 giftwise-validator:verify-guide + /healthz + /validate + id -u + find /app + grep 密钥
+## 退出码: 0
+## 判定: 全部子项满足
+==============================================================================
+本地 validator/rules.py sha256 = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+镜像 = giftwise-validator:verify-guide，容器 = gw-verify-check-39244，宿主端口 = 61281
+$ docker run -d --name gw-verify-check-39244 -p 127.0.0.1:61281:8000 giftwise-validator:verify-guide
+c0bb5594a44ea9bc42ccbbfd28301fb5f5f106a49cf0475011b9ae6c82d77e7d
+
+容器 /healthz 就绪：True
+[1] GET /healthz → HTTP 200
+    {"status": "ok", "service": "giftwise-validator", "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500"}
+    本地 sha256 = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+    一致 = True
+[2] POST /validate（夹具 T01_normal）→ HTTP 200
+    容器字节数 = 271，本机字节数 = 271，逐字节一致 = True
+[3] $ docker run --rm --entrypoint id giftwise-validator:verify-guide -u
+    10001
+    非 root（uid=10001）= True
+[4] 镜像内文件清单（find /app -maxdepth 2）：
+/app
+/app/validator
+/app/validator/rules.py
+/app/validator/__init__.py
+/app/deploy
+/app/deploy/server.py
+    禁止项命中 = 无
+    密钥模式命中 = 无
+    结论 = True
+$ docker stop gw-verify-check-39244
+gw-verify-check-39244
+
+[本工具] 本次尝试判定：PASS（全部子项满足）；耗时 5.98s

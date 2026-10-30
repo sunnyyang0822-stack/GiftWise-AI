@@ -1,0 +1,1 @@
+{"schema_version": 1, "ok": false, "channel": "web", "action": "read", "backend": null, "items": [], "meta": {"elapsed_ms": 15, "attempts": []}, "error": {"code": "RATE_LIMITED", "message": "Platform reported a rate limit", "hint": "Wait 2470 seconds before retrying this channel."}}

@@ -1,0 +1,22 @@
+# 容器内每请求 CPU 自测量（单次 exec）
+# 目标端口=8000 请求数=3000 并发=8
+# validate() 纯 CPU 参照=170.87 us/次（compose/evidence/cpu-cost-container.txt）
+
+  完成请求              : 3000（HTTP 200: 3000）
+  墙上时间              : 3.775 s
+  吞吐                  : 794.81 req/s
+
+  cgroup CPU 增量       : 7170362 us
+  客户端(本进程)CPU     : 1787308 us   <- time.process_time()，含全部客户端线程
+  服务端 CPU (相减)     : 5383054 us  = 5.3831 core-seconds
+  平均占用核数(服务端)  : 1.426 core
+  每请求服务端 CPU      : 1794.35 us
+
+  其中 validate() 纯计算 : 170.87 us = 9.5%
+  其余(HTTP/线程/socket) : 1623.48 us = 90.5%
+
+  单核吞吐上限(按实测每请求 CPU) = 557.3 req/s/核
+  单核吞吐上限(若只有 validate)  = 5852.4 req/s/核
+  => 框架开销把单核上限压低约 10.5 倍
+
+PROBE_JSON {"requests": 3000, "ok": 3000, "wall_s": 3.775, "throughput_rps": 794.81, "cgroup_delta_usec": 7170362, "client_process_cpu_usec": 1787307.6, "server_cpu_usec": 5383054.4, "server_cores_avg": 1.4262, "per_request_server_cpu_us": 1794.35, "validate_us_reference": 170.87, "validate_share_percent": 9.52, "single_core_limit_rps": 557.3}

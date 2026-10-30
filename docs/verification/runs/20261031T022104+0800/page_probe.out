@@ -1,0 +1,32 @@
+# 检查：page_probe
+# 最终判定：PASS
+# 尝试记录：第1次 PASS（page_probe.attempt1.out）
+# 本文件 = 最终尝试（page_probe.attempt1.out）的内容副本；各次尝试的原始输出独立保留，未被覆盖。
+检查: page_probe
+分组: fast
+说明: 页面探针（真实浏览器首帧）
+开始: 2026-10-31T02:21:11.866053+08:00
+尝试: 第 1 次
+
+==============================================================================
+## 页面探针（首帧渲染；本工具临时启动 Chrome）
+## 命令: C:\Users\lenovo\scoop\apps\nodejs-lts\current\node.EXE web/tools/page-probe.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]
+## 退出码: 0
+## 判定: 退出码 0
+==============================================================================
+✅ 服务一致性自检通过：/landing.css=24981B / /=20724B
+url                 http://127.0.0.1:8787/
+browser             Chrome/156.0.8078.79
+readyState          complete
+badges              5
+view                5
+banners             4
+modeFlagHidden      false
+heroFlagHidden      false
+footerMeta          模式：mock · 追求对象契约：已落地 · 演示开关：关闭 · 接入层 http://127.0.0.1:8787
+horizontalOverflow  false
+pageExceptions      0
+
+结论：首帧已渲染、模拟标识可见、无页面异常
+
+[本工具] 本次尝试判定：PASS（退出码 0）；耗时 4.66s

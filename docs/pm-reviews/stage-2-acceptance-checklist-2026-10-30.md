@@ -1,5 +1,7 @@
 # 阶段 2 验收清单：产品设计 / 用户故事 / PRD（PM 对照 Issue #1 权威）
 
+> 本报告数字为 2026-10-30 时点真值；后续变更见 `docs/acceptance-criteria.md` 第 13 节。
+
 - 日期：2026-10-30（北京时间）
 - 验收人：GiftWise｜PM Agent
 - 受验文件：[`docs/product-requirements.md`](../product-requirements.md)、[`docs/user-stories.md`](../user-stories.md)、[`docs/product-flow.md`](../product-flow.md)、[`docs/acceptance-criteria.md`](../acceptance-criteria.md)

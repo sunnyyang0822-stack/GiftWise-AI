@@ -129,6 +129,11 @@ def _request(request, errors):
             _text(request[field], "request." + field, errors, empty=field == "notes")
     budget = _amount(request["budget_amount"], "request.budget_amount", errors) if "budget_amount" in request else None
     days = _days(request["available_days"], "request.available_days", errors) if "available_days" in request else None
+    # 请求侧范围只在调用点检查：_amount/_days 与候选侧共用，范围约束不得进入共用函数。
+    if budget is not None and not (1 <= budget <= 10000):
+        _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间")
+    if days is not None and days > 365:
+        _error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间")
     if isinstance(request.get("currency"), str) and request["currency"] != "CNY":
         _error(errors, "UNSUPPORTED_CURRENCY", "request.currency", "首版仅支持 CNY，不执行换汇")
     facts = request.get("facts", [])

@@ -1,0 +1,34 @@
+{
+  "url": "http://127.0.0.1:18901",
+  "concurrency": 1,
+  "requests_per_worker": 50,
+  "requests_total": 50,
+  "wall_seconds": 0.4498,
+  "throughput_rps": 111.16,
+  "status_counts": {
+    "200": 50
+  },
+  "ok_200": 50,
+  "http_408": 0,
+  "error_count": 0,
+  "error_samples": [],
+  "body_bytes": 3473,
+  "latency": {
+    "n": 50,
+    "min_ms": 2.752,
+    "mean_ms": 8.975,
+    "p50_ms": 4.024,
+    "p90_ms": 21.18,
+    "p95_ms": 25.475,
+    "p99_ms": 27.041,
+    "max_ms": 27.041
+  },
+  "kind": "http",
+  "label": "c1",
+  "recorded_at": "2026-10-31T01:18:37+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

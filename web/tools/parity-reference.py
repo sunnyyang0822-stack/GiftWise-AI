@@ -43,7 +43,13 @@ def main() -> int:
         )
 
     validate_out = []
-    for batch in list(fixtures["candidate_batches"]) + list(fixtures.get("broken_batches", [])):
+    # 请求侧用例（request_cases）与候选批次走同一条比对通道：二者都携带 request_json，
+    # 参考实现只负责对**给定的字面量**求值，不关心它属于哪一类。
+    for batch in (
+        list(fixtures["candidate_batches"])
+        + list(fixtures.get("request_cases", []))
+        + list(fixtures.get("broken_batches", []))
+    ):
         result = validate(batch["request_json"], batch["candidates_json"])
         validate_out.append(
             {

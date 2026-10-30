@@ -1,0 +1,14 @@
+=== 清理 QA 自建资源 ===
+  rm container: gw-qa
+  rm container: gw-start
+  rmi: Deleted: sha256:57b9b15b883fa2326d85bf9eb157faf614365b17d252664f6e5c135ce13f807d
+  rmi: Deleted: sha256:f8078601495fe1be884d4a28f5eaf69a36f090aafe63a4855da3691c39de5199
+  rmi: Deleted: sha256:c94ce66c0b1f9f43687221d46255472bf195e7982745cc36a1e84e8f3a0e3272
+  rmi: Deleted: sha256:258bce73d7f00397cc9f919ace35047542dc488669d0062ba7c92f9e74c80a50
+  rmi: Error response from daemon: No such image: gw-qa-wrongctx:latest
+=== 恢复 latest 指向 PM 原始镜像 ===
+giftwise-validator:latest b42f408b4f07
+giftwise-validator:pm-baseline-20261030 b42f408b4f07
+python:3.12-slim aa943ce41142
+=== 残留容器（应为空）===
+(以上为空即已清理)

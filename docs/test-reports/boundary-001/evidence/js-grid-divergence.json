@@ -1,0 +1,1979 @@
+{
+  "summary": {
+    "node": "v24.21.0",
+    "case_count": 60,
+    "agree": 35,
+    "code_divergence": 9,
+    "accept_divergence": 16,
+    "accept_divergence_labels": [
+      "预算 \"10000.01\"（上限以上：10000.01）",
+      "预算 \"10001\"（上限以上：10001）",
+      "预算 \"99999\"（远超上限）",
+      "预算 \"100000\"（远超上限）",
+      "预算 \"11111111…（1000 码点（长度合规，数值巨大））",
+      "天数 366（上限以上 366）",
+      "天数 1000（远超上限 1000）",
+      "天数 100000（远超上限 100000）",
+      "天数 9007199254740991（**最大安全整数** 2^53-1（两侧都能解析））",
+      "【下限隔离】预算 \"0\" 且三个候选金额均为 \"0.00\"",
+      "【下限隔离】预算 \"0.00\" 且三个候选金额均为 \"0.00\"",
+      "【下限隔离】预算 \"0.01\" 且三个候选金额均为 \"0.00\"",
+      "【下限隔离】预算 \"0.99\" 且三个候选金额均为 \"0.00\"",
+      "【下限隔离】预算 \"0.99\" 且三个候选金额均为 \"0.00\"（天数 0）",
+      "【上界隔离】预算 \"10000.01\" 且三个候选金额均为 \"0.00\"",
+      "【上界隔离】预算 \"10001\" 且三个候选金额均为 \"0.00\""
+    ],
+    "code_divergence_labels": [
+      "预算 \"0\"（下限以下：0）",
+      "预算 \"0.00\"（下限以下：0.00）",
+      "预算 \"0.01\"（下限以下：0.01）",
+      "预算 \"0.99\"（下限以下：0.99）",
+      "天数 9007199254740992（2^53（JS 不安全整数 → 解析期拒绝））",
+      "天数 10000000000000000000（10^20（JS 不安全整数））",
+      "预算 0 + 天数 366（两个范围错）",
+      "预算 0 + 天数 -1（范围 + 类型）",
+      "候选 prep=9007199254740992（不安全整数）"
+    ]
+  },
+  "rows": [
+    {
+      "label": "预算 \"0\"（下限以下：0）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"0.00\"（下限以下：0.00）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"0.01\"（下限以下：0.01）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"0.99\"（下限以下：0.99）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"1\"（下限端点）",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"1.00\"（下限端点：1.00）",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"9999.99\"（上限内）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"10000\"（上限端点）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"10000.00\"（上限端点：10000.00）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"10000.01\"（上限以上：10000.01）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"10001\"（上限以上：10001）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"99999\"（远超上限）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"100000\"（远超上限）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"11111111…（1000 码点（长度合规，数值巨大））",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 \"11111111…（1001 码点（触长度规则））",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"01.00\"（格式错（数值=1，在范围内））",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"-1\"（格式错（负数））",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"1e5\"（格式错（指数））",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 \"1,000\"（格式错（千分位，数值=1000））",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_AMOUNT"
+        ],
+        "codes_deep": [
+          "INVALID_AMOUNT@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 20000（JSON 数字 20000）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 0（JSON 数字 0）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 null（null）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 true（布尔）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 -1（负数）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 0（下限端点 0）",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 1（范围 1）",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          true,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          true,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 3（常规 3）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 365（上限端点 365）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 366（上限以上 366）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 1000（远超上限 1000）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 100000（远超上限 100000）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 9007199254740991（**最大安全整数** 2^53-1（两侧都能解析））",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "天数 9007199254740992（2^53（JS 不安全整数 → 解析期拒绝））",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "error",
+        "all_passed": false,
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "codes_deep": [
+          "INVALID_JSON@request_json"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 10000000000000000000（10^20（JS 不安全整数））",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "error",
+        "all_passed": false,
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "codes_deep": [
+          "INVALID_JSON@request_json"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 0.0（JSON float）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 true（JSON 布尔）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 null（null）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "天数 1e400（JSON → inf）",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 0 + 天数 366（两个范围错）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.available_days",
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 0 + 天数 -1（范围 + 类型）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE",
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days",
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_TYPE"
+        ],
+        "codes_deep": [
+          "INVALID_TYPE@request.available_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "预算 10000 + 天数 365（双端点，须通过）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "预算 1 + 天数 0（双下限端点）",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET",
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total",
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET",
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total",
+          "OVER_BUDGET@candidates[1].estimated_total",
+          "OVER_BUDGET@candidates[2].estimated_total",
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[1].estimated_preparation_days",
+          "PREPARATION_TOO_LONG@candidates[2].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "候选 estimated_total='0'",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 estimated_total=20000",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 estimated_total='9'*999",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "OVER_BUDGET"
+        ],
+        "codes_deep": [
+          "OVER_BUDGET@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 estimated_total='1'*1001",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@candidates[0].estimated_total"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 prep=0",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 prep=5000",
+      "kind": "一致",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "候选 prep=9007199254740992（不安全整数）",
+      "kind": "码/状态分歧",
+      "python": {
+        "status": "failed",
+        "all_passed": false,
+        "codes": [
+          "PREPARATION_TOO_LONG"
+        ],
+        "codes_deep": [
+          "PREPARATION_TOO_LONG@candidates[0].estimated_preparation_days"
+        ],
+        "candidate_passed": [
+          false,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "error",
+        "all_passed": false,
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "codes_deep": [
+          "INVALID_JSON@candidates_json"
+        ],
+        "candidate_passed": []
+      }
+    },
+    {
+      "label": "【下限隔离】预算 \"0\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【下限隔离】预算 \"0.00\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【下限隔离】预算 \"0.01\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【下限隔离】预算 \"0.99\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【下限隔离】预算 \"0.99\" 且三个候选金额均为 \"0.00\"（天数 0）",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【上界隔离】预算 \"10000.01\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【上界隔离】预算 \"10001\" 且三个候选金额均为 \"0.00\"",
+      "kind": "接受性分歧",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "LIMIT_EXCEEDED"
+        ],
+        "codes_deep": [
+          "LIMIT_EXCEEDED@request.budget_amount"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "【上界隔离】预算 \"10000\" 且三个候选金额均为 \"0.00\"（对照，两侧应一致）",
+      "kind": "一致",
+      "python": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      },
+      "js": {
+        "status": "passed",
+        "all_passed": true,
+        "codes": [],
+        "codes_deep": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "label": "request 为空串",
+      "kind": "一致",
+      "python": {
+        "status": "error",
+        "all_passed": false,
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "codes_deep": [
+          "INVALID_JSON@request_json"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "error",
+        "all_passed": false,
+        "codes": [
+          "INVALID_JSON"
+        ],
+        "codes_deep": [
+          "INVALID_JSON@request_json"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "request = 'null'",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_REQUEST"
+        ],
+        "codes_deep": [
+          "INVALID_REQUEST@request"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_REQUEST"
+        ],
+        "codes_deep": [
+          "INVALID_REQUEST@request"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "label": "request 根为数组",
+      "kind": "一致",
+      "python": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_REQUEST"
+        ],
+        "codes_deep": [
+          "INVALID_REQUEST@request"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      },
+      "js": {
+        "status": "needs_input",
+        "all_passed": false,
+        "codes": [
+          "INVALID_REQUEST"
+        ],
+        "codes_deep": [
+          "INVALID_REQUEST@request"
+        ],
+        "candidate_passed": [
+          false,
+          false,
+          false
+        ]
+      }
+    }
+  ]
+}

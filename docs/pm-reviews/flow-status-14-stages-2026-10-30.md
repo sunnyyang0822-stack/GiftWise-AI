@@ -1,5 +1,7 @@
 # GiftWise AI｜14 阶段流程当前状态（2026-10-30 晚）
 
+> 本报告数字为 2026-10-30 时点真值；后续变更见 `docs/acceptance-criteria.md` 第 13 节。
+
 - 依据：Issue [#4](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/4) 的 14 阶段流程与 Gate 约定
   （**阶段 1–6 冻结后，7–8 才并行**）
 - 整理人：GiftWise｜PM Agent

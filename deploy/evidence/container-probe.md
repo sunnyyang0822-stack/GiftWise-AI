@@ -9,7 +9,8 @@
 >   → 因 `wsl --install --no-distribution` 经 **Store 通道返回 `禁止(403)`**，改从官方 GitHub Release 离线安装
 >   `wsl.3.0.3.0.x64.msi`（`msiexec /i ... /qn /norestart` → **exit 0**）
 >   → 重启后 `install --quiet --accept-license --backend=wsl-2`（**exit 0**）。
-> - `docker build -t giftwise-validator:latest -f deploy/Dockerfile .` **成功**；镜像 ID `b42f408b4f07`，`docker images` **178 MB**（inspect 169.4 MB）。
+> - `docker build -t giftwise-validator:latest -f deploy/Dockerfile .` **成功**；镜像 ID `b42f408b4f07`（**ID 会漂移，仅辅助**），`docker images` **178 MB**（inspect 169.4 MB）。
+>   **口径更正（2026-10-31）**：该 ID 只是当时的 config digest；镜像从未推仓库，**没有 manifest digest**。稳定标识用 tag + 构建日期 + `/healthz` 的 `rules_source_sha256`（见 [`image-audit-2026-10-31.md`](image-audit-2026-10-31.md) §1）。
 > - 容器内 `/healthz` 200（启动 **0.75–1.01 s**）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行。
 >
 > 新的完整证据：[`docker-2026-10-30.md`](docker-2026-10-30.md)（汇总 9/9）＋ [`raw/docker-2026-10-30/`](raw/docker-2026-10-30/)（12 个原始输出文件）。
@@ -167,6 +168,6 @@ WSL 没有安装（连 Appx 与注册表项都没有），Hyper-V 的计算服�
 | 启动 **0.75–1.01 s** | **0.750–0.939 s**（`d7-baseline.txt` 0.7506 s；`d11-startup-memory.txt` 5 次 0.786–0.939 s） |
 | 运行内存 **14.41–17.86 MiB** | **14.45–17.08 MiB**（`d7-baseline.txt` 14.45；`d11` 15.5–17.08） |
 | `inspect 169.4 MB` | **169.36 MiB**（177,582,258 字节；`docker images` 的 178 MB 是十进制 MB） |
-| 镜像 ID `b42f408b4f07` 作为标识 | **ID 每次重建都会变**（`d12-image-id-drift.txt`：同内容三次重建＝三个 ID）。判据用基础镜像 digest、`rules_source_sha256`、字节数 |
+| 镜像 ID `b42f408b4f07` 作为标识 | **ID 每次重建都会变**（`d12-image-id-drift.txt`：同内容三次重建＝三个 ID）。判据用基础镜像 digest、`rules_source_sha256`、字节数。<br>**口径更正（2026-10-31）**：ID 是 **config digest**；镜像未推仓库，**manifest digest 不存在**，`RepoDigests` 里那个与 ID 同值。稳定标识＝tag + 构建日期 + `rules_source_sha256` |
 
 结论不变：容器化**已实测**成立（`/healthz` 规则哈希与本机一致、`/validate` 与纯函数逐字节一致、非 root uid 10001、镜像内无密钥）。

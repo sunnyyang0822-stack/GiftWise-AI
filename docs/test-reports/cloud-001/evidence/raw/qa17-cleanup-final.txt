@@ -1,0 +1,24 @@
+=== 清理我自建的容器与镜像（保留部署线的 coldbuild/obs-check 与 PM 基线）===
+gw-qa
+Untagged: gw-pat-0:latest
+Deleted: sha256:c3550618fc1df37b29bb2a80973c3580458ad6ceabde37cc3f6224da2a5849dc
+
+=== 清理临时构建上下文 ===
+已删除 tests/acceptance/cloud-001/_ctx
+
+=== 清理后状态 ===
+(空=无容器)
+
+=== 剩余镜像 ===
+giftwise-validator:coldbuild-20261030	ed3fbe912571
+giftwise-validator:obs-check	61bdb8815bd9
+giftwise-validator:latest	b42f408b4f07
+giftwise-validator:pm-baseline-20261030	b42f408b4f07
+python:3.12-slim	aa943ce41142
+
+=== latest 是否仍指向 PM 基线 ===
+giftwise-validator:latest b42f408b4f07
+giftwise-validator:pm-baseline-20261030 b42f408b4f07
+
+=== 仓库内是否残留构建产物 ===
+?? tests/acceptance/cloud-001/

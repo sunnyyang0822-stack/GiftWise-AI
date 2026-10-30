@@ -107,6 +107,14 @@
   **没有连接任何真实主机**。
 - 成本核算：**未执行任何询价**；UCloud 官网定价页 `https://docs.ucloud.cn/uhost/introduction/charge`
   我**未能打开**（本环境网络工具报域名解析到非公网地址），故所有价格字段保持"未知，未测量"。
+- **2026-10-30 晚第三轮（缺陷 I-2 = 安全自查 S-5，真实执行）**：QA-001 的实验证明默认入口在
+  `Content-Length: 100` 只发 5 字节时会**一直挂住（占用持续到客户端放弃或进程重启）**（45 s 零响应、连接不关），9 条连接使容器 PID 1 线程 +9，
+  而 `/healthz` 仍 200。PM 派发后在 `deploy/server.py` 落地读超时（默认 10 s，`GIFTWISE_READ_TIMEOUT` 可覆盖）
+  + 正文读取**总预算** + **408 `REQUEST_TIMEOUT`**，`deploy/observable_server.py` 同一缺陷一并修复。
+  `python deploy/evidence/slow_body_check.py` → **exit 0，43/43 断言**（含修复前对照与容器 PID 1 Threads 前后）。
+  证据：`evidence/slow-body-2026-10-30.md`。
+  **这对预发方案的含义**：演示期服务不再会被"半开连接"钉死线程；但**并发连接数仍无上限**，
+  公网演示仍必须靠安全组限制来源（与 S-1/S-2 同一条结论）。
 
 **未完成清单（计划，未执行）**：
 
@@ -115,7 +123,9 @@
    → **已完成（2026-10-30 晚）**：Docker Desktop 29.9.2 装好，镜像 `giftwise-validator:latest` 构建成功（178 MB），
    容器内 `/healthz` 200、`/validate` 与本机纯函数逐字节一致、5 项错误路径符合契约；阶段 14 可观测入口另用
    独立 tag 完整验证（24/24）。证据：`evidence/docker-2026-10-30.md`、`evidence/observability-2026-10-30.md`。
-   **残留**：`Dockerfile` 的 `CMD` 尚未切换到可观测入口（QA 冻结中）。
+   **残留（2026-10-31 01:13:59 更新）**：`Dockerfile` 已改成 `COPY deploy /app/deploy`，可观测入口**已随镜像交付**；
+   **默认 `CMD` 仍是 `deploy.server`**（PM 夜间指令明确要求），故"镜像默认入口即可观测入口"**不做**——
+   正确表述是"可观测入口已随镜像交付、但非默认入口"。
 3. 路线 C 的 UHost 开通、上传、远端构建、公网验证（**未执行**，且无授权）。
 4. 成本数据（**未测量**，等 Q3/Q4 答复）。
 5. 与架构 Agent 同步"拟部署 → 已部署/未部署"的架构图标记（属他人文件，未改）。

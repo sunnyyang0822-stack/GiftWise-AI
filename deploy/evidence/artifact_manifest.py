@@ -29,6 +29,24 @@ TRACKED = [
     "deploy/evidence/local_check.py",
     "deploy/evidence/container_layout_dryrun.py",
     "deploy/evidence/container_probe.py",
+    # 阶段 14（2026-10-30 晚）新增：可观测性实现与验证脚本
+    "deploy/observability.py",
+    "deploy/observable_server.py",
+    "deploy/evidence/observability_check.py",
+    "deploy/evidence/observability_container_check.py",
+    "deploy/evidence/ps1_static_check.py",
+    # 缺陷 I-2（= 安全自查 S-5，2026-10-30 晚第三轮）新增：半开正文修复前对照 + 修复后回归
+    "deploy/evidence/slow_body_check.py",
+    "deploy/evidence/raw/slowbody-prefix/server.py.before",
+    # 交付镜像重建与口径更正（2026-10-31 凌晨）：镜像×源码一致性核验 + 审计报告 + 候选 Dockerfile
+    "deploy/evidence/image_source_parity_check.py",
+    "deploy/evidence/image_container_matrix_check.py",
+    "deploy/evidence/image-audit-2026-10-31.md",
+    "deploy/evidence/candidate-Dockerfile-observable",
+    # PM 夜间指令四修（2026-10-31 01:13:59）：N-1 入口进镜像 / N-4 日志粘连 + 改前 Dockerfile 字节副本
+    "deploy/evidence/log_interleave_check.py",
+    "deploy/evidence/image-rebuild-n1n4-2026-10-31.md",
+    "deploy/evidence/raw/slowbody-prefix/Dockerfile.before",
     "validator/rules.py",
     "validator/__init__.py",
     "workflow/examples/intake.json",

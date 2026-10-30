@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-10-31T01:36:20.659466+08:00",
+  "tier": "fast",
+  "run_dir": "docs/verification/runs/20261031T013620+0800",
+  "python": "3.12.12",
+  "node": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current/node.EXE",
+  "docker": "C:/Program Files/Docker/Docker/resources/bin/docker.exe",
+  "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd",
+  "passed": 0,
+  "failed": 1,
+  "skipped": 0,
+  "model_calls": 0,
+  "notes": [],
+  "rows": [
+    {
+      "name": "declared_rules_hash",
+      "group": "fast",
+      "what": "对外材料声明的规则哈希 / 版本指纹",
+      "status": "FAIL",
+      "seconds": 0.094,
+      "command": "(内置只读探针：docs/competition/材料清单与自查.md + workflow/generated/manifest.json)",
+      "raw_output": "docs/verification/runs/20261031T013620+0800/declared_rules_hash.out",
+      "note": "对外材料声明的规则哈希与当前 validator/rules.py 不一致（见原始输出）",
+      "retry": "",
+      "related_mtimes": {
+        "docs/competition/材料清单与自查.md": "2026-10-31 01:24:17",
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "workflow/generated/manifest.json": "2026-10-31 01:03:02"
+      }
+    }
+  ]
+}

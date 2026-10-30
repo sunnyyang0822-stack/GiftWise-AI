@@ -1,0 +1,338 @@
+{
+  "contended": {
+    "1": {
+      "BEFORE": {
+        "rounds": 2,
+        "tot": 120,
+        "ok": 120,
+        "err": 0,
+        "ok_rps": 91.8,
+        "ok_rps_pooled": 90.9,
+        "p50": 8.56,
+        "p95": 27.0,
+        "p99": 27.81,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      },
+      "AFTER": {
+        "rounds": 2,
+        "tot": 120,
+        "ok": 120,
+        "err": 0,
+        "ok_rps": 102.3,
+        "ok_rps_pooled": 102.0,
+        "p50": 3.65,
+        "p95": 25.53,
+        "p99": 27.57,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "10": {
+      "BEFORE": {
+        "rounds": 2,
+        "tot": 1200,
+        "ok": 1200,
+        "err": 0,
+        "ok_rps": 354.0,
+        "ok_rps_pooled": 354.0,
+        "p50": 7.96,
+        "p95": 28.04,
+        "p99": 31.96,
+        "err_pct": 0.0,
+        "over500": 6,
+        "over1000": 6,
+        "kinds": {}
+      },
+      "AFTER": {
+        "rounds": 2,
+        "tot": 1200,
+        "ok": 1200,
+        "err": 0,
+        "ok_rps": 642.7,
+        "ok_rps_pooled": 641.7,
+        "p50": 11.91,
+        "p95": 29.66,
+        "p99": 32.77,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "50": {
+      "BEFORE": {
+        "rounds": 2,
+        "tot": 6000,
+        "ok": 5928,
+        "err": 72,
+        "ok_rps": 459.3,
+        "ok_rps_pooled": 457.5,
+        "p50": 9.39,
+        "p95": 31.98,
+        "p99": 1042.95,
+        "err_pct": 1.2,
+        "over500": 234,
+        "over1000": 234,
+        "kinds": {
+          "RemoteDisconnected": 72
+        }
+      },
+      "AFTER": {
+        "rounds": 2,
+        "tot": 6000,
+        "ok": 6000,
+        "err": 0,
+        "ok_rps": 725.2,
+        "ok_rps_pooled": 725.1,
+        "p50": 68.03,
+        "p95": 77.87,
+        "p99": 82.07,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "100": {
+      "BEFORE": {
+        "rounds": 2,
+        "tot": 12000,
+        "ok": 11757,
+        "err": 243,
+        "ok_rps": 519.3,
+        "ok_rps_pooled": 519.2,
+        "p50": 10.95,
+        "p95": 1025.54,
+        "p99": 2165.27,
+        "err_pct": 2.02,
+        "over500": 849,
+        "over1000": 849,
+        "kinds": {
+          "RemoteDisconnected": 243
+        }
+      },
+      "AFTER": {
+        "rounds": 2,
+        "tot": 12000,
+        "ok": 12000,
+        "err": 0,
+        "ok_rps": 708.3,
+        "ok_rps_pooled": 708.2,
+        "p50": 138.08,
+        "p95": 162.45,
+        "p99": 172.7,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "200": {
+      "BEFORE": {
+        "rounds": 2,
+        "tot": 24000,
+        "ok": 23022,
+        "err": 978,
+        "ok_rps": 543.6,
+        "ok_rps_pooled": 539.0,
+        "p50": 15.48,
+        "p95": 1145.07,
+        "p99": 3281.96,
+        "err_pct": 4.08,
+        "over500": 3313,
+        "over1000": 3310,
+        "kinds": {
+          "RemoteDisconnected": 978
+        }
+      },
+      "AFTER": {
+        "rounds": 2,
+        "tot": 24000,
+        "ok": 24000,
+        "err": 0,
+        "ok_rps": 682.6,
+        "ok_rps_pooled": 682.6,
+        "p50": 286.57,
+        "p95": 337.54,
+        "p99": 357.66,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    }
+  },
+  "quiet": {
+    "1": {
+      "BEFORE": {
+        "rounds": 1,
+        "tot": 60,
+        "ok": 60,
+        "err": 0,
+        "ok_rps": 86.2,
+        "ok_rps_pooled": 86.2,
+        "p50": 13.16,
+        "p95": 27.42,
+        "p99": 28.5,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      },
+      "AFTER": {
+        "rounds": 1,
+        "tot": 60,
+        "ok": 60,
+        "err": 0,
+        "ok_rps": 84.1,
+        "ok_rps_pooled": 84.1,
+        "p50": 4.13,
+        "p95": 28.6,
+        "p99": 57.57,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "10": {
+      "BEFORE": {
+        "rounds": 1,
+        "tot": 600,
+        "ok": 600,
+        "err": 0,
+        "ok_rps": 378.1,
+        "ok_rps_pooled": 378.1,
+        "p50": 7.42,
+        "p95": 28.14,
+        "p99": 30.99,
+        "err_pct": 0.0,
+        "over500": 3,
+        "over1000": 3,
+        "kinds": {}
+      },
+      "AFTER": {
+        "rounds": 1,
+        "tot": 600,
+        "ok": 600,
+        "err": 0,
+        "ok_rps": 620.2,
+        "ok_rps_pooled": 620.2,
+        "p50": 13.13,
+        "p95": 30.05,
+        "p99": 34.41,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "50": {
+      "BEFORE": {
+        "rounds": 1,
+        "tot": 3000,
+        "ok": 2974,
+        "err": 26,
+        "ok_rps": 430.6,
+        "ok_rps_pooled": 430.6,
+        "p50": 11.34,
+        "p95": 32.55,
+        "p99": 1246.19,
+        "err_pct": 0.87,
+        "over500": 119,
+        "over1000": 119,
+        "kinds": {
+          "RemoteDisconnected": 26
+        }
+      },
+      "AFTER": {
+        "rounds": 1,
+        "tot": 3000,
+        "ok": 3000,
+        "err": 0,
+        "ok_rps": 642.0,
+        "ok_rps_pooled": 642.0,
+        "p50": 76.46,
+        "p95": 97.09,
+        "p99": 105.6,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "100": {
+      "BEFORE": {
+        "rounds": 1,
+        "tot": 6000,
+        "ok": 5875,
+        "err": 125,
+        "ok_rps": 464.3,
+        "ok_rps_pooled": 464.3,
+        "p50": 14.37,
+        "p95": 1031.12,
+        "p99": 2276.26,
+        "err_pct": 2.08,
+        "over500": 418,
+        "over1000": 418,
+        "kinds": {
+          "RemoteDisconnected": 125
+        }
+      },
+      "AFTER": {
+        "rounds": 1,
+        "tot": 6000,
+        "ok": 6000,
+        "err": 0,
+        "ok_rps": 664.1,
+        "ok_rps_pooled": 664.1,
+        "p50": 146.52,
+        "p95": 176.96,
+        "p99": 191.37,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    },
+    "200": {
+      "BEFORE": {
+        "rounds": 1,
+        "tot": 12000,
+        "ok": 11521,
+        "err": 479,
+        "ok_rps": 587.7,
+        "ok_rps_pooled": 587.7,
+        "p50": 13.21,
+        "p95": 1043.42,
+        "p99": 3286.67,
+        "err_pct": 3.99,
+        "over500": 1414,
+        "over1000": 1411,
+        "kinds": {
+          "RemoteDisconnected": 479
+        }
+      },
+      "AFTER": {
+        "rounds": 1,
+        "tot": 12000,
+        "ok": 12000,
+        "err": 0,
+        "ok_rps": 614.5,
+        "ok_rps_pooled": 614.5,
+        "p50": 315.45,
+        "p95": 385.93,
+        "p99": 412.48,
+        "err_pct": 0.0,
+        "over500": 0,
+        "over1000": 0,
+        "kinds": {}
+      }
+    }
+  }
+}

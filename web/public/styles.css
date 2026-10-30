@@ -94,6 +94,8 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  /* 极窄视口（320px）下品牌字标 + 模拟标识 + 按钮一行放不下，允许换行而不是撑破版 */
+  flex-wrap: wrap;
 }
 .brand {
   display: inline-flex;
@@ -106,6 +108,8 @@ body {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   white-space: nowrap;
+  /* 触控目标下限 */
+  min-height: 44px;
 }
 .brand svg {
   width: 20px;
@@ -127,6 +131,44 @@ body {
 }
 .site-header .btn {
   margin-left: auto;
+}
+/* 常驻吸顶的模拟数据标识：任何滚动位置、任何视口宽度都看得见 */
+.mode-flag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex: none;
+  border: 1px solid var(--warn-line);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+}
+.mode-flag--real {
+  border-color: var(--ok-line);
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+.mode-flag[hidden] {
+  display: none;
+}
+/* 首屏数据来源说明：与 hero__note 同级，但用警示底色突出 */
+.hero__flag {
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--warn-line);
+  border-left: 3px solid var(--warn-line);
+  border-radius: var(--radius-sm);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 46ch;
+}
+.hero__flag[hidden] {
+  display: none;
 }
 @media (min-width: 860px) {
   .site-nav {
@@ -284,6 +326,7 @@ body {
   padding: 12px 14px;
   font-size: 0.86rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 .banner--info {
   border-left-color: var(--ribbon-blue);
@@ -350,6 +393,9 @@ body {
   margin: 18px auto 0;
   padding: 0 20px 140px;
   outline: none;
+  /* 真实模型输出可能是不可断行的长串（URL / 无空格长词）：允许在任意字符处断行，
+     避免把整个文档撑宽（窄屏下会连带固定动作条一起变形）。 */
+  overflow-wrap: anywhere;
 }
 
 .card {
@@ -495,7 +541,7 @@ body {
 .interest-row .chip {
   border: 0;
   padding: 4px 6px;
-  min-height: 34px;
+  min-height: 44px;
   background: transparent;
 }
 .interest-row .chip:hover {
@@ -518,7 +564,7 @@ body {
   border: 0;
   background: transparent;
   padding: 8px 14px;
-  min-height: 40px;
+  min-height: 44px;
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
@@ -561,9 +607,13 @@ textarea {
   display: flex;
   gap: 10px;
   align-items: flex-start;
+  /* 整行都是可点击区域：触控目标按 label 高度计算，不能低于 44px */
+  min-height: 44px;
+  padding: 6px 0;
   margin-top: 12px;
   font-size: 0.88rem;
   color: var(--ink-2);
+  cursor: pointer;
 }
 .confirm-row input {
   width: 20px;
@@ -584,7 +634,7 @@ textarea {
   background: var(--surface);
   border-radius: 999px;
   padding: 9px 14px;
-  min-height: 42px;
+  min-height: 44px;
   font: inherit;
   font-size: 0.84rem;
   cursor: pointer;
@@ -632,7 +682,7 @@ textarea {
   background: transparent;
 }
 .btn--sm {
-  min-height: 40px;
+  min-height: 44px;
   padding: 9px 18px;
   font-size: 0.86rem;
 }
@@ -673,7 +723,10 @@ textarea {
 
 .kv {
   display: grid;
-  grid-template-columns: minmax(96px, auto) 1fr;
+  /* 第二列必须是 minmax(0, 1fr)：1fr 的自动最小尺寸是 max-content，
+     一格放不下就会把整条轨道顶宽、穿透卡片（.view 的 overflow-wrap 只治文字，
+     治不住轨道的自动最小尺寸，这里把轨道的最小尺寸显式归零）。 */
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr);
   gap: 8px 16px;
   font-size: 0.9rem;
   margin: 14px 0 0;
@@ -689,6 +742,9 @@ textarea {
 .kv dd {
   margin: 0;
   color: var(--ink-2);
+  /* flex/grid 子项默认 min-width:auto，会被最长的不可断行串顶宽；显式归零。 */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .kv dd strong {
   color: var(--ink);
@@ -801,6 +857,7 @@ textarea {
 .app-footer p {
   margin: 12px 0 0;
   max-width: 78ch;
+  overflow-wrap: anywhere;
 }
 .app-footer__meta {
   font-family: var(--mono);
@@ -839,5 +896,146 @@ textarea {
   }
   .actions .btn {
     flex: 0 1 auto;
+  }
+}
+
+/* ==========================================================================
+   第二前端线（line/web-alt）补充
+   1) 步骤条改为「四步走」：关系 / 场合 / 预算与时间 / 兴趣与禁忌；
+   2) 视图切换的一次性位移动效（只在视图 key 变化时触发，输入重绘不会闪）；
+   3) 流程收束的鼓励页。
+   动效只用 opacity / transform，reduced-motion 下全部关闭。
+   ========================================================================== */
+
+.steps {
+  align-items: center;
+}
+.step-page {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.step-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+.step-pill--todo {
+  border-style: dashed;
+}
+.step-pill--done::after {
+  content: " ✓";
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #view.gw-enter {
+    animation: gw-view-in 320ms var(--gw-motion-ease) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #view.gw-enter {
+    animation: none;
+  }
+}
+
+@media (hover: hover) {
+  .card {
+    transition: box-shadow 200ms ease, border-color 200ms ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-2);
+  }
+}
+
+/* ------------------------------------------------------------- 鼓励页 */
+.encourage__eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.encourage__title {
+  margin: 0 0 12px;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.encourage__lead {
+  margin: 0;
+  max-width: 54ch;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.encourage__rule {
+  width: 64px;
+  height: 2px;
+  margin: 24px 0;
+  background: var(--ribbon-red);
+}
+.encourage__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+.encourage__stat {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.encourage__stat dt {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.encourage__stat dd {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.encourage__note {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  .encourage__stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 状态页正文里的恢复入口（超时 / 错误） */
+.state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* 窄屏动作条会叠到三行（上一步 / 跳过 / 下一步：…），底部固定条更高，
+   内容和页脚都要多留出空间，否则最后一屏会被固定条压住。 */
+@media (max-width: 599px) {
+  .view {
+    padding-bottom: 215px;
+  }
+  .app-footer {
+    padding-bottom: 220px;
   }
 }

@@ -1,0 +1,152 @@
+{
+ "schema_version": 1,
+ "channel": "web-native-public-page",
+ "collector": "GiftWise research agent (Issue #26 / RESEARCH-001)",
+ "captured_at": "2026-10-30T17:03:18.636877+00:00",
+ "batch": "q1-static-page-path-probe",
+ "batch_title": "Q1 官方静态页路径探测（open.taobao.com/business.htm 命中；open.dewu.com 全部路径返回同一 JS 壳）",
+ "method": "HTTP GET via Python urllib with host system proxy; gzip decompressed where Content-Encoding was set; no cookies, no login, no JS execution.",
+ "records": [
+  {
+   "requested_url": "https://open.taobao.com/businessList.htm",
+   "fetched_at": "2026-10-30T17:01:20Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+   "requested_url": "https://open.taobao.com/business.htm",
+   "fetched_at": "2026-10-30T17:01:22Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.taobao.com/business.htm",
+   "content_type": "text/html;charset=UTF-8",
+   "content_encoding": null,
+   "bytes": 14747,
+   "sha256": "067d0ac166f9d3b72afb4878afbc8760102ea2d0abe9e4403bbc74d07bf29fd1",
+   "charset": "UTF-8",
+   "title": "淘宝开放平台 - 业务介绍",
+   "raw_text": "淘宝开放平台\n\n解决方案\n\n开放版图\n\n新零售开放\n智慧门店\n智能硬件\n\n电商开放\n第三方工具\n千牛插件\n\n无线开放\n品牌号\nC2B\n互动营销\n天猫精灵\n\n国际化\nAliExpress\nICBU\nLazada\n\n其他\n钉钉\n飞猪\n盒马\n淘宝客\n\n文档中心\n\n文档首页\nAPI文档\n消息文档\n\n工单支持\n\nFAQ\n支持中心\n\n平台公告\n\n控制台\n\n登录\n\n更多机会\n\nLearn more\n\n手淘无线\n\n分享三亿月活跃用户、移动云基础设施，以及丰富的API、SDK组件等\n\n电商后台\n\n开发电商管理类应用，全面服务天猫/淘宝/天猫国际/去啊/AE等平台商家，为电商业务管理提供系统支持\n\n千牛插件\n\n基于千万级卖家的千牛开放，向淘宝/天猫商家提供丰富的业务经营工具，从而打造千牛工作台\n\n更多业务\n\n了解其他的淘宝开放业务\n\n开放平台合作: 点此反馈\n\n咨询帮助：开放平台支持中心\n\n2003 - 2020 Taobao 版权所有\n\n阿里巴巴集团\n\n淘宝网\n\n天猫\n\n聚划算\n\n全球速卖通\n\n阿里巴巴国际交易市场\n\n1688\n\n阿里妈妈\n\n阿里云计算\n\nYunOS\n\n万网\n\n淘宝旅行\n\n虾米\n\n来往\n\n支付宝"
+  },
+  {
+   "requested_url": "https://open.taobao.com/docList.htm",
+   "fetched_at": "2026-10-30T17:01:25Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+   "requested_url": "https://open.taobao.com/apiList.htm",
+   "fetched_at": "2026-10-30T17:01:27Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+   "requested_url": "https://open.taobao.com/rule.htm",
+   "fetched_at": "2026-10-30T17:01:30Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+   "requested_url": "https://open.taobao.com/accessRule.htm",
+   "fetched_at": "2026-10-30T17:01:33Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+   "requested_url": "https://open.taobao.com/index.htm",
+   "fetched_at": "2026-10-30T17:01:35Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.taobao.com/index.htm",
+   "content_type": "text/html;charset=UTF-8",
+   "content_encoding": null,
+   "bytes": 2369,
+   "sha256": "ff055649025b8611dc02751fffdc47fe698cee1e016140ce7c40a2aaefac5f73",
+   "charset": "UTF-8",
+   "title": "淘宝开放平台",
+   "raw_text": "淘宝开放平台"
+  },
+  {
+   "requested_url": "https://open.dewu.com/",
+   "fetched_at": "2026-10-30T17:01:38Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.dewu.com/",
+   "content_type": "text/html",
+   "content_encoding": null,
+   "bytes": 3168,
+   "sha256": "5dd6c59e4f06c4be10d61a89eda04508878d3ae8677814430f5a842659c0d328",
+   "charset": "utf-8",
+   "title": "得物开放平台",
+   "raw_text": ""
+  },
+  {
+   "requested_url": "https://open.dewu.com/doc",
+   "fetched_at": "2026-10-30T17:01:41Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.dewu.com/doc",
+   "content_type": "text/html",
+   "content_encoding": null,
+   "bytes": 3168,
+   "sha256": "5dd6c59e4f06c4be10d61a89eda04508878d3ae8677814430f5a842659c0d328",
+   "charset": "utf-8",
+   "title": "得物开放平台",
+   "raw_text": ""
+  },
+  {
+   "requested_url": "https://open.dewu.com/agreement",
+   "fetched_at": "2026-10-30T17:01:43Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.dewu.com/agreement",
+   "content_type": "text/html",
+   "content_encoding": null,
+   "bytes": 3168,
+   "sha256": "5dd6c59e4f06c4be10d61a89eda04508878d3ae8677814430f5a842659c0d328",
+   "charset": "utf-8",
+   "title": "得物开放平台",
+   "raw_text": ""
+  },
+  {
+   "requested_url": "https://open.dewu.com/protocol",
+   "fetched_at": "2026-10-30T17:01:46Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.dewu.com/protocol",
+   "content_type": "text/html",
+   "content_encoding": null,
+   "bytes": 3168,
+   "sha256": "5dd6c59e4f06c4be10d61a89eda04508878d3ae8677814430f5a842659c0d328",
+   "charset": "utf-8",
+   "title": "得物开放平台",
+   "raw_text": ""
+  },
+  {
+   "requested_url": "https://open.dewu.com/help",
+   "fetched_at": "2026-10-30T17:01:49Z",
+   "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+   "method": "python urllib via system proxy from Windows registry",
+   "status": 200,
+   "final_url": "https://open.dewu.com/help",
+   "content_type": "text/html",
+   "content_encoding": null,
+   "bytes": 3168,
+   "sha256": "5dd6c59e4f06c4be10d61a89eda04508878d3ae8677814430f5a842659c0d328",
+   "charset": "utf-8",
+   "title": "得物开放平台",
+   "raw_text": ""
+  }
+ ],
+ "caveat": "business.htm 与 solutions.htm 是服务端渲染；faq.htm/announcement.htm 返回 '页面加载中,请稍候 ...'；open.dewu.com 的 / /doc /agreement /protocol /help 五个路径均返回同一个 3168 字节 SPA 壳。"
+}

@@ -1,0 +1,17 @@
+# 证据：JS↔Python parity（74 组）
+# 执行时间（开始）：2026-10-31 02:17:15 +0800
+# 执行目录：/c/Users/lenovo/Desktop/giftwise
+# 说明：纯离线比对（同一批字面 JSON 字符串分别跑 JS 接入层与 Python 参考实现），不需要网络、不需要模型。
+
+$ node web/tools/parity-check.mjs
+JS↔Python 语义比对：共 74 组样例（intake 27 条 / 候选批次 26 条 / **请求侧越界与格式** 17 条 / 损坏样例 4 条）
+  请求侧覆盖：越界网格 15 组（预算{0,1,10000,10000.01,10001} × 天数{0,365,366}）+ 格式优先 2 组
+参考实现：python: workflow/intake.py + validator/rules.py（Python 3.12.12）
+追求对象契约开关：PURSUIT_CONTRACT_READY=true
+结果：全部一致（0 处语义差异）
+
+附加检查（把契约开关当作未落地）：错误码 PURSUIT_CONTRACT_NOT_READY；未生成请求：true
+附加检查：通过（拒绝且不静默映射）
+
+# 执行时间（结束）：2026-10-31 02:17:15 +0800
+# 退出码：0

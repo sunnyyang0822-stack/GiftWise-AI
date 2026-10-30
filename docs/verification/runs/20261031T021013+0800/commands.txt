@@ -1,0 +1,2 @@
+# 本次实际执行的完整命令（结果表里因排版被截断，这里给全文）
+[PASS] browser_check: C:\Users\lenovo\scoop\apps\nodejs-lts\current\node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]

@@ -1,0 +1,176 @@
+{
+  "url": "http://127.0.0.1:18905",
+  "container": "__none__",
+  "levels": [
+    {
+      "url": "http://127.0.0.1:18905",
+      "concurrency": 100,
+      "requests_per_worker": 60,
+      "requests_total": 6000,
+      "wall_seconds": 9.7642,
+      "throughput_rps": 614.49,
+      "throughput_ok_rps": 601.59,
+      "status_counts": {
+        "200": 5874
+      },
+      "ok_200": 5874,
+      "http_408": 0,
+      "error_count": 126,
+      "error_kinds": {
+        "ConnectionResetError": 102,
+        "ConnectionRefusedError": 24
+      },
+      "error_samples": [
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 340,
+      "client_time_wait_after": 325,
+      "latency": {
+        "n": 6000,
+        "min_ms": 1.026,
+        "mean_ms": 92.349,
+        "p50_ms": 5.572,
+        "p90_ms": 509.224,
+        "p95_ms": 528.096,
+        "p99_ms": 1524.407,
+        "p999_ms": 2043.172,
+        "max_ms": 2054.516,
+        "tail": {
+          "over_50ms": 632,
+          "over_100ms": 632,
+          "over_500ms": 632,
+          "over_1000ms": 237,
+          "over_100ms_pct": 10.53
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18905",
+      "concurrency": 200,
+      "requests_per_worker": 60,
+      "requests_total": 12000,
+      "wall_seconds": 21.9066,
+      "throughput_rps": 547.78,
+      "throughput_ok_rps": 505.92,
+      "status_counts": {
+        "200": 11083
+      },
+      "ok_200": 11083,
+      "http_408": 0,
+      "error_count": 917,
+      "error_kinds": {
+        "ConnectionResetError": 600,
+        "ConnectionRefusedError": 317
+      },
+      "error_samples": [
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 327,
+      "client_time_wait_after": 324,
+      "latency": {
+        "n": 12000,
+        "min_ms": 1.115,
+        "mean_ms": 240.425,
+        "p50_ms": 11.126,
+        "p90_ms": 1027.309,
+        "p95_ms": 1543.129,
+        "p99_ms": 2039.42,
+        "p999_ms": 2070.231,
+        "max_ms": 2144.094,
+        "tail": {
+          "over_50ms": 2626,
+          "over_100ms": 2598,
+          "over_500ms": 2598,
+          "over_1000ms": 1430,
+          "over_100ms_pct": 21.65
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18905",
+      "concurrency": 300,
+      "requests_per_worker": 60,
+      "requests_total": 18000,
+      "wall_seconds": 23.5157,
+      "throughput_rps": 765.45,
+      "throughput_ok_rps": 701.92,
+      "status_counts": {
+        "200": 16506
+      },
+      "ok_200": 16506,
+      "http_408": 0,
+      "error_count": 1494,
+      "error_kinds": {
+        "ConnectionResetError": 1165,
+        "ConnectionRefusedError": 329
+      },
+      "error_samples": [
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionResetError:WinError10054(连接被重置): [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionRefusedError:WinError10061(连接被拒): [WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 324,
+      "client_time_wait_after": 315,
+      "latency": {
+        "n": 18000,
+        "min_ms": 1.071,
+        "mean_ms": 242.43,
+        "p50_ms": 7.745,
+        "p90_ms": 1024.167,
+        "p95_ms": 1536.874,
+        "p99_ms": 2038.859,
+        "p999_ms": 2058.098,
+        "max_ms": 2070.319,
+        "tail": {
+          "over_50ms": 4369,
+          "over_100ms": 4346,
+          "over_500ms": 4346,
+          "over_1000ms": 2107,
+          "over_100ms_pct": 24.14
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "threads_peak": null,
+        "note": "本机直跑，无容器资源"
+      }
+    }
+  ],
+  "requests_per_worker": 60,
+  "client_linger0": true,
+  "baseline": null,
+  "kind": "ramp",
+  "label": "levels100-200-300",
+  "recorded_at": "2026-10-31T01:26:49+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

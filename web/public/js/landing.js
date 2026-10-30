@@ -1,6 +1,8 @@
-/* 首屏只负责锚点体验与数据来源说明；流程入口由 app.js 独占绑定。 */
+/* 首屏六屏（hero / how / after / faq / theme / privacy）只负责锚点体验与「是否还停在首屏」的判定；
+   流程入口与数据来源文案由 app.js 独占绑定与写入，这里不覆盖任何流程文案。 */
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-document.querySelectorAll('.site-nav a[href^="#"], .gw-scroll-link').forEach((link) => {
+
+for (const link of document.querySelectorAll('.site-nav a[href^="#"], .gw-scroll-link, [data-anchor-link]')) {
   link.addEventListener("click", (event) => {
     const target = document.querySelector(link.getAttribute("href"));
     if (!target) return;
@@ -10,20 +12,10 @@ document.querySelectorAll('.site-nav a[href^="#"], .gw-scroll-link').forEach((li
     target.focus({ preventScroll: true });
     history.replaceState(null, "", link.getAttribute("href"));
   });
-});
-
-// 接入脚本的历史说明含已过时的 Dify 发布判断；首屏只披露当前界面的数据来源。
-const heroFlag = document.getElementById("hero-flag");
-const mockDisclosure = "当前为模拟数据演示；方案与呈现内容并非真实模型输出，价格、库存及送达未核实。";
-function normalizeDisclosure() {
-  if (heroFlag && !heroFlag.hidden && heroFlag.textContent.includes("模拟数据") && heroFlag.textContent !== mockDisclosure) {
-    heroFlag.textContent = mockDisclosure;
-  }
 }
-if (heroFlag) new MutationObserver(normalizeDisclosure).observe(heroFlag, { childList: true, characterData: true, subtree: true });
-normalizeDisclosure();
 
-// 品牌与流程说明区域不展示旧流程动作条；进入流程挂载区后恢复。
+// 只要用户还停在首屏任意一屏上，就收起底部固定的流程动作条（避免盖住品牌与说明）。
+// 进入流程挂载区（#badges / #steps / #view）后动作条恢复。
 const visibleLandingSections = new Set();
 const landingObserver = new IntersectionObserver((entries) => {
   for (const entry of entries) {
@@ -32,4 +24,4 @@ const landingObserver = new IntersectionObserver((entries) => {
   }
   document.body.classList.toggle("gw-on-landing", visibleLandingSections.size > 0);
 });
-for (const section of document.querySelectorAll("#hero, #how")) landingObserver.observe(section);
+for (const section of document.querySelectorAll("[data-landing]")) landingObserver.observe(section);

@@ -1,0 +1,548 @@
+{
+  "stamp": "20261030-232152",
+  "sentinel": "SENTINEL_绝不入库_082d15bc7e85",
+  "port_frozen": 8801,
+  "port_observable": 8802,
+  "phase1_seconds": 0.858,
+  "concurrency_seconds": 0.582,
+  "concurrency_rps": 137.4,
+  "requests_total_after_phase1": 70,
+  "requests_total_final": 151,
+  "ledger_status_counts": {
+    "200": 128,
+    "400": 11,
+    "404": 5,
+    "413": 4,
+    "501": 2
+  },
+  "ledger_keys": {
+    "GET / 200": 1,
+    "GET /healthz 200": 6,
+    "GET /metrics 200": 5,
+    "GET /readyz 200": 2,
+    "GET __unmatched__ 404": 5,
+    "POST /validate 200": 114,
+    "POST /validate 400": 11,
+    "POST /validate 413": 4,
+    "PUT /validate 501": 2
+  },
+  "ledger_error_codes": {
+    "INVALID_JSON": 8,
+    "INVALID_PAYLOAD": 3,
+    "MISSING_FIELD": 3,
+    "NOT_FOUND": 5,
+    "REQUEST_TOO_LARGE": 4
+  },
+  "ledger_validate_results": {
+    "needs_input": 3,
+    "passed": 111
+  },
+  "jsonl_lines": 152,
+  "jsonl_invalid": 0,
+  "metrics_after_phase1": {
+    "ts": "2026-10-30T23:21:53.742+08:00",
+    "service": "giftwise-validator",
+    "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
+    "uptime_seconds": 1.228,
+    "requests_total": 70,
+    "errors_total": 22,
+    "error_rate": 0.314286,
+    "requests_by_key": {
+      "GET / 200": 1,
+      "GET /healthz 200": 6,
+      "GET /metrics 200": 5,
+      "GET /readyz 200": 2,
+      "GET __unmatched__ 404": 5,
+      "POST /validate 200": 34,
+      "POST /validate 400": 11,
+      "POST /validate 413": 4,
+      "PUT /validate 501": 2
+    },
+    "errors_by_status": {
+      "400": 11,
+      "404": 5,
+      "413": 4,
+      "501": 2
+    },
+    "validate_results_total": {
+      "needs_input": 3,
+      "passed": 31
+    },
+    "error_codes_total": {
+      "INVALID_JSON": 8,
+      "INVALID_PAYLOAD": 3,
+      "MISSING_FIELD": 3,
+      "NOT_FOUND": 5,
+      "REQUEST_TOO_LARGE": 4
+    },
+    "latency_by_route": {
+      "/": {
+        "count": 1,
+        "sum_ms": 0.117,
+        "p50_ms": 0.117,
+        "p95_ms": 0.117,
+        "p99_ms": 0.117,
+        "max_ms": 0.117,
+        "reservoir_size": 1
+      },
+      "/healthz": {
+        "count": 6,
+        "sum_ms": 0.755,
+        "p50_ms": 0.124,
+        "p95_ms": 0.139,
+        "p99_ms": 0.14,
+        "max_ms": 0.14,
+        "reservoir_size": 6
+      },
+      "/metrics": {
+        "count": 5,
+        "sum_ms": 1.926,
+        "p50_ms": 0.349,
+        "p95_ms": 0.5,
+        "p99_ms": 0.517,
+        "max_ms": 0.521,
+        "reservoir_size": 5
+      },
+      "/readyz": {
+        "count": 2,
+        "sum_ms": 37.214,
+        "p50_ms": 18.607,
+        "p95_ms": 34.608,
+        "p99_ms": 36.03,
+        "max_ms": 36.386,
+        "reservoir_size": 2
+      },
+      "/validate": {
+        "count": 51,
+        "sum_ms": 19.831,
+        "p50_ms": 0.404,
+        "p95_ms": 0.953,
+        "p99_ms": 1.187,
+        "max_ms": 1.322,
+        "reservoir_size": 51
+      },
+      "__unmatched__": {
+        "count": 5,
+        "sum_ms": 0.613,
+        "p50_ms": 0.116,
+        "p95_ms": 0.14,
+        "p99_ms": 0.14,
+        "max_ms": 0.14,
+        "reservoir_size": 5
+      }
+    },
+    "in_flight_requests": 1,
+    "metrics_scrapes_total": 5,
+    "ready_checks_total": 2,
+    "bytes_in_total": 280017,
+    "bytes_out_total": 51966,
+    "nonzero_latency_samples": 70,
+    "process_resident_memory_bytes": 27992064,
+    "model_calls_total": 0,
+    "cost": {
+      "unit": "CNY",
+      "amount": 0.0,
+      "source": "deterministic_rules_only"
+    },
+    "python_version": "3.12.12",
+    "platform": "Windows"
+  },
+  "metrics_after_concurrency": {
+    "ts": "2026-10-30T23:21:54.341+08:00",
+    "service": "giftwise-validator",
+    "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
+    "uptime_seconds": 1.828,
+    "requests_total": 151,
+    "errors_total": 22,
+    "error_rate": 0.145695,
+    "requests_by_key": {
+      "GET / 200": 1,
+      "GET /healthz 200": 6,
+      "GET /metrics 200": 6,
+      "GET /readyz 200": 2,
+      "GET __unmatched__ 404": 5,
+      "POST /validate 200": 114,
+      "POST /validate 400": 11,
+      "POST /validate 413": 4,
+      "PUT /validate 501": 2
+    },
+    "errors_by_status": {
+      "400": 11,
+      "404": 5,
+      "413": 4,
+      "501": 2
+    },
+    "validate_results_total": {
+      "needs_input": 3,
+      "passed": 111
+    },
+    "error_codes_total": {
+      "INVALID_JSON": 8,
+      "INVALID_PAYLOAD": 3,
+      "MISSING_FIELD": 3,
+      "NOT_FOUND": 5,
+      "REQUEST_TOO_LARGE": 4
+    },
+    "latency_by_route": {
+      "/": {
+        "count": 1,
+        "sum_ms": 0.117,
+        "p50_ms": 0.117,
+        "p95_ms": 0.117,
+        "p99_ms": 0.117,
+        "max_ms": 0.117,
+        "reservoir_size": 1
+      },
+      "/healthz": {
+        "count": 6,
+        "sum_ms": 0.755,
+        "p50_ms": 0.124,
+        "p95_ms": 0.139,
+        "p99_ms": 0.14,
+        "max_ms": 0.14,
+        "reservoir_size": 6
+      },
+      "/metrics": {
+        "count": 6,
+        "sum_ms": 2.724,
+        "p50_ms": 0.383,
+        "p95_ms": 0.729,
+        "p99_ms": 0.784,
+        "max_ms": 0.798,
+        "reservoir_size": 6
+      },
+      "/readyz": {
+        "count": 2,
+        "sum_ms": 37.214,
+        "p50_ms": 18.607,
+        "p95_ms": 34.608,
+        "p99_ms": 36.03,
+        "max_ms": 36.386,
+        "reservoir_size": 2
+      },
+      "/validate": {
+        "count": 131,
+        "sum_ms": 80.186,
+        "p50_ms": 0.539,
+        "p95_ms": 1.294,
+        "p99_ms": 1.513,
+        "max_ms": 1.584,
+        "reservoir_size": 131
+      },
+      "__unmatched__": {
+        "count": 5,
+        "sum_ms": 0.613,
+        "p50_ms": 0.116,
+        "p95_ms": 0.14,
+        "p99_ms": 0.14,
+        "max_ms": 0.14,
+        "reservoir_size": 5
+      }
+    },
+    "in_flight_requests": 1,
+    "metrics_scrapes_total": 6,
+    "ready_checks_total": 2,
+    "bytes_in_total": 459617,
+    "bytes_out_total": 76027,
+    "nonzero_latency_samples": 151,
+    "process_resident_memory_bytes": 28053504,
+    "model_calls_total": 0,
+    "cost": {
+      "unit": "CNY",
+      "amount": 0.0,
+      "source": "deterministic_rules_only"
+    },
+    "python_version": "3.12.12",
+    "platform": "Windows"
+  },
+  "checks": [
+    {
+      "name": "前置：工作负载载荷经纯函数校验为 passed（否则下面的期望不成立）",
+      "ok": true,
+      "detail": {
+        "status": "passed",
+        "all_passed": true,
+        "errors": []
+      }
+    },
+    {
+      "name": "两个服务在 30s 内就绪",
+      "ok": true,
+      "detail": "127.0.0.1 可连接"
+    },
+    {
+      "name": "阶段 1 每个请求都拿到响应（无 0 状态）",
+      "ok": true,
+      "detail": {
+        "200": 47,
+        "400": 11,
+        "404": 5,
+        "413": 4,
+        "501": 2
+      }
+    },
+    {
+      "name": "阶段 1 状态码分布符合契约（0 个 5xx）",
+      "ok": true,
+      "detail": {
+        "200": 47,
+        "400": 11,
+        "404": 5,
+        "413": 4,
+        "501": 2
+      }
+    },
+    {
+      "name": "/metrics 200 且 content-type 为 Prometheus 文本 v0.0.4",
+      "ok": true,
+      "detail": "200 text/plain; version=0.0.4; charset=utf-8"
+    },
+    {
+      "name": "/metrics?format=json 200 且可解析",
+      "ok": true,
+      "detail": "200 字段数=23"
+    },
+    {
+      "name": "指标请求总数 == 已记录请求数（不含本次抓取自身）",
+      "ok": true,
+      "detail": "指标=70 账本=70"
+    },
+    {
+      "name": "按 方法/路由/状态码 的计数与账本完全一致",
+      "ok": true,
+      "detail": {
+        "不一致": {},
+        "多余键": {}
+      }
+    },
+    {
+      "name": "错误码计数与账本一致",
+      "ok": true,
+      "detail": {
+        "指标": {
+          "INVALID_JSON": 8,
+          "INVALID_PAYLOAD": 3,
+          "MISSING_FIELD": 3,
+          "NOT_FOUND": 5,
+          "REQUEST_TOO_LARGE": 4
+        },
+        "账本": {
+          "INVALID_JSON": 8,
+          "INVALID_PAYLOAD": 3,
+          "MISSING_FIELD": 3,
+          "REQUEST_TOO_LARGE": 4,
+          "NOT_FOUND": 5
+        }
+      }
+    },
+    {
+      "name": "校验结果分布与账本一致",
+      "ok": true,
+      "detail": {
+        "指标": {
+          "needs_input": 3,
+          "passed": 31
+        },
+        "账本": {
+          "passed": 31,
+          "needs_input": 3
+        }
+      }
+    },
+    {
+      "name": "并发 8×10 全部 200",
+      "ok": true,
+      "detail": "200×80 / 80，0.582s"
+    },
+    {
+      "name": "并发后请求总数 = 前值 + 抓取 + 并发数",
+      "ok": true,
+      "detail": "指标=151 期望=151"
+    },
+    {
+      "name": "并发后校验结果分布仍与账本一致",
+      "ok": true,
+      "detail": {
+        "指标": {
+          "needs_input": 3,
+          "passed": 111
+        },
+        "账本": {
+          "passed": 111,
+          "needs_input": 3
+        }
+      }
+    },
+    {
+      "name": "访问日志每行都是合法 JSON（并发未交错）",
+      "ok": true,
+      "detail": "总行数=152 解析失败=0 首条坏行=[]"
+    },
+    {
+      "name": "日志行数 == 指标请求总数 + 本次抓取自身（抓取在渲染后才记账）",
+      "ok": true,
+      "detail": "行数=152 指标=151+1"
+    },
+    {
+      "name": "请求体未进入日志（哨兵串 0 命中）",
+      "ok": true,
+      "detail": "sentinel_in_log=False matches=0"
+    },
+    {
+      "name": "日志不含请求体字段与商品文本",
+      "ok": true,
+      "detail": {
+        "request_json": 0,
+        "candidates_json": 0,
+        "notes": 0,
+        "咖啡主题杯垫与马克杯": 0,
+        "recipient_relation": 0
+      }
+    },
+    {
+      "name": "路径字段已脱敏（ESC 被替换，无控制字符）",
+      "ok": true,
+      "detail": "含 ESC 的路径记录=['/a?b']"
+    },
+    {
+      "name": "每条日志都有唯一非空 request_id",
+      "ok": true,
+      "detail": "唯一 id 数=152 行数=152"
+    },
+    {
+      "name": "透传的 run_id 被如实记录（缺失记 null）",
+      "ok": true,
+      "detail": {
+        "run-obs-check-001": 30,
+        "null": 42,
+        "run-obs-conc-002": 80
+      }
+    },
+    {
+      "name": "每条日志都有非负耗时",
+      "ok": true,
+      "detail": "n=152 min=0.090ms median=0.471ms max=36.386ms"
+    },
+    {
+      "name": "候选串指纹被记录且不含内容",
+      "ok": true,
+      "detail": "唯一指纹数=1 样例=8122251b2a29ec85…"
+    },
+    {
+      "name": "日志记录模型调用与成本恒为 0",
+      "ok": true,
+      "detail": "全部 0"
+    },
+    {
+      "name": "Prometheus 文本包含全部要求的指标",
+      "ok": true,
+      "detail": "缺失=[]"
+    },
+    {
+      "name": "延迟分位为真实非零值且 p95 >= p50",
+      "ok": true,
+      "detail": {
+        "count": 131,
+        "p50_ms": 0.539,
+        "p95_ms": 1.294,
+        "p99_ms": 1.513,
+        "max_ms": 1.584
+      }
+    },
+    {
+      "name": "RSS 为正且量级合理（1MiB–1GiB）",
+      "ok": true,
+      "detail": "28053504 bytes = 26.75 MiB"
+    },
+    {
+      "name": "成本字段为确定性 0（未编造）",
+      "ok": true,
+      "detail": {
+        "unit": "CNY",
+        "amount": 0.0,
+        "source": "deterministic_rules_only"
+      }
+    },
+    {
+      "name": "/healthz 与 /validate 各自有独立延迟统计",
+      "ok": true,
+      "detail": {
+        "/healthz": 6,
+        "/validate": 131,
+        "/validate 账本": 131
+      }
+    },
+    {
+      "name": "/healthz 与冻结实现逐字节一致",
+      "ok": true,
+      "detail": "frozen=200 obs=200 逐字节一致=True len=135"
+    },
+    {
+      "name": "/validate 与冻结实现、纯函数三方逐字节一致",
+      "ok": true,
+      "detail": "frozen=200 obs=200 frozen==obs=True obs==inproc=True len=271 all_passed=True"
+    },
+    {
+      "name": "/validate 响应回显 X-GiftWise-Request-Id",
+      "ok": true,
+      "detail": "845268c797bc4b9e"
+    },
+    {
+      "name": "流水线第二个请求的行为与冻结实现一致（HTTP/1.0：每连接只应答一个请求）",
+      "ok": true,
+      "detail": "可观测实现响应数=1 冻结实现响应数=1；原因：protocol_version=HTTP/1.0，keep-alive 仅在 HTTP/1.1 才被采纳"
+    },
+    {
+      "name": "容器 HEALTHCHECK 依赖的 /healthz 契约未变",
+      "ok": true,
+      "detail": {
+        "status": "ok",
+        "service": "giftwise-validator",
+        "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500"
+      }
+    },
+    {
+      "name": "原实现的 501（不支持方法）行为未变",
+      "ok": true,
+      "detail": "501 次数=2"
+    },
+    {
+      "name": "原实现的 404（含 /healthz?x=1 一类未匹配路径）行为未变",
+      "ok": true,
+      "detail": "unmatched 404=5"
+    },
+    {
+      "name": "优雅退出并打印末次指标汇总",
+      "ok": true,
+      "detail": "ctl_break_sent=True graceful=True"
+    },
+    {
+      "name": "关机汇总的请求总数 == 访问日志行数",
+      "ok": true,
+      "detail": {
+        "关机汇总": 154,
+        "日志行数": 154
+      }
+    },
+    {
+      "name": "整份访问日志无一行解析失败",
+      "ok": true,
+      "detail": "坏行=0 总行=154"
+    },
+    {
+      "name": "关机汇总里 /healthz 契约依旧",
+      "ok": true,
+      "detail": "1f389dad4c2589fb…"
+    }
+  ],
+  "checks_passed": 39,
+  "checks_total": 39,
+  "files": [
+    "access.jsonl",
+    "frozen-server.log",
+    "metrics-prometheus.txt",
+    "metrics-summary-after-concurrency.json",
+    "metrics-summary.json",
+    "observable-server.log"
+  ]
+}

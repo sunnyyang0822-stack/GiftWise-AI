@@ -35,6 +35,8 @@ const state = {
   busy: false,
   error: null,
   timeout: false,
+  /** 四段呈现之后的收束屏（鼓励页）；与 presentation 分开，便于「再看一遍」来回切。 */
+  encourage: false,
   report: null,
   presentation: null,
   demo: new URLSearchParams(location.search).get("demo") || "",
@@ -70,6 +72,7 @@ const demoOptions = [
   { value: "model_error", label: "错误：模拟模型输出损坏 JSON" },
   { value: "partial_fail", label: "部分通过：一个候选修订修不好" },
   { value: "presentation_over_budget", label: "呈现：首次复核超预算" },
+  { value: "stress", label: "压力：超长文案 + emoji + 不可断行长串" },
   { value: "slow", label: "超时：服务端延迟 45 秒" },
 ];
 
@@ -79,6 +82,26 @@ function renderBadges() {
   const slot = $("badges");
   slot.replaceChildren();
   if (!state.config) return;
+  const mock = state.config.mode === "mock";
+  // 吸顶常驻标识：滚动到任何位置、任何窄屏宽度都看得见数据来源
+  const flag = $("mode-flag");
+  if (flag) {
+    flag.hidden = false;
+    flag.textContent = mock ? "模拟数据 · 未接真实模型" : "真实模型已接入";
+    flag.classList.toggle("mode-flag--real", !mock);
+    flag.title = mock
+      ? "当前接入层没有接入真实模型（未配置模型凭证），候选与呈现内容来自接入层内置模拟数据，不是模型真实输出。"
+      : "当前由服务端调用真实模型；结果仍以服务端独立规则校验为准。";
+  }
+  const heroFlag = $("hero-flag");
+  if (heroFlag) {
+    heroFlag.hidden = !mock;
+    if (mock) {
+      heroFlag.textContent =
+        "当前为模拟数据演示：接入层还没有接入真实模型（未配置模型凭证），三个方案与四段呈现都不是模型真实输出。" +
+        "独立规则校验、选择门槛与修订计数是真实实现，可以真实拦住不合格的方案。";
+    }
+  }
   slot.append(
     el("span", { class: "badge badge--mock", text: state.config.mode === "mock" ? "模拟数据模式" : "真实 Dify 模式" }),
     el("span", { class: "badge", text: `币种：${state.config.limits.currency}（首版不换汇）` }),
@@ -89,7 +112,7 @@ function renderBadges() {
     }),
     el("span", {
       class: "badge",
-      text: `Dify 真实调用：${state.config.dify_configured ? "已配置但未确认发布" : "未配置"}`,
+      text: `真实模型调用：${state.config.dify_configured ? "已配置，未确认发布" : "未配置凭证（模拟）"}`,
     }),
   );
 }
@@ -118,33 +141,47 @@ function renderBanners() {
   renderDemoPanel();
 }
 
+/**
+ * 进度条按产品口径显示「四步走」：关系 / 场合 / 预算与时间 / 兴趣与禁忌。
+ * 注意：这四步是用户真正要提供的四组信息，与表单的三个页面不是一一对应
+ * （第一页同时收关系、场合、预算与时间），所以页面数单独标出，不做假映射。
+ */
 function renderSteps() {
   const nav = $("steps");
   nav.replaceChildren();
-  const inForm = !state.report && !state.presentation && !state.error;
+  const inForm = !state.report && !state.presentation && !state.error && !state.encourage;
   nav.hidden = !inForm;
   if (!inForm) return;
-  const titles = ["第一步 · 关系与硬约束", "第二步 · 兴趣与风格", "第三步 · 排除与补充"];
-  titles.forEach((title, index) => {
-    const stepNo = index + 1;
+  const f = state.form;
+  const topics = [
+    { label: "关系", done: Boolean(f.recipient_relation) },
+    { label: "场合", done: Boolean(f.occasion) },
+    {
+      label: "预算与时间",
+      done: Boolean(f.budget_range && f.budget_confirmed && f.deadline_range && f.deadline_confirmed),
+    },
+    { label: "兴趣与禁忌", done: state.step >= 3 },
+  ];
+  const nextIndex = topics.findIndex((topic) => !topic.done);
+  nav.append(el("span", { class: "step-page", text: `第 ${state.step} / 3 页` }));
+  topics.forEach((topic, index) => {
     nav.append(
       el("span", {
-        class: `step-pill ${stepNo < state.step ? "step-pill--done" : ""}`,
-        "aria-current": stepNo === state.step ? "true" : "false",
-        text: `${title}${stepNo < state.step ? " ✓" : ""}`,
+        class: `step-pill ${topic.done ? "step-pill--done" : "step-pill--todo"}`,
+        "aria-current": index === nextIndex ? "true" : "false",
+        text: `第 ${index + 1} 步 · ${topic.label}`,
       }),
     );
   });
 }
 
-/** landing 区（hero + 三步说明）只在还没开始填写时出现，避免挤压操作区。 */
+/** 首屏六屏只在还没开始填写时出现，避免挤压操作区；进入流程或出错时整组收起。 */
 function renderLandingVisibility() {
-  const inForm = !state.report && !state.presentation && !state.error && !state.busy;
+  const inForm = !state.report && !state.presentation && !state.error && !state.busy && !state.encourage;
   const atStart = inForm && state.step === 1;
-  const hero = $("hero");
-  const how = $("how");
-  if (hero) hero.hidden = !atStart;
-  if (how) how.hidden = !atStart;
+  for (const section of document.querySelectorAll("[data-landing]")) {
+    section.hidden = !atStart;
+  }
 }
 
 function errorBox(errors, title = "需要处理的问题") {
@@ -292,6 +329,7 @@ function renderStep1() {
               placeholder: "例如 200.00",
               value: f.budget_amount,
               "aria-label": "预算上限金额",
+              "data-field": "budget_amount",
               oninput: (event) => {
                 f.budget_amount = event.target.value.trim();
                 f.budget_confirmed = false;
@@ -371,6 +409,7 @@ function renderStep1() {
               placeholder: "例如 2",
               value: f.deadline_days,
               "aria-label": "可用准备天数",
+              "data-field": "deadline_days",
               oninput: (event) => {
                 f.deadline_days = event.target.value.trim();
                 f.deadline_confirmed = false;
@@ -404,6 +443,8 @@ function renderStep1() {
       el("button", {
         class: "btn btn--primary",
         type: "button",
+        // 稳定 id：验证脚本按 id 选择，不再依赖会变的按钮文案（协调方 01:2x 的契约改动）。
+        id: "step-next",
         text: "下一步：兴趣与风格",
         onclick: () => {
           const problem = validateStep1();
@@ -545,7 +586,9 @@ function renderStep2() {
       el("button", {
         class: "btn btn--ghost",
         type: "button",
-        text: "返回第一步",
+        // 第二步的「返回第一步」就是这一步的上一步；给它稳定 id，不再另加一个同义按钮。
+        id: "step-back",
+        text: "上一步",
         onclick: () => {
           state.step = 1;
           state.error = null;
@@ -570,6 +613,7 @@ function renderStep2() {
       el("button", {
         class: "btn btn--primary",
         type: "button",
+        id: "step-next",
         text: "下一步：排除与补充",
         onclick: () => {
           state.step = 3;
@@ -624,6 +668,7 @@ function renderStep3() {
         placeholder: "例如：酒、香水（用顿号或逗号分隔）",
         value: f.exclusion_terms,
         "aria-label": "明确禁忌的字面词",
+        "data-field": "exclusion_terms",
         oninput: (event) => {
           f.exclusion_terms = event.target.value;
           render();
@@ -642,6 +687,7 @@ function renderStep3() {
         placeholder: "例如：不要看起来像在暗示关系（需先确认如何拦截）",
         value: f.exclusion_unresolved,
         "aria-label": "待澄清的禁忌",
+        "data-field": "exclusion_unresolved",
         oninput: (event) => {
           f.exclusion_unresolved = event.target.value;
           render();
@@ -657,6 +703,7 @@ function renderStep3() {
       el("textarea", {
         placeholder: "例如：完全虚构的演示请求；希望表达祝福，不造成关系压力。",
         "aria-label": "补充说明",
+        "data-field": "additional_context",
         oninput: (event) => {
           f.additional_context = event.target.value;
         },
@@ -670,7 +717,8 @@ function renderStep3() {
       el("button", {
         class: "btn btn--ghost",
         type: "button",
-        text: "返回第二步",
+        id: "step-back",
+        text: "上一步",
         onclick: () => {
           state.step = 2;
           state.error = null;
@@ -690,6 +738,14 @@ function renderStep3() {
 
 /* ------------------------------------------------------------- 状态页 */
 
+/** 超时与错误态的恢复入口：贴在中文明说旁边（在 #view 里），而不是只挂在底部固定动作条上。 */
+function recoveryActions() {
+  return el("div", { class: "state__actions" }, [
+    el("button", { class: "btn btn--primary", type: "button", text: "重试上一次动作", onclick: () => selectLast() }),
+    el("button", { class: "btn", type: "button", text: "回到表单", onclick: () => resetToForm() }),
+  ]);
+}
+
 function stateView(title, paragraphs, actions = [], extraNodes = []) {
   return {
     body: [
@@ -703,12 +759,26 @@ function stateView(title, paragraphs, actions = [], extraNodes = []) {
   };
 }
 
-function renderGenerating() {
+/** 配置未就位时的中文等待态：表单字段全部来自接入层配置，缺配置就先去读配置。 */
+function renderWaiting() {
   return {
+    body: [
+      el("section", { class: "state" }, [
+        el("div", { class: "spinner", role: "presentation" }),
+        el("h2", { class: "state__title", text: "正在载入接入层配置…" }),
+        el("p", { text: "关系、场合、兴趣、风格与预算区间都由服务端配置下发，载入完成前不显示空表单，也不使用任何前端内置默认值。" }),
+      ]),
+    ],
+    actions: [],
+  };
+}
+
+function renderGenerating() {  return {
     body: [
       el("section", { class: "state" }, [
         el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), "正在生成三个不同思路…"]),
         el("p", { text: "服务端正在做确定性适配 → 生成三候选 → 独立规则校验；如有可修订项，最多自动修订一次并重新校验。" }),
+        el("p", { text: "你已经在认真对待这份心意了——先喝口水，剩下的交给服务端。" }),
         el("p", { class: "field__hint", text: "请不要重复点击；推荐阶段不会生成任何包装、贺卡或赠送话术。" }),
       ]),
     ],
@@ -901,6 +971,8 @@ function renderPresentation() {
           : null,
         el("dt", { text: "全局修订" }),
         el("dd", { text: `已用 ${view.repair_count} / 1，剩余 ${view.remaining_repairs}` }),
+        el("dt", { text: "真实业务数据" }),
+        el("dd", { text: "not_verified（价格、库存、送达均未核实，本页费用与天数只是估算）" }),
         view.repair_note ? el("dt", { text: "修订说明" }) : null,
         view.repair_note ? el("dd", { text: view.repair_note }) : null,
       ]),
@@ -945,6 +1017,12 @@ function renderPresentation() {
 
   const actions = [
     el("button", {
+      class: "btn btn--primary",
+      type: "button",
+      text: "收下这份鼓励",
+      onclick: () => backToEncourage(),
+    }),
+    el("button", {
       class: "btn",
       type: "button",
       text: "返回三方案（可另选，但全局修订额度不再重置）",
@@ -958,11 +1036,97 @@ function renderPresentation() {
   return { body, actions };
 }
 
+/* ------------------------------------------------- 鼓励页（流程收束屏） */
+
+/** 四段呈现看完之后的收束屏：先说一句人话，再给「回到主页」。 */
+function backToEncourage() {
+  state.encourage = true;
+  render();
+  const view = $("view");
+  if (view) {
+    view.scrollIntoView({ block: "start" });
+    view.focus({ preventScroll: true });
+  }
+}
+
+function renderEncourage() {
+  const report = state.report;
+  const view = state.presentation;
+  const request = report ? report.request : null;
+  const summary = view ? view.recheck_summary : null;
+  const stat = (term, detail) =>
+    el("div", { class: "encourage__stat" }, [el("dt", { text: term }), el("dd", { text: detail })]);
+  return {
+    body: [
+      el("section", { class: "card" }, [
+        el("p", { class: "encourage__eyebrow", text: "四步走完 · 鼓励页" }),
+        el("h2", { class: "encourage__title", text: "心意已经想清楚了。" }),
+        el("p", {
+          class: "encourage__lead",
+          text:
+            "你不是不知道送什么，你只是想把这件事做对——这本身就是礼物里最值钱的部分。" +
+            "剩下的，只是把它包起来、写下来、递出去。",
+        }),
+        el("div", { class: "encourage__rule", "aria-hidden": "true" }),
+        el("dl", { class: "encourage__stats" }, [
+          stat("你为谁准备", request ? `${request.recipient_relation} · ${request.occasion}` : "未记录"),
+          stat(
+            "你守住的边界",
+            request
+              ? `预算上限 ${request.budget_amount} ${request.currency}；可用 ${request.available_days} 天（估算，不是送达承诺）`
+              : "未记录",
+          ),
+          stat(
+            "你选定的方案",
+            view
+              ? `${view.selected_candidate_id}；四段呈现已通过复核，全量估算 ${summary ? summary.revised_estimated_total : "—"} ${
+                  summary ? summary.currency : ""
+                }`
+              : "未生成呈现",
+          ),
+        ]),
+        el("p", {
+          class: "encourage__note",
+          text:
+            "提醒：价格、库存与送达仍未核实（not_verified）；准备天数不是送达承诺；对方是否喜欢也不会被承诺。" +
+            "这次查看不消耗、也不重置全局自动修订额度（两个阶段合计最多 1 次，由服务端持有）。",
+        }),
+      ]),
+    ],
+    actions: [
+      el("button", { class: "btn btn--primary", type: "button", text: "回到主页", onclick: () => backToHome() }),
+      el("button", {
+        class: "btn",
+        type: "button",
+        text: "再看一遍四段呈现",
+        onclick: () => {
+          state.encourage = false;
+          render();
+        },
+      }),
+    ],
+  };
+}
+
+/** 回到主页：清掉本次任务状态，首屏六屏重新出现并回到页首。
+ *  从收束屏到页首是几千像素的距离，这里不做平滑滚动（那样又慢又晕），直接回到顶部。 */
+function backToHome() {
+  state.encourage = false;
+  resetToForm();
+  window.scrollTo(0, 0);
+  const hero = $("hero");
+  if (hero) {
+    hero.setAttribute("tabindex", "-1");
+    hero.focus({ preventScroll: true });
+  }
+}
+
 /* --------------------------------------------------------------- 流程 */
 
 function resetToForm() {
   state.report = null;
   state.presentation = null;
+  state.encourage = false;
   state.error = null;
   state.timeout = false;
   state.step = 1;
@@ -1102,6 +1266,49 @@ async function selectCandidate(candidateId) {
 
 /* ------------------------------------------------------------------ 组装 */
 
+/**
+ * 记录当前正在编辑的字段（用 data-field 标识，跨重绘稳定）。
+ * 没有 data-field 的元素不记录：重绘后无法安全地认回同一个节点。
+ */
+function captureFocus() {
+  const active = document.activeElement;
+  if (!active || active === document.body || !active.dataset || !active.dataset.field) return null;
+  let start = null;
+  let end = null;
+  try {
+    start = active.selectionStart;
+    end = active.selectionEnd;
+  } catch {
+    /* type=number 的输入框不支持选区 API */
+  }
+  return { field: active.dataset.field, start, end };
+}
+
+function restoreFocus(snapshot) {
+  if (!snapshot) return;
+  const node = document.querySelector(`[data-field="${snapshot.field}"]`);
+  if (!node) return;
+  if (node !== document.activeElement) node.focus({ preventScroll: true });
+  if (snapshot.start === null || snapshot.start === undefined) return;
+  try {
+    node.setSelectionRange(snapshot.start, snapshot.end);
+  } catch {
+    /* 同上：number 输入框忽略 */
+  }
+}
+
+/** 当前视图标识：只在切换时重放一次入场动效，同一视图内的重绘（打字）不重放。 */
+function currentViewKey() {
+  if (!state.config && !(state.error && state.error.kind === "error")) return "waiting";
+  if (state.busy && !state.report && !state.presentation) return "generating";
+  if (state.timeout) return "timeout";
+  if (state.error && state.error.kind === "error") return "error";
+  if (state.encourage) return "encourage";
+  if (state.presentation) return "presentation";
+  if (state.report) return "recommendation";
+  return `step${state.step}`;
+}
+
 function render() {
   renderBadges();
   renderBanners();
@@ -1109,7 +1316,10 @@ function render() {
   renderLandingVisibility();
   const view = $("view");
   let rendered;
-  if (state.busy && !state.report && !state.presentation) {
+  if (!state.config && !(state.error && state.error.kind === "error")) {
+    // 接入层配置还没到手：不渲染表单（表单字段全部来自配置，读它会空指针）。
+    rendered = renderWaiting();
+  } else if (state.busy && !state.report && !state.presentation) {
     rendered = renderGenerating();
   } else if (state.timeout) {
     rendered = stateView(
@@ -1118,22 +1328,18 @@ function render() {
         state.error && state.error.errors[0] ? state.error.errors[0].message : "请求超时。",
         "超时不会被当作成功，也没有生成任何方案或呈现内容。",
       ],
-      [
-        el("button", { class: "btn btn--primary", type: "button", text: "重试上一次动作", onclick: () => selectLast() }),
-        el("button", { class: "btn", type: "button", text: "回到表单", onclick: () => resetToForm() }),
-      ],
-      state.error ? [errorBox(state.error.errors, "错误码")] : [],
+      [],
+      [state.error ? errorBox(state.error.errors, "错误码") : null, recoveryActions()],
     );
   } else if (state.error && state.error.kind === "error") {
     rendered = stateView(
       "错误：这次请求没有成功",
       ["服务端返回错误，未把任何内容标记为通过。请稍后重试或检查接入层是否已启动。"],
-      [
-        el("button", { class: "btn btn--primary", type: "button", text: "重试上一次动作", onclick: () => selectLast() }),
-        el("button", { class: "btn", type: "button", text: "回到表单", onclick: () => resetToForm() }),
-      ],
-      [errorBox(state.error.errors, "错误详情")],
+      [],
+      [errorBox(state.error.errors, "错误详情"), recoveryActions()],
     );
+  } else if (state.encourage) {
+    rendered = renderEncourage();
   } else if (state.presentation) {
     rendered = renderPresentation();
   } else if (state.report) {
@@ -1150,7 +1356,18 @@ function render() {
   if (state.error && state.error.kind === "needs_input" && !state.timeout && !state.presentation && !state.report) {
     nodes.unshift(errorBox(state.error.errors, "提交前需要修改（服务端确定性适配）"));
   }
+  // 重绘会销毁并替换输入框节点：先记下正在编辑的字段，重绘后还原焦点与光标。
+  const focused = captureFocus();
   view.replaceChildren(...nodes);
+
+  // 视图切换时给一次位移动效（CSS 里是 #view.gw-enter）；打字重绘不会重放。
+  const viewKey = currentViewKey();
+  if (view.dataset.viewKey !== viewKey) {
+    view.dataset.viewKey = viewKey;
+    view.classList.remove("gw-enter");
+    void view.offsetWidth;
+    view.classList.add("gw-enter");
+  }
 
   const actions = $("actions") || (() => {
     const bar = el("div", { class: "actions", id: "actions" });
@@ -1158,6 +1375,7 @@ function render() {
     return bar;
   })();
   actions.replaceChildren(...[].concat(rendered.actions || []).filter(Boolean));
+  restoreFocus(focused);
 
   $("footer-meta").textContent = state.config
     ? `模式：${state.config.mode} · 追求对象契约：${state.config.pursuit_contract_ready ? "已落地" : "未落地"} · 演示开关：${state.demo || "关闭"} · 接入层 http://${location.host}`
@@ -1185,25 +1403,31 @@ function renderDemoPanel() {
         }, { class: "chip--radio", type: "radio" }),
       ),
     ),
-    el("p", { class: "field__hint", text: "也可以在地址栏加 ?demo=slow / ?demo=model_error / ?demo=partial_fail / ?demo=presentation_over_budget。" }),
+    el("p", {
+      class: "field__hint",
+      text: "也可以在地址栏加 ?demo=slow / ?demo=model_error / ?demo=partial_fail / ?demo=presentation_over_budget / ?demo=stress。",
+    }),
   ]);
   slot.append(details);
 }
 
 async function bootstrap() {
-  render();
-  for (const id of ["cta-start", "cta-start-2"]) {
+  // 先绑定入口与读取配置，再渲染：渲染依赖 state.config，
+  // 顺序反了会在首帧抛 TypeError 并阻断后面的配置加载。
+  for (const id of ["cta-start", "cta-start-2", "cta-start-3"]) {
     const node = $(id);
     if (node) {
       node.addEventListener("click", () => {
         state.step = 1;
         state.error = null;
+        state.encourage = false;
         render();
         $("view").scrollIntoView({ block: "start" });
         $("view").focus({ preventScroll: true });
       });
     }
   }
+  render();
   try {
     const response = await fetch("/api/config");
     state.config = await response.json();

@@ -1,0 +1,15 @@
+# 被测镜像指纹固定（复验开始时与结束时各记一次，确认镜像未在复验中途变动）
+# 记录时间: 2026-10-31 01:19:07 +0800
+latest Id=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+RepoDigests=[giftwise-validator@sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169]
+Created=2026-10-30T17:13:59.527621865Z
+Tags=[giftwise-validator:latest giftwise-validator:submission-20261101]
+
+# gw-verify 容器
+Image=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+Started=2026-10-30T17:15:30.244670781Z
+Running=true
+
+# gw-obs 容器（observable 变体，显式启用）
+Image=sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169
+Started=2026-10-30T17:17:56.398847639Z
