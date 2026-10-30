@@ -277,7 +277,12 @@ def validate(request_json: str, candidates_json: str) -> dict:
 # SOURCE: workflow/labels.py
 """intake-v1 共享标签；界面与工作流须使用相同 ID，待 PM 审查。"""
 
-RELATIONS = {"friend": "朋友", "colleague": "同事", "partner": "伴侣", "family": "家人", "classmate": "同学", "mentor": "老师/导师", "client_partner": "客户/合作伙伴", "other": "其他", "unknown": "关系暂不确定"}
+# 产品面冻结关系枚举（8 个稳定 ID）：partner 恋人、pursuit 追求对象、friend 朋友、family 家人、
+# classmate 同学、mentor 老师/导师、client_partner 客户/合作伙伴、other 其他。
+# partner 与 pursuit 并列互斥，不得合并，也不得把追求对象落入 other。
+# colleague（同事）仅技术回归：产品场景已完全移出，界面/导航/演示/验收不得出现；
+# 保留该机器值以免破坏 46 项本地探针与 tests/ 的同事回归夹具。
+RELATIONS = {"friend": "朋友", "colleague": "同事", "partner": "恋人", "pursuit": "追求对象", "family": "家人", "classmate": "同学", "mentor": "老师/导师", "client_partner": "客户/合作伙伴", "other": "其他", "unknown": "关系暂不确定"}
 CLOSENESS = {"very_familiar": "非常熟悉", "familiar": "比较熟悉", "limited": "了解不多", "unfamiliar": "几乎不了解", "unknown": "不确定"}
 OCCASIONS = {"birthday": "生日", "festival": "节日", "thanks": "感谢", "anniversary": "纪念日", "graduation_promotion": "毕业/升职祝贺", "other": "其他", "unknown": "场合暂不确定"}
 INTERESTS = {"design_art": "设计与艺术", "coffee_food": "咖啡与美食", "reading_learning": "阅读与学习", "tech_digital": "科技与数码", "sports_outdoors": "运动与户外", "music_movies": "音乐与电影", "games_anime": "游戏与动漫", "travel_exploration": "旅行与探索", "home_living": "家居与生活", "plants_nature": "植物与自然", "fashion_accessories": "时尚与配饰", "experiences_activities": "体验与活动"}
@@ -401,7 +406,12 @@ def adapt_intake(intake_json):
                 err("INTAKE_UNKNOWN_LABEL", f"intake.hard_exclusions.tags[{i}]", "禁忌类别须使用固定 ID，不自动猜同义词")
 
     request = {
-        "recipient_relation": RELATIONS.get(relation, ""), "occasion": OCCASIONS.get(occasion, ""),
+        # 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
+        # recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值。
+        # 它只由服务端 intake 产出，不在上面的 fields 输入白名单内，前端不得提交。
+        "recipient_relation": RELATIONS.get(relation, ""),
+        "recipient_relation_id": relation if relation in RELATIONS else "",
+        "occasion": OCCASIONS.get(occasion, ""),
         "budget_amount": data.get("budget_amount"), "currency": data.get("currency"),
         "available_days": data.get("deadline_days"),
         "facts": [{"id": "interest:" + key, "text": "用户明确知道：对方对“" + INTERESTS[key] + "”感兴趣（未确认该组内具体偏好）"} for key in interests if confidence.get(key, "inferred") == "confirmed"],

@@ -114,7 +114,12 @@ def adapt_intake(intake_json):
                 err("INTAKE_UNKNOWN_LABEL", f"intake.hard_exclusions.tags[{i}]", "禁忌类别须使用固定 ID，不自动猜同义词")
 
     request = {
-        "recipient_relation": RELATIONS.get(relation, ""), "occasion": OCCASIONS.get(occasion, ""),
+        # 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
+        # recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值。
+        # 它只由服务端 intake 产出，不在上面的 fields 输入白名单内，前端不得提交。
+        "recipient_relation": RELATIONS.get(relation, ""),
+        "recipient_relation_id": relation if relation in RELATIONS else "",
+        "occasion": OCCASIONS.get(occasion, ""),
         "budget_amount": data.get("budget_amount"), "currency": data.get("currency"),
         "available_days": data.get("deadline_days"),
         "facts": [{"id": "interest:" + key, "text": "用户明确知道：对方对“" + INTERESTS[key] + "”感兴趣（未确认该组内具体偏好）"} for key in interests if confidence.get(key, "inferred") == "confirmed"],

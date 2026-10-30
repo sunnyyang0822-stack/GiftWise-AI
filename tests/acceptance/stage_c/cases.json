@@ -1,0 +1,60 @@
+{
+  "_note": "QA-001 阶段 C 独立夹具。由测试验收 Agent 自建，不导入 tests/test_cases.json 或 tests/test_validator.py。基线派生自 workflow/examples/intake.json 与 candidates.json 的语义，冻结为独立副本，避免被其他线的后续编辑影响。全部为虚构数据。",
+  "frozen_at": "2026-10-30",
+  "baseline_intake": {
+    "recipient_relation": "pursuit",
+    "closeness": "limited",
+    "occasion": "birthday",
+    "budget_amount": "200.00",
+    "currency": "CNY",
+    "deadline_days": 2,
+    "interests": ["coffee_food", "design_art"],
+    "interest_confidence": {"coffee_food": "confirmed", "design_art": "inferred"},
+    "gift_styles": ["practical", "understated"],
+    "hard_exclusions": {"tags": ["alcohol"], "terms": ["酒"], "unresolved": []},
+    "additional_context": "QA-001 阶段 C 虚构基线：追求对象，低压力表达，不假定双向好感。"
+  },
+  "baseline_candidates": {
+    "candidates": [
+      {
+        "id": "c1",
+        "name": "简洁杯具与杯垫",
+        "description": "以日常饮用器具为方向，不涉及具体豆种或食品口味。",
+        "estimated_total": "150.00",
+        "currency": "CNY",
+        "estimated_preparation_days": 1,
+        "tags": ["other"],
+        "reason": "用户确认了咖啡与美食这一宽泛兴趣，杯具是相关但较少依赖口味的方向。",
+        "fact_refs": ["interest:coffee_food"],
+        "inferences": ["日常用品可能较便于表达低压力祝福，不保证对方喜欢。"],
+        "unknowns": ["对方是否已有同类物品", "实际价格、库存和送达均未核实"]
+      },
+      {
+        "id": "c2",
+        "name": "空白便笺与书写笔",
+        "description": "以低负担的通用记录用品为方向，不推定其职业或阅读爱好。",
+        "estimated_total": "120.00",
+        "currency": "CNY",
+        "estimated_preparation_days": 2,
+        "tags": ["other"],
+        "reason": "回应送礼者希望实用、精致但不张扬的要求；这是送礼者选择的风格，不是收礼人已确认的偏好。",
+        "fact_refs": [],
+        "inferences": ["了解不多时，通用用品可能较稳妥，不保证适合对方。"],
+        "unknowns": ["对方是否使用纸笔", "实际价格、库存和送达均未核实"]
+      },
+      {
+        "id": "c3",
+        "name": "可自主挑选的通用消费额度",
+        "description": "以保留收礼人自主选择空间为方向，具体支持渠道需购买前确认。",
+        "estimated_total": "80.00",
+        "currency": "CNY",
+        "estimated_preparation_days": 1,
+        "tags": ["other"],
+        "reason": "具体兴趣尚不充分时，让对方自主挑选可能降低选错物品的风险。",
+        "fact_refs": [],
+        "inferences": ["自主选择可能更灵活，但额度类礼物也可能显得直接。"],
+        "unknowns": ["对方对额度类礼物的接受程度", "可用范围和有效期"]
+      }
+    ]
+  }
+}

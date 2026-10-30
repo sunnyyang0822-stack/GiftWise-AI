@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-10-30T21:25:54+08:00",
+  "healthcheck_cmd_template": "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)",
+  "note": "两种布局都用同一条 CMD：python -m deploy.server",
+  "layouts": [
+    {
+      "layout": "repo_copy",
+      "plan": [
+        "validator",
+        "deploy/server.py"
+      ],
+      "disclaimer": "非容器运行；只验证 Dockerfile COPY（或发布脚本上传）后的文件树能否用同一条 CMD 启动",
+      "copied": [
+        "validator",
+        "deploy/server.py"
+      ],
+      "app_tree": [
+        "deploy/server.py",
+        "validator/__init__.py",
+        "validator/rules.py"
+      ],
+      "has_deploy_init": false,
+      "has_validator_init": true,
+      "ms_to_accept": 565.8,
+      "healthz": {
+        "status": 200,
+        "body": "{\"status\":\"ok\",\"service\":\"giftwise-validator\",\"rules_source_sha256\":\"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\"}"
+      },
+      "validate": {
+        "http_status": 200,
+        "status": "passed",
+        "all_passed": true
+      },
+      "healthcheck_exit_code": 0,
+      "healthcheck_output": "",
+      "server_log": [
+        "giftwise-validator listening on 127.0.0.1:8123; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+        "127.0.0.1 - \"GET /healthz HTTP/1.1\" 200 -",
+        "127.0.0.1 - \"POST /validate HTTP/1.1\" 200 -",
+        "127.0.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+      ]
+    },
+    {
+      "layout": "upload_minimal",
+      "plan": [
+        "validator/rules.py",
+        "deploy/server.py"
+      ],
+      "disclaimer": "非容器运行；只验证 Dockerfile COPY（或发布脚本上传）后的文件树能否用同一条 CMD 启动",
+      "copied": [
+        "validator/rules.py",
+        "deploy/server.py"
+      ],
+      "app_tree": [
+        "deploy/server.py",
+        "validator/rules.py"
+      ],
+      "has_deploy_init": false,
+      "has_validator_init": false,
+      "ms_to_accept": 577.3,
+      "healthz": {
+        "status": 200,
+        "body": "{\"status\":\"ok\",\"service\":\"giftwise-validator\",\"rules_source_sha256\":\"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3\"}"
+      },
+      "validate": {
+        "http_status": 200,
+        "status": "passed",
+        "all_passed": true
+      },
+      "healthcheck_exit_code": 0,
+      "healthcheck_output": "",
+      "server_log": [
+        "giftwise-validator listening on 127.0.0.1:8124; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+        "127.0.0.1 - \"GET /healthz HTTP/1.1\" 200 -",
+        "127.0.0.1 - \"POST /validate HTTP/1.1\" 200 -",
+        "127.0.0.1 - \"GET /healthz HTTP/1.1\" 200 -"
+      ]
+    }
+  ]
+}

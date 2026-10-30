@@ -1,0 +1,4 @@
+ M deploy/.dockerignore
+ M deploy/Dockerfile
+ M deploy/publish-to-uhost.ps1
+?? deploy/evidence/

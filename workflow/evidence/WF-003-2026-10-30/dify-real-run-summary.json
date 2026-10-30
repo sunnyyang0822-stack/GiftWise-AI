@@ -1,0 +1,205 @@
+[
+  {
+    "case": "real1_normal_200",
+    "expect": "N2 真实生成 → N3 通过 → N4[true] → N7a → End A",
+    "startedAtUtc": "2026-10-30T13:14:52.968Z",
+    "httpStatus": 200,
+    "browserElapsedMs": 9485,
+    "N2_raw_text_chars": 1310,
+    "N2_elapsed_s": 5.113186,
+    "N3_status": "failed",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "FORBIDDEN_TERM"
+    ],
+    "N3_per_candidate": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c2",
+        "passed": false,
+        "errors": [
+          "FORBIDDEN_TERM"
+        ]
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N3_preserved": [
+      "c1",
+      "c3"
+    ],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N5_elapsed_s": 3.028706,
+    "N5_raw_text_chars": 1305,
+    "N6_status": "passed",
+    "N6_all_passed": true,
+    "N6_per_candidate": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "workflow_elapsed_s": 8.920904686092399,
+    "total_tokens": 3811,
+    "end_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 1
+    },
+    "selectable_candidate_ids": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "selected_candidate_id": null,
+    "candidate_names": [
+      [
+        "c1",
+        "精品咖啡豆小礼盒",
+        "168.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c2",
+        "咖啡风味点心组合",
+        "138.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c3",
+        "简洁咖啡杯与手冲滤杯小套装",
+        "188.00",
+        [
+          "other"
+        ]
+      ]
+    ]
+  },
+  {
+    "case": "real2_budget_1_repair",
+    "expect": "N2 真实生成超预算 → N4[repairable] → N5 真实修订 → N6 → N7b → End B",
+    "startedAtUtc": "2026-10-30T13:15:02.453Z",
+    "httpStatus": 200,
+    "browserElapsedMs": 9342,
+    "N2_raw_text_chars": 1234,
+    "N2_elapsed_s": 4.957488,
+    "N3_status": "failed",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "FORBIDDEN_TERM"
+    ],
+    "N3_per_candidate": [
+      {
+        "id": "c1",
+        "passed": false,
+        "errors": [
+          "FORBIDDEN_TERM"
+        ]
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N3_preserved": [
+      "c2",
+      "c3"
+    ],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N5_elapsed_s": 3.116228,
+    "N5_raw_text_chars": 1234,
+    "N6_status": "failed",
+    "N6_all_passed": false,
+    "N6_per_candidate": [
+      {
+        "id": "c1",
+        "passed": false,
+        "errors": [
+          "FORBIDDEN_TERM"
+        ]
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "workflow_elapsed_s": 8.751160130021162,
+    "total_tokens": 3585,
+    "end_outputs": {
+      "status": "failed",
+      "all_passed": false,
+      "repair_count": 1
+    },
+    "selectable_candidate_ids": [
+      "c2",
+      "c3"
+    ],
+    "selected_candidate_id": null,
+    "candidate_names": [
+      [
+        "c1",
+        "咖啡风味小食组合",
+        "1.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c2",
+        "简洁实用小物",
+        "1.00",
+        [
+          "other"
+        ]
+      ],
+      [
+        "c3",
+        "小型绿植或桌面植物",
+        "1.00",
+        [
+          "plant"
+        ]
+      ]
+    ]
+  }
+]

@@ -1,0 +1,56 @@
+%% GiftWise AI · 可观测性数据流与落点图（ARCH-001，阶段 3）
+%% 对应评分规则 1.2「可观测性证据」；字段与落点定义见 docs/architecture/observability.md。
+%% 真实约束：该 Dify 租户 trace-runs 返回 not_collected，无平台级追踪，故走 ① ② ③ 替代路径。
+flowchart LR
+    subgraph SRC["产生点"]
+        U1["浏览器提交<br/>界面字段"]
+        U2["接入层适配<br/>request_json"]
+        U3["Dify 执行<br/>workflow_run_id"]
+        U4["规则校验<br/>validation"]
+        U5["用户选择<br/>{run_id, candidate_id}"]
+    end
+
+    subgraph ID["运行标识贯穿（一次送礼任务 = 一个 run_id）"]
+        RID["接入层 run_id<br/>gw-{base36 时间戳}-{uuid8}"]
+        WID["Dify workflow_run_id<br/>由 SSE 抓取，非同源"]
+    end
+
+    subgraph REC["记录落点（按当前真实可用性分级）"]
+        L1["① 接入层结构化调用记录<br/>call_counts · 状态 · 错误码 · 耗时<br/>落点：进程内 + 计划 JSONL<br/>【已实现·未落盘持久化】"]
+        L2["② Dify draft/run SSE 节点级事件<br/>node_finished / workflow_finished<br/>含 status · error · elapsed_time · total_tokens<br/>【已实测可用·人工/脚本抓取】"]
+        L3["③ 版本锚定哈希<br/>rules_source_sha256 · manifest artifacts_sha256<br/>【已实测】"]
+        L4["④ Dify 平台 trace-runs 接口<br/>【本租户 not_collected·不可用】"]
+        L5["⑤ 运行原文归档<br/>workflow/evidence/**<br/>【已实测·一次性留存】"]
+    end
+
+    U1 --> RID
+    U2 --> RID
+    U3 --> WID
+    U4 --> RID
+    U5 --> RID
+
+    RID --> L1
+    RID --> L5
+    WID --> L2
+    WID --> L4
+    U2 --> L3
+    U4 --> L3
+
+    L5 -->|"逐字原文 + 服务端时间戳"| EVID["评审可核验证据"]
+    L1 --> DASH["计划：状态面板 / 告警<br/>【未实现】"]
+    L2 --> EVID
+    L3 --> EVID
+    L4 -->|"本租户不可用"| GAP["缺口：无平台级调用轨迹<br/>补足方式见 ① ②"]
+
+    NOTE["隐私红线：不记录用户原文、密钥、令牌<br/>server.py 只记录方法与路径<br/>证据中不得含真实收礼人资料"] -.-> L1
+    NOTE -.-> L5
+
+    classDef live fill:#d3f9d8,stroke:#2b8a3e,color:#000
+    classDef partial fill:#fff3bf,stroke:#e67700,color:#000
+    classDef dead fill:#ffc9c9,stroke:#c92a2a,color:#000
+    classDef plan fill:#e9ecef,stroke:#868e96,color:#000
+
+    class L2,L3,L5,EVID live
+    class L1,RID,WID partial
+    class L4,GAP dead
+    class DASH plan

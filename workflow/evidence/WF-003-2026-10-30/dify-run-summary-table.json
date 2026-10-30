@@ -1,0 +1,197 @@
+[
+  {
+    "case": "case1_normal_three_candidates",
+    "at": "2026-10-30T12:58:12.870Z",
+    "http": 200,
+    "elapsedMs": 1259,
+    "path": "N3 -> N4[true] -> N7a -> EndA",
+    "N1_status": "ready",
+    "N2_status": "placeholder_fixed_snapshot",
+    "N2_model_called": false,
+    "N3_validation_status": "passed",
+    "N3_all_passed": true,
+    "N3_codes": [],
+    "N3_repairable": false,
+    "N3_repair_count": 0,
+    "N3_preserved": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "N4_case": "true",
+    "N5_ran": false,
+    "N6_all_passed": null,
+    "N6_repairable": null,
+    "N6_repair_count": null,
+    "workflow_status": "succeeded",
+    "wf_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 0
+    },
+    "wf_selected_candidate_id": null,
+    "wf_selectable": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "wf_total_tokens": 0,
+    "wf_error": null
+  },
+  {
+    "case": "case2_over_budget_repair_passes",
+    "at": "2026-10-30T12:58:14.129Z",
+    "http": 200,
+    "elapsedMs": 1099,
+    "path": "N3 -> N4[repairable] -> N5 -> N6 -> N7b -> EndB",
+    "N1_status": "ready",
+    "N2_status": "placeholder_injected",
+    "N2_model_called": false,
+    "N3_validation_status": "failed",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "OVER_BUDGET"
+    ],
+    "N3_repairable": true,
+    "N3_repair_count": 0,
+    "N3_preserved": [
+      "c2",
+      "c3"
+    ],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N6_all_passed": true,
+    "N6_repairable": false,
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "wf_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 1
+    },
+    "wf_selected_candidate_id": null,
+    "wf_selectable": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "wf_total_tokens": 0,
+    "wf_error": null
+  },
+  {
+    "case": "case3_forbidden_tag_repair_passes",
+    "at": "2026-10-30T12:58:15.228Z",
+    "http": 200,
+    "elapsedMs": 1083,
+    "path": "N3 -> N4[repairable] -> N5 -> N6 -> N7b -> EndB",
+    "N1_status": "ready",
+    "N2_status": "placeholder_injected",
+    "N2_model_called": false,
+    "N3_validation_status": "failed",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "FORBIDDEN_TAG"
+    ],
+    "N3_repairable": true,
+    "N3_repair_count": 0,
+    "N3_preserved": [
+      "c2",
+      "c3"
+    ],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N6_all_passed": true,
+    "N6_repairable": false,
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "wf_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 1
+    },
+    "wf_selected_candidate_id": null,
+    "wf_selectable": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "wf_total_tokens": 0,
+    "wf_error": null
+  },
+  {
+    "case": "case4_broken_json_repair_passes",
+    "at": "2026-10-30T12:58:16.311Z",
+    "http": 200,
+    "elapsedMs": 1235,
+    "path": "N3 -> N4[repairable] -> N5 -> N6 -> N7b -> EndB",
+    "N1_status": "ready",
+    "N2_status": "placeholder_invalid_snapshot",
+    "N2_model_called": false,
+    "N3_validation_status": "error",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "INVALID_JSON"
+    ],
+    "N3_repairable": true,
+    "N3_repair_count": 0,
+    "N3_preserved": [],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N6_all_passed": true,
+    "N6_repairable": false,
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "wf_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 1
+    },
+    "wf_selected_candidate_id": null,
+    "wf_selectable": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "wf_total_tokens": 0,
+    "wf_error": null
+  },
+  {
+    "case": "case5_persistent_failure",
+    "at": "2026-10-30T12:58:17.546Z",
+    "http": 200,
+    "elapsedMs": 1018,
+    "path": "N3 -> N4[repairable] -> N5 -> N6 -> N7b -> EndB",
+    "N1_status": "ready",
+    "N2_status": "placeholder_injected",
+    "N2_model_called": false,
+    "N3_validation_status": "failed",
+    "N3_all_passed": false,
+    "N3_codes": [
+      "OVER_BUDGET"
+    ],
+    "N3_repairable": true,
+    "N3_repair_count": 0,
+    "N3_preserved": [
+      "c2",
+      "c3"
+    ],
+    "N4_case": "repairable",
+    "N5_ran": true,
+    "N6_all_passed": false,
+    "N6_repairable": false,
+    "N6_repair_count": 1,
+    "workflow_status": "succeeded",
+    "wf_outputs": {
+      "status": "failed",
+      "all_passed": false,
+      "repair_count": 1
+    },
+    "wf_selected_candidate_id": null,
+    "wf_selectable": [
+      "c2",
+      "c3"
+    ],
+    "wf_total_tokens": 0,
+    "wf_error": null
+  }
+]

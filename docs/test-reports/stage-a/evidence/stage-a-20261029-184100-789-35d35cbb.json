@@ -1,0 +1,116 @@
+{
+  "collected_at": "2026-10-29T18:41:01.2578840+08:00",
+  "time_zone": "Asia/Shanghai",
+  "repository": "C:\\Users\\lenovo\\Desktop\\giftwise",
+  "head": "3c62930b19aacc4edda3ea13ea90a7191ac3e154",
+  "powershell_version": "7.6.5",
+  "git_version": "git version 2.55.0.windows.3",
+  "initial_status": [
+    "?? docs/test-reports/stage-a/checklist.md",
+    "?? docs/test-reports/stage-a/evidence/powershell-diagnostic.txt",
+    "?? docs/test-reports/stage-a/evidence/pwsh-verification-2026-10-29.json",
+    "?? docs/test-reports/stage-a/evidence/regression-2026-10-29.json",
+    "?? docs/test-reports/stage-a/evidence/stage-a-baseline.json",
+    "?? docs/test-reports/stage-a/preparation-2026-10-29.md",
+    "?? tests/acceptance/stage-a/README.md",
+    "?? tests/acceptance/stage-a/audit.ps1",
+    "?? tests/acceptance/stage-a/baseline.json"
+  ],
+  "tracked_files": [
+    ".env.example",
+    ".gitignore",
+    "AGENTS.md",
+    "README.md",
+    "docs/architecture.md",
+    "docs/demo-script.md",
+    "docs/development-process.md",
+    "docs/product-positioning.md",
+    "docs/product-requirements.md",
+    "docs/test-plan.md",
+    "workflow/workflow-spec.md"
+  ],
+  "required_documents": [
+    {
+      "path": "AGENTS.md",
+      "exists": true,
+      "sha256": "5156511FF31002612AC18935D3ED20A27B14F6A29D8863BAEF7F400DB439F40F"
+    },
+    {
+      "path": "docs/product-positioning.md",
+      "exists": true,
+      "sha256": "372DBB5832F95E2ED45EBF2873CAB7BCDFDD82FCEB0FCB0C87365422CB3DFB2E"
+    },
+    {
+      "path": "README.md",
+      "exists": true,
+      "sha256": "92A06501EC741EB1CDBED5E7D780711EDE8173C34A0EE807CFC2ABD745CD6159"
+    },
+    {
+      "path": "docs/product-requirements.md",
+      "exists": true,
+      "sha256": "744A0463E8390AC91AD7DCECB85FBA71A0A90826C8F1550551059B0567DDD717"
+    },
+    {
+      "path": "workflow/workflow-spec.md",
+      "exists": true,
+      "sha256": "9B25E37F0A9294CFE1475E9749003AFF228E6D4DFD107D96195FCD7D704F3004"
+    },
+    {
+      "path": "docs/architecture.md",
+      "exists": true,
+      "sha256": "692326ED9A738F3CE78C3F8F0B603351FDFF021BBC602823C9134BA1498CC639"
+    },
+    {
+      "path": "docs/test-plan.md",
+      "exists": true,
+      "sha256": "9EF8D67DA638DC1FCE7A68A7B188AC46FE152EAB86277A557D8E5328CDA7CFB3"
+    }
+  ],
+  "broken_local_markdown_links": [],
+  "conflict_excerpts": [
+    {
+      "source": "README.md",
+      "line": 41,
+      "text": "| [产品定位入口](docs/product-positioning.md) | 指向唯一权威 Issue |"
+    },
+    {
+      "source": "docs/architecture.md",
+      "line": 3,
+      "text": "更新日期：2026-10-29（亚洲／上海）。产品定位以[产品定位统一说明](product-positioning.md)为准，字段以[工作流规范](../workflow/workflow-spec.md)为准。"
+    },
+    {
+      "source": "workflow/workflow-spec.md",
+      "line": 3,
+      "text": "更新日期：2026-10-29。状态：设计规范，尚未配置或运行验证。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。"
+    },
+    {
+      "source": "workflow/workflow-spec.md",
+      "line": 124,
+      "text": "不得把前端提交的 `passed: true`、价格、候选内容或 `repair_count` 当作可信依据。优先由服务端按运行编号取回可信快照，核对候选 ID、版本、原始约束、最终校验与已用修订次数。若暂无可信快照能力，演示可由受控操作员从真实运行记录传入原始数据并在可信执行端重检；这种人工衔接只能标记为演示步骤，不能声称网页选择闭环完成。面向真实网页的实现必须先具备可信快照或等效的防篡改校验机制。仅重检可验证候选约束，不能证明它确实来自原推荐或真实修订次数，不能以此替代来源校验。"
+    },
+    {
+      "source": "docs/test-plan.md",
+      "line": 3,
+      "text": "更新日期：2026-10-29（亚洲／上海）。定位以[统一说明](product-positioning.md)为准。当前只有测试设计，没有业务测试、Dify 礼赠运行、成功率、延迟或成本数据。文档检查不等于业务测试。"
+    },
+    {
+      "source": "docs/test-plan.md",
+      "line": 32,
+      "text": "| T18 可信边界 | 篡改前端 passed 或候选内容 | 可信来源校验加必要的规则重检拦截，不信任前端标记；仅重检不能证明来源和已用修订次数 |"
+    },
+    {
+      "source": "docs/test-plan.md",
+      "line": 39,
+      "text": "宣称完成前执行 T01–T08 的适用离线和实际工作流测试，并完成 T16–T22 选择与赠送闭环。涉及工作流、页面或可信状态的测试不能用纯校验器单测替代。稳定演示错误时可用明确标注的测试注入，与正常生成分离，不伪装为模型自然出错。"
+    }
+  ],
+  "local_export_metadata": {
+    "path": "Giftwise.ifpkg",
+    "bytes": 1887,
+    "archive_entry_count": 2,
+    "content_reviewed": false,
+    "note": "仅检查归档元数据，未输出或验证工作流内容、凭证与模型调用。"
+  },
+  "business_tests_executed": 0,
+  "scope": "阶段 A 静态仓库证据；非业务、Dify、模型或部署测试结果。"
+}

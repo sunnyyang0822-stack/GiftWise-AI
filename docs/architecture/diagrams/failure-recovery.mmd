@@ -1,0 +1,74 @@
+%% GiftWise AI · 异常处理与状态恢复图（ARCH-001，阶段 3）
+%% 对应评分规则 1.2「异常处理说明」；正文 docs/architecture.md 第 6 节逐项对照。
+%% 原则：任何失败都不伪装为完成；自动业务修订全局合计最多一次；基础设施重试默认关闭。
+flowchart TD
+    IN["用户提交 intake"] --> ADAPT{"确定性适配<br/>字段与约束是否齐全？"}
+    ADAPT -->|"缺少必填 / 标签非法<br/>/ 可信度不匹配"| NEEDS["needs_input<br/>中文提示补充<br/>不静默补值、不调用模型"]
+    ADAPT -->|"INTAKE_INVALID_JSON"| BADJSON["needs_input<br/>受控解析错误<br/>不回显用户原文"]
+    ADAPT -->|"INTERNAL_ERROR（校验器自身异常）"| INFRA1["status=error<br/>不泄露堆栈"]
+    ADAPT -->|ready| GEN["进入生成阶段"]
+
+    GEN --> CALL{"工具调用是否成功？"}
+    CALL -->|"DIFY_NOT_CONFIGURED<br/>DIFY_NOT_PUBLISHED"| NOCALL["明确失败<br/>不静默切回模拟<br/>不标为真实成功"]
+    CALL -->|"DIFY_TIMEOUT<br/>超过 DIFY_TIMEOUT_MS"| TO["按超时处理<br/>不采用该次输出"]
+    CALL -->|"DIFY_HTTP_ERROR<br/>DIFY_BAD_RESPONSE<br/>DIFY_REQUEST_FAILED"| FAILCALL["按失败上报<br/>未生成候选"]
+    CALL -->|成功| PARSE{"模型输出能否解析？"}
+
+    PARSE -->|"INVALID_JSON（损坏 / 非严格 JSON）"| REPAIRQ{"全局修订额度<br/>是否仍为 0？"}
+    PARSE -->|"结构错误<br/>INVALID_TYPE / MISSING_FIELD<br/>/ INVALID_CANDIDATE_COUNT"| REPAIRQ
+    PARSE -->|"可解析"| RULES{"独立规则校验"}
+
+    RULES -->|"OVER_BUDGET / FORBIDDEN_TAG<br/>/ FORBIDDEN_TERM / UNKNOWN_FACT_REF<br/>/ PREPARATION_TOO_LONG"| REPAIRQ
+    RULES -->|"全部通过"| PASS["status=passed<br/>三项均可选"]
+    RULES -->|"请求字段本身无效"| NEEDS
+    RULES -->|"规则执行异常"| INFRA1
+
+    REPAIRQ -->|"repairable=true（首检）"| N5["进入 N5 一次修订<br/>额度即刻占用"]
+    REPAIRQ -->|"额度已用尽"| NOREPAIR["REPAIR_NOT_ALLOWED<br/>不采用新候选<br/>如实报告失败项"]
+    REPAIRQ -->|"请求或基础设施错误"| NORE["不可修订<br/>直接进入报告"]
+
+    N5 -->|"节点超时 / 输出无效 / 调用失败"| BURN["额度同样消耗<br/>不回滚（防绕过）"]
+    N5 -->|成功| RECHECK{"N6 再校验<br/>已通过候选是否保持逐字不变？"}
+    RECHECK -->|"被改动或无法确认"| PCT["PASSED_CANDIDATE_CHANGED<br/>整次修订拒绝用于选择"]
+    RECHECK -->|保持一致| RECHECK2{"修订后是否全部通过？"}
+    RECHECK2 -->|是| PASSR["status=passed<br/>repair_count=1"]
+    RECHECK2 -->|否| PARTIAL["status=failed<br/>仅放行通过项<br/>失败项不可选"]
+
+    BURN --> PARTIAL
+    NOREPAIR --> PARTIAL
+    NORE --> REPORT
+    PCT --> PARTIAL
+    PARTIAL --> REPORT["N7 报告<br/>中文状态 + 错误码 + 已用修订次数"]
+    PASS --> REPORT
+    PASSR --> REPORT
+    NEEDS --> REPORT
+    NOCALL --> REPORT
+    TO --> REPORT
+    FAILCALL --> REPORT
+    BADJSON --> REPORT
+    INFRA1 --> REPORT
+
+    REPORT --> IDEM{"用户选择事件<br/>来源 / ID / 通过状态 / 版本"}
+    IDEM -->|"未选择 / 伪造选择 / 不合格项 / 陈旧记录"| REJECT["拒绝进入呈现<br/>保留原推荐以便重选<br/>不调用呈现模型"]
+    IDEM -->|"重复点击同一选择"| CACHE["幂等返回同一份呈现<br/>不重复消耗额度"]
+    IDEM -->|"校验通过"| PRES["呈现阶段<br/>包装 · 配色 · 贺卡 · 赠送方式"]
+    PRES --> PRECHK{"费用 / 时间 / 禁忌复核"}
+    PRECHK -->|"超出原始约束"| PREFAIL["如实失败<br/>不自动替用户换方案"]
+    PRECHK -->|通过| DONE["输出可执行指南"]
+
+    CACHE --> DONE
+    PRES -->|"呈现阶段仍违规且额度未用"| PREREPAIR["可再用一次呈现修订<br/>合计仍不超过一次"]
+    PREREPAIR --> PRECHK
+
+    HUMAN["人工介入路径<br/>受控操作员从真实运行记录带入可信数据并重检<br/>只能标记为演示步骤"] -.-> IDEM
+    HUMAN -.-> REPORT
+
+    classDef ok fill:#d3f9d8,stroke:#2b8a3e,color:#000
+    classDef warn fill:#fff3bf,stroke:#e67700,color:#000
+    classDef bad fill:#ffc9c9,stroke:#c92a2a,color:#000
+    classDef human fill:#e7f5ff,stroke:#1971c2,color:#000
+
+    class PASS,PASSR,DONE,CACHE ok
+    class NEEDS,BADJSON,TO,NOREPAIR,NORE,PARTIAL,REJECT,PREFAIL,PREREPAIR warn
+    class NOCALL,FAILCALL,INFRA1,BURN,PCT bad
+    class HUMAN human

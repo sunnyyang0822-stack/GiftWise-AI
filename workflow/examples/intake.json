@@ -1,5 +1,5 @@
 {
-  "recipient_relation": "colleague",
+  "recipient_relation": "pursuit",
   "closeness": "limited",
   "occasion": "birthday",
   "budget_amount": "200.00",
@@ -9,5 +9,5 @@
   "interest_confidence": {"coffee_food": "confirmed", "design_art": "inferred"},
   "gift_styles": ["practical", "understated"],
   "hard_exclusions": {"tags": ["alcohol"], "terms": ["酒"], "unresolved": []},
-  "additional_context": "完全虚构的联调请求。希望表达祝福，不给关系造成压力。"
+  "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。"
 }

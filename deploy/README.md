@@ -1,49 +1,183 @@
-# GiftWise 最小 UHost 部署包
+# deploy/ —— GiftWise 规则 API 部署包（CLOUD-001）
 
-此目录只部署确定性规则 API，不包含 Dify 凭证、模型调用、前端或真实商品数据。
+本目录只负责**部署确定性规则 API**（`POST /validate`、`GET /healthz`）。
+它不包含 Dify 凭证、不调用模型、不访问外部网络、不含真实商品数据。
 
-## 本地验证
+负责人：GiftWise｜部署 Agent（Issue [#10](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/10) CLOUD-001，阶段 12 + 14）。
+本目录此前不属于任何文件线，本 Issue 即认领声明。
 
-```powershell
-python deploy/server.py
-Invoke-WebRequest http://127.0.0.1:8000/healthz
+## 目录内容与状态
+
+| 文件 | 职责 | 真实验证状态 |
+| --- | --- | --- |
+| `server.py` | 最小 HTTP 规则 API，复用 `validator/rules.py` | **已在真实进程运行并请求**（本次未修改） |
+| `Dockerfile` | `python:3.12-slim` + 非 root 用户 + HEALTHCHECK | **从未构建成功**（本机无容器运行时）；本次仅新增 `ENV GIFTWISE_BIND=0.0.0.0`，仍未构建 |
+| `.dockerignore` | 收窄构建上下文 | 本次新增排除项，静态估算 10.29 MiB → 0.05 MiB，未构建验证 |
+| `publish-to-uhost.ps1` | 上传三个文件到 UHost 并远端构建启动 | **从未上传过任何主机**；本次修复两个致命缺陷并用 `-DryRun` 实测参数拼装 |
+| `evidence/` | 运行证据、探针脚本与原始输出 | 本次新增，见 `evidence/README.md` |
+| `observability-collection.md` | 阶段 14 采集与落点实现方案 | 本次新增，纯设计，未实现代码 |
+| `preprod-plan.md` | 预发候选方案、成本、风险与待确认事项 | 本次新增，纯方案，未采购未部署 |
+| `security-review.md` | 安全与健壮性自查 | 本次新增，含实测证据 |
+
+## 依赖
+
+- Python **3.12**（实测 3.12.12；仓库自带测试与 CI 均按 3.12）。
+- 运行时**只用标准库**（`http.server`、`json`、`hashlib`、`decimal`、`re`、`unicodedata`），无第三方包、无 `requirements.txt` 需求。
+- 必须能 `import validator.rules`，因此工作目录需为仓库根目录（或把仓库根加入 `sys.path`）。
+- 容器路径额外依赖 Docker（本机无，见下）。
+
+## 本地真实运行方式（已实测）
+
+```bash
+# 1) 显式绑定回环地址，避免默认对外监听
+cd <仓库根>
+GIFTWISE_BIND=127.0.0.1 GIFTWISE_PORT=8765 python -m deploy.server
+# 启动即打印：giftwise-validator listening on 127.0.0.1:8765; rules=<rules.py 的 sha256>
 ```
 
-`POST /validate` 接收：
+也可以直接用 `python deploy/server.py`。环境变量：
+
+| 变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `GIFTWISE_BIND` | `0.0.0.0` | **默认监听所有接口**；本机自测建议显式设为 `127.0.0.1` |
+| `GIFTWISE_PORT` | `8000` | 监听端口 |
+
+请求（实测输出，取自 `evidence/raw/local-check-latest.json`，2026-10-30 21:25）：
+
+```bash
+curl -sS -i http://127.0.0.1:8000/healthz
+# HTTP/1.0 200 OK
+# Server: GiftWiseValidator/0.1 Python/3.12.12
+# Content-Type: application/json; charset=utf-8
+# Content-Length: 135
+# Cache-Control: no-store
+# {"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}
+```
+
+`POST /validate` 的输入是**两个 JSON 字符串**（不是嵌套对象）：
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/validate \
+  -H 'Content-Type: application/json' \
+  -d '{"request_json":"{\"recipient_relation\":\"pursuit\",...}","candidates_json":"{\"candidates\":[...]}"}'
+```
+
+真实通过用例（`tests/test_cases.json#T01_normal`）的实测响应：
 
 ```json
-{"request_json":"{...}","candidates_json":"{...}"}
+{"status":"passed","all_passed":true,"errors":[],"candidate_results":[{"id":"c1","passed":true,"errors":[],"warnings":[]}, ...],"business_data_verification":"not_verified"}
 ```
 
-API 复用 `validator/rules.py`，响应仍是既有校验结果；请求内容不写入日志。
+响应体与在同一进程内直接调用 `validator.rules.validate(...)` 的结果**逐字节一致**（实测 `byte_identical = true`，367 字节）。
 
-## UCloud 控制台准备
+### 状态码契约（全部实测）
 
-1. 创建或选择 Linux UHost，并绑定公网 EIP。
-2. 安全组允许管理来源访问 TCP 22；允许演示来源访问 TCP 8000。不要默认对全网开放管理端口。
-3. 准备 SSH 私钥文件和实例用户名；不要把私钥、AccessKey 或 Secret 写入仓库。
-4. 确认实例已安装 Docker。若镜像未安装，可在实例上按 UCloud 镜像文档安装后再执行脚本。
+| 场景 | 状态码 | 响应体 |
+| --- | --- | --- |
+| `GET /healthz` | 200 | `{"status":"ok","service":"giftwise-validator","rules_source_sha256":"..."}` |
+| `GET /` | 200 | 端点清单 |
+| `GET /<未知路径>` | 404 | `{"error":"NOT_FOUND"}` |
+| `POST /validate` 合法载荷 | 200 | 校验结果（业务不通过也是 200，见下） |
+| `POST /validate` 缺字段 / 字段非字符串 / 顶层非对象 | 400 | `{"error":"INVALID_PAYLOAD","message":"request_json 和 candidates_json 必须是 JSON 字符串"}` |
+| `POST /validate` 请求体不是合法 JSON 或非 UTF-8 | 400 | `{"error":"INVALID_JSON"}` |
+| `POST /validate` 请求体超过 65536 字节 | 413 | `{"error":"REQUEST_TOO_LARGE"}` |
+| `POST /<其它路径>` | 404 | `{"error":"NOT_FOUND"}` |
+| `HEAD` / `PUT` 等未实现方法 | 501 | 标准库 HTML 错误页（**不是** JSON） |
 
-UCloud 文档：
+注意：**业务校验不通过时仍是 HTTP 200**，失败信息在响应体的 `status`/`all_passed`/`errors` 里
+（实测 `{"request_json":"{}"}` → 200 + `status=needs_input`）。这一点与 `validator.rules.validate` 的契约一致，
+调用方不能只看 HTTP 状态码。
 
-- [创建云主机](https://docs.ucloud.cn/uhost/newuser/briefguide)
-- [远程登录 Linux](https://docs.ucloud.cn/UCloudStack/userguide/mdToPdf/userguide.pdf)
-- [安全组规则](https://docs.ucloud.cn/UCloudStack_v2.x/userguide/sg)
+## 已验证 / 未验证 / 无法执行
 
-## 从 Windows 执行上传与启动
+### 已验证（有本次真实命令与输出）
 
-```powershell
-.\deploy\publish-to-uhost.ps1 `
-  -Host "公网IP" `
-  -User "root" `
-  -KeyPath "C:\path\to\private_key" `
-  -ServicePort 8000
+1. 服务可在本机真实启动，启动到可接受连接 **563.9 ms**（含解释器启动与 `rules.py` 哈希计算）。
+2. 上表 14 个请求用例的状态码与响应体，全部为真实回环请求结果。
+3. `/validate` 响应与进程内 `validate()` 逐字节一致。
+4. `T01_normal` 通过用例：HTTP 200、`status=passed`、`all_passed=true`。
+5. 默认配置确实监听 `0.0.0.0:8000`（`netstat` 实测 `TCP 0.0.0.0:8000 LISTENING`）。
+6. 进程常驻内存 **23.47 MiB**（Working Set）；无请求内容进入日志（日志仅方法+路径+状态码）。
+7. 容器**布局**等价演练：按 Dockerfile 的 COPY 结果与按发布脚本实际上传的最小文件集，
+   两种目录都能用同一条 `CMD python -m deploy.server` 启动，`/healthz` 200、`/validate` 通过、
+   Dockerfile 的 HEALTHCHECK 命令 exit 0（**这不是构建镜像**，详见 `evidence/container-probe.md`）。
+8. 修复后的 `publish-to-uhost.ps1 -DryRun` 可运行并打印完整计划命令，端口规格为 `0.0.0.0:8000:8000`。
+
+### 未验证
+
+1. **镜像从未构建**：本机无 docker/podman/WSL/containerd，`docker build` 无法执行。
+   因此 `python:3.12-slim` 是否可拉取、构建是否成功、`USER giftwise` 与 `HEALTHCHECK` 在容器内是否工作，
+   全部**未验证**。
+2. **从未部署到任何云主机**：`publish-to-uhost.ps1` 的 ssh/scp/docker 远端流程从未真实执行，
+   `-DryRun` 只证明参数拼装正确。
+3. 未做负载/容量测试：延迟数据来自与客户端同机、每请求新建连接（HTTP/1.0）的测量，
+   不能作为容量结论，见 `evidence/20261030-local-run.md` 的延迟表。
+4. 未做 TLS/反向代理/鉴权：当前 API 没有认证，任何能访问该端口的人都能调用。
+5. `/validate` 的 `INTERNAL_ERROR`（500）分支**未能诱导触发**（`validate()` 内部已捕获所有异常），
+   仅做代码走查，未取得运行时证据。
+
+### 无法执行（含原因）
+
+1. `docker build` / `docker run`：本机 `docker: command not found`，且 Docker Desktop、
+   Rancher Desktop、Podman、containerd、WSL 发行版、`kubectl`/`minikube`/`kind` **全部不存在**
+   （逐条命令与原始输出见 `evidence/container-probe.md`）。安装 Docker 需要产品负责人授权与时间预算。
+2. 任何 UCloud 操作（开实例、绑 EIP、改安全组、上传）：按任务边界**不得自行采购或上传**，
+   也**没有读取任何云凭证**。
+
+## 安全提醒（摘要）
+
+默认 `GIFTWISE_BIND=0.0.0.0` 意味着服务监听所有网卡；在有公网 IP 的机器上，只要安全组放行即**全网可达**，
+而该 API 无鉴权、无请求频率限制。自测请显式绑定 `127.0.0.1`；上云时必须用安全组限制来源。
+完整问题清单与最小修复建议见 `security-review.md`。
+
+## 证据与复现
+
+```bash
+python deploy/evidence/local_check.py                # 本地运行取证（端点矩阵、延迟、内存、日志）
+python deploy/evidence/container_layout_dryrun.py    # 容器布局等价演练（两种文件集）
+python deploy/evidence/container_probe.py            # 容器运行时存在性探测
+python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha256
 ```
 
-脚本只上传 `validator/rules.py`、`deploy/server.py` 和 `deploy/Dockerfile`，然后在 UHost 上构建并启动容器。完成后检查：
+原始输出在 `evidence/raw/`，索引见 `evidence/README.md`。所有脚本只做本机操作，不上传、不产生费用。
 
-```powershell
-Invoke-WebRequest http://公网IP:8000/healthz
-```
+---
 
-当前脚本不能代替 UCloud 账号登录、实例创建、费用确认或安全组授权；这些必须在用户自己的控制台完成。
+## 当前进度 / 未完成清单 / 阻塞
+
+（本节为 CLOUD-001 本轮收尾状态，2026-10-30 21:30 北京时间）
+
+**当前进度**
+
+- 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
+- 实际执行过的命令（全部在本机、无网络写操作、无费用）：
+  - `python deploy/evidence/local_check.py` → exit 0，产出 `raw/local-check-latest.json`（stamp `20261030-212549`）
+    与 `raw/server-8765.log`（215 行服务端日志）。
+  - `python deploy/evidence/container_layout_dryrun.py` → exit 0，两种布局均 `/healthz` 200、`/validate` `passed`、
+    HEALTHCHECK 等价命令 exit 0。
+  - `python deploy/evidence/container_probe.py` → exit 0，18 条探测全部记录原始输出；`docker`/`podman`/`nerdctl`/
+    `containerd`/`kubectl`/`minikube`/`kind` 均 `command not found`，`wsl --status` exit 50
+    （"未安装适用于 Linux 的 Windows 子系统"）。
+  - `powershell -File deploy\publish-to-uhost.ps1 -Host 203.0.113.10 -KeyPath <虚构> -DryRun` → exit 0。
+  - `python deploy/evidence/artifact_manifest.py` → git HEAD `89d6624`，12 个关键文件 sha256 已落盘。
+  - 修复前对照组：`powershell -File deploy\publish-to-uhost.ps1 -Host ... -KeyPath ...` → exit 1，
+    `VariableNotWritable`（该脚本此前**完全无法运行**）。
+- 已交付文件：`deploy/README.md`、`deploy/security-review.md`、`deploy/preprod-plan.md`、
+  `deploy/observability-collection.md`、`deploy/evidence/`（README + 报告 + 3 个脚本 + raw 输出）。
+
+**未完成清单（均为计划，无真实执行）**
+
+1. 镜像构建与容器内健康检查（计划：装 Docker Desktop 或租 UHost 后 `docker build`）。
+2. `publish-to-uhost.ps1` 的远端上传与启动（计划：拿到真实主机、私钥与端口后执行）。
+3. 预发环境端到端验证（计划：Dockerfile → UHost → 安全组 → 公网 `/healthz`）。
+4. 阶段 14 采集方案的代码实现（`observability-collection.md` 目前只是设计，未写任何采集代码）。
+5. 成本数据（计划：拿到 UCloud 当期报价或额度后再填；当前一律记"未知，未测量"）。
+6. 鉴权/限流/TLS（计划，尚未决定是否列入比赛范围）。
+
+**阻塞**
+
+1. **无容器运行时**：本机无 docker/podman/WSL/containerd，无法构建镜像；安装需产品负责人授权
+   （估 30–60 分钟下载安装 + 需重启生效，且会改变本机环境）。
+2. **无云资源授权**：无 UHost、无 EIP、无额度确认，且按边界不得自行采购；这是任务 4/5 无法闭环的唯一原因。
+3. **无当前代码的提交**：工作区有 48 条未提交改动（含其他 Agent 的文件），本轮按纪律未 `git add`/未提交，
+   因此上述证据对应的是**工作区状态 + git HEAD `89d6624`**，不是某个提交。

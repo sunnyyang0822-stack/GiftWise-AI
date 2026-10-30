@@ -1,0 +1,66 @@
+{
+  "label": "tavily_optimized_kinto",
+  "observed_at": "2026-10-30T01:34:27.337397+00:00",
+  "elapsed_seconds": 7.032,
+  "endpoint": "https://api.tavily.com/search",
+  "request": {
+    "query": "SCS-S03 320ml",
+    "include_domains": [
+      "kintocn.cn"
+    ],
+    "search_depth": "advanced",
+    "max_results": 5
+  },
+  "http_status": 200,
+  "transport_error": null,
+  "response": {
+    "query": "SCS-S03 320ml",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://www.kintocn.cn/product/detail_131.html",
+        "title": "SCS-S02 黄铜手冲套装架 - KINTO",
+        "content": "Unique products ensuring comfort of use are created by seeking the best ... SCS-S03 手做陶瓷马克杯320ml. logo. 中国. 产品 · 新闻 · 展厅/学院 · 关于我们 · 联系我们.Read more",
+        "score": 0.76617163,
+        "raw_content": null,
+        "id": "58785f-00"
+      },
+      {
+        "url": "https://www.kintocn.cn/product/list_I1I149.html",
+        "title": "饮品器具马克杯及杯品- KINTO",
+        "content": "SCS-S03 手做陶瓷马克杯110ml. ￥147.00. image. SCS-S03 手做陶瓷马克杯320ml. ￥168.00. image. OCT陶瓷杯碟套装80ml（意浓杯）. ￥140.00. image. OCT陶瓷杯碟套装220ml ...Read more",
+        "score": 0.7045877,
+        "raw_content": null,
+        "id": "cfae93-01"
+      },
+      {
+        "url": "https://www.kintocn.cn",
+        "title": "KINTO",
+        "content": "TO GO TUMBLER 桌上杯\n\nFOG系列\n\nFOG系列\n\nPIPPLE 马克杯\n\nPIPPLE 马克杯\n\nLUNA 花瓶系列\n\nLUNA 花瓶系列\n\nKAKOMI IH 日式砂锅\n\nKAKOMI IH 日式砂锅\n\nTRAVEL TUMBLER 经典保温杯\n\nTRAVEL TUMBLER 经典保温杯\n\nPOUR OVER KETTLE 手冲壶\n\nPOUR OVER KETTLE 手冲壶\n\nSCS-S02 四人份黄铜手冲套装\n\nSCS-S02 四人份黄铜手冲套装\n\nAQUA CULTURE 经典玻璃花瓶\n\nAQUA CULTURE 经典玻璃花瓶\n\n新闻 更多\n\n 2023-04-24\n\n  Tea Meditation to Find Balance with Our Mind and Body\n 2023-04-24\n\n  KINTO x HERENESS Yoga Event Report\n 2023-04-23\n\n  Lakeside Scenery\n 2023-04-23\n\n  Maison Mastrorelli (France)\n 2023-04-23\n\n  The Orchard Townhouse (USA)\n 2023-04-23\n\n  Pour Over Coffee Tips - LIGHT UP COFFEE -\n 2023-04-23\n\n  Table Styling - ATELIER TETE -\n 2023-04-23\n\n  Coconut Rice Porridge\n 2023-04-23\n\n  Mont-Blanc Marathon - MRC -\n 2023-04-23\n\n  Day to Day with Tableware\n\nback top icon;) [...] logo\n\n 产品 \n\n  VIEW BY COLLECTION\n\n  系列一览\n\n  SCS 慢咖啡风格  TUMBLER 经典彩色随行杯  UNITEA 简约茶具系列  CLK 日制经典陶瓷系列  KAKOMI 寿喜锅系列\n\n  饮品器具\n\n  茶具 咖啡器具 玻璃器具 马克杯及杯品 水壶及冷水壶 彩色随行杯 手冲壶\n\n  桌上器皿\n\n  碟子 碗 餐具\n\n  厨房用具\n\n  储存器皿 托盘及小碟 厨房工具 烹饪器具\n\n  家居摆件\n\n  花瓶 卫浴摆件\n 新闻\n 关于我们\n 展厅/学院\n\nemail  user     \n 微信扫码打开小程序   cart\n\nsearch\n\nclose\n\nWORKOUT BOTTLE 健身杯\n\n儿童保温杯\n\n随身杯\n\nACTIVE TUMBLER\n\n花瓶\n\n茶具\n\n手冲壶\n\nLet your day be filled with what inspires you.\n\nbanner\n\nSTAFF NOTE ▪ KINTO 2019年春季东京咖啡节\n\nbanner\n\nDAZ OFF TUMBLER 户外保温杯\n\nbanner\n\nWORKOUT BOTTLE 健身杯\n\nSTAFF NOTE ▪ KINTO 2019 秋季新品发布晚宴\n\nSTAFF NOTE ▪ KINTO 2019 秋季新品发布晚宴\n\nSTAFF NOTE ▪ KINTO 洛杉矶旗舰店\n\nSTAFF NOTE ▪ KINTO 洛杉矶旗舰店\n\nSTAFF NOTE ▪ KINTO 咖啡工坊活动\n\nSTAFF NOTE ▪ KINTO 咖啡工坊活动\n\n特色产品\n\nWORKOUT BOTTLE 健身杯\n\nWORKOUT BOTTLE 健身杯\n\nTO GO TUMBLER 桌上杯\n\nTO GO TUMBLER 桌上杯\n\nFOG系列\n\nFOG系列\n\nPIPPLE 马克杯",
+        "score": 0.27602088,
+        "raw_content": null,
+        "id": "5afe94-02"
+      },
+      {
+        "url": "https://www.kintocn.cn/productsdetail/6.html",
+        "title": "TUMBLER 经典彩色随行杯 - KINTO",
+        "content": "logo\n\n 产品 \n\n  VIEW BY COLLECTION\n\n  系列一览\n\n  特色系列\n\n  SCS 慢咖啡风格  TUMBLER 经典彩色随行杯  UNITEA 简约茶具系列  CLK 日制经典陶瓷系列  KAKOMI 寿喜锅系列\n\n  饮品器具\n\n  茶具 咖啡器具 玻璃器具 马克杯及杯品 水壶及冷水壶 彩色随行杯 手冲壶\n\n  桌上器皿\n\n  碟子 碗 餐具\n\n  厨房用具\n\n  储存器皿 托盘及小碟 厨房工具 烹饪器具\n\n  家居摆件\n\n  花瓶 卫浴摆件\n 新闻\n 关于我们\n 展厅/学院\n\nemail  user     \n 微信扫码打开小程序   cart\n\nsearch\n\nclose\n\nTUMBLER 经典彩色随行杯\n\n无论何时何地的舒适饮用\n\nTRAVEL TUMBLER 经典彩色随行杯系列专为自由生活意识的人群所打造. 无论是对单品咖啡还是茶饮的赏味,或是仅仅矿泉水的随身饮用,都可以由经典彩色随身杯盛装.真空不锈钢内胆可以很好保温隔热.并可以保持饮品的原有风味.杯盖与饮水口的内螺纹设计,可以让您饮用的时候毫无口部与杯口接触的螺纹感.带有滤口的饮用口可以很好防止冰块, 热水大量涌出,让您惬意饮用.\n\n1.jpg 2.jpg 3.jpg4.jpg   \n  \n5.jpg   \n  \n6.jpg   \n  \n7.jpg   \n  \n8.jpg   \n  \n9.jpg\n\n#### TUMBLER 经典彩色随行杯\n\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 不锈钢色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 白色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 红色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 卡其绿\n image [...] TRAVEL TUMBLER 经典保温杯 500ml 卡其绿\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 绿松石色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 黑色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 狼棕色\n image\n\n  TRAVEL TUMBLER 经典保温杯 500ml 银色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 不锈钢色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 白色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 红色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 卡其绿\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 绿松石色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 黑色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 狼棕色\n image\n\n  TRAVEL TUMBLER 经典保温杯 350ml 银色\n\nback top icon;)",
+        "score": 0.24297762,
+        "raw_content": null,
+        "id": "ba6a75-03"
+      },
+      {
+        "url": "https://www.kintocn.cn/product/detail_132.html",
+        "title": "SCS-S04 二人份手冲套装- KINTO",
+        "content": "SLOW COFFEE STYLE SPECIALTY 慢咖啡精品风格系列因受到手作匠人的感染而生。由所获最好材质经过手工制作，精心打磨才创造了可以让使用更舒服且独一无二的产品。",
+        "score": 0.2043899,
+        "raw_content": null,
+        "id": "d02595-04"
+      }
+    ],
+    "response_time": 5.22,
+    "request_id": "23c46cef-f7e6-4843-99d7-e7e88c8fc8b4"
+  }
+}

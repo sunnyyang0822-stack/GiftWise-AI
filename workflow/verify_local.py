@@ -114,7 +114,29 @@ def run():
         exec(compile((ROOT / "workflow/generated" / filename).read_text(encoding="utf-8"), filename, "exec"), entry_namespace)
         entrypoints[filename] = entry_namespace["main"]
     entry_intake = entrypoints["intake_node.py"](dump(intake))
-    record("Dify 专用输入节点", entry_intake, lambda r: r["status"] == "ready" and r["request_json"] == request_json)
+    # colleague 是「仅技术回归」机器值，产品场景已移出；夹具单独成文件，验证既有链路不退化。
+    regression = json.loads((ROOT / "workflow/examples/intake-colleague.json").read_text(encoding="utf-8"))
+    entry_intake_regression = entrypoints["intake_node.py"](dump(regression))
+    relations = {}
+    for relation_id in ("partner", "pursuit", "friend"):
+        sample = copy.deepcopy(intake)
+        sample["recipient_relation"] = relation_id
+        adapted_relation = json.loads(adapt_intake(dump(sample))["request_json"])
+        relations[relation_id] = {"id": adapted_relation["recipient_relation_id"], "label": adapted_relation["recipient_relation"]}
+    injected = copy.deepcopy(intake)
+    injected["recipient_relation_id"] = "pursuit"
+    record("Dify 专用输入节点（pursuit 主场景／colleague 技术回归／关系分叉值／该字段不可输入）", {
+        "main": entry_intake, "colleague": entry_intake_regression, "relations": relations,
+        "injected_relation_id": adapt_intake(dump(injected))["status"],
+    }, lambda r: r["main"]["status"] == "ready" and r["main"]["request_json"] == request_json
+        and json.loads(r["main"]["request_json"])["recipient_relation_id"] == "pursuit"
+        and r["colleague"]["status"] == "ready"
+        and json.loads(r["colleague"]["request_json"])["recipient_relation"] == "同事"
+        and json.loads(r["colleague"]["request_json"])["recipient_relation_id"] == "colleague"
+        and r["relations"] == {"partner": {"id": "partner", "label": "恋人"},
+                               "pursuit": {"id": "pursuit", "label": "追求对象"},
+                               "friend": {"id": "friend", "label": "朋友"}}
+        and r["injected_relation_id"] == "needs_input")
     entry_check = entrypoints["check_node.py"](request_json, over, 0)
     record("Dify 专用首检节点及保留项", entry_check, lambda r: r["repairable"] and set(json.loads(r["preserved_candidates_json"])) == {"c2", "c3"})
     entry_recheck = entrypoints["recheck_node.py"](request_json, over, good, 0)

@@ -1,7 +1,14 @@
+# 镜像只需要 validator/ 与 deploy/server.py 两个 COPY 源；
+# 其余内容只影响传给 docker daemon 的构建上下文体积，因此一律排除。
 .env
 .git
 __pycache__
 *.pyc
 tests
-workflow/tools
+workflow
+.dockerignore
 docs
+web
+.tmp
+deploy/evidence
+*.log

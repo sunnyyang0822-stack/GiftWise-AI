@@ -1,0 +1,52 @@
+ M README.md
+ M deploy/.dockerignore
+ M deploy/Dockerfile
+ M deploy/README.md
+ M deploy/publish-to-uhost.ps1
+ M docs/acceptance-criteria.md
+ M docs/architecture.md
+ M docs/demo-script.md
+ M docs/development-process.md
+ M docs/intake-contract.md
+ M docs/product-flow.md
+ M docs/product-requirements.md
+ M docs/test-plan.md
+ M docs/user-stories.md
+ M workflow/evidence/WF-002-2026-10-30.md
+ M workflow/examples/candidates.json
+ M workflow/examples/intake.json
+ M workflow/generated/check_node.py
+ M workflow/generated/code_node.py
+ M workflow/generated/intake_node.py
+ M workflow/generated/manifest.json
+ M workflow/generated/recheck_node.py
+ M workflow/generated/report_node.py
+ M workflow/intake.py
+ M workflow/labels.py
+ M workflow/prompts/generate.md
+ M workflow/prompts/repair.md
+ M workflow/verify_local.py
+ M workflow/workflow-spec.md
+?? .tmp/
+?? deploy/evidence/
+?? deploy/observability-collection.md
+?? deploy/preprod-plan.md
+?? deploy/security-review.md
+?? docs/architecture/
+?? docs/competition/
+?? docs/pm-reviews/contract-decisions-draft-2026-10-30.md
+?? docs/pm-reviews/stage-2-acceptance-checklist-2026-10-30.md
+?? docs/product-data-research.md
+?? docs/requirements-analysis.md
+?? docs/research-evidence/
+?? docs/test-reports/stage-a/
+?? docs/test-reports/stage-c/
+?? tests/acceptance/stage-a/
+?? tests/acceptance/stage_c/
+?? web/
+?? workflow/evidence/WF-003-2026-10-30.md
+?? workflow/evidence/WF-003-2026-10-30/
+?? workflow/evidence/local-2026-10-29/
+?? workflow/evidence/local-2026-10-30/
+?? workflow/examples/intake-colleague.json
+?? workflow/tools/

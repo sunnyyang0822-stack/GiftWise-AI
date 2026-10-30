@@ -1,0 +1,166 @@
+[
+  {
+    "case": "real1_normal_200",
+    "expect": "N2 真实生成 → N3 通过 → N4[true] → N7a → End A",
+    "startedAtUtc": "2026-10-30T13:16:57.203Z",
+    "httpStatus": 200,
+    "browserElapsedMs": 7147,
+    "N2_raw_text_chars": 1468,
+    "N2_elapsed_s": 6.005652,
+    "N3_status": "passed",
+    "N3_all_passed": true,
+    "N3_codes": [],
+    "N3_per_candidate": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N3_preserved": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "N4_case": "true",
+    "N5_ran": false,
+    "N5_elapsed_s": null,
+    "N5_raw_text_chars": null,
+    "N6_status": null,
+    "N6_all_passed": null,
+    "N6_per_candidate": [],
+    "N6_repair_count": null,
+    "workflow_status": "succeeded",
+    "workflow_elapsed_s": 6.484221920953132,
+    "total_tokens": 1614,
+    "end_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 0
+    },
+    "selectable_candidate_ids": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "selected_candidate_id": null,
+    "candidate_names": [
+      [
+        "c1",
+        "精品咖啡豆小礼盒",
+        "168.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c2",
+        "小型美食体验礼盒",
+        "188.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c3",
+        "咖啡主题实用小物组合",
+        "150.00",
+        [
+          "other"
+        ]
+      ]
+    ]
+  },
+  {
+    "case": "real2_budget_1_repair",
+    "expect": "N2 真实生成超预算 → N4[repairable] → N5 真实修订 → N6 → N7b → End B",
+    "startedAtUtc": "2026-10-30T13:17:04.350Z",
+    "httpStatus": 200,
+    "browserElapsedMs": 5771,
+    "N2_raw_text_chars": 1121,
+    "N2_elapsed_s": 4.48922,
+    "N3_status": "passed",
+    "N3_all_passed": true,
+    "N3_codes": [],
+    "N3_per_candidate": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": []
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": []
+      }
+    ],
+    "N3_preserved": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "N4_case": "true",
+    "N5_ran": false,
+    "N5_elapsed_s": null,
+    "N5_raw_text_chars": null,
+    "N6_status": null,
+    "N6_all_passed": null,
+    "N6_per_candidate": [],
+    "N6_repair_count": null,
+    "workflow_status": "succeeded",
+    "workflow_elapsed_s": 5.2075010110856965,
+    "total_tokens": 1413,
+    "end_outputs": {
+      "status": "passed",
+      "all_passed": true,
+      "repair_count": 0
+    },
+    "selectable_candidate_ids": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "selected_candidate_id": null,
+    "candidate_names": [
+      [
+        "c1",
+        "挂耳咖啡小样组合",
+        "1.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c2",
+        "手写生日祝福卡配小份点心",
+        "1.00",
+        [
+          "food"
+        ]
+      ],
+      [
+        "c3",
+        "简约桌面小摆件",
+        "1.00",
+        [
+          "other"
+        ]
+      ]
+    ]
+  }
+]

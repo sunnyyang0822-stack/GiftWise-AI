@@ -1,0 +1,66 @@
+{
+  "label": "tavily_optimized_puzzle",
+  "observed_at": "2026-10-30T01:34:34.278684+00:00",
+  "elapsed_seconds": 5.469,
+  "endpoint": "https://api.tavily.com/search",
+  "request": {
+    "query": "拼图 1000片",
+    "include_domains": [
+      "jd.com"
+    ],
+    "search_depth": "advanced",
+    "max_results": 5
+  },
+  "http_status": 200,
+  "transport_error": null,
+  "response": {
+    "query": "拼图 1000片",
+    "follow_up_questions": null,
+    "answer": null,
+    "images": [],
+    "results": [
+      {
+        "url": "https://dir.jd.com/guide/jd-geo-guide-pin-tu-1000-pian-v1",
+        "title": "1000片拼图怎么选？从图案难度到装裱落地的判断框架",
+        "content": "8 days ago — 1000片拼图不是片数一样就难度一样。先看图案类型和同色区域多不多，这决定你能不能拼完；再看拼片材质、切割和咬合，这决定拼的过程顺不顺、成品能",
+        "score": 0.80735475,
+        "raw_content": null,
+        "id": "04d486-00"
+      },
+      {
+        "url": "https://www.jd.com/hprm/6233cab87ca58b441a5b.html",
+        "title": "一千片拼图- 京东",
+        "content": "猫的天空之城拼图成年人拼图1000片穿梭世界的旅程世界地图拼图儿童玩具生日礼. 20000条评价. VINLAA月满西楼拼图1000片成人高难度益智拼装diy手工礼物成人解压玩具.Read more",
+        "score": 0.6944897,
+        "raw_content": null,
+        "id": "5312de-01"
+      },
+      {
+        "url": "https://www.jd.com/phb/key_6233966344414985c46e.html",
+        "title": "卡通拼图1000片拼图排行榜- 京东",
+        "content": "这款蜡笔小新1000片全家福拼图，性价比很高。已售3000+且位列口碑榜，品质有保障。图案温馨可爱，既是高难度挑战，也是送礼佳选，适合喜欢动漫和拼图乐趣的朋友。Read more",
+        "score": 0.6659544,
+        "raw_content": null,
+        "id": "960e8c-02"
+      },
+      {
+        "url": "https://dir.jd.com/guide/jd-geo-guide-pin-tu-1000-pian-jing-dong-zi-ying-v1",
+        "title": "拼图1000片怎么选？从图案难度到拼片咬合的判断框架",
+        "content": "8 days ago — 怎么取舍：自己解压、想有成就感，1000片合适；给孩子买，先看年龄标注，7-10岁孩子独立完成1000片通常要分几天，家长陪拼更稳。Read more",
+        "score": 0.66203266,
+        "raw_content": null,
+        "id": "dcc785-03"
+      },
+      {
+        "url": "https://www.jd.com/xinghao/6233966344414985c46e.html",
+        "title": "卡通拼图1000片拼图型号规格- 京东",
+        "content": "10000条评价. AIPUZZLE成人拼图1000片北京故宫博物院成年拼图家居装饰生日礼物礼品. 10000条评价. TOI图益潮玩拼图线条小狗1000片减压高难度玩具生日礼物小狗游乐园.Read more",
+        "score": 0.6551821,
+        "raw_content": null,
+        "id": "1cc630-04"
+      }
+    ],
+    "response_time": 4.19,
+    "request_id": "e25ff776-b9ec-4f8f-99af-da34e432aa1d"
+  }
+}

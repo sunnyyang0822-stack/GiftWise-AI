@@ -13,6 +13,7 @@
 - inferences 与 unknowns 为字符串数组，区分判断和未知；unknown 不编造。未知购买渠道、具体口味等明确写出。
 - estimated_total 是非负且至多两位小数的 ASCII 十进制字符串，包含礼物、基础包装、贺卡、配送及声明费用；不得用零替代未知价格。currency 必须 CNY。estimated_preparation_days 为非负整数，不得超过 available_days。均为估算，不能声称实价、库存、实际送达已核实。
 - tags 至少一个，且仅可为 alcohol、food、fragrance、jewelry、plant、other；如实标注，不靠漏标规避明确禁忌。不要推荐违反 forbidden_tags 或 forbidden_terms 的方案；字面禁忌也检查理由、推断等文本。
+- 禁忌词按**字面**匹配所有文本字段。因此不要在 name、description、reason、inferences、unknowns 中写出禁忌词或禁忌标签词本身，**包括"不含X""无X""非X"这类否定式与声明式表述**。需要表达该方向不可用时，直接改为描述所选方向，不要提及被禁止的词。
 - 每字段字符串不超过 1000 码点、数组最多 20 项，完整输出不超过 32768 UTF-8 字节。
 - 本阶段不生成详细包装步骤、配色、贺卡正文与赠送话术。不替用户选第一项，不生成 selected_candidate_id。
 

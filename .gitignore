@@ -11,6 +11,8 @@ secrets.*
 # 原始工作流导出须审查后再公开
 *.ifpkg
 workflow/private/
+# PM 本地临时产物（Issue 副本、发布演练输出等），不进提交包
+.tmp/
 # Python 缓存与构建产物
 __pycache__/
 .venv/

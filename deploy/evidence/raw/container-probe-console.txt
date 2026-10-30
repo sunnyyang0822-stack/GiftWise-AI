@@ -1,0 +1,25 @@
+raw   -> deploy/evidence/raw/container-probe-20261030-212742.txt
+json  -> deploy/evidence/raw/container-probe-latest.json
+  [  1] docker_cli_in_path                 信息: 用提供的模式无法找到文件。
+  [  1] docker_version                     'docker' 不是内部或外部命令，也不是可运行的程序
+  [  1] docker_info                        'docker' 不是内部或外部命令，也不是可运行的程序
+  [  1] docker_build_dry                   'docker' 不是内部或外部命令，也不是可运行的程序
+  [  1] docker_compose_version             'docker' 不是内部或外部命令，也不是可运行的程序
+  [  1] podman_in_path                     信息: 用提供的模式无法找到文件。
+  [  1] podman_version                     'podman' 不是内部或外部命令，也不是可运行的程序
+  [  1] nerdctl_in_path                    信息: 用提供的模式无法找到文件。
+  [  1] nerdctl_version                    'nerdctl' 不是内部或外部命令，也不是可运行的程序
+  [  1] containerd_in_path                 信息: 用提供的模式无法找到文件。
+  [ 50] wsl_status                         未安装适用于 Linux 的 Windows 子系统。可通过运行 “wsl.exe --install” 进行安装。
+  [  1] wsl_list_verbose                   未安装适用于 Linux 的 Windows 子系统。可通过运行 “wsl.exe --install” 进行安装。
+  [  1] wsl_version                        未安装适用于 Linux 的 Windows 子系统。可通过运行 “wsl.exe --install” 进行安装。
+  [  1] kubectl_version                    'kubectl' 不是内部或外部命令，也不是可运行的程序
+  [  1] minikube_version                   'minikube' 不是内部或外部命令，也不是可运行的程序
+  [  1] kind_version                       'kind' 不是内部或外部命令，也不是可运行的程序
+  [  1] buildkit_in_path                   信息: 用提供的模式无法找到文件。
+  [  1] windows_services                   <无输出>
+  [  0] docker_desktop_paths               C:\Program Files\Docker\Docker\Docker Desktop.exe => False
+  [  0] windows_optional_features_containers Containers = 查询失败: 请求的操作需要提升。
+  [  0] wsl_appx_package                   appx_found=False
+  [  0] wsl_distros_registry               Lxss 注册表项不存在: 找不到路径“HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Lxss”，因为
+  [  0] hyperv_present                     vmcompute_service=; lxss_dir=True
