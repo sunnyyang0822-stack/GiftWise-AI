@@ -1,0 +1,28 @@
+# docker exec 自身开销的独立测量（本线发现，推翻了第一版日志实验的基线）
+# 方法：连续两次 exec 读 cpu.stat，中间什么都没做；增量即 exec 自身的 CPU 记账。
+
+--- gw-idle-test  (只跑 sleep 900 的容器，零请求（最干净的对照）) ---
+  b-a 增量(us): [35453, 28109, 29637, 30788, 31300]
+  中位数 = 30788 us
+
+--- gw-logtest-json  (validator 容器，零请求（无 healthcheck、不在 LB 后）) ---
+  b-a 增量(us): [187101, 29258, 33639, 33709, 33129]
+  中位数 = 33639 us
+
+--- giftwise-cloudnative-lab-validator-a-1  (有健康探测的容器) ---
+  b-a 增量(us): [36849, 30771, 31676, 36812, 40387]
+  中位数 = 36812 us
+
+结论：
+  - 即使容器内只有一个 sleep 进程，两次 exec 之间也会被记上约 34 ms CPU。
+  - 所以『用两次 exec 夹一段 sleep 测空转 CPU』这种方法**必然**把 exec 开销当成应用开销。
+  - 正确做法：把整个测量放进**一次** exec（见 compose/lb/incontainer_cpu_probe.py）。
+
+另一个交叉验证（docker stats vs cgroup，同一容器各测 20s）：
+  gw-idle-test                                  cgroup=   0.165%核   docker stats=   0.00%
+  giftwise-cloudnative-lab-validator-a-1        cgroup=  10.722%核   docker stats=   0.26%
+  gw-logtest-json                               cgroup=   1.945%核   docker stats=   0.01%
+
+  docker stats 与 cgroup 读数在此环境下**不一致**（docker stats 会把容器用量
+  按宿主核心数归一化，本机 24 核，因此数值被显著摊薄）。
+  本线以『单次 exec 内的 cgroup 增量』为准，因为它不依赖归一化假设。

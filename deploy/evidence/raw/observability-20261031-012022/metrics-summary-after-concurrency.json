@@ -1,0 +1,108 @@
+{
+  "ts": "2026-10-31T01:20:24.931+08:00",
+  "service": "giftwise-validator",
+  "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
+  "uptime_seconds": 1.585,
+  "requests_total": 151,
+  "errors_total": 22,
+  "error_rate": 0.145695,
+  "requests_by_key": {
+    "GET / 200": 1,
+    "GET /healthz 200": 6,
+    "GET /metrics 200": 6,
+    "GET /readyz 200": 2,
+    "GET __unmatched__ 404": 5,
+    "POST /validate 200": 114,
+    "POST /validate 400": 11,
+    "POST /validate 413": 4,
+    "PUT /validate 501": 2
+  },
+  "errors_by_status": {
+    "400": 11,
+    "404": 5,
+    "413": 4,
+    "501": 2
+  },
+  "validate_results_total": {
+    "needs_input": 3,
+    "passed": 111
+  },
+  "error_codes_total": {
+    "INVALID_JSON": 8,
+    "INVALID_PAYLOAD": 3,
+    "MISSING_FIELD": 3,
+    "NOT_FOUND": 5,
+    "REQUEST_TOO_LARGE": 4
+  },
+  "latency_by_route": {
+    "/": {
+      "count": 1,
+      "sum_ms": 0.365,
+      "p50_ms": 0.365,
+      "p95_ms": 0.365,
+      "p99_ms": 0.365,
+      "max_ms": 0.365,
+      "reservoir_size": 1
+    },
+    "/healthz": {
+      "count": 6,
+      "sum_ms": 2.242,
+      "p50_ms": 0.367,
+      "p95_ms": 0.48,
+      "p99_ms": 0.485,
+      "max_ms": 0.486,
+      "reservoir_size": 6
+    },
+    "/metrics": {
+      "count": 6,
+      "sum_ms": 3.582,
+      "p50_ms": 0.566,
+      "p95_ms": 0.837,
+      "p99_ms": 0.905,
+      "max_ms": 0.922,
+      "reservoir_size": 6
+    },
+    "/readyz": {
+      "count": 2,
+      "sum_ms": 100.541,
+      "p50_ms": 50.271,
+      "p95_ms": 92.257,
+      "p99_ms": 95.989,
+      "max_ms": 96.922,
+      "reservoir_size": 2
+    },
+    "/validate": {
+      "count": 131,
+      "sum_ms": 179.445,
+      "p50_ms": 0.864,
+      "p95_ms": 4.069,
+      "p99_ms": 6.977,
+      "max_ms": 23.488,
+      "reservoir_size": 131
+    },
+    "__unmatched__": {
+      "count": 5,
+      "sum_ms": 1.193,
+      "p50_ms": 0.229,
+      "p95_ms": 0.315,
+      "p99_ms": 0.324,
+      "max_ms": 0.327,
+      "reservoir_size": 5
+    }
+  },
+  "in_flight_requests": 1,
+  "metrics_scrapes_total": 6,
+  "ready_checks_total": 2,
+  "bytes_in_total": 459617,
+  "bytes_out_total": 76047,
+  "nonzero_latency_samples": 151,
+  "process_resident_memory_bytes": 28712960,
+  "model_calls_total": 0,
+  "cost": {
+    "unit": "CNY",
+    "amount": 0.0,
+    "source": "deterministic_rules_only"
+  },
+  "python_version": "3.12.12",
+  "platform": "Windows"
+}

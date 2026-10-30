@@ -1,0 +1,42 @@
+{
+  "GET /healthz": [
+    200,
+    "{\"status\":\"ok\",\"service\":\"giftwise-validator\",\"rules_source_sha256\":\"1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500\"}"
+  ],
+  "GET /": [
+    200,
+    "{\"service\":\"giftwise-validator\",\"endpoints\":[\"GET /healthz\",\"POST /validate\"]}"
+  ],
+  "GET /nope": [
+    404,
+    "{\"error\":\"NOT_FOUND\"}"
+  ],
+  "POST /validate 正常载荷": [
+    200,
+    "{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"}"
+  ],
+  "POST /validate 字段非字符串": [
+    400,
+    "{\"error\":\"INVALID_PAYLOAD\",\"message\":\"request_json 和 candidates_json 必须是 JSON 字符串\"}"
+  ],
+  "POST /validate 非法 JSON": [
+    400,
+    "{\"error\":\"INVALID_JSON\"}"
+  ],
+  "POST /validate 超长正文": [
+    413,
+    "{\"error\":\"REQUEST_TOO_LARGE\"}"
+  ],
+  "PUT /validate 未实现方法": [
+    501,
+    "<!DOCTYPE HTML>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <title>Error response</title>\n    </head>\n    <body>\n        <h1>Error response</h1>\n        <p>Error code: 501</p>\n        <p>Message: Unsupported method ('PUT').</p>\n        <p>Error code explanation: 501 - Server does not support this operation.</p>\n    </body>\n</html>\n"
+  ],
+  "POST /nope": [
+    404,
+    "{\"error\":\"NOT_FOUND\"}"
+  ],
+  "POST /validate 无 Content-Length": [
+    413,
+    "{\"error\":\"REQUEST_TOO_LARGE\"}"
+  ]
+}

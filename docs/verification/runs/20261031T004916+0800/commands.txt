@@ -1,0 +1,4 @@
+# 本次实际执行的完整命令（结果表里因排版被截断，这里给全文）
+[FAIL] declared_rules_hash: (内置只读探针：docs/competition/材料清单与自查.md + workflow/generated/manifest.json)
+[PASS] secret_scan: (内置只读探针：密钥模式扫描 + 声明里的逐字 grep 命令)
+[SKIP] dify_publish_state: (未执行；只读归档证据 workflow/evidence/WF-003-2026-10-31-publish-v2/)

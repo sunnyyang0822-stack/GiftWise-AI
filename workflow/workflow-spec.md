@@ -93,7 +93,9 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 顶层错误覆盖无效请求、批次结构、JSON 解析问题，并阻止 `all_passed`。所有三个候选通过时才是 `passed`；候选或批次不合格为 `failed`；用户必填字段缺失或无效为 `needs_input`；无效 JSON 或执行异常为 `error`。拒绝非标准 JSON 常量、重复对象键、空值或标量根节点、错误字段类型，不用 `eval`，不静默修复 JSON。返回受控中文解释，不回显敏感原文或堆栈。
 
-既有错误代码保持：`INVALID_JSON`、`INVALID_REQUEST`、`MISSING_FIELD`、`INVALID_TYPE`、`INVALID_AMOUNT`、`INVALID_CANDIDATE_COUNT`、`INVALID_CANDIDATE_ID`（`validator/rules.py:181`，候选 ID 必须为 c1/c2/c3）、`DUPLICATE_ID`、`DUPLICATE_CANDIDATE_CONTENT`（`validator/rules.py:242`，不同候选的名称与描述标准化后重复）、`UNSUPPORTED_CURRENCY`、`CURRENCY_MISMATCH`、`OVER_BUDGET`、`FORBIDDEN_TAG`、`FORBIDDEN_TERM`、`PREPARATION_TOO_LONG`、`UNKNOWN_FACT_REF`、`UNKNOWN_TAG`、`INTERNAL_ERROR`。每条含字段路径与中文说明；格式错误不能继续参与数值比较或使整个批次崩溃。
+既有错误代码保持 **19 个**（2026-10-30 与 `validator/rules.py` 逐条对账；全量出处见 `docs/validator-contract-decisions.md` 第 7 节）：`INVALID_JSON`、`INVALID_REQUEST`、`MISSING_FIELD`、`INVALID_TYPE`、`INVALID_AMOUNT`、`LIMIT_EXCEEDED`（`validator/rules.py:41` 参数字符串超 32768 UTF-8 字节、`:57` 单个字段字符串超 1000 个 Unicode 码点、`:60` 业务数组超 20 项；另含请求侧数值范围检查，见下）、`INVALID_CANDIDATE_COUNT`、`INVALID_CANDIDATE_ID`（`validator/rules.py:181`，候选 ID 必须为 c1/c2/c3）、`DUPLICATE_ID`、`DUPLICATE_CANDIDATE_CONTENT`（`validator/rules.py:242`，不同候选的名称与描述标准化后重复）、`UNSUPPORTED_CURRENCY`、`CURRENCY_MISMATCH`、`OVER_BUDGET`、`FORBIDDEN_TAG`、`FORBIDDEN_TERM`、`PREPARATION_TOO_LONG`、`UNKNOWN_FACT_REF`、`UNKNOWN_TAG`、`INTERNAL_ERROR`。每条含字段路径与中文说明；格式错误不能继续参与数值比较或使整个批次崩溃。
+
+> **对账说明（2026-10-30 补）**：本行原先只列 18 个码，**缺 `LIMIT_EXCEEDED`**。该码在 `validator/rules.py` 的 `:41`／`:57`／`:60` 三处实际发出，也在 `docs/validator-contract-decisions.md` 第 6、7 节有定义，故补入本清单，计 **19 个**。`LIMIT_EXCEEDED` 同时承载请求侧数值范围检查（`request.budget_amount` ∉ [1, 10000]、`request.available_days` > 365）；该范围约束**只在调用点检查**，不得下沉到与候选侧共用的 `_amount`／`_days` 函数，否则会把预算上限误加到候选估算上。
 
 没有真实商品源时，一律不声称验证了实时价格、库存、可购买性或实际送达时间。用户文本属于数据，提示词不得服从其中要求绕过校验的指令。
 

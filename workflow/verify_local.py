@@ -1,4 +1,16 @@
-"""任务专属离线探针，不替代独立验收或真实模型测试。"""
+"""任务专属离线探针，不替代独立验收或真实模型测试。
+
+输出目录 workflow/evidence/local-2026-10-29/ 是 WF-001 时期固定下来的**历史路径**，
+不代表内容时间戳。按产品负责人 2026-10-30 的裁定，本脚本现在：
+
+  1. 每次运行写入新目录 `runs/<时间戳>/`，**绝不覆盖已存在的文件**（独占创建；撞名自动加 -2/-3 后缀）；
+  2. 在该目录之外维护指针文件 `latest.json`——它是**唯一**每次运行都会被重写的文件，且明示为指针、不是证据；
+  3. 追加一行到 `runs-index.jsonl`（只追加，从不重写，记录每次运行的目录与结论）；
+  4. 保留历史目录名，语义说明见该目录的 `README.md`。
+
+**旧行为已冻结**：过去每次运行都被覆盖的顶层文件 `results.json`、`adapted-request.json`、
+`node-input-*.json`、`report.txt` 保留为「最后一次覆盖式运行」的快照，**不再更新、也不会被本脚本改写**。
+"""
 
 import copy
 import hashlib
@@ -17,16 +29,42 @@ from workflow.intake import adapt_intake, dump
 from workflow.runtime import check, recheck, report, main
 
 
+def _stamp_shanghai():
+    """本次运行的时间戳（Asia/Shanghai，带 +0800 偏移）。"""
+    return datetime.now(timezone(timedelta(hours=8))).strftime("%Y%m%dT%H%M%S%z")
+
+
+def write_new(path, text):
+    """独占写入：目标已存在就抛 FileExistsError，绝不覆盖既有证据（PM 2026-10-30 裁定）。"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "x", encoding="utf-8") as handle:
+        handle.write(text)
+    return path
+
+
+def new_run_dir(base):
+    """分配一个全新的时间戳目录；同名则加 -2/-3 后缀，绝不复用已存在的目录。"""
+    stamp = _stamp_shanghai()
+    run_dir = base / "runs" / stamp
+    suffix = 1
+    while run_dir.exists():
+        suffix += 1
+        run_dir = base / "runs" / f"{stamp}-{suffix}"
+    run_dir.mkdir(parents=True, exist_ok=False)
+    return run_dir
+
+
 def run():
-    output = ROOT / "workflow/evidence/local-2026-10-29"
-    output.mkdir(parents=True, exist_ok=True)
+    base = ROOT / "workflow/evidence/local-2026-10-29"
+    base.mkdir(parents=True, exist_ok=True)
+    output = new_run_dir(base)
     intake = json.loads((ROOT / "workflow/examples/intake.json").read_text(encoding="utf-8"))
     batch = json.loads((ROOT / "workflow/examples/candidates.json").read_text(encoding="utf-8"))
     adapted = adapt_intake(dump(intake))
     assert adapted["status"] == "ready", adapted
     request_json = adapted["request_json"]
     request = json.loads(request_json)
-    (output / "adapted-request.json").write_text(json.dumps(request, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_new(output / "adapted-request.json", json.dumps(request, ensure_ascii=False, indent=2) + "\n")
     code, manifest = build()
     # 只在本地加载自产构建物，不是执行模型文本；Dify 中不使用 exec。
     namespace = {}
@@ -107,7 +145,7 @@ def run():
     for i, (action, payload) in enumerate(payloads):
         actual = bundled_main(action, dump(payload))
         record("生成 Code 与仓库适配一致 " + action, actual, lambda r: r == main(action, dump(payload)))
-        (output / f"node-input-{i}-{action}.json").write_text(json.dumps({"action": action, "payload_json": dump(payload)}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        write_new(output / f"node-input-{i}-{action}.json", json.dumps({"action": action, "payload_json": dump(payload)}, ensure_ascii=False, indent=2) + "\n")
     entrypoints = {}
     for filename in ("intake_node.py", "check_node.py", "recheck_node.py", "report_node.py"):
         entry_namespace = {}
@@ -147,10 +185,29 @@ def run():
     record("标准库探针本地执行", sandbox_probe(), lambda r: r["compatible"])
     record("节点异常中文受控失败", bundled_main('check', '{}'), lambda r: r["status"] == "error" and not r["all_passed"] and not r["repairable"])
     final_report = report(repaired)
-    (output / "report.txt").write_text(final_report["report_text"] + "\n", encoding="utf-8")
-    record_data = {"timestamp": datetime.now(timezone(timedelta(hours=8))).isoformat(), "python": platform.python_version(), "platform": platform.platform(), "head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "command": "python workflow/verify_local.py", "mode": "offline-fixed-snapshots-no-model", "model_calls": 0, "model_cost": "not_measured", "cloud_verified": False, "manifest": manifest, "passed": len(results), "failed": 0, "results": results}
-    (output / "results.json").write_text(json.dumps(record_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_new(output / "report.txt", final_report["report_text"] + "\n")
+    record_data = {"timestamp": datetime.now(timezone(timedelta(hours=8))).isoformat(), "python": platform.python_version(), "platform": platform.platform(), "head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "command": "python workflow/verify_local.py", "mode": "offline-fixed-snapshots-no-model", "model_calls": 0, "model_cost": "not_measured", "cloud_verified": False, "manifest": manifest, "passed": len(results), "failed": 0, "run_dir": output.relative_to(ROOT).as_posix(), "write_policy": "append-only: 本次运行未覆盖任何已存在的文件", "results": results}
+    write_new(output / "results.json", json.dumps(record_data, ensure_ascii=False, indent=2) + "\n")
+    relative = lambda target: target.relative_to(ROOT).as_posix()
+    pointer = {
+        "_note": "本文件是「最新一次运行」的指针，是唯一每次运行都会被重写的文件；它不是证据。"
+                 "证据在 latest_run 指向的时间戳目录内，写一次即冻结，从不被覆盖。",
+        "updated_at": record_data["timestamp"],
+        "latest_run": relative(output),
+        "results": relative(output / "results.json"),
+        "head": record_data["head"],
+        "passed": record_data["passed"],
+        "failed": record_data["failed"],
+        "model_calls": 0,
+        "cloud_verified": False,
+    }
+    (base / "latest.json").write_text(json.dumps(pointer, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    with open(base / "runs-index.jsonl", "a", encoding="utf-8") as index:
+        index.write(json.dumps({"timestamp": record_data["timestamp"], "run_dir": relative(output),
+                                "head": record_data["head"], "passed": record_data["passed"],
+                                "failed": record_data["failed"]}, ensure_ascii=False) + "\n")
     print(f"local probes: {len(results)} passed; 0 failed; model calls: 0; cloud verified: false")
+    print(f"run dir: {relative(output)}  (latest 指针 -> {relative(base / 'latest.json')})")
 
 
 if __name__ == "__main__":

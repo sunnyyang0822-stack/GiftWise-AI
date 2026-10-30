@@ -1,0 +1,40 @@
+输出目录：C:/Users/lenovo/Desktop/giftwise/deploy/evidence/raw/image-parity-20261031-011520
+本机源码哈希：
+  deploy/server.py: 130cb065db6868c8
+  validator/rules.py: 1f389dad4c2589fb
+  validator/__init__.py: f94446ea4292f37b
+  deploy/observable_server.py: 4c11499108bf12ef
+  deploy/observability.py: 467f98b88d033fcd
+
+本机 giftwise-validator 镜像（注意 ID 会漂移）：
+giftwise-validator:latest	d9a4a35763ee	2026-10-31 01:13:59 +0800 CST	178MB
+giftwise-validator:submission-20261101	d9a4a35763ee	2026-10-31 01:13:59 +0800 CST	178MB
+giftwise-validator:slowbody-check	5fb1eaff59be	2026-10-31 01:08:39 +0800 CST	178MB
+giftwise-validator:obs-check	6bbe2a5d401e	2026-10-31 01:08:39 +0800 CST	178MB
+giftwise-validator:candidate-observable	b8d712a83155	2026-10-31 00:57:04 +0800 CST	178MB
+giftwise-validator:verify-guide	528b17261860	2026-10-30 23:20:06 +0800 CST	178MB
+giftwise-validator:log-prefix	0f3d0efbb64b	2026-10-30 23:13:07 +0800 CST	178MB
+giftwise-validator:prefix-check	0371186facc1	2026-10-30 23:13:07 +0800 CST	178MB
+giftwise-validator:coldbuild-20261030	ed3fbe912571	2026-10-30 22:50:36 +0800 CST	178MB
+giftwise-validator:pm-baseline-20261030	b42f408b4f07	2026-10-30 22:20:54 +0800 CST	178MB
+
+===== 核验镜像 giftwise-validator:submission-20261101 =====
+[PASS] giftwise-validator:submission-20261101：镜像存在且能读到元数据 :: {'Id': 'sha256:d9a4a35763ee', 'Created': '2026-10-30T17:13:59.527621865Z'}
+  RepoDigests=['giftwise-validator@sha256:d9a4a35763eeff67a34702c1ee7028c081d57b21ced1814d16ff07f6f0528169']
+  → 这些 digest 与镜像 ID 同值（本地 config digest），**不是 manifest digest**（镜像从未推送）：True
+  /app 文件数=13：['/app/deploy/.dockerignore', '/app/deploy/Dockerfile', '/app/deploy/README.md', '/app/deploy/__init__.py', '/app/deploy/observability-collection.md', '/app/deploy/observability.py', '/app/deploy/observable_server.py', '/app/deploy/preprod-plan.md', '/app/deploy/publish-to-uhost.ps1', '/app/deploy/security-review.md', '/app/deploy/server.py', '/app/validator/__init__.py', '/app/validator/rules.py']
+    deploy/server.py: 容器=130cb065db6868c8  本机=130cb065db6868c8  一致
+    validator/rules.py: 容器=1f389dad4c2589fb  本机=1f389dad4c2589fb  一致
+    validator/__init__.py: 容器=f94446ea4292f37b  本机=f94446ea4292f37b  一致
+    deploy/observable_server.py: 容器=4c11499108bf12ef  本机=4c11499108bf12ef  一致
+    deploy/observability.py: 容器=467f98b88d033fcd  本机=467f98b88d033fcd  一致
+[PASS] giftwise-validator:submission-20261101①容器内 validator/rules.py 与本机源码一致 :: {'容器': '1f389dad4c2589fb', '本机': '1f389dad4c2589fb'}
+[PASS] giftwise-validator:submission-20261101①容器内 deploy/server.py 与本机源码一致（I-2 修复是否进镜像） :: {'容器': '130cb065db6868c8', '本机': '130cb065db6868c8'}
+[PASS] giftwise-validator:submission-20261101③镜像内含可观测入口（observable_server.py + observability.py） :: {'/app 文件数': 13, '缺': []}
+[PASS] giftwise-validator:submission-20261101②默认 CMD 启动后 /healthz 200 :: {'status': 200, 'body': '{"status":"ok","service":"giftwise-validator","rules_source_sha256":"1f389dad4c2'}
+  /healthz rules_source_sha256 = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+[PASS] giftwise-validator:submission-20261101①/healthz 的 rules_source_sha256 == 本机 validator/rules.py 的 sha256 :: {'镜像': '1f389dad4c2589fb', '本机': '1f389dad4c2589fb'}
+  半开正文探测（观察窗口 26s）：状态行=HTTP/1.0 408 Request Timeout 耗时=10.01s 服务端关闭=True Threads 前/中/后=1/2/1
+[PASS] giftwise-validator:submission-20261101②半开正文探测在 26s 内返回 408（含 I-2 修复） :: {'状态行': 'HTTP/1.0 408 Request Timeout', '耗时': 10.01, '窗口': 26.0}
+[PASS] giftwise-validator:submission-20261101②探测期间 /healthz 仍 200（与修复与否无关，证明健康检查会掩盖） :: {'状态': 200}
+[PASS] giftwise-validator:submission-20261101②连接被服务端关闭且线程回落 :: {'服务端关闭': True, 'Threads 前': 1, 'Threads 后': 1}

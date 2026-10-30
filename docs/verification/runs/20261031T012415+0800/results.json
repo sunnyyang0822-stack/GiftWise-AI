@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-10-31T01:26:40.055054+08:00",
+  "tier": "fast",
+  "run_dir": "docs/verification/runs/20261031T012415+0800",
+  "python": "3.12.10",
+  "node": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current\\node.EXE",
+  "docker": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+  "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd",
+  "passed": 0,
+  "failed": 3,
+  "skipped": 0,
+  "model_calls": 0,
+  "notes": [
+    "接入层 127.0.0.1:8787 已在监听：**复用既有进程**（非本工具启动），结果反映当前工作区状态。",
+    "Chrome CDP 127.0.0.1:9333 已在监听：**复用既有浏览器**（非本工具启动）。"
+  ],
+  "rows": [
+    {
+      "name": "browser_check",
+      "group": "fast",
+      "what": "浏览器自查（web 线自带，多视口 + 主流程）",
+      "status": "FAIL",
+      "seconds": 137.516,
+      "command": "C:\\Users\\lenovo\\scoop\\apps\\nodejs-lts\\current\\node.EXE web/tools/browser-check.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]",
+      "raw_output": "docs/verification/runs/20261031T012415+0800/browser_check.out",
+      "note": "退出码 1（非 0 即判据不满足）",
+      "retry": "首次 FAIL（browser_check.attempt1.out）→ 重试 仍 FAIL（browser_check.attempt2.out）",
+      "related_mtimes": {
+        "web/tools/browser-check.mjs": "2026-10-31 01:23:42",
+        "web/public/app.js": "2026-10-30 23:02:25"
+      }
+    },
+    {
+      "name": "js_range_parity",
+      "group": "fast",
+      "what": "JS 侧范围一致性（已知缺口）",
+      "status": "FAIL",
+      "seconds": 0.735,
+      "command": "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe -X utf8 tests/acceptance/boundary/run_js_parity_probe.py",
+      "raw_output": "docs/verification/runs/20261031T012415+0800/js_range_parity.out",
+      "note": "期望 0/14，实际 1/14（退出码=0）",
+      "retry": "首次 FAIL（js_range_parity.attempt1.out）→ 重试 仍 FAIL（js_range_parity.attempt2.out）",
+      "related_mtimes": {
+        "tests/acceptance/boundary/run_js_parity_probe.py": "2026-10-31 00:30:12",
+        "web/server/checker.mjs": "2026-10-31 01:12:08"
+      }
+    },
+    {
+      "name": "declared_rules_hash",
+      "group": "fast",
+      "what": "对外材料声明的规则哈希 / 版本指纹",
+      "status": "FAIL",
+      "seconds": 0.094,
+      "command": "(内置只读探针：docs/competition/材料清单与自查.md + workflow/generated/manifest.json)",
+      "raw_output": "docs/verification/runs/20261031T012415+0800/declared_rules_hash.out",
+      "note": "对外材料声明的规则哈希与当前 validator/rules.py 不一致（见原始输出）",
+      "retry": "",
+      "related_mtimes": {
+        "docs/competition/材料清单与自查.md": "2026-10-31 01:24:17",
+        "validator/rules.py": "2026-10-30 23:11:21",
+        "workflow/generated/manifest.json": "2026-10-31 01:03:02"
+      }
+    }
+  ]
+}

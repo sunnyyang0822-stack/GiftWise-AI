@@ -8,7 +8,7 @@
  *   - 网络/超时/非 2xx 一律作为失败上报，由调用方决定是否占用修订额度。
  *
  * 重要限制（不得读作已联通）：本客户端按 Dify 官方 `/workflows/run`（blocking）约定编写，
- * 但本机无凭证、Dify 侧仍是未发布草稿，**从未实际调用成功过一次**。
+ * 但本机无凭证（DIFY_API_KEY 未配置），接入层**从未实际调用成功过一次**（与 Dify 是否已发布无关）。
  */
 
 import { difyConfig, hasDifyConfig } from "./config.mjs";

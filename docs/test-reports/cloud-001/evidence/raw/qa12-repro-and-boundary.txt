@@ -1,0 +1,46 @@
+=== 1. 内容级可复现性：PM 基线镜像 vs 我 --no-cache 构建的镜像（逐文件 sha256）===
+--- PM 基线 giftwise-validator:pm-baseline-20261030 ---
+cdc4a981b688359c00b7538dc3716f9248f11d005567294c67a23b626e865a7a /app/deploy/server.py
+f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5 /app/validator/__init__.py
+90e7e233f4441d008acd49bc974a5d3870e00ddb0bd38db8b30f7adfbc70d159 /app/validator/__pycache__/__init__.cpython-312.pyc
+2360bda0fd4b0a56138f65b18d5d0fa9a6cbe50755e40fa8f358c1f551374379 /app/validator/__pycache__/rules.cpython-312.pyc
+4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3 /app/validator/rules.py
+--- 我 --no-cache 构建 giftwise-validator-qa:fresh ---
+cdc4a981b688359c00b7538dc3716f9248f11d005567294c67a23b626e865a7a /app/deploy/server.py
+f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5 /app/validator/__init__.py
+90e7e233f4441d008acd49bc974a5d3870e00ddb0bd38db8b30f7adfbc70d159 /app/validator/__pycache__/__init__.cpython-312.pyc
+2360bda0fd4b0a56138f65b18d5d0fa9a6cbe50755e40fa8f358c1f551374379 /app/validator/__pycache__/rules.cpython-312.pyc
+4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3 /app/validator/rules.py
+
+=== 2. 镜像是否只存在于本机（有无 registry 推送痕迹）===
+gw-qa-ctxsize:latest 57b9b15b883f
+gw-qa-ignore-test2:latest c94ce66c0b1f
+gw-qa-ignore-test1:latest f8078601495f
+giftwise-validator-qa:fresh 258bce73d7f0
+giftwise-validator:latest 61321052b48b
+giftwise-validator:pm-baseline-20261030 b42f408b4f07
+python:3.12-slim aa943ce41142
+--- 本地镜像仓库前缀检查（无 registry 域名前缀即未关联远端仓库）---
+giftwise-validator
+giftwise-validator-qa
+gw-qa-ctxsize
+gw-qa-ignore-test1
+gw-qa-ignore-test2
+python
+
+=== 3. 原始证据里是否出现 docker push / registry 登录 ===
+deploy/evidence/raw/container-probe-console.txt
+deploy/evidence/raw/container-probe-latest.json
+(以上为空=证据中无推送痕迹)
+
+=== 4. 容器内运行时是否会产生新的 pyc（PYTHONDONTWRITEBYTECODE 是否真的生效）===
+total 32
+drwxr-xr-x 1 giftwise giftwise  4096 Oct 29 10:57 .
+drwxr-xr-x 1 giftwise giftwise  4096 Oct 29 10:47 ..
+-rwxr-xr-x 1 giftwise giftwise   282 Oct 29 10:47 __init__.cpython-312.pyc
+-rwxr-xr-x 1 giftwise giftwise 18549 Oct 29 10:57 rules.cpython-312.pyc
+---
+dont_write_bytecode= True
+
+=== 5. 非 root 用户确认 ===
+uid=10001(giftwise) gid=10001(giftwise) groups=10001(giftwise)

@@ -1,0 +1,15 @@
+# 容器内 validate() 纯 CPU 成本
+# 平台: Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41  Python: 3.12.16
+# 载荷: request_json=274 B, candidates_json=1030 B
+# 自检 status= passed all_passed= True
+
+  trial1: 5000 次 -> 205.94 us/次
+  trial2: 5000 次 -> 170.87 us/次
+  trial3: 5000 次 -> 190.39 us/次
+  trial4: 5000 次 -> 262.75 us/次
+  trial5: 5000 次 -> 189.22 us/次
+  trial6: 5000 次 -> 187.90 us/次
+  trial7: 5000 次 -> 189.22 us/次
+
+最佳 = 170.87 us/次
+单核理论上限 = 5852.5 次/秒

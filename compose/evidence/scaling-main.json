@@ -1,0 +1,342 @@
+{
+  "label": "main",
+  "run_at": "2026-10-31 01:41:58 +0800",
+  "requests_per_point": 400,
+  "rows": [
+    {
+      "label": "直连 1 副本 / conc=1",
+      "targets": [
+        "127.0.0.1:19001"
+      ],
+      "requests": 400,
+      "concurrency": 1,
+      "wall_s": 3.612,
+      "throughput_rps": 110.74,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 4.089,
+      "latency_ms_p95": 26.783,
+      "latency_ms_max": 29.892,
+      "by_upstream": {
+        "127.0.0.1:19001": 400
+      }
+    },
+    {
+      "label": "直连 2 副本 / conc=1",
+      "targets": [
+        "127.0.0.1:19001",
+        "127.0.0.1:19002"
+      ],
+      "requests": 400,
+      "concurrency": 1,
+      "wall_s": 4.06,
+      "throughput_rps": 98.52,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 4.065,
+      "latency_ms_p95": 26.54,
+      "latency_ms_max": 28.832,
+      "by_upstream": {
+        "127.0.0.1:19001": 200,
+        "127.0.0.1:19002": 200
+      }
+    },
+    {
+      "label": "经 LB 1 副本 / conc=1",
+      "targets": [
+        "127.0.0.1:18082"
+      ],
+      "requests": 400,
+      "concurrency": 1,
+      "wall_s": 5.071,
+      "throughput_rps": 78.88,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 6.846,
+      "latency_ms_p95": 30.493,
+      "latency_ms_max": 32.83,
+      "by_upstream": {
+        "validator-a:8000": 400
+      }
+    },
+    {
+      "label": "经 LB 2 副本 / conc=1",
+      "targets": [
+        "127.0.0.1:18080"
+      ],
+      "requests": 400,
+      "concurrency": 1,
+      "wall_s": 5.186,
+      "throughput_rps": 77.13,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 6.492,
+      "latency_ms_p95": 30.008,
+      "latency_ms_max": 33.317,
+      "by_upstream": {
+        "validator-a:8000": 200,
+        "validator-b:8000": 200
+      }
+    },
+    {
+      "label": "直连 1 副本 / conc=4",
+      "targets": [
+        "127.0.0.1:19001"
+      ],
+      "requests": 400,
+      "concurrency": 4,
+      "wall_s": 0.806,
+      "throughput_rps": 496.55,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 6.297,
+      "latency_ms_p95": 21.038,
+      "latency_ms_max": 29.621,
+      "by_upstream": {
+        "127.0.0.1:19001": 400
+      }
+    },
+    {
+      "label": "直连 2 副本 / conc=4",
+      "targets": [
+        "127.0.0.1:19001",
+        "127.0.0.1:19002"
+      ],
+      "requests": 400,
+      "concurrency": 4,
+      "wall_s": 0.657,
+      "throughput_rps": 609.01,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 4.467,
+      "latency_ms_p95": 21.738,
+      "latency_ms_max": 29.443,
+      "by_upstream": {
+        "127.0.0.1:19002": 200,
+        "127.0.0.1:19001": 200
+      }
+    },
+    {
+      "label": "经 LB 1 副本 / conc=4",
+      "targets": [
+        "127.0.0.1:18082"
+      ],
+      "requests": 400,
+      "concurrency": 4,
+      "wall_s": 1.084,
+      "throughput_rps": 369.02,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 9.244,
+      "latency_ms_p95": 24.768,
+      "latency_ms_max": 32.737,
+      "by_upstream": {
+        "validator-a:8000": 400
+      }
+    },
+    {
+      "label": "经 LB 2 副本 / conc=4",
+      "targets": [
+        "127.0.0.1:18080"
+      ],
+      "requests": 400,
+      "concurrency": 4,
+      "wall_s": 0.942,
+      "throughput_rps": 424.47,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 8.485,
+      "latency_ms_p95": 13.107,
+      "latency_ms_max": 31.331,
+      "by_upstream": {
+        "validator-a:8000": 200,
+        "validator-b:8000": 200
+      }
+    },
+    {
+      "label": "直连 1 副本 / conc=16",
+      "targets": [
+        "127.0.0.1:19001"
+      ],
+      "requests": 400,
+      "concurrency": 16,
+      "wall_s": 1.329,
+      "throughput_rps": 301.08,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 12.609,
+      "latency_ms_p95": 26.215,
+      "latency_ms_max": 1038.328,
+      "by_upstream": {
+        "127.0.0.1:19001": 400
+      }
+    },
+    {
+      "label": "直连 2 副本 / conc=16",
+      "targets": [
+        "127.0.0.1:19001",
+        "127.0.0.1:19002"
+      ],
+      "requests": 400,
+      "concurrency": 16,
+      "wall_s": 1.214,
+      "throughput_rps": 329.39,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 13.565,
+      "latency_ms_p95": 19.208,
+      "latency_ms_max": 1030.811,
+      "by_upstream": {
+        "127.0.0.1:19002": 200,
+        "127.0.0.1:19001": 200
+      }
+    },
+    {
+      "label": "经 LB 1 副本 / conc=16",
+      "targets": [
+        "127.0.0.1:18082"
+      ],
+      "requests": 400,
+      "concurrency": 16,
+      "wall_s": 1.061,
+      "throughput_rps": 377.02,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 26.987,
+      "latency_ms_p95": 42.479,
+      "latency_ms_max": 1018.587,
+      "by_upstream": {
+        "validator-a:8000": 400
+      }
+    },
+    {
+      "label": "经 LB 2 副本 / conc=16",
+      "targets": [
+        "127.0.0.1:18080"
+      ],
+      "requests": 400,
+      "concurrency": 16,
+      "wall_s": 1.379,
+      "throughput_rps": 289.97,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 16.927,
+      "latency_ms_p95": 40.643,
+      "latency_ms_max": 1040.176,
+      "by_upstream": {
+        "validator-a:8000": 200,
+        "validator-b:8000": 200
+      }
+    },
+    {
+      "label": "直连 1 副本 / conc=48",
+      "targets": [
+        "127.0.0.1:19001"
+      ],
+      "requests": 400,
+      "concurrency": 48,
+      "wall_s": 1.301,
+      "throughput_rps": 307.53,
+      "ok": 390,
+      "failed": 10,
+      "latency_ms_p50": 13.966,
+      "latency_ms_p95": 1031.53,
+      "latency_ms_max": 1248.522,
+      "by_upstream": {
+        "127.0.0.1:19001": 400
+      }
+    },
+    {
+      "label": "直连 2 副本 / conc=48",
+      "targets": [
+        "127.0.0.1:19001",
+        "127.0.0.1:19002"
+      ],
+      "requests": 400,
+      "concurrency": 48,
+      "wall_s": 1.321,
+      "throughput_rps": 302.9,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 16.526,
+      "latency_ms_p95": 1028.787,
+      "latency_ms_max": 1045.749,
+      "by_upstream": {
+        "127.0.0.1:19002": 200,
+        "127.0.0.1:19001": 200
+      }
+    },
+    {
+      "label": "经 LB 1 副本 / conc=48",
+      "targets": [
+        "127.0.0.1:18082"
+      ],
+      "requests": 400,
+      "concurrency": 48,
+      "wall_s": 1.865,
+      "throughput_rps": 214.52,
+      "ok": 388,
+      "failed": 12,
+      "latency_ms_p50": 44.5,
+      "latency_ms_p95": 1037.424,
+      "latency_ms_max": 1090.536,
+      "by_upstream": {
+        "validator-a:8000": 388,
+        "127.0.0.1:18082": 12
+      }
+    },
+    {
+      "label": "经 LB 2 副本 / conc=48",
+      "targets": [
+        "127.0.0.1:18080"
+      ],
+      "requests": 400,
+      "concurrency": 48,
+      "wall_s": 1.459,
+      "throughput_rps": 274.08,
+      "ok": 400,
+      "failed": 0,
+      "latency_ms_p50": 25.698,
+      "latency_ms_p95": 1036.506,
+      "latency_ms_max": 1051.459,
+      "by_upstream": {
+        "validator-b:8000": 200,
+        "validator-a:8000": 200
+      }
+    }
+  ],
+  "gains": {
+    "1": {
+      "direct_gain": 0.89,
+      "lb_gain": 0.978,
+      "direct_1": 110.74,
+      "direct_2": 98.52,
+      "lb_1": 78.88,
+      "lb_2": 77.13
+    },
+    "4": {
+      "direct_gain": 1.226,
+      "lb_gain": 1.15,
+      "direct_1": 496.55,
+      "direct_2": 609.01,
+      "lb_1": 369.02,
+      "lb_2": 424.47
+    },
+    "16": {
+      "direct_gain": 1.094,
+      "lb_gain": 0.769,
+      "direct_1": 301.08,
+      "direct_2": 329.39,
+      "lb_1": 377.02,
+      "lb_2": 289.97
+    },
+    "48": {
+      "direct_gain": 0.985,
+      "lb_gain": 1.278,
+      "direct_1": 307.53,
+      "direct_2": 302.9,
+      "lb_1": 214.52,
+      "lb_2": 274.08
+    }
+  }
+}

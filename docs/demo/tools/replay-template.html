@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GiftWise AI · 离线兜底回放（演示备份）</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d2129; --line:#2a2f3a;
+    --fg:#f2f4f8; --muted:#a3adbd; --mono:ui-monospace,"Cascadia Mono",Consolas,"Noto Sans Mono CJK SC",monospace;
+    --archived:#0b6b3a; --rules:#1d4ed8; --mock:#b45309; --limit:#b91c1c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--fg);
+    font:16px/1.65 "Microsoft YaHei","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:#7dd3fc}
+  header{
+    position:sticky; top:0; z-index:50; background:#000; border-bottom:3px solid #dc2626;
+    padding:10px 18px; display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+  }
+  header .warn{
+    background:#dc2626; color:#fff; font-weight:800; letter-spacing:.06em;
+    padding:5px 12px; border-radius:5px; font-size:19px;
+  }
+  header .sub{color:#fca5a5; font-size:14px; font-weight:600}
+  header .meta{margin-left:auto; color:var(--muted); font-size:12.5px; font-family:var(--mono); text-align:right}
+  .wrap{max-width:1180px; margin:0 auto; padding:22px 18px 90px}
+  h1{font-size:32px; margin:16px 0 6px; letter-spacing:-.01em}
+  h2{font-size:25px; margin:38px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--line)}
+  h3{font-size:19px; margin:0 0 8px}
+  p{margin:8px 0}
+  .lede{color:var(--muted); font-size:15px; max-width:900px}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:16px 18px; margin:14px 0}
+  .badge{
+    display:inline-block; color:#fff; font-weight:800; font-size:15px;
+    padding:5px 13px; border-radius:6px; letter-spacing:.03em; margin-bottom:9px;
+  }
+  .badge.archived_real_model{background:var(--archived)}
+  .badge.local_real_rules{background:var(--rules)}
+  .badge.mock_ui{background:var(--mock)}
+  .badge.declared_limitation{background:var(--limit)}
+  .kindnote{color:var(--muted); font-size:13.5px; margin:2px 0 12px; font-style:normal}
+  .caveat{
+    background:#2a1d08; border-left:5px solid #f59e0b; color:#fde68a;
+    padding:10px 14px; border-radius:0 7px 7px 0; margin:12px 0; font-size:15px;
+  }
+  .replay{
+    background:#052e21; border-left:5px solid #10b981; color:#a7f3d0;
+    padding:10px 14px; border-radius:0 7px 7px 0; margin:12px 0; font-size:15px;
+  }
+  .src{font-family:var(--mono); font-size:12.5px; color:var(--muted); word-break:break-all}
+  .pill{
+    display:inline-block; background:#252a34; border:1px solid var(--line); border-radius:20px;
+    padding:3px 11px; font-size:12.5px; margin:3px 5px 3px 0; color:#cbd5e1; font-family:var(--mono);
+  }
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14.5px}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top}
+  th{background:#20252f; font-weight:700}
+  td.num{font-family:var(--mono); text-align:right; white-space:nowrap}
+  pre{
+    background:#0a0c10; border:1px solid var(--line); border-radius:8px; padding:13px;
+    overflow:auto; font-family:var(--mono); font-size:13px; line-height:1.55; max-height:440px;
+  }
+  details{margin:10px 0}
+  summary{cursor:pointer; color:#93c5fd; font-size:15px; padding:5px 0}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:13px}
+  .cand{background:var(--panel2); border:1px solid var(--line); border-radius:9px; padding:13px}
+  .cand h4{margin:0 0 6px; font-size:17px}
+  .cand .price{font-family:var(--mono); color:#fbbf24; font-size:15px; font-weight:700}
+  .kv{font-size:14px; color:#cbd5e1}
+  .kv b{color:#f2f4f8}
+  .toc{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin:18px 0}
+  .toc ol{margin:6px 0 0; padding-left:22px}
+  .toc li{margin:4px 0}
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0}
+  .legend div{flex:1 1 230px; background:var(--panel2); border:1px solid var(--line); border-radius:9px; padding:11px 13px; font-size:13.5px}
+  .ok{color:#34d399; font-weight:700}
+  .no{color:#f87171; font-weight:700}
+  footer{border-top:1px solid var(--line); margin-top:46px; padding-top:16px; color:var(--muted); font-size:13.5px}
+  .big{font-size:19px}
+</style>
+</head>
+<body>
+<header>
+  <span class="warn">离线兜底回放 · 非实时运行</span>
+  <span class="sub">本页不联网、不调用模型、不需要 node</span>
+  <span class="meta" id="hdr-meta"></span>
+</header>
+
+<div class="wrap">
+  <h1>GiftWise AI · 演示离线兜底包</h1>
+  <p class="lede">
+    这是模式 C（网络不可用 / Dify 不可达 / 模型额度不可用）时的<b>完整替代路径</b>。
+    本页把三类证据严格分开放置，每一块都带来源文件与证据性质角标。
+    <b>现场播放本页不产生任何新的模型调用。</b>
+  </p>
+
+  <div class="toc">
+    <b class="big">本页怎么用（给演示者）</b>
+    <ol>
+      <li>先照读顶部红条声明：「现场网络/额度不可用，以下为已归档的真实运行记录，本次没有发起新的模型调用。」</li>
+      <li>按下面四节顺序往下滚：<b>① 真实模型归档 → ② 本机真实规则 → ③ 模拟界面 → ④ 如实声明</b>。</li>
+      <li>每一块左上角的角标就是该块的证据性质，口播必须与角标一致，<b>不得张冠李戴</b>。</li>
+      <li>琥珀色框是「不准说成什么」的提醒，照它避开即可。</li>
+    </ol>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div id="app"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script type="application/json" id="snapshot-data">__SNAPSHOT_JSON__</script>
+<script>
+(function(){
+  "use strict";
+  var S = JSON.parse(document.getElementById("snapshot-data").textContent);
+  var K = S.evidence_kinds;
+
+  document.getElementById("hdr-meta").textContent =
+    "冻结 HEAD " + (S.frozen_head_short || "?") + " · 构建 " + S.built_at +
+    " · 本轮新模型调用 " + S.new_model_calls_made_by_this_snapshot;
+
+  /* 图例 */
+  var legend = document.getElementById("legend");
+  Object.keys(K).forEach(function(k){
+    var d = document.createElement("div");
+    d.innerHTML = '<span class="badge ' + k + '">' + esc(K[k].badge) + '</span><div>' + mdBold(K[k].meaning) + '</div>';
+    legend.appendChild(d);
+  });
+
+  var SECTION_ORDER = [
+    ["archived_real_model", "① 已归档的真实模型输出", "这些是当时**真实调用 deepseek-v4-flash** 并逐字归档的原文。现场只播放，不发起新调用。"],
+    ["local_real_rules",    "② 本机真实规则代码（零模型、零网络）", "本机真实 Python 规则代码的运行结果。这一节最可靠：断网、无额度、Dify 全挂都照样能跑。"],
+    ["mock_ui",             "③ 模拟数据 · 界面预览", "Dify 侧包装/配色/贺卡/赠送阶段未实现；以下全部是接入层内置的固定模拟数据。**必须显著标注**。"],
+    ["declared_limitation", "④ 未完成与未核实（如实声明）", "这些是确实没做到或没核实的事。不美化、不省略。"]
+  ];
+
+  var app = document.getElementById("app");
+  var counts = {};
+
+  SECTION_ORDER.forEach(function(entry){
+    var key = entry[0], title = entry[1], lead = entry[2];
+    var blocks = (S.sections[key] || []);
+    counts[key] = blocks.length;
+    var h2 = document.createElement("h2");
+    h2.textContent = title + "（" + blocks.length + " 块）";
+    app.appendChild(h2);
+    var p = document.createElement("p");
+    p.className = "lede";
+    p.innerHTML = mdBold(lead);
+    app.appendChild(p);
+    blocks.forEach(function(b){ app.appendChild(renderBlock(b)); });
+  });
+
+  document.getElementById("foot").innerHTML =
+    "证据块合计 <b>" + (S.counts.archived_real_model + S.counts.local_real_rules + S.counts.mock_ui + S.counts.declared_limitation) +
+    "</b> 块 ｜ 真实模型归档 " + S.counts.archived_real_model +
+    " ｜ 本机规则 " + S.counts.local_real_rules +
+    " ｜ 模拟界面 " + S.counts.mock_ui +
+    " ｜ 如实声明 " + S.counts.declared_limitation +
+    "<br>快照格式 " + esc(S.format) + " ｜ 构建器 " + esc(S.builder) +
+    " ｜ 网络依赖：" + (S.network_required ? "是" : "否") +
+    " ｜ node 依赖：" + (S.node_required ? "是" : "否") +
+    " ｜ 本轮新模型调用：" + S.new_model_calls_made_by_this_snapshot +
+    "<br>冻结 HEAD " + esc(S.frozen_head || "?") + " ｜ 工作区脏文件数（读取时刻）" + S.worktree_dirty_files;
+
+  /* ── 渲染 ── */
+  function renderBlock(b){
+    var k = b.evidence_kind;
+    var card = document.createElement("div");
+    card.className = "card";
+
+    var badge = document.createElement("span");
+    badge.className = "badge " + k;
+    badge.textContent = K[k].badge;
+    card.appendChild(badge);
+
+    var h3 = document.createElement("h3");
+    h3.innerHTML = mdBold(b.title);
+    card.appendChild(h3);
+
+    var meta = document.createElement("div");
+    meta.className = "kindnote";
+    meta.innerHTML =
+      '<span class="pill">' + esc(b.id) + '</span>' +
+      '<span class="pill">模型调用 ' + b.model_calls + '</span>' +
+      '<span class="pill">已核验 ' + (b.verified ? "是" : "否") + '</span>';
+    card.appendChild(meta);
+
+    var src = document.createElement("div");
+    src.className = "src";
+    src.textContent = "来源：" + (Array.isArray(b.source) ? b.source.join(" ｜ ") : b.source);
+    card.appendChild(src);
+
+    if (b.caveat){
+      var cv = document.createElement("div");
+      cv.className = "caveat";
+      cv.innerHTML = "⚠ " + mdBold(b.caveat);
+      card.appendChild(cv);
+    }
+    if (b.how_to_replay){
+      var rp = document.createElement("div");
+      rp.className = "replay";
+      rp.innerHTML = "▶ 现场口径：" + mdBold(b.how_to_replay);
+      card.appendChild(rp);
+    }
+
+    card.appendChild(renderPayload(b.id, b.payload));
+    return card;
+  }
+
+  function renderPayload(id, p){
+    var box = document.createElement("div");
+
+    /* R-01：真实模型三候选 —— 定制渲染 */
+    if (id === "R-01" && p.candidates && p.candidates.length){
+      var info = document.createElement("p");
+      info.className = "kv";
+      info.innerHTML = "模型 <b>" + esc(p.model) + "</b>（provider <b>" + esc(p.provider) +
+        "</b>）　N2 耗时 <b>" + p.elapsed_s + " s</b>　tokens <b>" +
+        esc((p.usage && p.usage.total_tokens) || "?") + "</b>　服务端时间戳 <b>" + esc(p.server_ts) + "</b>";
+      box.appendChild(info);
+
+      var g = document.createElement("div");
+      g.className = "grid";
+      p.candidates.forEach(function(c){
+        var d = document.createElement("div");
+        d.className = "cand";
+        var refs = (c.fact_refs || []).map(function(x){ return '<span class="pill">事实 '+esc(x)+'</span>'; }).join("");
+        var inf  = (c.inferences || []).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join("");
+        var unk  = (c.unknowns || []).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join("");
+        d.innerHTML =
+          '<h4>' + esc(c.id) + '　' + esc(c.name) + '</h4>' +
+          '<div class="price">' + esc(c.estimated_total) + ' ' + esc(c.currency) +
+            '　·　' + esc(c.estimated_preparation_days) + ' 天　·　' + esc((c.tags||[]).join("/")) + '</div>' +
+          '<p class="kv">' + esc(c.description) + '</p>' +
+          '<p class="kv"><b>选择理由：</b>' + esc(c.reason) + '</p>' +
+          '<div>' + refs + '</div>' +
+          (inf ? '<p class="kv"><b>推断（未确认）：</b></p><ul class="kv">' + inf + '</ul>' : '') +
+          (unk ? '<p class="kv"><b>未知（未核实）：</b></p><ul class="kv">' + unk + '</ul>' : '');
+        g.appendChild(d);
+      });
+      box.appendChild(g);
+      var note = document.createElement("p");
+      note.className = "kv";
+      note.innerHTML = "<b>原始 JSON 大小：</b>" + p.raw_length_chars + " 字符（逐字归档，未改写）";
+      box.appendChild(note);
+      box.appendChild(details("原始归档 JSON（model/usage）", {model:p.model, provider:p.provider, usage:p.usage, server_ts:p.server_ts}));
+      return box;
+    }
+
+    /* R-02：运行汇总表 */
+    if (id === "R-02"){
+      [["pre_prompt_fix","提示词修复**之前**（N3 首次校验失败 → 走修订）"],
+       ["post_prompt_fix","提示词修复**之后**（N3 直接通过 → End A）"]].forEach(function(pair){
+        var rows = p[pair[0]] || [];
+        if (!rows.length) return;
+        var cap = document.createElement("p");
+        cap.className = "big";
+        cap.innerHTML = mdBold(pair[1]);
+        box.appendChild(cap);
+        box.appendChild(runTable(rows));
+      });
+      return box;
+    }
+
+    /* R-04：v2 两次运行 */
+    if (id === "R-04"){
+      box.appendChild(cap("v2 · run1 demo（正常输入）"));
+      box.appendChild(runTable([p.run1_demo]));
+      box.appendChild(cap("v2 · run2 boundary（越界输入）"));
+      box.appendChild(runTable([p.run2_boundary]));
+      return box;
+    }
+
+    /* R-05：占位夹具跑 */
+    if (id === "R-05"){
+      var t = document.createElement("table");
+      t.innerHTML = "<thead><tr><th>归档文件</th><th>端到端</th><th>N2/N5 是否真实模型</th><th>预期路径</th><th>节点顺序</th></tr></thead>";
+      var tb = document.createElement("tbody");
+      p.forEach(function(x){
+        var tr = document.createElement("tr");
+        tr.innerHTML = "<td class='src'>" + esc(x.file.split("/").pop()) + "</td>" +
+          "<td class='num'>" + esc(x.elapsed) + "</td>" +
+          "<td>" + (x.model_called ? '<span class="ok">真实 LLM</span>' : '<span class="no">未接模型（占位）</span>') + "</td>" +
+          "<td class='kv'>" + esc((x.expect||"").slice(0,60)) + "</td>" +
+          "<td class='kv'>" + esc(x.node_sequence.map(function(n){return n.node.slice(0,4);}).join(" → ")) + "</td>";
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb);
+      box.appendChild(t);
+      return box;
+    }
+
+    /* L-01：规则层结果 */
+    if (id === "L-01"){
+      var t2 = document.createElement("table");
+      t2.innerHTML = "<thead><tr><th>#</th><th>用例</th><th>结果</th><th>实测观测</th></tr></thead>";
+      var tb2 = document.createElement("tbody");
+      (p.results||[]).forEach(function(r){
+        var tr = document.createElement("tr");
+        tr.innerHTML = "<td class='num'>" + esc(r.id) + "</td><td>" + esc(r.label) + "</td>" +
+          "<td>" + (r.ok ? '<span class="ok">PASS</span>' : '<span class="no">FAIL</span>') + "</td>" +
+          "<td class='src'>" + esc(JSON.stringify(r.observed)) + "</td>";
+        tb2.appendChild(tr);
+      });
+      t2.appendChild(tb2);
+      box.appendChild(t2);
+      var h = document.createElement("p");
+      h.className = "kv";
+      h.innerHTML = "校验器地址 <b>" + esc(p.base) + "</b>　规则源码 sha256 <b>" + esc(p.rules_source_sha256) + "</b>　失败数 <b>" + p.failed + "</b>";
+      box.appendChild(h);
+      return box;
+    }
+
+    /* M-01：模拟候选与四段 */
+    if (id === "M-01"){
+      var w = document.createElement("div");
+      w.className = "caveat";
+      w.innerHTML = "⚠ 下面这些是 <b>模拟数据</b>，不是模型输出：" + esc(p.mock_mode_notice || "");
+      box.appendChild(w);
+
+      var g2 = document.createElement("div");
+      g2.className = "grid";
+      (p.candidates||[]).forEach(function(c){
+        var d = document.createElement("div");
+        d.className = "cand";
+        d.innerHTML = '<h4>' + esc(c.id) + '　' + esc(c.name) + '</h4>' +
+          '<div class="price">' + esc(c.estimated_total) + ' ' + esc(c.currency) + '　·　' + esc(c.estimated_preparation_days) + ' 天</div>' +
+          '<p class="kv">' + esc(c.description) + '</p>';
+        g2.appendChild(d);
+      });
+      box.appendChild(g2);
+
+      box.appendChild(cap("四段呈现（② 包装材料与步骤 在追求对象/恋人下**完全相同**）"));
+      (p.sections||[]).forEach(function(s){
+        var d = document.createElement("div");
+        d.className = "card";
+        d.style.margin = "10px 0";
+        d.innerHTML = '<h3>' + esc(s.title) + '</h3>' +
+          (s.items||[]).map(function(x){ return '<p class="kv">' + esc(x) + '</p>'; }).join("");
+        box.appendChild(d);
+      });
+      var m = document.createElement("p");
+      m.className = "kv";
+      m.innerHTML = "业务数据核实状态 <b>" + esc(p.business_data_verification) + "</b>　可选项 <b>" +
+        esc((p.selectable_candidate_ids||[]).join(", ")) + "</b>　repair_count <b>" + esc(p.repair_count) + "</b>";
+      box.appendChild(m);
+      return box;
+    }
+
+    /* M-02：关系差异 */
+    if (id === "M-02"){
+      Object.keys(p.diff||{}).forEach(function(key){
+        var d = p.diff[key];
+        var c = document.createElement("div");
+        c.className = "card";
+        c.style.margin = "10px 0";
+        var badge = d.identical
+          ? '<span class="no">两关系完全相同</span>'
+          : '<span class="ok">两关系有差异</span>';
+        c.innerHTML = '<h3>' + esc(d.pursuit_title || key) + '　' + badge + '</h3>' +
+          '<table><thead><tr><th>追求对象</th><th>恋人</th></tr></thead><tbody><tr>' +
+          '<td>' + (d.pursuit_items||[]).map(function(x){return '<p class="kv">'+esc(x)+'</p>';}).join("") + '</td>' +
+          '<td>' + (d.partner_items||[]).map(function(x){return '<p class="kv">'+esc(x)+'</p>';}).join("") + '</td>' +
+          '</tr></tbody></table>';
+        box.appendChild(c);
+      });
+      return box;
+    }
+
+    /* 默认：statement 或通用 JSON */
+    if (p && p.statement){
+      var s = document.createElement("p");
+      s.className = "big";
+      s.innerHTML = mdBold(p.statement);
+      box.appendChild(s);
+      return box;
+    }
+    box.appendChild(details("明细", p));
+    return box;
+  }
+
+  function runTable(rows){
+    var t = document.createElement("table");
+    t.innerHTML = "<thead><tr><th>用例</th><th>N2 耗时</th><th>N5 是否跑</th>" +
+      "<th>N3 结果</th><th>N4 分支</th><th>N6 结果</th><th>repair</th>" +
+      "<th>End 输出</th><th>tokens</th><th>端到端</th></tr></thead>";
+    var tb = document.createElement("tbody");
+    rows.forEach(function(r){
+      var tr = document.createElement("tr");
+      var eo = r.end_outputs || {};
+      tr.innerHTML =
+        "<td class='src'>" + esc(r.case) + "</td>" +
+        "<td class='num'>" + (r.N2_elapsed_s != null ? r.N2_elapsed_s.toFixed(2)+" s" : "—") + "</td>" +
+        "<td>" + (r.N5_ran ? "是 ("+(r.N5_elapsed_s?r.N5_elapsed_s.toFixed(2)+" s":"?")+")" : "否") + "</td>" +
+        "<td>" + esc(r.N3_status) + (r.N3_codes && r.N3_codes.length ? " / "+esc(r.N3_codes.join(",")) : "") + "</td>" +
+        "<td class='src'>" + esc(String(r.N4_case)) + "</td>" +
+        "<td>" + esc(r.N6_status || "—") + "</td>" +
+        "<td class='num'>" + esc(String(eo.repair_count != null ? eo.repair_count : "—")) + "</td>" +
+        "<td class='src'>" + esc(JSON.stringify(eo)) + "</td>" +
+        "<td class='num'>" + esc(String(r.total_tokens || "—")) + "</td>" +
+        "<td class='num'>" + (r.workflow_elapsed_s != null ? r.workflow_elapsed_s.toFixed(2)+" s" : "—") + "</td>";
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    return t;
+  }
+
+  function cap(txt){
+    var p = document.createElement("p");
+    p.className = "big";
+    p.innerHTML = mdBold(txt);
+    return p;
+  }
+
+  function details(summary, obj){
+    var d = document.createElement("details");
+    var s = document.createElement("summary");
+    s.textContent = summary;
+    d.appendChild(s);
+    var pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(obj, null, 2);
+    d.appendChild(pre);
+    return d;
+  }
+
+  function esc(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function mdBold(s){
+    return esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  }
+})();
+</script>
+</body>
+</html>

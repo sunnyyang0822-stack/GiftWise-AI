@@ -1,0 +1,11 @@
+{
+  "_note": "本文件是「最新一次运行」的指针，是唯一每次运行都会被重写的文件；它不是证据。证据在 latest_run 指向的时间戳目录内，写一次即冻结，从不被覆盖。",
+  "updated_at": "2026-10-31T02:06:27.649228+08:00",
+  "latest_run": "workflow/evidence/local-2026-10-29/runs/20261031T020627+0800",
+  "results": "workflow/evidence/local-2026-10-29/runs/20261031T020627+0800/results.json",
+  "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd",
+  "passed": 46,
+  "failed": 0,
+  "model_calls": 0,
+  "cloud_verified": false
+}

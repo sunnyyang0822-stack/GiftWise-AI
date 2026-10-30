@@ -1,0 +1,461 @@
+{
+  "probe": "deep-edges",
+  "python": "3.12.12 (main, Oct 10 2025, 15:08:20)  [GCC 15.2.0 64 bit (AMD64)]",
+  "results": [
+    {
+      "label": "budget=\"1\"*1000（恰好 1000 码点，数值巨大、越界）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ]
+      ]
+    },
+    {
+      "label": "budget=\"1\"*1001（1001 码点 → _amount 静默 None）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "字段字符串超过 1000 个 Unicode 码点"
+        ]
+      ]
+    },
+    {
+      "label": "budget=\"9\"*999（999 码点，越界）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ]
+      ]
+    },
+    {
+      "label": "budget=\"11\"（对照：在范围内，只应报候选 OVER_BUDGET）",
+      "status": "failed",
+      "all_passed": false,
+      "codes": [
+        [
+          "候选[0]",
+          "OVER_BUDGET",
+          "candidates[0].estimated_total",
+          "估算总费用超过预算"
+        ],
+        [
+          "候选[1]",
+          "OVER_BUDGET",
+          "candidates[1].estimated_total",
+          "估算总费用超过预算"
+        ],
+        [
+          "候选[2]",
+          "OVER_BUDGET",
+          "candidates[2].estimated_total",
+          "估算总费用超过预算"
+        ]
+      ]
+    },
+    {
+      "label": "available_days = 4299 位整数字面量",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.available_days",
+          "可用天数须在 0 至 365 天之间"
+        ]
+      ]
+    },
+    {
+      "label": "available_days = 4300 位整数字面量",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.available_days",
+          "可用天数须在 0 至 365 天之间"
+        ]
+      ]
+    },
+    {
+      "label": "available_days = 4301 位整数字面量",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "available_days = 5000 位整数字面量",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "available_days = 20000 位整数字面量",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "候选 estimated_preparation_days = 5000 位整数字面量",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "candidates_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "budget=0 且 days=366（两个范围错误并存）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ],
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.available_days",
+          "可用天数须在 0 至 365 天之间"
+        ]
+      ]
+    },
+    {
+      "label": "budget=0 且 days=-1（范围 + 类型）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.available_days",
+          "天数必须为非负 JSON 整数，不能为布尔值"
+        ],
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ]
+      ]
+    },
+    {
+      "label": "budget=0 且 currency=USD（范围 + 币种）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ],
+        [
+          "顶层",
+          "UNSUPPORTED_CURRENCY",
+          "request.currency",
+          "首版仅支持 CNY，不执行换汇"
+        ]
+      ]
+    },
+    {
+      "label": "budget_amount=20000（JSON 数字，非字符串）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.budget_amount",
+          "金额必须为十进制字符串"
+        ]
+      ]
+    },
+    {
+      "label": "budget_amount=0（JSON 数字，非字符串）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.budget_amount",
+          "金额必须为十进制字符串"
+        ]
+      ]
+    },
+    {
+      "label": "budget_amount 字段缺失",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "MISSING_FIELD",
+          "request.budget_amount",
+          "缺少必填字段"
+        ]
+      ]
+    },
+    {
+      "label": "available_days 字段缺失",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "MISSING_FIELD",
+          "request.available_days",
+          "缺少必填字段"
+        ]
+      ]
+    },
+    {
+      "label": "days=1e400（JSON → float inf）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.available_days",
+          "天数必须为非负 JSON 整数，不能为布尔值"
+        ]
+      ]
+    },
+    {
+      "label": "days=0.0（JSON float）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.available_days",
+          "天数必须为非负 JSON 整数，不能为布尔值"
+        ]
+      ]
+    },
+    {
+      "label": "days=true（JSON 布尔）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.available_days",
+          "天数必须为非负 JSON 整数，不能为布尔值"
+        ]
+      ]
+    },
+    {
+      "label": "days=-1 且 budget=0 且 currency=USD（三个错并存）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_TYPE",
+          "request.available_days",
+          "天数必须为非负 JSON 整数，不能为布尔值"
+        ],
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.budget_amount",
+          "预算须在 1 至 10000 之间"
+        ],
+        [
+          "顶层",
+          "UNSUPPORTED_CURRENCY",
+          "request.currency",
+          "首版仅支持 CNY，不执行换汇"
+        ]
+      ]
+    },
+    {
+      "label": "候选 estimated_total=0 且 prep=0（**字符串** \"0\"，须通过）",
+      "status": "passed",
+      "all_passed": true,
+      "codes": []
+    },
+    {
+      "label": "⚠️ 探针自身 bug 对照：候选 estimated_total=0（**JSON 数字**，应报 INVALID_TYPE）",
+      "status": "failed",
+      "all_passed": false,
+      "codes": [
+        [
+          "候选[0]",
+          "INVALID_TYPE",
+          "candidates[0].estimated_total",
+          "金额必须为十进制字符串"
+        ]
+      ]
+    },
+    {
+      "label": "候选 estimated_total 为 1001 码点合法金额串",
+      "status": "failed",
+      "all_passed": false,
+      "codes": [
+        [
+          "候选[0]",
+          "LIMIT_EXCEEDED",
+          "candidates[0].estimated_total",
+          "字段字符串超过 1000 个 Unicode 码点"
+        ]
+      ]
+    },
+    {
+      "label": "候选 prep = 5000 位整数",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "candidates_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "候选 estimated_total='9'*999（越界，须只报 OVER_BUDGET）",
+      "status": "failed",
+      "all_passed": false,
+      "codes": [
+        [
+          "候选[0]",
+          "OVER_BUDGET",
+          "candidates[0].estimated_total",
+          "估算总费用超过预算"
+        ]
+      ]
+    },
+    {
+      "label": "request_json 为空字符串",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    {
+      "label": "request_json = 'null'",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_REQUEST",
+          "request",
+          "请求根节点必须为对象"
+        ]
+      ]
+    },
+    {
+      "label": "request_json 根为数组",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_REQUEST",
+          "request",
+          "请求根节点必须为对象"
+        ]
+      ]
+    },
+    {
+      "label": "request_json 含重复键 budget_amount",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    }
+  ],
+  "int_digit_limit_experiment": {
+    "default_limit": 4300,
+    "disabled_result": {
+      "label": "available_days = 5000 位整数（**已关闭**解释器上限）",
+      "status": "needs_input",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "LIMIT_EXCEEDED",
+          "request.available_days",
+          "可用天数须在 0 至 365 天之间"
+        ]
+      ]
+    },
+    "default_result": {
+      "label": "available_days = 5000 位整数字面量",
+      "status": "error",
+      "all_passed": false,
+      "codes": [
+        [
+          "顶层",
+          "INVALID_JSON",
+          "request_json",
+          "JSON 无效，可能含重复键、非标准常量或嵌套过深"
+        ]
+      ]
+    },
+    "hypothesis_holds": true
+  }
+}

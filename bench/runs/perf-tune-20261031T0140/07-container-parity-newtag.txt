@@ -1,0 +1,28 @@
+===== 7. 容器一致性探针（架构线入库）针对【新 tag】=====
+命令: PYTHONIOENCODING=utf-8 python docs/architecture/probes/verify_container_parity.py giftwise-validator:perf-tuning-20261031 18401
+（注：首次运行在本机默认 GBK 控制台编码下打印 ✅ 时 UnicodeEncodeError 崩溃，属探针的编码问题，非功能失败；
+  加 PYTHONIOENCODING=utf-8 后通过。）
+
+镜像           : giftwise-validator:perf-tuning-20261031
+宿主端口       : 18401
+本机 rules.py  : sha256=1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
+容器已启动     : b46a2b945c577bf1881d
+
+/healthz       : {"status": "ok", "service": "giftwise-validator", "rules_source_sha256": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500"}
+规则哈希一致   : ✅ 是  (容器 1f389dad4c2589fb… vs 本机 1f389dad4c2589fb…)
+
+比对用例       : 9 组（前 6 组合法夹具 + 3 组越界请求）
+  [PASS] mock-默认三候选               HTTP 200  local={"all_passed":true,"business_data_verification":"not_verified","candid
+  [PASS] 边界-刚好等于预算                HTTP 200  local={"all_passed":true,"business_data_verification":"not_verified","candid
+  [PASS] 超预算一分钱                   HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+  [PASS] 天数等于上限                   HTTP 200  local={"all_passed":true,"business_data_verification":"not_verified","candid
+  [PASS] 天数超一天                    HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+  [PASS] 触犯禁忌类别 alcohol           HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+  [PASS] 越界 budget=10000.01       HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+  [PASS] 越界 budget=10001          HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+  [PASS] 越界 days=366              HTTP 200  local={"all_passed":false,"business_data_verification":"not_verified","candi
+
+结论           : 9/9 组逐字节一致；规则哈希一致
+临时容器已移除。
+
+exitcode=0

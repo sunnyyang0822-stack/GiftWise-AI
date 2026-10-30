@@ -1,0 +1,171 @@
+==============================================================================
+§1 现状取证：冻结版 workflow/labels.py 的 RELATIONS 逐字清单
+==============================================================================
+文件：workflow/labels.py   RELATIONS 定义行：第 8 行
+键数量：10
+
+  #  机器值 ID          中文（逐字）
+  1  friend             朋友
+  2  colleague          同事
+  3  partner            恋人
+  4  pursuit            追求对象
+  5  family             家人
+  6  classmate          同学
+  7  mentor             老师/导师
+  8  client_partner     客户/合作伙伴
+  9  other              其他
+  10 unknown            关系暂不确定
+
+含「上司/领导/老板/上级/主管」任一语义的值 = {}  ← 空
+结论：10 个关系值里，表示「职场上司」的值有 0 个。
+labels.py 注释／文档串中提及上司语义的行数 = 0
+
+==============================================================================
+§2 新值生效证明：提交 recipient_relation="boss" 的前后对比
+==============================================================================
+  冻结版：status=needs_input  codes=['INTAKE_UNKNOWN_LABEL', 'INVALID_TYPE']
+  变体版：status=ready        codes=[]
+
+  变体版 request.recipient_relation    = '职场上司'
+  变体版 request.recipient_relation_id = 'boss'
+  变体版英文键已加入 RELATIONS = True
+  变体版 RELATIONS 键数 = 11（冻结版 10）
+
+  生效的代码分支：
+    workflow/intake.py:50-57  choice("recipient_relation", RELATIONS)
+      → 该值不在 RELATIONS 时发 INTAKE_UNKNOWN_LABEL 并回退；在表内则直接通过。
+    workflow/intake.py:120-121 RELATIONS.get() / recipient_relation_id 透出
+      → 中文变为「职场上司」，机器值变为 boss（原来是「其他」/other）。
+    判定：这是唯一因新值而换挡的 intake 分支。
+
+==============================================================================
+§3 回归证明：既有 10 个值的行为逐字节不变
+==============================================================================
+  关系值               冻结版                       变体版                       一致    
+  friend            ready                     ready                     是     
+  colleague         ready                     ready                     是     
+  partner           ready                     ready                     是     
+  pursuit           ready                     ready                     是     
+  family            ready                     ready                     是     
+  classmate         ready                     ready                     是     
+  mentor            ready                     ready                     是     
+  client_partner    ready                     ready                     是     
+  other             ready                     ready                     是     
+  unknown           needs_input               needs_input               是     
+
+  比对项：status + errors(逐字节) + request_json(逐字节)，共 10 个旧值
+  发生变化的值：无（0 个）
+  回归结论：全部 10 个旧值行为一字不变
+
+==============================================================================
+§4 「按关系分流的产品逻辑」到底哪一段会因新值换挡
+==============================================================================
+  boss 与 other 的 request_json 差异字段（变体版）：
+    recipient_relation: '其他'  →  '职场上司'
+    recipient_relation_id: 'other'  →  'boss'
+  差异字段数 = 2
+
+  逐层核对（哪些层真的按关系分流）：
+    validator/rules.py    : 不消费关系枚举（只要求 recipient_relation 是非空字符串）。
+                            → 规则层无任何规则因新值生效（PM 定性：/validate 是规则门不是契约门）。
+    workflow/prompts/*.md : generate.md / repair.md 无逐关系枚举，只有通用「低关系压力」措辞。
+                            → 提示词不需要改动，也不会因新值自动换挡。
+    web/server/intake.mjs : choice("recipient_relation", RELATIONS_FULL)。
+                            → 与 Python 同形的白名单闸门；变体表里加了 boss 才放行。
+    web/server/mock-model.mjs relationFlavor()：有 8 个键，没有 boss 键。
+                            → 把 recipient_relation_id="boss" 渲染呈现时，
+                              与 "other" 的 presentation_json 完全相同 = True
+                              与 "pursuit" 是否不同 = True
+                              实际贺卡文案：生日快乐！一点心意，祝一切顺利。
+                              实际关系提示：['关系信息有限，保持中性表达']
+                            → 结论：单独加枚举值**不会**让「职场分寸／送礼边界」分支生效；
+                              它只会让 boss 从 other 的中性话术变为「有明确关系名」的中性话术。
+
+==============================================================================
+§5 测试影响：哪些断言会因 11 个值而失败
+==============================================================================
+
+  【5.1】tests/acceptance/boundary/test_cross_layer_gate.py:155-171
+        test_relation_enum_has_exactly_the_frozen_membership
+        断言 A（第 163-165 行）assertEqual({...8 个产品值...}, product_ids)
+           期望 = ['classmate', 'client_partner', 'family', 'friend', 'mentor', 'other', 'partner', 'pursuit']
+           实际 = ['boss', 'classmate', 'client_partner', 'family', 'friend', 'mentor', 'other', 'partner', 'pursuit']
+           → FAIL（多出 ['boss']）
+        断言 B（第 168-169 行）assertEqual(10, len(RELATIONS), "枚举总数应为 10（8 产品 + colleague + unknown）")
+           期望 = 10   实际 = 11   → FAIL
+        应改成：产品值集合加入 "boss"（9 个）；总数断言由 10 改为 11，并把说明改为
+                「9 产品 + colleague + unknown」。
+
+  【5.2】tests/acceptance/contract/run_contract.py:89
+        add("REL-UNDECLARED", "intake", "relation=未声明值 'boss'",
+            intake=dict(BASE, recipient_relation="boss"),
+            expect_codes=["INTAKE_UNKNOWN_LABEL"], expect_status="needs_input")
+           期望 codes = ['INTAKE_UNKNOWN_LABEL']   status = 'needs_input'
+           实际 codes = []   status = 'ready'
+           → FAIL：该用例把 boss 当作『未声明值』的字面样本，
+             一旦 boss 成为已声明值，它就不再能充当这个样本。
+        应改成：把样本值换成仍未被声明的值（例如 "supervisor" 或 "BOSS"），
+                或保留 boss 但把期望改为 status=ready、codes=[]（会与用例标题冲突，不推荐）。
+        另注：同文件第 24-25 行 RELATION_IDS 是硬编码的 10 项清单，第 1 行 docstring 写
+              「10 个关系 ID 全量」；新值不会让它失败，但『全量』覆盖声明会变成陈旧口径
+              （第 356 行 relation_ids_declared 会实际列出 11 个键）。
+
+  【5.3】web/tests/access-layer.test.mjs:32 与 34-36（原版／变体重放）
+        第 32 行：FAIL   assert.equal(PRODUCT_RELATIONS.length, 8);
+           期望 = 8
+           实际 = 9
+        第 34 行：FAIL   assert.deepEqual(PRODUCT_RELATIONS.map((x) => x.id), ["partner","pursuit","friend","family","classmate","mentor","client_partner","other"]);
+           期望 = ['partner', 'pursuit', 'friend', 'family', 'classmate', 'mentor', 'client_partner', 'other']
+           实际 = ['partner', 'pursuit', 'friend', 'family', 'boss', 'classmate', 'mentor', 'client_partner', 'other']
+        第 37 行：PASS   assert.ok(!PRODUCT_RELATIONS.some((x) => x.id === "colleague" || x.zh === "同事"));
+        应改成：第 32 行 PRODUCT_RELATIONS.length 由 8 改为 9；
+                第 34-36 行 deepEqual 期望数组插入 "boss"（放在 "family" 之后，与实现同序）。
+
+  【5.4】不受影响的断言（已核对，不会被 11 个值打破）
+        tests/acceptance/stage_c/test_stage_c_workflow.py:133-145 test_c2_01
+          total_ids=len(RELATIONS) 与 labels_sha256 只是 observe() 的观察字段；
+          判定式 ok= 只检查 pursuit 存在／文案／partner 文案／colleague 存在 → 仍为 True。
+        tests/test_validator.py 全部用例：validator 不消费关系枚举 → 无影响。
+        tests/acceptance/stage_c/fixtures/labels_before_pursuit.py：
+          该夹具 sha256=333ad976… 固定不变，不受影响。
+
+==============================================================================
+§6 版本指纹与生成物：labels.py 哈希变化 → 5 个生成物必须重建
+==============================================================================
+  冻结版 labels.py sha256 = e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910
+  manifest 声明          = e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910
+  两者一致（未漂移）      = True
+  变体版 labels.py sha256 = 37d500aefc6cfd5e73089d311dea555e55f1e9ed00522897beb8e2f758ca40e6
+  变体版会令 manifest 的 workflow/labels.py 条目失效 = True
+
+  受影响生成物（workflow/build_code_node.py 的 SOURCES 内嵌 labels.py 源码）：
+    workflow/generated/code_node.py
+    workflow/generated/intake_node.py
+    workflow/generated/check_node.py
+    workflow/generated/recheck_node.py
+    workflow/generated/report_node.py
+  重建命令：python workflow/build_code_node.py
+  未重建的后果：Dify Code 节点内的 RELATIONS 仍是 10 键，云端仍返回
+                INTAKE_UNKNOWN_LABEL，而本机为 ready —— 两边行为分叉。
+
+==============================================================================
+§7 需要同步的契约文档与前端（均在我写范围之外，只登记不修改）
+==============================================================================
+  docs/intake-contract.md:15   「产品面冻结 8 个稳定 ID」→ 应改为 9 个并补 boss
+  docs/intake-contract.md:130  「8 个产品 ID … labels.py:RELATIONS 10 键，完全一致」→ 9 / 11 键
+  docs/intake-contract.md:141  「9 个可用 ID 全部输出正确中文与 ID 对」→ 10 个
+  docs/architecture.md:53      「契约已冻结 8 个关系 ID」→ 9 个
+  docs/architecture.md:504     labels.py=e3128d29… 指纹 → 更新为新哈希
+  docs/product-flow.md:126     「机器值保留在 8 项枚举内」→ 需 PM 明确口径（见提案 §决策）
+  web/server/labels.mjs:5,11   注释「冻结 8 项／8 个稳定 ID」→ 9（已含在补丁内）
+  web/public/app.js:218-223   关系卡片由 cfg.labels.relations.map() 动态渲染 → 无需改 app.js
+
+==============================================================================
+汇总
+==============================================================================
+  §1 冻结版关系值        : 10 个，含上司语义的 0 个
+  §2 boss 通过 intake    : 是（needs_input → ready）
+  §3 旧值回归            : 10/10 逐字节不变
+  §4 新增专属分支        : 无（boss 落入 other 中性话术）
+  §5 会失败的断言        : 5 处（另有 1 处计数断言）
+  §6 需重建生成物        : 5 个

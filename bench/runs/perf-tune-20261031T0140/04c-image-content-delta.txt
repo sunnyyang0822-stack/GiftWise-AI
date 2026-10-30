@@ -1,0 +1,60 @@
+===== 4c. 新旧镜像 /app 内容差异（重要：COPY deploy 会连带把别人的文档改动带进镜像）=====
+--- prev-20261031T0200 : find /app -type f | sort + sha256 ---
+c3d9bde8f7f6557a075c337e6dda52769f4a102ec20ecc14b5ad464424887381  /app/deploy/.dockerignore
+ff0338b03c29f42268c120a5c96ae3e9572fd00f5e94b80165e12ff562e1c049  /app/deploy/Dockerfile
+8cdf2a44a5da1dfef00697cf49f4762b7c0121639eeb7275b3acd9b22d77ca49  /app/deploy/README.md
+e2922b66a96c103db2b16f5b71df7882147258db813af67723b87814c4cef3d1  /app/deploy/__init__.py
+f7bc9e1132f8ca97e4170881b48b5946f5f04658bf49aa373686ae1e96d77543  /app/deploy/observability-collection.md
+467f98b88d033fcd0731220ae212c3e6ba5f88d9a33c43fd044f4f1861d2908c  /app/deploy/observability.py
+4c11499108bf12effad186cfdf64d9baf5b51d26330c4477962c0537fea5963c  /app/deploy/observable_server.py
+9269b2cfabd646d03a42bd26151bb2d3657f4c64ce2e5e411d5142a8d55739d9  /app/deploy/preprod-plan.md
+cce9c8aa237480531624210a995935805c8ad2ba074bc6b8209f423849f67385  /app/deploy/publish-to-uhost.ps1
+a21cd616be2588353ebdfd1d1c18f5f21458460c1954fae4fbd08638017a9c69  /app/deploy/security-review.md
+130cb065db6868c897308cbb79ef5cce16fcd323c94d958524aaf3e960c71076  /app/deploy/server.py
+f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5  /app/validator/__init__.py
+1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500  /app/validator/rules.py
+--- perf-tuning-20261031 : find /app -type f | sort + sha256 ---
+c3d9bde8f7f6557a075c337e6dda52769f4a102ec20ecc14b5ad464424887381  /app/deploy/.dockerignore
+ff0338b03c29f42268c120a5c96ae3e9572fd00f5e94b80165e12ff562e1c049  /app/deploy/Dockerfile
+763f0e831ea43ed68653d9334b715f3c9d832baef962d793f30635331a217c3a  /app/deploy/README.md
+e2922b66a96c103db2b16f5b71df7882147258db813af67723b87814c4cef3d1  /app/deploy/__init__.py
+b07a2063e963b894dbb9f9a18745c21f176ac24b7ff47bf5035e026633af84cd  /app/deploy/observability-collection.md
+467f98b88d033fcd0731220ae212c3e6ba5f88d9a33c43fd044f4f1861d2908c  /app/deploy/observability.py
+4c11499108bf12effad186cfdf64d9baf5b51d26330c4477962c0537fea5963c  /app/deploy/observable_server.py
+e6fae301eebbd9f4e66d1b18e8491bd8c17138a0718695e4af448d20f9df99dc  /app/deploy/preprod-plan.md
+6ed53376218787e7bc81ed5cf08d1e5af88f26f766461025b850e353b1bfe7cc  /app/deploy/publish-to-uhost.ps1
+3f1f96ad27200b8d9edf5d9f2bde9455f49cda70acfec9e558bb238881b8b16c  /app/deploy/security-review.md
+e8b40f9fd685150510fe3af87611c635c1e5b23b4dd4628a5e399d1b907c42df  /app/deploy/server.py
+f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5  /app/validator/__init__.py
+1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500  /app/validator/rules.py
+
+===== 差异（左=旧镜像 右=新镜像）=====
+3c3
+< 8cdf2a44a5da1dfef00697cf49f4762b7c0121639eeb7275b3acd9b22d77ca49  deploy/README.md
+---
+> 763f0e831ea43ed68653d9334b715f3c9d832baef962d793f30635331a217c3a  deploy/README.md
+5c5
+< f7bc9e1132f8ca97e4170881b48b5946f5f04658bf49aa373686ae1e96d77543  deploy/observability-collection.md
+---
+> b07a2063e963b894dbb9f9a18745c21f176ac24b7ff47bf5035e026633af84cd  deploy/observability-collection.md
+8,11c8,11
+< 9269b2cfabd646d03a42bd26151bb2d3657f4c64ce2e5e411d5142a8d55739d9  deploy/preprod-plan.md
+< cce9c8aa237480531624210a995935805c8ad2ba074bc6b8209f423849f67385  deploy/publish-to-uhost.ps1
+< a21cd616be2588353ebdfd1d1c18f5f21458460c1954fae4fbd08638017a9c69  deploy/security-review.md
+< 130cb065db6868c897308cbb79ef5cce16fcd323c94d958524aaf3e960c71076  deploy/server.py
+---
+> e6fae301eebbd9f4e66d1b18e8491bd8c17138a0718695e4af448d20f9df99dc  deploy/preprod-plan.md
+> 6ed53376218787e7bc81ed5cf08d1e5af88f26f766461025b850e353b1bfe7cc  deploy/publish-to-uhost.ps1
+> 3f1f96ad27200b8d9edf5d9f2bde9455f49cda70acfec9e558bb238881b8b16c  deploy/security-review.md
+> e8b40f9fd685150510fe3af87611c635c1e5b23b4dd4628a5e399d1b907c42df  deploy/server.py
+
+===== 改动后的关键行号（供报告引用）=====
+150:class Server(ThreadingHTTPServer):
+182:    request_queue_size = 512
+189:    server = Server((host, port), Handler)
+192:        f"rules={RULES_HASH}; backlog={Server.request_queue_size}"
+--- 原有 Handler / log_message 行号 ---
+27:_LOG_LOCK = threading.Lock()
+30:def _log_line(text: str) -> None:
+52:class Handler(BaseHTTPRequestHandler):
+144:    def log_message(self, fmt: str, *args: object) -> None:

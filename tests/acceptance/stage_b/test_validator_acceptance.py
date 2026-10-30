@@ -22,8 +22,15 @@ from validator import validate
 
 CASES = json.loads(Path(__file__).with_name("cases.json").read_text(encoding="utf-8"))["cases"]
 OBSERVATIONS = {}
+# 2026-10-29 的独立评审报告：**历史记录，不随代码演进而被改写**（B 类）。
+# 它不再直接充当基线取值来源，改为用来核对"基线的文件范围"与"被取代的旧值"。
 REVIEW = ROOT / "docs/pm-reviews/val-001-rereview-2026-10-29.md"
-EXPECTED_HASHES = dict(re.findall(r"- `([^`]+)`：`([0-9a-f]{64})`", REVIEW.read_text(encoding="utf-8")))
+REVIEW_HASHES = dict(re.findall(r"- `([^`]+)`：`([0-9a-f]{64})`", REVIEW.read_text(encoding="utf-8")))
+# 现行基线（2026-10-31 重钉）：规则侧请求范围校验落地后，规则源码、单元测试与用例集
+# 发生经 PM 确认的合法变更。重钉理由、逐文件旧值与变更依据见同目录 pinned_hashes.json。
+BASELINE = Path(__file__).with_name("pinned_hashes.json")
+BASELINE_META = json.loads(BASELINE.read_text(encoding="utf-8"))
+EXPECTED_HASHES = dict(BASELINE_META["files"])
 
 
 def call_public(case):
@@ -39,7 +46,17 @@ def call_public(case):
 
 class Acceptance(unittest.TestCase):
     def test_review_manifest_has_four_files(self):
+        # 现行基线必须覆盖与 2026-10-29 评审**完全相同**的四个文件（防两边范围漂移）。
         self.assertEqual({"validator/__init__.py", "validator/rules.py", "tests/test_validator.py", "tests/test_cases.json"}, set(EXPECTED_HASHES))
+        self.assertEqual(set(REVIEW_HASHES), set(EXPECTED_HASHES))
+        for name, digest in EXPECTED_HASHES.items():
+            self.assertRegex(digest, r"^[0-9a-f]{64}$", f"{name} 的基线摘要格式不合法")
+        # 可追溯性：基线里记录的"被取代的旧值"必须能在这份历史评审里逐条对上，
+        # 以证明本次重钉是"同一批文件的合法更新"，而不是悄悄换了核对对象。
+        self.assertEqual("docs/pm-reviews/val-001-rereview-2026-10-29.md", BASELINE_META["superseded_review"])
+        self.assertEqual(set(REVIEW_HASHES), set(BASELINE_META["superseded_sha256"]))
+        for name, old in BASELINE_META["superseded_sha256"].items():
+            self.assertEqual(REVIEW_HASHES[name], old, f"{name} 的被取代旧值与 2026-10-29 评审不一致")
 
     def test_fixed_snapshots_only_change_failed_candidate_amount(self):
         cases = {c["id"]: c for c in CASES}

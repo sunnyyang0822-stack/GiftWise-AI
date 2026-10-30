@@ -173,6 +173,76 @@ const candidateBatches = [
   },
 ];
 
+/* ---------------------------------------- 请求侧越界网格与反向断言（新增） */
+
+/**
+ * ⚠️ 历史盲区（本次修正）：此前本文件顶层只有**一个**固定合法的 request_json，
+ * 且所有候选批次都复用它（见旧版写出逻辑），因此 `validator/rules.py:131-134`
+ * 的**请求侧数值范围校验在 parity 里永远不可能被触发**。
+ * 这不是"这次恰好没覆盖"，而是**结构性的**：样例集合本身在设计上就排除了越界请求。
+ *
+ * 修法：让**请求本身也变化**——显式生成越界网格，并让每个用例携带自己的 request_json，
+ * 使 JS 接入层与 Python 参考实现对同一批越界请求**字面量**各自求值后逐项比对。
+ */
+const requestBase = strictParse(requestJson);
+
+/** 以基准请求为模板替换字段后重新序列化（保持与 intake 产物同形的字面 JSON）。 */
+function requestWith(overrides) {
+  return dump({ ...requestBase, ...overrides });
+}
+
+/** 预算 ∈ {0,1,10000,10000.01,10001} × 天数 ∈ {0,365,366}，共 15 组。 */
+const budgetRange = ["0", "1", "10000", "10000.01", "10001"];
+const daysRange = [0, 365, 366];
+const requestRangeCases = budgetRange.flatMap((budget_amount) =>
+  daysRange.map((available_days) => ({
+    id: `请求越界-预算${budget_amount}-天数${available_days}`,
+    request_json: requestWith({ budget_amount, available_days }),
+    candidates_json: dump(baseBatch),
+  })),
+);
+
+/**
+ * 格式优先：当金额或天数的**格式**本身已非法时，共用的 amount()/days() 先失败，
+ * 请求侧范围检查必须被**跳过**（不得出现 LIMIT_EXCEEDED）。两个方向各一条。
+ */
+const requestFormatCases = [
+  {
+    id: "请求格式优先-金额非法且天数越界",
+    request_json: requestWith({ budget_amount: "100-200", available_days: 366 }),
+    candidates_json: dump(baseBatch),
+  },
+  {
+    id: "请求格式优先-天数非整数且预算越界",
+    request_json: requestWith({ budget_amount: "10001", available_days: 2.5 }),
+    candidates_json: dump(baseBatch),
+  },
+];
+
+/**
+ * 反向断言：候选侧的 0 值**不得**被误伤。
+ * 若请求侧范围约束被错误地下沉进与候选侧共用的 amount()/days()，
+ * 这两条就会冒出 LIMIT_EXCEEDED，而不是像现在这样照常通过。
+ */
+const reverseAssertCases = [
+  {
+    id: "反向断言-三候选金额与准备时间全为0",
+    candidates: batchWith((b) => {
+      b.candidates.forEach((c) => {
+        c.estimated_total = "0";
+        c.estimated_preparation_days = 0;
+      });
+    }),
+  },
+  {
+    id: "反向断言-单候选金额为0其余不变",
+    candidates: batchWith((b) => {
+      b.candidates[0].estimated_total = "0";
+      b.candidates[0].estimated_preparation_days = 0;
+    }),
+  },
+];
+
 /* ----------------------------------------------------------- 写出产物 */
 
 const fixtures = {
@@ -183,11 +253,13 @@ const fixtures = {
     // undefined 表示「该键不出现」，与 Python 侧缺键语义一致
     intake_json: "raw" in item ? item.raw : dump(omitUndefined(item.intake)),
   })),
-  candidate_batches: candidateBatches.map((item) => ({
+  candidate_batches: [...candidateBatches, ...reverseAssertCases].map((item) => ({
     id: item.id,
     request_json: requestJson,
     candidates_json: dump(item.candidates),
   })),
+  // 请求侧用例自带 request_json（这是修掉结构性盲区的关键）
+  request_cases: [...requestRangeCases, ...requestFormatCases],
   broken_batches: [
     { id: "截断 JSON", request_json: requestJson, candidates_json: '{"candidates":[{"id":"c1","name":"示例",' },
     { id: "非字符串输入", request_json: requestJson, candidates_json: null },
@@ -200,5 +272,6 @@ const outFile = join(outDir, "fixtures.json");
 writeFileSync(outFile, dump(fixtures), "utf8");
 process.stdout.write(
   `已写出 ${outFile}\n  intake 用例 ${fixtures.intake_cases.length} 条\n` +
-    `  候选批次 ${fixtures.candidate_batches.length} 批 + 损坏样例 ${fixtures.broken_batches.length} 条\n`,
+    `  候选批次 ${fixtures.candidate_batches.length} 批 + 请求侧越界/格式 ${fixtures.request_cases.length} 条 + ` +
+    `损坏样例 ${fixtures.broken_batches.length} 条\n`,
 );

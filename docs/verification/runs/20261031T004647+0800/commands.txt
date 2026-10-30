@@ -1,0 +1,18 @@
+# 本次实际执行的完整命令（结果表里因排版被截断，这里给全文）
+[PASS] unit: D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests
+[PASS] stage_c: D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/stage_c
+[PASS] contract: D:/msys64/mingw64/bin/python.exe -X utf8 docs/test-reports/contract-001/tools/run_all.py
+[PASS] probe46: D:/msys64/mingw64/bin/python.exe -X utf8 tests/acceptance/stage_c/run_verify_local_nopipe.py
+[PASS] parity: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/gen-parity-fixtures.mjs  &&  D:/msys64/mingw64/bin/python.exe -X utf8 web/tools/parity-reference.py  &&  C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/parity-check.mjs
+[PASS] http_smoke: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/smoke-http.mjs   [env: GW_BASE=http://127.0.0.1:8787]
+[PASS] page_probe: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tools/page-probe.mjs   [env: GW_CDP=http://127.0.0.1:9333 GW_URL=http://127.0.0.1:8787/]
+[PASS] access_layer: C:\Users\lenovo\scoop\apps\nodejs-lts\current/node.EXE web/tests/access-layer.test.mjs
+[PASS] boundary: D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/boundary
+[FAIL] js_range_parity: D:/msys64/mingw64/bin/python.exe -X utf8 tests/acceptance/boundary/run_js_parity_probe.py
+[FAIL] stage_b: D:/msys64/mingw64/bin/python.exe -X utf8 -m unittest discover -s tests/acceptance/stage_b
+[PASS] range_contract: (内置纯函数探针：validator.rules.validate)
+[PASS] i2_local: GIFTWISE_PORT=8799 GIFTWISE_READ_TIMEOUT=3 python -m deploy.server + 原始 socket
+[PASS] docker_build: C:/Program Files/Docker/Docker/resources/bin/docker.exe build -f deploy/Dockerfile -t giftwise-validator:verify-guide .
+[PASS] container_check: docker run -d -p 127.0.0.1:<free>:8000 giftwise-validator:verify-guide + /healthz + /validate + id -u + find /app + grep 密钥
+[PASS] i2_image: 同 container_check 起容器 + 原始 socket（Content-Length: 100 只发 5 字节）
+[FAIL] image_latest_stale: docker run -d giftwise-validator:latest -p 127.0.0.1:<free>:8000 + /healthz 哈希 + 半开正文探针

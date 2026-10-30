@@ -1,0 +1,59 @@
+输出目录：C:/Users/lenovo/Desktop/giftwise/deploy/evidence/raw/slowbody-20261031-011814
+仓库根：C:/Users/lenovo/Desktop/giftwise
+修复前对照源码：C:/Users/lenovo/Desktop/giftwise/deploy/evidence/raw/slowbody-prefix/server.py.before
+修复前对照 Dockerfile：C:/Users/lenovo/Desktop/giftwise/deploy/evidence/raw/slowbody-prefix/Dockerfile.before
+[PASS] 前置：deploy/server.py 已带读超时且默认 10s :: READ_TIMEOUT_SECONDS=10.0
+[PASS] 前置：工作负载载荷经纯函数校验为 passed :: {'status': 'passed'}
+
+===== 阶段 A：修复后默认入口（默认 10s 超时） =====
+[PASS] A0 服务就绪（<25s） :: 127.0.0.1:8801
+[PASS] A1 声明 Content-Length:100 只发 5 字节 → 408 REQUEST_TIMEOUT :: {'状态行': 'HTTP/1.0 408 Request Timeout', 'body': '{"error":"REQUEST_TIMEOUT"}'}
+[PASS] A2 在上限内返回（10s 量级，绝不再挂 45s） :: 耗时=10.00s（观察窗口=18s）
+[PASS] A3 服务端随后关闭了连接 :: {'closed': True, 'reset': False}
+[PASS] A4 9 条并发半开连接全部得到 408 :: {'条数': 9, '状态码集合': [408]}
+[PASS] A5 9 条全部被关闭、且都在上限内结束 :: {'全部关闭': True, '最大耗时': 10.01}
+[PASS] A6 半开连接进行中 /healthz 仍 200 且响应体与基线一致 :: {'状态': 200, '与基线一致': True}
+[PASS] A7 线程数回落（9 条结束后回到基线） :: {'基线': 4, '半开进行中': 13, '全部结束后': 4}
+  Threads 采样：前=4 中=13 后=4
+[PASS] A8 正常请求与既有错误路径全部保持原状态码（未回退） :: {'实际': {'GET /healthz': 200, 'GET /': 200, 'GET /nope': 404, 'POST /validate 正常载荷': 200, 'POST /validate 字段非字符串': 400, 'POST /validate 非法 JSON': 400, 'POST /validate 超长正文': 413, 'PUT /validate 未实现方法': 501, 'POST /nope': 404, 'POST /validate 无 Content-Length': 413}, '期望': {'GET /healthz': 200, 'GET /': 200, 'GET /nope': 404, 'POST /validate 正常载荷': 200, 'POST /validate 字段非字符串': 400, 'POST /validate 非法 JSON': 400, 'POST /validate 超长正文': 413, 'PUT /validate 未实现方法': 501, 'POST /nope': 404, 'POST /validate 无 Content-Length': 413}}
+[PASS] A9 正常请求仍为业务通过（200 + status=passed + all_passed=true） :: {'status': 'passed', 'all_passed': True}
+
+===== 阶段 B：GIFTWISE_READ_TIMEOUT=3s 的辅助场景 =====
+[PASS] B0 短超时实例就绪（环境变量可覆盖） :: 127.0.0.1:8802
+[PASS] B1 短读（发 20 字节后关闭写方向）→ 400 且立即返回 :: {'状态行': 'HTTP/1.0 400 Bad Request', '耗时': 0, 'body': '{"error":"INVALID_PAYLOAD","message":"request_json å\x92\x8c candi'}
+[PASS] B2 连上不发任何数据 → 有界关闭（无响应，不再永久占线程） :: {'关闭': True, '耗时': 3.0, '响应': None}
+[PASS] B3 只发半个请求行 → 有界关闭 :: {'关闭': True, '耗时': 3.02}
+[PASS] B4 滴流（每 1s 发 1 字节、声明 100 字节）被总预算截断 → 408 :: {'状态行': 'HTTP/1.0 408 Request Timeout', '耗时': 3.0, '预算': 3.0}
+
+===== 阶段 C：修复前对照（git HEAD 的 server.py 字节副本，观察窗口 14s） =====
+[PASS] C0 修复前实例就绪 :: 127.0.0.1:8803（源码=C:/Users/lenovo/AppData/Local/Temp/dsh-i2-9f9de200/prefix-tree）
+[PASS] C1 缺陷复现：14s 内 9 条半开连接【零响应】 :: {'零响应条数': 9, '总条数': 9}
+[PASS] C2 缺陷复现：14s 后连接仍【未被关闭】 :: {'仍打开条数': 9}
+[PASS] C3 缺陷复现：半开连接进行中线程 +9，且 12s 后仍不回收（服务端自身无超时） :: {'基线': 4, '连接后 2s': 13, '连接后 12s': 13}
+[PASS] C4 缺陷复现：只有【客户端主动关闭】后才释放（证明服务端没有自我超时） :: {'基线': 4, '客户端关闭后': 4}
+  Threads 采样（修复前）：前=4 2s=13 12s=13 客户端关闭后=4
+[PASS] A10/C4 端点矩阵逐字节回归：修复后与修复前完全一致（10 个用例） :: {'差异条数': 0, '差异': []}
+
+===== 阶段 E：可观测入口（deploy.observable_server） =====
+[PASS] E0 可观测入口就绪 :: 127.0.0.1:8804
+[PASS] E1 可观测入口同样返回 408 并关闭（同一缺陷已一并修复） :: {'状态行': 'HTTP/1.0 408 Request Timeout', '关闭': True, '耗时': 10.01}
+[PASS] E2 可观测入口 /healthz 仍 200 :: {'状态': 200}
+[PASS] E3 JSONL 记到了 408 + REQUEST_TIMEOUT（超时可被观测） :: {'日志行数': 2, '408+REQUEST_TIMEOUT 行数': 1, '样例': {'route': '/validate', 'http_status': 408, 'error_codes': ['REQUEST_TIMEOUT'], 'duration_ms': 10008.657}}
+[PASS] E4 /metrics 里 POST /validate 408 计数 >= 1 :: {'状态': 200, '408 计数': {'POST /validate 408': 1}}
+
+===== 阶段 F：容器内 —— PID 1 的 /proc/1/status Threads 前后 =====
+[PASS] F0 找到 docker 客户端 :: Docker version 29.9.2, build a82e528
+[PASS] F1 修复后镜像构建成功（默认 CMD = deploy.server；可观测入口随镜像交付但非默认入口） :: {'exit': 0, '末行': '#10 DONE 3.4s'}
+[PASS] F2 修复后容器已启动 :: {'exit': 0, 'id 长度': 64}
+[PASS] F3 容器 /healthz 真正返回 200（端口代理先接受 TCP，不能只看端口通） :: {'status': 200, 'body': '{"status":"ok","service":"giftwise-validator","rules_source_'}
+[PASS] F4 容器内 9 条半开连接全部 408 且全部关闭 :: {'状态码集合': [408], '全部关闭': True}
+[PASS] F5 半开连接进行中 /healthz 仍 200（健康检查依旧正常） :: {'状态': 200, 'Threads 中': 10}
+[PASS] F6 修复后容器：Threads 中 ≈ 前+9，且 9 条结束后回落到基线（QA 的 +9 不回收已消除） :: {'前': 1, '中': 10, '后': 1}
+[PASS] F7 容器内端点矩阵与修复前一致（正常请求 + 既有 5 条错误路径未回退） :: {'差异': []}
+[PASS] F8 修复后容器可正常停止 :: gw-slowbody-fixed
+[PASS] F9 修复前镜像构建成功（上下文与 Dockerfile 都用修复前字节副本） :: {'exit': 0, '末行': '#10 DONE 0.2s'}
+[PASS] F9b 修复前对照 Dockerfile 的 CMD 是 deploy.server（不是可观测入口） :: {'CMD': 'CMD ["python", "-m", "deploy.server"]'}
+[PASS] F10 修复前容器已启动 :: {'exit': 0, 'id 长度': 64}
+[PASS] F11 修复前容器 /healthz 200（健康检查在缺陷存在时也照常通过） :: {'status': 200, 'body': '{"status":"ok","service":"giftwise-validator","rules_source_'}
+[PASS] F12 缺陷复现（容器）：14s 内 9 条零响应且连接未关闭 :: {'零响应条数': 9, '仍打开条数': 9}
+[PASS] F13 缺陷复现（容器 PID 1）：Threads +9 且 12s 内不回收；同时 /healthz 仍 200（被掩盖） :: {'前': 1, '中 2s': 10, '中 12s': 10, '客户端关闭后': 1, '/healthz': 200}

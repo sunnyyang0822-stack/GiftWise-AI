@@ -1,0 +1,17 @@
+# 证据：容器 /healthz 的 rules_source_sha256 与 sha256sum validator/rules.py 并排比对
+# 执行时间：2026-10-31 02:07:40 (UTC%z)
+# 执行目录：/c/Users/lenovo/Desktop/giftwise
+# 镜像：giftwise-validator:submission-20261101（= latest = d9a4a35763ee）
+
+$ sha256sum validator/rules.py
+1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500 *validator/rules.py
+
+$ docker run -d --rm --name gw-pack-val -p 127.0.0.1:8010:8000 giftwise-validator:submission-20261101
+（容器内 CMD: python -m deploy.server，以非 root 用户 giftwise 运行；容器只绑定本机回环，未推任何镜像仓库）
+
+$ curl -s http://127.0.0.1:8010/healthz
+{"status":"ok","service":"giftwise-validator","rules_source_sha256":"1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500"}
+$ docker exec gw-pack-val id
+uid=10001(giftwise) gid=10001(giftwise) groups=10001(giftwise)
+
+# 结论：两侧 rules_source_sha256 一致 = 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500

@@ -13,6 +13,9 @@
 | [`diagrams/failure-recovery.mmd`](diagrams/failure-recovery.mmd) | 异常处理与状态恢复流程 | 异常处理说明 |
 | [`diagrams/observability-flow.mmd`](diagrams/observability-flow.mmd) | 可观测性数据流与落点分级 | 可观测性证据 |
 | [`rendered/`](rendered/) | 三张图的**渲染产物（SVG）**，可直接放入 PPT | 架构图 |
+| [`diagram-src/`](diagram-src/) | 赛道 B 提交图的**可编辑源**（版式与全部文字 HTML + 无头 Chrome 渲染与尺寸校验脚本） | 架构图（赛道 B 必交） |
+| [`probes/`](probes/) | 架构线独立探针：交付镜像 `/validate` 与本机规则的**一致性复核** | 架构图 · 工程完成度 |
+| [`evidence/`](evidence/) | 架构线复跑的**原始输出**归档（可观测性三项、镜像一致性） | 可观测性证据 |
 | [`adr/`](adr/) | 4 份架构决策记录（取舍与被否决方案） | 技术选型及设计理由 |
 
 ## 架构决策记录（ADR）
@@ -41,6 +44,29 @@ mmdc -i diagrams/system-architecture.mmd -o rendered/system-architecture.svg
 
 **同步约定**：`.mmd` 文件是单一事实源；`../architecture.md` 与 `observability.md` 中内嵌的 Mermaid 块**必须与对应 `.mmd` 逐行一致**（忽略 `%%` 注释行）。修改图时改 `.mmd` → 重新渲染 → 同步内嵌块。
 
+### 赛道 B 提交图的可编辑源（2026-10-31 起）
+
+`rendered/system-architecture-competition.png`（**1680×1170**）是**赛道 B 的提交用架构图**。
+它原先只有一张 PNG、**仓库里没有可编辑源**，且带着已被推翻的文字与过时数字（详见 §修订记录）；
+现已在 `diagram-src/` 建立**唯一事实源**：
+
+| 文件 | 作用 |
+| --- | --- |
+| `diagram-src/system-architecture-competition.html` | 版式与全部文字。**零外部依赖**：无 CDN、无 web font、无图片、无 JS，可离线渲染 |
+| `diagram-src/render_competition_diagram.py` | 无头 Chrome 截图 → **尺寸校验**（必须正好 1680×1170，不符则删除产物并返回码 2）→ 打印路径/尺寸/字节/SHA256 |
+
+```bash
+# 一条命令：渲染 + 校验（在仓库根目录执行）
+python docs/architecture/diagram-src/render_competition_diagram.py
+```
+
+- Chrome 路径由脚本里的 `CHROME_CANDIDATES` 依次探测（本机命中 `C:\Program Files\Google\Chrome\Application\chrome.exe`）。
+- 脚本**只用 Python 标准库**（自己解析 PNG 的 IHDR 核对尺寸），换机器不需要装 Pillow。
+- Chrome 使用系统临时目录作为 `user-data-dir`（结束即删），**不在仓库里留任何中间文件**。
+- **改图请改 HTML**，不要直接编辑 PNG。颜色语义见 HTML 头部注释：
+  蓝/绿实线＝已实现且已核实；**黄实线＝已实现且已实测，但未进默认镜像／未上云**；灰虚线＝目标设计未实现；橙虚线＝如实登记的缺口。
+- 该 PNG **在 `docs/competition/` 中的替换（含 PPTX 内嵌图）由发布线执行**；本目录不修改 `docs/competition/**`。
+
 ## 证据等级约定（全文统一）
 
 | 等级 | 含义 |
@@ -62,6 +88,8 @@ mmdc -i diagrams/system-architecture.mmd -o rendered/system-architecture.svg
 | 文件 | 内容 |
 | --- | --- |
 | [`../../workflow/evidence/WF-002-2026-10-30.md`](../../workflow/evidence/WF-002-2026-10-30.md) | Dify Cloud Code 节点沙箱探针（真实执行、0 Tokens） |
-| [`../../workflow/evidence/WF-003-2026-10-30.md`](../../workflow/evidence/WF-003-2026-10-30.md) | N1–N7 接线、五类用例真实运行、DeepSeek 可用性核查 |
+| [`../../workflow/evidence/WF-003-2026-10-30.md`](../../workflow/evidence/WF-003-2026-10-30.md) | N1–N7 接线、注入轮五类用例、**真实 DeepSeek 6 次运行 / 主批次 10 次调用 / 34,127 tokens**（累计 13 次 / 38,326） |
+| [`../../deploy/evidence/docker-2026-10-30.md`](../../deploy/evidence/docker-2026-10-30.md) | 容器化 D-0…D-10 实测（**14 项**；部署线自纠，原文记 9/9）；口径缺口见 ARCH-001 §9 A-11 |
+| [`../../deploy/evidence/observability-2026-10-30.md`](../../deploy/evidence/observability-2026-10-30.md) | 可观测性三项断言出处（本机 39/39、容器内 24/24、脚本静态 17/17）；架构线 2026-10-31 独立复跑全通过，见 [`evidence/observability-counts-2026-10-31.md`](evidence/observability-counts-2026-10-31.md) |
 | [`../test-reports/stage-c/acceptance-2026-10-30.md`](../test-reports/stage-c/acceptance-2026-10-30.md) | 测试验收 Agent 独立复核（含缺陷清单与三段清单） |
 | [`../requirements-analysis.md`](../requirements-analysis.md) | 阶段 1 冻结件（SC-1…SC-9、OPEN-1…OPEN-9） |

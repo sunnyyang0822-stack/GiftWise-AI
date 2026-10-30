@@ -1,8 +1,8 @@
 /**
  * 模拟数据生成（必须显著标注为模拟，不得让演示者或评委误以为已联通 Dify）。
  *
- * 为什么是模拟：Dify 侧尚未发布可用的礼赠工作流（草稿只有「用户输入 → 代码执行」，
- * 无模型、无结束节点），接入层无法调用真实推荐接口。这里用确定性「模拟模型」产生
+ * 为什么是模拟：接入层未配置真实模型凭证（DIFY_API_KEY），从未成功调用过一次，
+ * 因而无法调用真实推荐接口。这里用确定性「模拟模型」产生
  * 三个候选与呈现内容：它只看 confirmed 事实、风格与关系，**不做预算/禁忌过滤**，
  * 由独立的规则校验负责拦截不合格候选——这与真实链路的职责划分一致。
  *
@@ -407,5 +407,59 @@ export function buildMockPartialFailure(request) {
     candidates_json: dump({ candidates }),
     notice: "模拟模型输出了一条引用不存在事实的候选；自动修订无法修复它，用于验证「部分通过、失败项不可选」。",
     mock: true,
+  };
+}
+
+/* ----------------------------------------------------- 最坏情况文案（破版自查用） */
+
+/**
+ * 压力文案：真实模型输出可能很长、夹 emoji、含不可断行的连续字符（长 URL、长英文词）。
+ * 这类内容不该撑破卡片或产生横向滚动。仅用于 `?demo=stress` 的前端自查，
+ * 不参与正常演示路径，也不会被当成真实模型输出。
+ */
+const UNBREAKABLE = "https://example.com/%E8%B6%85%E9%95%BF%E9%93%BE%E6%8E%A5Supercalifragilisticexpialidocious";
+const LONG_ZH =
+  "这一段是故意写得极长的说明，用来验证窄屏下中文长句能否正常换行、不撑破卡片边界、不与右侧动作条重叠。" +
+  "它还包含标点密集片段：「一号、二号（三号）／四号——五号；六号、七号」，以及全角空格　和半角空格混合排版。";
+const LONG_EMOJI = "🎁 表情符号夹在中文里不应打断换行 🎀✨🧦☕️🌱 也来一串家族 emoji 👨‍👩‍👧‍ 和地区旗 🇨🇳🇯🇵🇫🇷 与变体 ❤️︎➡️⬆️";
+
+export function buildMockStressCandidates(request) {
+  const built = buildMockCandidates(request);
+  const candidates = JSON.parse(JSON.stringify(built.candidates));
+  candidates.forEach((candidate, index) => {
+    candidate.name = `第 ${index + 1} 个思路的名字也被刻意拉长：${UNBREAKABLE} ${LONG_EMOJI}`;
+    candidate.description = `${LONG_ZH}${LONG_EMOJI}`;
+    candidate.reason = `${candidate.reason} ${LONG_ZH}`;
+    candidate.inferences = [`${candidate.inferences[0]} ${LONG_ZH}`, `不可断行长串：${UNBREAKABLE}${UNBREAKABLE}`];
+    candidate.unknowns = [`${candidate.unknowns[0]}（后续追加极长说明以检查列表项换行）${LONG_ZH}`, `emoji 计数：${"🎁".repeat(40)}`];
+  });
+  return {
+    candidates,
+    candidates_json: dump({ candidates }),
+    notice: "压力演示：候选文案被刻意拉长并夹入 emoji 与不可断行长串，仅用于前端破版自查，不是真实模型输出。",
+    mock: true,
+  };
+}
+
+/** 呈现阶段的压力文案：同一份呈现结构，字段全部换成极端长度。 */
+export function stressifyPresentation(presentation) {
+  const long = (text) => `${text} ${LONG_ZH}${LONG_EMOJI}`;
+  return {
+    ...presentation,
+    packaging: {
+      ...presentation.packaging,
+      materials: presentation.packaging.materials.map((m) => `${m}（${UNBREAKABLE}）`),
+      steps: presentation.packaging.steps.map(long),
+      color_palette: [...presentation.packaging.color_palette, "极长配色名：暖白偏米色调第 13 号色卡", `🎨️🪵${LONG_EMOJI}`],
+    },
+    card_text: long(presentation.card_text),
+    decorative_advice: presentation.decorative_advice.map(long),
+    giving_advice: {
+      ...presentation.giving_advice,
+      timing: long(presentation.giving_advice.timing),
+      wording: long(presentation.giving_advice.wording),
+      relationship_cautions: [...presentation.giving_advice.relationship_cautions, long("追加一条超长关系提示")],
+    },
+    unknowns: [...presentation.unknowns, `不可断行长串：${UNBREAKABLE}${UNBREAKABLE}${UNBREAKABLE}`],
   };
 }

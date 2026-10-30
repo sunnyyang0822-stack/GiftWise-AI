@@ -1,0 +1,197 @@
+# ⚠️⚠️⚠️  本目录仅为架构示意，从未在任何 K8S 集群上执行过，YAML 未经行为验证  ⚠️⚠️⚠️
+#
+# 未执行声明（请先读完再往下看）：
+#   1. 本目录下的 YAML **从未**被 `kubectl apply` / `kubectl create` 执行过；
+#   2. 本机**没有**任何 K8S 集群（没有 kubeconfig、没有控制面、没有节点）；
+#   3. 这些 YAML **没有**经过 K8S API server 的 schema 校验，
+#      只做过**纯 YAML 语法解析**（见 compose/k8s/README.md 的「验证到什么程度」一节）；
+#   4. 因此：副本数、探针阈值、资源 requests/limits、HPA 阈值**全部是设计值，不是实测值**。
+#      任何把它们当作"已验证配置"引用的行为都是错误的。
+#   5. 交付物仍然是单容器 `deploy/Dockerfile`（`CMD ["python","-m","deploy.server"]`）。
+#      上 K8S 在当前阶段属于**过度设计**，理由见 compose/k8s/README.md。
+#
+# 与本仓库实测数据的关系（哪些数字有出处，哪些没有）：
+#   - `readinessProbe` 用 `/healthz`：这是**真实存在**的端点（deploy/server.py:105）。
+#     但注意：本仓库实测证明 /healthz 在半开正文挂满 10s 期间**全程 200**
+#     （compose/evidence/halfopen-main.json，27/27 全绿），
+#     所以它**不能**证明服务能在预算内处理正文。见 docs/cloud-native/01-现状与差距.md。
+#   - `terminationGracePeriodSeconds` 与优雅停机：**当前默认入口不支持优雅停机**
+#     （deploy/server.py 无 SIGTERM 处理，且 ThreadingHTTPServer.daemon_threads=True）。
+#     补丁见 compose/patches/graceful-shutdown.patch（**只生成，未应用**）。
+#     在补丁合入之前，这个字段调多大都不能避免在途请求被丢弃。
+#   - `resources` 与 HPA 的 CPU 阈值：**没有实测依据**。本仓库只实测了单请求服务端 CPU
+#     约 1794 us、其中 validate() 仅占 9.5%（compose/evidence/incontainer-perrequest-cpu.txt）。
+#     但那是 Docker Desktop/WSL2 单机环境，且 90% 是 HTTP 框架开销，
+#     不能直接换算成云端 K8S 的 requests/limits 或 HPA 目标利用率。
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: giftwise-validator-config
+  labels:
+    app.kubernetes.io/name: giftwise-validator
+    app.kubernetes.io/component: validator
+data:
+  # 与 deploy/server.py 实际读取的环境变量保持一致（GIFTWISE_BIND/GIFTWISE_PORT/
+  # GIFTWISE_READ_TIMEOUT，见 deploy/server.py:40,151,152）。
+  GIFTWISE_BIND: "0.0.0.0"
+  GIFTWISE_PORT: "8000"
+  GIFTWISE_READ_TIMEOUT: "10"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: giftwise-validator
+  labels:
+    app.kubernetes.io/name: giftwise-validator
+    app.kubernetes.io/component: validator
+spec:
+  # 设计值，非实测值。单容器版本没有多副本需求（见 README.md「什么条件下才值得上」）。
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: giftwise-validator
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # maxUnavailable: 0 是**前提性**要求，但它只有在进程支持优雅停机时才有意义。
+      # 当前默认入口不支持（无 SIGTERM 处理），滚更时在途请求仍会丢。
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: giftwise-validator
+        app.kubernetes.io/component: validator
+    spec:
+      # 只有在该 Deployment 的 Pod 确实支持 SIGTERM 优雅停机后，这个值才有意义。
+      # 与 compose/patches/graceful-shutdown.patch 里的 SHUTDOWN_GRACE_SECONDS 配套：
+      # terminationGracePeriodSeconds 必须 **大于** 应用内的 grace，留出退出余量。
+      terminationGracePeriodSeconds: 30
+      # 镜像需要被替换成真实可拉取的镜像引用。
+      # 本仓库的镜像 `giftwise-validator:submission-20261101`（= d9a4a35763ee）
+      # **从未推送到任何镜像仓库**，因此在集群里无法以这个名字拉取——
+      # 这是本文件最需要修改的地方，也是"从未上云"的直接证据之一。
+      # 另外镜像内 USER 是 uid 10001（deploy/Dockerfile:18-20），
+      # 若挂载卷需注意文件属主。
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: validator
+          image: giftwise-validator:submission-20261101   # <-- 需替换为真实仓库地址
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: giftwise-validator-config
+          # ---------------------------------------------------------------
+          # 探针：startup / readiness / liveness 三件套
+          # ---------------------------------------------------------------
+          # startupProbe：进程冷启动到 /healthz 可用需要时间。
+          # 本仓库单机实测启动耗时 0.750~0.939 s（见 docs/cloud-native/01-现状与差距.md 的来源），
+          # 故 failureThreshold * periodSeconds = 30 * 2 = 60 s 是很宽松的上限；
+          # 这是**设计值**，未在集群里验证过。
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+            timeoutSeconds: 2
+          # readinessProbe：注意它只能反映"进程活着"（见文件头的说明）。
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+          # livenessProbe：同上。用 /healthz 做 liveness 的风险是：
+          # 若将来 /healthz 开始做依赖检查，会把"依赖慢"变成"重启风暴"。
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            # ⚠️ 全部是**设计值**，没有任何实测依据。
+            # 本仓库唯一的 CPU 实测（1794 us/请求，其中 validate 占 9.5%）
+            # 来自 Docker Desktop/WSL2 单机，不能外推到集群。
+            requests:
+              cpu: "100m"
+              memory: "32Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
+          securityContext:
+            readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: giftwise-validator
+  labels:
+    app.kubernetes.io/name: giftwise-validator
+    app.kubernetes.io/component: validator
+spec:
+  # ClusterIP：只在集群内可达。本服务不含任何鉴权
+  # （默认入口只暴露 /healthz 与 /validate，见 deploy/server.py:104-142），
+  # 不应通过 LoadBalancer/NodePort 直接暴露到公网。
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: giftwise-validator
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  # 注意：本文件**没有**配置 Ingress / Gateway。若要对集群外提供访问，
+  # 需要额外的入口资源与 TLS 终止，那属于另一份设计，不在本示意范围内。
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: giftwise-validator
+  labels:
+    app.kubernetes.io/name: giftwise-validator
+    app.kubernetes.io/component: validator
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: giftwise-validator
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          # ⚠️ 设计值。而且这里有一个**已知的方法论问题**：
+          # 本仓库实测显示该服务约 90% 的 CPU 花在 HTTP 框架开销上
+          # （compose/evidence/incontainer-perrequest-cpu.txt），
+          # 也就是说"CPU 利用率"这个信号基本在度量框架开销，而不是业务负载。
+          # 用它做扩容阈值，会把"框架开销随连接数增长"误判成"业务需要更多副本"。
+          # 要真正用 HPA，应改用业务指标（如每秒校验数、在途请求数），
+          # 但那需要先有可信的指标采集链路（当前 /metrics 未鉴权且非默认入口）。
+          averageUtilization: 70
+  behavior:
+    scaleDown:
+      # 缩容过快的风险：当前入口不支持优雅停机，缩容会直接丢在途请求。
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      stabilizationWindowSeconds: 30

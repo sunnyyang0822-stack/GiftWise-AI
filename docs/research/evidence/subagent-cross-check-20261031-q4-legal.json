@@ -1,0 +1,89 @@
+{
+ "schema_version": 1,
+ "channel": "subagent-cross-check",
+ "collector": "GiftWise research agent (Issue #26 / RESEARCH-001)",
+ "captured_at": "2026-10-30T17:00:00Z",
+ "batch": "q4-legal-cross-check",
+ "batch_title": "Q4 合规边界：独立子代理交叉核验记录（补充证据，非一手）",
+ "status": "supplementary",
+ "why_supplementary": "子代理只读调研、未落盘原始 HTTP 响应体。本文件记录它的取证范围与自报缺口；所有决定性原句已由主代理用 fetch.py 重新一手抓取，落在 web-native-*-q4-*.json 与 web-native-*-q4-legal-official.json 中。以那些文件为准。",
+ "mandate": "查《反不正当竞争法》(2025修订)、《网络反不正当竞争暂行规定》、《刑法》285(2)/286、《数据安全法》《个人信息保护法》原文；查 3-5 个抓取电商/平台数据的真实司法执法案例；实测 9 个平台 robots.txt；取淘宝/京东协议禁止抓取原句。要求每条附 URL + 逐字原句，不确定标未核实。",
+ "sources_returned": [
+  "http://paper.people.com.cn/rmrb/pad/content/202510/10/content_30108522.html",
+  "https://www.gov.cn/zhengce/202406/content_6959668.htm",
+  "https://jy.dysjcy.gov.cn/news/show-7.html",
+  "http://www.jinzhongpeace.gov.cn/zcfg/zcfg/xingf/197413_44.shtml",
+  "https://www.jining.gov.cn/art/2015/8/16/art_325_36.html",
+  "https://gzca.miit.gov.cn/zwgk/hlwgl/zcfg/art/2022/art_092ca2718a224802afef999b1c42cdee.html",
+  "https://login.12309.gov.cn:8443/spp/fl/202108/t20210820_527244.shtml",
+  "https://bjzcfy.bjcourt.gov.cn/article/detail/2026/04/id/9289097.shtml",
+  "https://www.rmfyb.com/content/202604/23/article_1021760_1391775188_6582542.html",
+  "https://www.xhby.net/content/s68bea673e4b0096798380c6b.html",
+  "https://tldl.lncourt.gov.cn/article/detail/2025/09/id/8964091.shtml",
+  "http://www.pazjw.gov.cn/shuoan/202606/t20260619_31736178.shtml",
+  "https://terms.alicdn.com/legal-agreement/terms/suit_bu1_taobao/suit_bu1_taobao201908081411_65986.html",
+  "https://in.m.jd.com/help/app/register_info.html",
+  "https://vop.jd.com/reg/agreement"
+ ],
+ "additional_cases_found": [
+  {
+   "name": "搬家软件「盗图抄店」不正当竞争纠纷案",
+   "court": "江苏省高级人民法院（2024）苏民终212号（二审）；江苏省镇江市中级人民法院（2023）苏11民初29号（一审）",
+   "damages": "500 万元",
+   "why_it_matters": "明确把「绕开验证机制和反爬措施」写成被诉行为特征——这是把技术对抗手段作为不正当性/加重情节认定的一手表述。",
+   "quote": "该软件能够绕开淘某公司、天某公司的验证机制和反爬措施，抓取海量商品数据并“搬运”至其他电商平台开设“无货源店铺”。",
+   "source": "https://www.xhby.net/content/s68bea673e4b0096798380c6b.html"
+  },
+  {
+   "name": "最高人民法院指导性案例262号（抓取搬运平台数据）",
+   "court": "北京市海淀区人民法院（2019）京0108民初35902号；北京知识产权法院（2021）京73民终1011号",
+   "damages": "500 万元",
+   "quote": "对于未经许可获取并向公众提供相关数据，实质性替代网络平台产品或者服务，扰乱市场竞争秩序、损害网络平台经营者或者其他权利人合法权益的行为，人民法院可以适用《中华人民共和国反不正当竞争法》有关规定，认定构成不正当竞争行为。",
+   "source": "https://tldl.lncourt.gov.cn/article/detail/2025/09/id/8964091.shtml"
+  },
+  {
+   "name": "爬取网络平台数据不正当竞争案",
+   "court": "浙江省宁波市中级人民法院（2024）浙02民初562号",
+   "why_it_matters": "最高法 2025 年知产典型案例之一；但子代理只拿到法院新闻稿与专家点评，判决书「本院认为」逐字未核实。",
+   "source": "https://www.rmfyb.com/content/202604/23/article_1021760_1391775188_6582542.html"
+  }
+ ],
+ "platform_terms_quotes": [
+  {
+   "platform": "淘宝",
+   "document": "《淘宝平台服务协议》（页面标注版本生效日期 2019-08-19）",
+   "url": "https://terms.alicdn.com/legal-agreement/terms/suit_bu1_taobao/suit_bu1_taobao201908081411_65986.html",
+   "quote": "存在可能破坏、篡改、删除、影响淘宝平台任何系统正常运行或未经授权秘密获取淘宝平台及其他用户的数据、个人资料的病毒、木马、爬虫等恶意软件、程序代码的；"
+  },
+  {
+   "platform": "淘宝",
+   "document": "《淘宝网法律声明》（同页）",
+   "quote": "为维护淘宝网的正常运行秩序及效率，未经阿里巴巴集团及/或其关联公司许可，任何人不得自行、授权或协助第三方对淘宝网及其系统进行地址扫描、网络端口扫描、操作系统探测等扫描及/或探测，或以包括通过机器人、蜘蛛等程序或设备监视、复制、传播、展示、镜像、上载、下载等方式擅自获取、使用淘宝网内的任何内容。"
+  },
+  {
+   "platform": "京东",
+   "document": "《京东用户服务协议》",
+   "url": "https://in.m.jd.com/help/app/register_info.html",
+   "quote": "除法律另有强制性规定外，未经京东明确的特别书面同意 , 任何单位或个人不得以任何方式非法地全部或部分复制、转载、引用、链接、抓取或以其他方式使用本网站的信息内容，否则，京东有权追究其法律责任。"
+  },
+  {
+   "platform": "京东",
+   "document": "《【京东VOP开放平台】服务协议》",
+   "url": "https://vop.jd.com/reg/agreement",
+   "quote": "6.2 除非法律允许或京东书面许可， 您不得从事下列行为：…（ 6 ）您不得通过任何方式或工具（如网络搜索 / 检索程序、抓取工具等），对本服务的任何内容进行检索或索引，或在未获得用户等权利人授权的情况下收集用户相关信息。"
+  }
+ ],
+ "unverified_list_reported_by_subagent": [
+  "刑法现行官方文本：flk.npc.gov.cn 为 JS 单页应用，未取得正文；改用检察机关官网全文并与两处 gov 站点逐字比对一致。",
+  "检察日报《绕过验证码、虚设登录身份爬取数据…获刑》原文：三次尝试（www.jcrb.com 等）均失败，未取得；同案已由平安浙江网取得。",
+  "(2019)京0108民初35902号判决书「本院认为」完整原文：仅取得指导性案例发布稿；裁判文书网需登录，未访问。",
+  "宁波中院(2024)浙02民初562号判决书「本院认为」逐字：仅有法院新闻稿＋专家点评。",
+  "央视《绕开电商平台风控机制爬取知名电商平台数据 法院判赔500万》：页面 JS 渲染，raw_text 为空。",
+  "淘宝《关于不当获取使用信息实施细则》正文：JS 单页，raw_text 为空。",
+  "京东开放平台规则总则 PDF：本次未抓取，URL 可达性未验证。",
+  "「拥堵延时指数」案一审法院名称与案号：法院官方稿隐名，全文未载。",
+  "上海长宁爬虫案案号与一审法院全称：报道未载。",
+  "广和评述《数据爬取类不正当竞争行为的认定》：抓取失败。",
+  "京东 robots.txt 真实内容：HTTP 200 但重定向至首页 HTML，未取得任何规则文本。"
+ ]
+}

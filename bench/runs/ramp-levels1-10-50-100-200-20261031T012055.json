@@ -1,0 +1,237 @@
+{
+  "url": "http://127.0.0.1:18902",
+  "container": "__none__",
+  "levels": [
+    {
+      "url": "http://127.0.0.1:18902",
+      "concurrency": 1,
+      "requests_per_worker": 60,
+      "requests_total": 60,
+      "wall_seconds": 0.2208,
+      "throughput_rps": 271.76,
+      "status_counts": {
+        "200": 60
+      },
+      "ok_200": 60,
+      "http_408": 0,
+      "error_count": 0,
+      "error_samples": [],
+      "body_bytes": 3473,
+      "latency": {
+        "n": 60,
+        "min_ms": 1.479,
+        "mean_ms": 3.673,
+        "p50_ms": 2.747,
+        "p90_ms": 4.758,
+        "p95_ms": 7.194,
+        "p99_ms": 23.65,
+        "p999_ms": 23.65,
+        "max_ms": 23.65,
+        "tail": {
+          "over_50ms": 0,
+          "over_100ms": 0,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "mem_samples": 1,
+        "threads_peak": null,
+        "threads_raw_last": "<err FileNotFoundError>"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18902",
+      "concurrency": 10,
+      "requests_per_worker": 60,
+      "requests_total": 600,
+      "wall_seconds": 1.5673,
+      "throughput_rps": 382.83,
+      "status_counts": {
+        "200": 600
+      },
+      "ok_200": 600,
+      "http_408": 0,
+      "error_count": 0,
+      "error_samples": [],
+      "body_bytes": 3473,
+      "latency": {
+        "n": 600,
+        "min_ms": 1.688,
+        "mean_ms": 16.24,
+        "p50_ms": 8.591,
+        "p90_ms": 24.136,
+        "p95_ms": 31.973,
+        "p99_ms": 57.032,
+        "p999_ms": 523.764,
+        "max_ms": 523.764,
+        "tail": {
+          "over_50ms": 14,
+          "over_100ms": 5,
+          "over_500ms": 5,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.83
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "mem_samples": 3,
+        "threads_peak": null,
+        "threads_raw_last": "<err FileNotFoundError>"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18902",
+      "concurrency": 50,
+      "requests_per_worker": 60,
+      "requests_total": 3000,
+      "wall_seconds": 10.6741,
+      "throughput_rps": 281.06,
+      "status_counts": {
+        "200": 2959
+      },
+      "ok_200": 2959,
+      "http_408": 0,
+      "error_count": 41,
+      "error_samples": [
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。"
+      ],
+      "body_bytes": 3473,
+      "latency": {
+        "n": 3000,
+        "min_ms": 1.483,
+        "mean_ms": 127.87,
+        "p50_ms": 11.749,
+        "p90_ms": 511.046,
+        "p95_ms": 1028.801,
+        "p99_ms": 2038.0,
+        "p999_ms": 2159.759,
+        "max_ms": 2194.875,
+        "tail": {
+          "over_50ms": 486,
+          "over_100ms": 344,
+          "over_500ms": 315,
+          "over_1000ms": 165,
+          "over_100ms_pct": 11.47
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "mem_samples": 20,
+        "threads_peak": null,
+        "threads_raw_last": "<err FileNotFoundError>"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18902",
+      "concurrency": 100,
+      "requests_per_worker": 60,
+      "requests_total": 6000,
+      "wall_seconds": 14.6469,
+      "throughput_rps": 409.64,
+      "status_counts": {
+        "200": 5123
+      },
+      "ok_200": 5123,
+      "http_408": 0,
+      "error_count": 877,
+      "error_samples": [
+        "ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "OSError: [WinError 10048] 通常每个套接字地址(协议/网络地址/端口)只允许使用一次。",
+        "OSError: [WinError 10048] 通常每个套接字地址(协议/网络地址/端口)只允许使用一次。"
+      ],
+      "body_bytes": 3473,
+      "latency": {
+        "n": 6000,
+        "min_ms": 0.316,
+        "mean_ms": 176.81,
+        "p50_ms": 9.061,
+        "p90_ms": 526.14,
+        "p95_ms": 1537.022,
+        "p99_ms": 2064.421,
+        "p999_ms": 2146.872,
+        "max_ms": 2744.168,
+        "tail": {
+          "over_50ms": 904,
+          "over_100ms": 877,
+          "over_500ms": 862,
+          "over_1000ms": 459,
+          "over_100ms_pct": 14.62
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "mem_samples": 28,
+        "threads_peak": null,
+        "threads_raw_last": "<err FileNotFoundError>"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18902",
+      "concurrency": 200,
+      "requests_per_worker": 60,
+      "requests_total": 12000,
+      "wall_seconds": 7.664,
+      "throughput_rps": 1565.76,
+      "status_counts": {
+        "200": 862
+      },
+      "ok_200": 862,
+      "http_408": 0,
+      "error_count": 11138,
+      "error_samples": [
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。",
+        "OSError: [WinError 10048] 通常每个套接字地址(协议/网络地址/端口)只允许使用一次。",
+        "OSError: [WinError 10048] 通常每个套接字地址(协议/网络地址/端口)只允许使用一次。",
+        "OSError: [WinError 10048] 通常每个套接字地址(协议/网络地址/端口)只允许使用一次。"
+      ],
+      "body_bytes": 3473,
+      "latency": {
+        "n": 12000,
+        "min_ms": 0.659,
+        "mean_ms": 80.276,
+        "p50_ms": 12.944,
+        "p90_ms": 33.269,
+        "p95_ms": 93.482,
+        "p99_ms": 2049.909,
+        "p999_ms": 2120.534,
+        "max_ms": 2246.52,
+        "tail": {
+          "over_50ms": 724,
+          "over_100ms": 594,
+          "over_500ms": 572,
+          "over_1000ms": 390,
+          "over_100ms_pct": 4.95
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": null,
+        "mem_samples": 13,
+        "threads_peak": null,
+        "threads_raw_last": "<err FileNotFoundError>"
+      }
+    }
+  ],
+  "requests_per_worker": 60,
+  "baseline": {
+    "mem_bytes": null,
+    "threads_raw": "<err FileNotFoundError>"
+  },
+  "kind": "ramp",
+  "label": "levels1-10-50-100-200",
+  "recorded_at": "2026-10-31T01:20:54+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "url": "http://127.0.0.1:18901",
+  "container": "gwbench-oldq",
+  "levels": [
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 1,
+      "requests_per_worker": 60,
+      "requests_total": 60,
+      "wall_seconds": 0.6959,
+      "throughput_rps": 86.21,
+      "throughput_ok_rps": 86.21,
+      "status_counts": {
+        "200": 60
+      },
+      "ok_200": 60,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 219,
+      "client_time_wait_after": 219,
+      "latency": {
+        "n": 60,
+        "min_ms": 2.092,
+        "mean_ms": 11.594,
+        "p50_ms": 13.157,
+        "p90_ms": 26.153,
+        "p95_ms": 27.417,
+        "p99_ms": 28.501,
+        "p999_ms": 28.501,
+        "max_ms": 28.501,
+        "tail": {
+          "over_50ms": 0,
+          "over_100ms": 0,
+          "over_500ms": 0,
+          "over_1000ms": 0,
+          "over_100ms_pct": 0.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 24240128,
+        "mem_samples": 2,
+        "threads_peak": 2,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 10,
+      "requests_per_worker": 60,
+      "requests_total": 600,
+      "wall_seconds": 1.5868,
+      "throughput_rps": 378.12,
+      "throughput_ok_rps": 378.12,
+      "status_counts": {
+        "200": 600
+      },
+      "ok_200": 600,
+      "http_408": 0,
+      "error_count": 0,
+      "error_kinds": {},
+      "error_samples": [],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 214,
+      "client_time_wait_after": 214,
+      "latency": {
+        "n": 600,
+        "min_ms": 1.947,
+        "mean_ms": 15.743,
+        "p50_ms": 7.418,
+        "p90_ms": 25.482,
+        "p95_ms": 28.144,
+        "p99_ms": 30.987,
+        "p999_ms": 1019.499,
+        "max_ms": 1019.499,
+        "tail": {
+          "over_50ms": 3,
+          "over_100ms": 3,
+          "over_500ms": 3,
+          "over_1000ms": 3,
+          "over_100ms_pct": 0.5
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 25526272,
+        "mem_samples": 3,
+        "threads_peak": 8,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 50,
+      "requests_per_worker": 60,
+      "requests_total": 3000,
+      "wall_seconds": 6.9062,
+      "throughput_rps": 434.39,
+      "throughput_ok_rps": 430.63,
+      "status_counts": {
+        "200": 2974
+      },
+      "ok_200": 2974,
+      "http_408": 0,
+      "error_count": 26,
+      "error_kinds": {
+        "RemoteDisconnected": 26
+      },
+      "error_samples": [
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 214,
+      "client_time_wait_after": 230,
+      "latency": {
+        "n": 3000,
+        "min_ms": 2.025,
+        "mean_ms": 62.239,
+        "p50_ms": 11.338,
+        "p90_ms": 27.728,
+        "p95_ms": 32.551,
+        "p99_ms": 1246.193,
+        "p999_ms": 2255.917,
+        "max_ms": 2257.958,
+        "tail": {
+          "over_50ms": 120,
+          "over_100ms": 120,
+          "over_500ms": 119,
+          "over_1000ms": 119,
+          "over_100ms_pct": 4.0
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 26124288,
+        "mem_samples": 10,
+        "threads_peak": 8,
+        "threads_raw_last": "Threads:\t2"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 100,
+      "requests_per_worker": 60,
+      "requests_total": 6000,
+      "wall_seconds": 12.6528,
+      "throughput_rps": 474.2,
+      "throughput_ok_rps": 464.32,
+      "status_counts": {
+        "200": 5875
+      },
+      "ok_200": 5875,
+      "http_408": 0,
+      "error_count": 125,
+      "error_kinds": {
+        "RemoteDisconnected": 125
+      },
+      "error_samples": [
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 230,
+      "client_time_wait_after": 224,
+      "latency": {
+        "n": 6000,
+        "min_ms": 1.88,
+        "mean_ms": 124.561,
+        "p50_ms": 14.371,
+        "p90_ms": 33.138,
+        "p95_ms": 1031.117,
+        "p99_ms": 2276.265,
+        "p999_ms": 4319.195,
+        "max_ms": 4330.056,
+        "tail": {
+          "over_50ms": 431,
+          "over_100ms": 419,
+          "over_500ms": 418,
+          "over_1000ms": 418,
+          "over_100ms_pct": 6.98
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 26730496,
+        "mem_samples": 15,
+        "threads_peak": 9,
+        "threads_raw_last": "Threads:\t1"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:18901",
+      "concurrency": 200,
+      "requests_per_worker": 60,
+      "requests_total": 12000,
+      "wall_seconds": 19.6034,
+      "throughput_rps": 612.14,
+      "throughput_ok_rps": 587.71,
+      "status_counts": {
+        "200": 11521
+      },
+      "ok_200": 11521,
+      "http_408": 0,
+      "error_count": 479,
+      "error_kinds": {
+        "RemoteDisconnected": 479
+      },
+      "error_samples": [
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response",
+        "RemoteDisconnected: Remote end closed connection without response"
+      ],
+      "body_bytes": 3473,
+      "client_linger0": true,
+      "client_time_wait_before": 224,
+      "client_time_wait_after": 209,
+      "latency": {
+        "n": 12000,
+        "min_ms": 1.819,
+        "mean_ms": 211.922,
+        "p50_ms": 13.213,
+        "p90_ms": 1021.022,
+        "p95_ms": 1043.418,
+        "p99_ms": 3286.669,
+        "p999_ms": 7385.353,
+        "max_ms": 11506.699,
+        "tail": {
+          "over_50ms": 1454,
+          "over_100ms": 1419,
+          "over_500ms": 1414,
+          "over_1000ms": 1411,
+          "over_100ms_pct": 11.82
+        }
+      },
+      "resource": {
+        "mem_peak_bytes": 41316352,
+        "mem_samples": 29,
+        "threads_peak": 15,
+        "threads_raw_last": "Threads:\t2"
+      }
+    }
+  ],
+  "requests_per_worker": 60,
+  "client_linger0": true,
+  "baseline": {
+    "mem_bytes": 22302720,
+    "threads_raw": "Threads:\t1"
+  },
+  "kind": "ramp",
+  "label": "levels1-10-50-100-200",
+  "recorded_at": "2026-10-31T02:03:51+08:00",
+  "env": {
+    "python": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_logical": 24
+  }
+}

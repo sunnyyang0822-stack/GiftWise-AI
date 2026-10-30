@@ -1,5 +1,7 @@
 # 阶段 C 逐例证据（QA-001 独立复核）
 
+> 本报告数字为 2026-10-30 时点真值；后续变更见 `docs/acceptance-criteria.md` 第 13 节。
+
 - 运行时间：2026-10-30T20:53:23.730834+08:00 → 2026-10-30T20:53:23.861700+08:00（Asia/Shanghai）
 - 命令：`python tests/acceptance/stage_c/run_stage_c.py`
 - Git HEAD：`89d662483febbb90ab7fd579e05052b309700b91`（工作区有 35 项未提交改动，逐项见 JSON）

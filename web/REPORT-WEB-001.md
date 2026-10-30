@@ -107,6 +107,8 @@ $ node web/tests/access-layer.test.mjs
 
 ### 2.2 JS↔Python 语义比对（55 组样例，0 处语义差异）
 
+> **⚠️ 时点勘误（2026-10-31，由 PM 追加，正文数字不改写）**：本报告描述的是 **2026-10-30 的前端**（19 文件 / 5921 行；`landing.css` **4,104,653 B**，内含 base64 内联图）。其后发生的变化：**① 前端已集成第二前端线成果**——`landing.css` **24,981 B**、内联 `data:image` **0 处**、3 张图外置为 WebP（合计 348,480 B）、`web/public` 合计 **496 KB**；**② 首屏 desktop 4,190,755 B → 486,091 B（−88.4%）**，390/320 → **366,825 B**；**③ `browser-check` 由 100 项 / 4 失败 → 100 项 / 0 失败**；**④ 本节 parity 的「55 组」为当时口径，现行为 74 组**（新增请求侧越界与格式 17 组）；**⑤ 浏览器级走查工具已加"服务身份自检"**（连错工作区会以退出码 3 失败）。本报告正文按纪律**不改写**，引用时以本条为准。
+
 ```text
 $ node web/tools/gen-parity-fixtures.mjs
 已写出 .tmp/web-parity/fixtures.json
@@ -400,7 +402,24 @@ STATUS: ready   request.recipient_relation_id: "pursuit"
 - **沙箱限制导致两条既有验证命令跑不了**：`workflow/verify_local.py`、`node --test`（`spawn EPERM`）。
   我已绕开（测试改成直接执行、比对改成三段脚本），但这意味着**我没能亲自复现规则线的 46/322 结论**。
 - **模型与额度未授权（`OPEN-5`）**：真实推荐接口在本轮客观上不存在，只能用模拟数据开发，已显眼标注。
-- **无浏览器自动化工具**：前端渲染与窄屏可操作无法自证。
+  ⚠️ 但发布前提已在 23:04 由工作流线达成，且我发现**出参约定不一致**与**修订额度可能双重消耗**
+  两个流程风险，详见本节末「🔴 联调前的流程风险」与 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md) 第 6 节。
+- **~~无浏览器自动化工具~~（本节第 9 节已推翻）**：前端渲染与窄屏可操作**已在真实 Chromium 中自查**，
+  并因此发现一个既有致命 bug；详见第 9 节与 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md)。
+
+### 🔴 联调前的流程风险（23:05 后读到他人证据，未花任何调用额度）
+
+工作流线已于 2026-10-30 23:04:23 **发布** Dify 工作流（`appId 5abdb13c-a633-4a9c-96c3-dabd44072511`、
+11 节点、`nodeTypes start,code,llm,code,if-else,llm,code,code,code,end,end`、`hasPublishedLabel=True`）。
+我只读了他们的证据文件，**没有**发起真实调用，也没读任何凭证。
+
+但**出参约定与我的接入层不一致**，照现状联调必然失败：Dify 的 End 出参是
+`report_json` / `report_text`（未修订）与 `revised_report_json` / `revised_report_text`（已修订），
+而 `web/server/dify.mjs` 读的是 `candidates_json` / `presentation_json`。
+更需要 PM 拍板的是：**Dify 内部已有 `if-else` + revised 分支，即修订可能发生在工作流内部，
+而接入层也持有"全局最多 1 次自动业务修订"的可信计数——两边各自修订一次就会合计 2 次，违反契约。**
+额度的唯一持有者必须是单边。三点详细分析见 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md) 第 6 节。
+
 
 ---
 
@@ -412,3 +431,83 @@ STATUS: ready   request.recipient_relation_id: "pursuit"
   `?demo=partial_fail`（部分通过、失败项不可选）、`?demo=model_error`（错误态零可选）、
   `?demo=presentation_over_budget`（呈现阶段用掉唯一修订）、`?demo=slow`（超时状态）。
 - 想看「契约未落地」那一态：`GW_PORT=8788 GW_PURSUIT_CONTRACT_READY=0 node web/server/server.mjs`。
+
+---
+
+## 9. 当前进度 / 未完成清单 / 阻塞（2026-10-30 深夜收尾，前端工作转交）
+
+> 最后一次更新。浏览器自查的**剩余修复工作转交其他子 Agent**，此处如实记录交接点。
+> 逐条细节（含建议改法与脚本误报清单）见 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md)。
+
+### 进度变化
+
+- 第 6 节"未核实"里的**「浏览器实际渲染」已补上**：用真实 `Chrome/156.0.8078.79` 经 CDP 驱动
+  （`web/tools/browser-check.mjs`，零依赖，Node 24 内置 WebSocket），6 场景 / 100 项检查 / 13 类截图，
+  三种视口 1280×900、390×844、320×640。
+- 因此发现并**修复一个既有致命 bug**：`bootstrap()` 在 `state.config` 仍为 `null` 时就 `render()`，
+  `renderStep1()` 解引用 `config.labels` 抛 `TypeError`，导致事件绑定与 `/api/config` 请求全部不执行，
+  **首屏完全点不动**。真实栈：
+
+  ```text
+  TypeError: Cannot read properties of null (reading 'labels')
+      at renderStep1 (app.js:218)  at render (app.js:1163)  at bootstrap (app.js:1218)
+  readyState: complete / #badges 子节点: 0 / #view 子节点: 0 / #mode-flag hidden: true
+  ```
+
+  修复：`render()` 在配置未就位时渲染中文等待态 `renderWaiting()`；`bootstrap()` 改为
+  先绑事件 → 再渲染 → 再取配置。修复后实测 `#view` 5 个子节点、`#mode-flag` 可见、页面异常 0 条。
+- **这条自我修正很重要**：第 2.1 节"40 项单测全通过"与 2.3 节"59 项冒烟全通过"并没有覆盖这一层。
+  单测与 HTTP 冒烟都是服务端视角，前端首帧崩溃只有真实浏览器能抓到。
+  此前那张首屏截图步骤条下方是空白，我误判成"landing 主动隐藏了表单"，其实是崩溃。
+- 新增能力：吸顶常驻模拟标识 `#mode-flag`、首屏数据来源说明 `#hero-flag`（三种视口均实测可见）；
+  服务端新增 `?demo=stress` 压力演示（超长中文 + emoji + 不可断行长 URL），已验证不污染业务校验路径。
+  动机：上一版模拟数据横幅位于 hero/how **之后**，首屏看不见，评委容易误判为已联通真实模型。
+
+### 未完成清单（交接给下一个 Agent）
+
+浏览器自查 100 项检查中 **32 项 FAIL**，分类与状态：
+
+| # | 问题 | 状态 |
+| --- | --- | --- |
+| 1 | 首屏 `TypeError` 致页面不可交互 | **已修并已验证** |
+| 2 | 真实逐字输入丢焦点、丢字符（`value=1 focused=false`） | 改动已落盘（`captureFocus`/`restoreFocus` + 五字段 `data-field`），**未重跑验证** |
+| 3 | 320px 头部挤爆，连带 `.actions` 拉到 414px | 改动已落盘（`flex-wrap: wrap`、`.brand{min-height:44px}`），**未重跑验证** |
+| 4 | 不可断行长串撑破 `.kv dd` / `.list li`（390 视口被撑到 790px） | **未修**，根因已定位，建议 `overflow-wrap: anywhere` |
+| 5 | 触控目标 <44px（`.site-nav a` 23px、头部 `.btn--sm` 42px） | **未修** |
+| 6 | 超时状态断言未通过 | **未定位**；很可能是断言文案写错而非页面缺陷 |
+| 7 | 性能基线只有首屏 4 请求 / ~71KB / 零外部依赖 | 接口延迟分布、服务端内存、FCP/LCP **全部空白** |
+| 8 | 截图的人眼视觉效果 | 脚本只能量化溢出与尺寸，**需要人看** |
+
+另有 4 条**自查脚本自身已知误报**（`a.skip-link` 的 `-9999px` 无障碍定位被判溢出、呈现页
+`not_verified` 字面断言写错、`maxTouchPoints` 不能为 0、复用调试端口需关 HTTP 缓存），
+已写进交接文件第 3 节，避免接手者去修页面里本来没坏的东西。
+
+**结论：P0 的服务端闭环仍然成立（40 项单测 0 失败、59 项冒烟 0 失败）；
+前端首次达到"真的可交互"，但窄屏与长文本破版、输入焦点、性能基线四项未完成，已交接。**
+
+### 阻塞（未变，且不由我单方面解除）
+
+- **真实模型调用上限 10 次已用满（总上限 16）**：未获 PM 明确授权前不触发任何真实调用。
+  本轮**没有**发起过真实调用，`web/server/dify.mjs` 至今从未成功调用过一次。
+  就绪清单：环境变量 `DIFY_API_BASE` / `DIFY_API_KEY`（只在服务端）/ `DIFY_PUBLISHED_VERIFIED=1` /
+  `GW_MODE=dify` / `GW_PURSUIT_CONTRACT_READY`。
+  ⚠️ **本节早前写的"Dify 侧需补模型与结束节点并发布"已过时**：工作流线在 23:04:23 已发布
+  （11 节点、2 个 LLM、2 个 End、`hasPublishedLabel=True`，我只读了他们的证据文件，未发起调用）。
+  现在的阻塞不再是"未发布"，而是**两个需要 PM 拍板的契约分歧**：
+  ① 出参名不一致（Dify 用 `report_json` / `revised_report_json`，我的 `dify.mjs` 读 `candidates_json` / `presentation_json`）；
+  ② **全局修订额度可能双重消耗**（Dify 内部已有 `if-else` + revised 分支，接入层也持有 1 次额度）。
+  详细分析见第 7 节末「🔴 联调前的流程风险」与 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md) 第 6 节。
+  `cloud_verified` 此前为 `false`、`OPEN-5` 未关闭。额度获批后接入层**不需要改结构**，预计 30 分钟内跑通第一轮。
+- **GitHub 仍不可达**：Issue #3 的"正文更正"原文与其 1 条评论始终没读到，
+  以任务单 + `docs/pm-reviews/contract-decisions-draft-2026-10-30.md` + `docs/requirements-analysis.md` 为权威。
+- `pursuit` 落地状态与任务单假设不一致（实测已落地但**未提交**，HEAD=89d6624），待 PM 裁定；两态都已实现并测过。
+- 沙箱限制：`node --test` 与 `python workflow/verify_local.py` 因 `spawn EPERM` 跑不起来，
+  未亲自复现规则线 46 项探针 / 322 项 unittest 的结论。
+
+### 边界与 git 状态
+
+**未执行任何 git 分支操作**（无 checkout / switch / branch / merge / rebase / push），**也未提交**——
+按用户指示，提交与 PR 统一由 PM 处理，改动全部留在工作区。
+只新增/修改 `web/` 下文件；`docs/`、`workflow/`、`validator/`、`tests/`、`deploy/`、`AGENTS.md`
+与共享契约 `docs/intake-contract.md` 均未触碰。工作区其他目录的近期变动属其他线并发写入。
+

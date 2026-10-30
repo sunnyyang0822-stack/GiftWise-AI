@@ -1,0 +1,17 @@
+{
+  "stamp": "20261031-005650",
+  "checks_passed": 0,
+  "checks_total": 1,
+  "checks": [
+    {
+      "name": "giftwise-validator:candidate-observable：镜像存在",
+      "ok": false,
+      "detail": "Error response from daemon: No such image: giftwise-validator:candidate-observable"
+    }
+  ],
+  "images": [
+    {
+      "tag": "giftwise-validator:candidate-observable"
+    }
+  ]
+}

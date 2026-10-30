@@ -1,0 +1,136 @@
+================================================================================
+§1 Q8 救回：否定式合规表述（4 个场景同源用例 + 场景线原用例）
+================================================================================
+  S01｜名称含「无酒」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].name']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 应被救回：修复后不再命中
+  S03｜描述含「不含酒精」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 应被救回
+  S12｜描述含「不含酒类」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 应被救回
+  S13｜描述含「不含酒类」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 应被救回
+  场景线原用例 c1「无酒精饮品组合」（name+description+reason+inferences 四处否定）
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description', 'candidates[0].inferences[0]', 'candidates[0].name', 'candidates[0].reason']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 应被救回：修复后 4 条 FORBIDDEN_TERM 全部消失
+
+================================================================================
+§2 Q7 绕过：语义属酒精、但避字面词 + tags=['other']
+================================================================================
+  F｜名称/描述用「陈年佳酿」等避开字面词
+      冻结版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 本轮修复不针对此路径 → 预期仍【未解决】
+
+================================================================================
+§3 官方样例回归：workflow/examples/ 配对（修复前后判定必须一致）
+================================================================================
+  intake.json + candidates.json
+      冻结版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 修复前后判定应完全一致（回归）
+      修复前后是否一致: ✅ 一致
+  demo-intake-judge-forbidden-term.json + demo-candidates-clean.json
+      冻结版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 修复前后判定应完全一致（回归）
+      修复前后是否一致: ✅ 一致
+  demo-intake-judge-forbidden-term.json + demo-candidates-violating.json
+      冻结版: status=failed    禁忌=命中  通过=['c1', 'c3']  命中字段=['candidates[1].description']
+      修复版: status=failed    禁忌=命中  通过=['c1', 'c3']  命中字段=['candidates[1].description']
+      期望: 修复前后判定应完全一致（回归）
+      修复前后是否一致: ✅ 一致
+  intake-colleague.json + candidates.json
+      冻结版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 修复前后判定应完全一致（回归）
+      修复前后是否一致: ✅ 一致
+
+  映射说明（本脚本显式声明）：hard_exclusions.tags/terms → forbidden_tags/forbidden_terms；deadline_days → available_days；interests[k] → facts[{id:'interest:<k>'}]
+
+================================================================================
+§4 真阳性仍被拒：真含禁忌且未声明不含的，修复后必须仍命中
+================================================================================
+  description = 「礼盒内含一瓶红酒」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（未否定的字面命中）
+  name = 「茅台酒礼盒」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].name']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].name']
+      期望: 修复后仍须命中（未否定的字面命中）
+  description = 「含酒精饮品组合」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（未否定的字面命中）
+  description = 「酒精浓度 12% 的佐餐饮品」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（未否定的字面命中）
+  reason = 「因为对方喜欢喝酒，所以选它」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].reason']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].reason']
+      期望: 修复后仍须命中（解释性字段里的正向提及）
+  inferences = 「该酒类礼盒可能受欢迎」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].inferences[0]']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].inferences[0]']
+      期望: 修复后仍须命中（解释性字段里的正向提及）
+  presentation = 「呈现时会强调酒庄故事」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].presentation']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].presentation']
+      期望: 修复后仍须命中（presentation 里的正向提及）
+  description = 「不含酒精，但另配一瓶米酒」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（混合：第二次出现未被否定）
+  description = 「并非不含酒精」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（双重否定，语义回到含忌）
+  description = 「无酒精的周边，另附红酒一支」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 修复后仍须命中（混合：第二次出现未被否定）
+
+  真阳性仍被拒：10/10
+
+================================================================================
+§5 全量回归：tests/test_cases.json 全部用例，逐条对比两个实现
+================================================================================
+  用例总数: 320；成功对比: 320
+  判定发生变化的用例数: 0
+  ⚠️ 修复版引入的新错误（应为 0）: 0
+
+  不变量「只放宽、不收紧」：✅ 成立（修复版未产生任何冻结版没有的错误）
+
+================================================================================
+§6 残留假阳性：本轮修复救不了的那一类（如实披露）
+================================================================================
+  I｜「无酒精啤酒，适合不饮酒的人」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      期望: 仍会被拒：词条「酒」命中「啤酒」的子串，与否定语义无关
+  I2｜「本店招牌无醇饮品」
+      冻结版: status=failed    禁忌=命中  通过=['c2', 'c3']  命中字段=['candidates[0].description']
+      修复版: status=passed    禁忌=未命中 通过=['c1', 'c2', 'c3']
+      期望: 含「不含酒精」→ 应被救回（对照）
+
+================================================================================
+汇总
+================================================================================
+  §1 Q8 救回: 5/5
+  §2 Q7 绕过: 仍可绕过（未解决）
+  §3 官方样例回归: 4/4 判定一致
+  §4 真阳性仍被拒: 10/10
+  §5 全量回归: 320 条中 0 条变化，新增错误 0 条
+  §6 残留假阳性: 1/2 仍被误杀
+
+  结构化结果已写入: rulefix/evidence/prove-result.json

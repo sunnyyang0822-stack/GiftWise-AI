@@ -1,0 +1,39 @@
+{
+ "schema_version": 1,
+ "channel": "agent-reach",
+ "collector": "GiftWise research agent (Issue #26 / RESEARCH-001)",
+ "captured_at": "2026-10-30T16:51:17.926089+00:00",
+ "batch": "agent-reach-channel-probes",
+ "batch_title": "agent-reach 各渠道可用性探测（含失败）",
+ "method": "agent-reach CLI, read-only; raw stdout stored verbatim.",
+ "records": [
+  {
+   "probe": "probe_web_search.json",
+   "channel": "web",
+   "action": "search",
+   "note": "首次 web search 探测，返回 RATE_LIMITED/HTTP 429",
+   "raw_stdout": "{\"schema_version\": 1, \"ok\": false, \"channel\": \"web\", \"action\": \"search\", \"backend\": null, \"items\": [], \"meta\": {\"elapsed_ms\": 422, \"attempts\": [{\"backend\": \"exa\", \"result\": \"RATE_LIMITED\", \"message\": \"HTTP 429\"}]}, \"error\": {\"code\": \"RATE_LIMITED\", \"message\": \"HTTP 429\", \"hint\": \"The platform reported a rate limit. Reach pauses this channel; respect retry_after_seconds and do not switch backends.\"}}\n"
+  },
+  {
+   "probe": "probe_web_read.json",
+   "channel": "web",
+   "action": "read",
+   "note": "首次 web read 探测，返回渠道暂停秒数",
+   "raw_stdout": "{\"schema_version\": 1, \"ok\": false, \"channel\": \"web\", \"action\": \"read\", \"backend\": null, \"items\": [], \"meta\": {\"elapsed_ms\": 15, \"attempts\": []}, \"error\": {\"code\": \"RATE_LIMITED\", \"message\": \"Platform reported a rate limit\", \"hint\": \"Wait 3593 seconds before retrying this channel.\"}}\n"
+  },
+  {
+   "probe": "probe_bili.json",
+   "channel": "bilibili",
+   "action": "search",
+   "note": "bilibili search 探测，返回 NEED_SETUP（bili-cli 未安装）",
+   "raw_stdout": "{\"schema_version\": 1, \"ok\": false, \"channel\": \"bilibili\", \"action\": \"search\", \"backend\": null, \"items\": [], \"meta\": {\"elapsed_ms\": 156, \"attempts\": [{\"backend\": \"bili-cli\", \"result\": \"NEED_SETUP\", \"message\": \"bili is not installed\"}]}, \"error\": {\"code\": \"NEED_SETUP\", \"message\": \"bili is not installed\", \"hint\": \"This backend is not installed. Ask the user to run `agent-reach doctor` for setup steps.\"}}\n"
+  },
+  {
+   "probe": "probe_github.json",
+   "channel": "github",
+   "action": "search",
+   "note": "github search 探测，成功返回结果",
+   "raw_stdout": "{\"schema_version\": 1, \"ok\": true, \"channel\": \"github\", \"action\": \"search\", \"backend\": \"github-api\", \"items\": [{\"title\": \"luminati-io/jd-price-tracker\", \"url\": \"https://github.com/luminati-io/jd-price-tracker\", \"author\": \"luminati-io\", \"published_at\": \"2026-03-25T10:34:35Z\", \"text\": \"Track prices from Jd - AI-powered via Bright Insights or self-service via Bright Data's Web Scraper API\", \"raw\": {\"description\": \"Track prices from Jd - AI-powered via Bright Insights or self-service via Bright Data's Web Scraper API\", \"stargazers_count\": 0, \"forks_count\": 0, \"language\": \"Python\", \"topics\": [\"bright-data\", \"ecommerce\", \"jd\", \"price-tracker\", \"python\", \"web-scraper\", \"web-scraping\"], \"pushed_at\": \"2026-03-25T15:12:34Z\", \"open_issues_count\": 0, \"archived\": false, \"license\": null}}, {\"title\": \"bright-data-de/jd-price-tracker\", \"url\": \"https://github.com/bright-data-de/jd-price-tracker\", \"author\": \"bright-data-de\", \"published_at\": \"2026-04-05T17:08:47Z\", \"text\": \"Verfolgen Sie Preise von Jd – KI-gestützt über Bright Insights oder als Self-Service über die Web Scraper API von Bright Data\", \"raw\": {\"description\": \"Verfolgen Sie Preise von Jd – KI-gestützt über Bright Insights oder als Self-Service über die Web Scraper API von Bright Data\", \"stargazers_count\": 0, \"forks_count\": 0, \"language\": \"Python\", \"topics\": [], \"pushed_at\": \"2026-04-05T17:09:01Z\", \"open_issues_count\": 0, \"archived\": false, \"license\": null}}, {\"title\": \"bright-jp/jd-price-tracker\", \"url\": \"https://github.com/bright-jp/jd-price-tracker\", \"author\": \"bright-jp\", \"published_at\": \"2026-04-05T14:17:55Z\", \"text\": \"Jdの価格を追跡 — Bright Insights によるAI活用、または Bright Data の Web Scraper API によるセルフサービス利用\", \"raw\": {\"description\": \"Jdの価格を追跡 — Bright Insights によるAI活用、または Bright Data の Web Scraper API によるセルフサービス利用\", \"stargazers_count\": 0, \"forks_count\": 0, \"language\": \"Python\", \"topics\": [], \"pushed_at\": \"2026-04-05T14:18:09Z\", \"open_issues_count\": 0, \"archived\": false, \"license\": null}}, {\"title\": \"bright-cn/jd-price-tracker\", \"url\": \"https://github.com/bright-cn/jd-price-tracker\", \"author\": \"bright-cn\", \"published_at\": \"2026-04-05T19:51:13Z\", \"text\": \"从京东跟踪价格——可通过 Bright Insights 的 AI 驱动方式，或通过 Bright Data 的 Web Scraper API 自助实现\", \"raw\": {\"description\": \"从京东跟踪价格——可通过 Bright Insights 的 AI 驱动方式，或通过 Bright Data 的 Web Scraper API 自助实现\", \"stargazers_count\": 0, \"forks_count\": 0, \"language\": \"Python\", \"topics\": [\"bright-data\", \"ecommerce\", \"jd\", \"price-tracker\", \"python\", \"web-scraper\", \"web-scraping\"], \"pushed_at\": \"2026-04-05T19:51:29Z\", \"open_issues_count\": 0, \"archived\": false, \"license\": null}}, {\"title\": \"jr551/wetherspoons-api-python\", \"url\": \"https://github.com/jr551/wetherspoons-api-python\", \"author\": \"jr551\", \"published_at\": \"2026-04-19T18:51:48Z\", \"text\": \"Python port of the Wetherspoons API - Access JD Wetherspoon's venue and menu data with drink pricing analysis\", \"raw\": {\"description\": \"Python port of the Wetherspoons API - Access JD Wetherspoon's venue and menu data with drink pricing analysis\", \"stargazers_count\": 0, \"forks_count\": 0, \"language\": \"Python\", \"topics\": [], \"pushed_at\": \"2026-10-29T17:48:38Z\", \"open_issues_count\": 0, \"archived\": true, \"license\": \"MIT\"}}], \"meta\": {\"elapsed_ms\": 1156, \"attempts\": [{\"backend\": \"gh\", \"result\": \"UPSTREAM_BROKEN\", \"message\": \"PermissionError: [WinError 5] 拒绝访问。\"}, {\"backend\": \"github-api\", \"result\": \"ok\"}]}, \"error\": null}\n"
+  }
+ ]
+}

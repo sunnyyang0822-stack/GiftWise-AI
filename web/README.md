@@ -13,7 +13,7 @@
   → 选择后才生成四段呈现 → 呈现复核（全量费用/准备时间/禁忌）
 ```
 
-**当前是模拟数据模式。** Dify 侧礼赠工作流未发布（草稿只有「用户输入 → 代码执行」两个节点、无模型、无结束节点），
+**当前是模拟数据模式。** 接入层未配置真实模型凭证（DIFY_API_KEY），从未成功调用过一次，
 所以候选与呈现内容来自接入层内置的固定模拟数据，页面顶部常驻黄色警示横幅说明这一点。
 **不要把它读作已联通 Dify 或已有真实模型输出。**
 
@@ -43,7 +43,9 @@ web/
     ├── gen-parity-fixtures.mjs  生成 JS↔Python 比对用的固定样例
     ├── parity-reference.py      调仓库 Python 参考实现算期望结果（只读，不改既有文件）
     ├── parity-check.mjs         逐项比对两侧结果
-    └── smoke-http.mjs           59 项 HTTP 冒烟检查
+    ├── smoke-http.mjs           59 项 HTTP 冒烟检查
+    ├── browser-check.mjs        真实 Chromium 自查（CDP，6 场景 / 100 项检查 + 截图）
+    └── page-probe.mjs           最小页面探针：首帧是否真的渲染、有无页面异常（3 秒）
 ```
 
 接入层目录选在 `web/server/` 而不是仓库根的 `server/`：它只服务前端闭环，
@@ -61,17 +63,26 @@ node web/server/server.mjs
 #    http://127.0.0.1:8787
 ```
 
-自检三条命令：
+自检命令（服务端两条 + 浏览器两条 + 语义比对三步）：
 
 ```bash
 node web/tests/access-layer.test.mjs   # 单元检查（40 项）
 node web/tools/smoke-http.mjs          # HTTP 冒烟（59 项，需服务已启动）
+
+# 真实浏览器自查（需先起一个带远程调试端口的 Chrome，命令见 HANDOFF 第 1 节）
+GW_CDP=http://127.0.0.1:9333 node web/tools/page-probe.mjs      # 3 秒：首帧是否真的渲染
+GW_CDP=http://127.0.0.1:9333 node web/tools/browser-check.mjs   # 6 场景 / 100 项检查 + 截图
 
 # JS↔Python 语义比对（三步，产出落在 .tmp/，不提交）
 node web/tools/gen-parity-fixtures.mjs
 python web/tools/parity-reference.py
 node web/tools/parity-check.mjs
 ```
+
+> 单测与 HTTP 冒烟都是**服务端视角**；前端首帧是否真的可交互只能靠真实浏览器验证
+> ——2026-10-30 深夜的浏览器自查救回了一个致命 bug（`bootstrap()` 在配置未就位时渲染表单，
+> 抛 `TypeError` 导致首屏完全点不动）。交接状态与未完成清单见
+> [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md)。
 
 ### 可用的环境变量
 
@@ -98,6 +109,7 @@ GW_PORT=8788 GW_PURSUIT_CONTRACT_READY=0 node web/server/server.mjs
 | `?demo=model_error` | 模拟模型两次都输出损坏 JSON → 错误态、零可选 |
 | `?demo=partial_fail` | 一个候选引用不存在的事实 → 部分通过、失败项不可选 |
 | `?demo=presentation_over_budget` | 呈现首次复核超预算一分钱 → 走全局唯一一次修订 |
+| `?demo=stress` | 超长中文 + emoji + 不可断行长串 → 前端破版自查用（结构不变，校验仍通过） |
 | `?demo=slow` | 服务端延迟 45 秒 → 前端 20 秒超时状态 |
 
 ## 界面承诺（都已实现）
@@ -124,4 +136,6 @@ GW_PORT=8788 GW_PURSUIT_CONTRACT_READY=0 node web/server/server.mjs
 ## 我不碰的范围
 
 只写 `web/`（与本目录下的工具、测试）。没改 `validator/`、`workflow/`、`tests/`、`docs/` 下任何既有文件，
-也没改 `AGENTS.md` 与共享契约 `docs/intake-contract.md`。未提交、未推送、未部署、未触碰 Dify 草稿。
+也没改 `AGENTS.md` 与共享契约 `docs/intake-contract.md`。未提交、未推送、未部署、未触碰 Dify 草稿
+（2026-10-30 23:04 的 Dify 发布是工作流线自己的动作，我只读过他们的证据文件，未发起任何真实模型调用）。
+交接状态与未完成清单见 [HANDOFF-2026-10-30.md](./HANDOFF-2026-10-30.md)。

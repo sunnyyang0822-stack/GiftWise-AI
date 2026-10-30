@@ -1,0 +1,25 @@
+==============================================================================
+把真实测试文件跑在变体枚举上（生产文件零改动）
+==============================================================================
+测试文件：tests/acceptance/boundary/test_cross_layer_gate.py
+变体枚举：bossfix/variant/labels.py
+
+--- A 冻结版（10 键，= 仓库当前生产文件） ---
+用例 CrossLayerContractGate.test_relation_enum_has_exactly_the_frozen_membership
+  运行 = 1  失败/错误 = 0
+
+--- B 变体版（11 键，含 boss） ---
+用例 CrossLayerContractGate.test_relation_enum_has_exactly_the_frozen_membership
+  运行 = 1  失败/错误 = 1
+  失败原文：
+    Traceback (most recent call last):
+      File "C:/Users/lenovo/Desktop/giftwise/tests/acceptance/boundary/test_cross_layer_gate.py", line 163, in test_relation_enum_has_exactly_the_frozen_membership
+        self.assertEqual(
+    AssertionError: Items in the second set but not the first:
+    'boss' : 产品关系值集应恰为 8 个，实际=['boss', 'classmate', 'client_partner', 'family', 'friend', 'mentor', 'other', 'partner', 'pursuit']
+
+==============================================================================
+结论
+==============================================================================
+  冻结版：失败 0 / 运行 1  → 该断言当前通过
+  变体版：失败 1 / 运行 1  → 加 boss 后该断言失败

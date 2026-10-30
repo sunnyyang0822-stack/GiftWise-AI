@@ -1,0 +1,394 @@
+[
+ {
+  "label": "demo_forbidden_term_chocolate",
+  "httpStatus": 200,
+  "contentType": "text/event-stream; charset=utf-8",
+  "elapsedMs": 6065,
+  "startedAtLocal": null,
+  "events": [
+   {
+    "event": "node_started",
+    "node": "用户输入",
+    "node_id": "1793273634593",
+    "node_type": "start",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377323,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "用户输入",
+    "node_id": "1793273634593",
+    "node_type": "start",
+    "inputs": {
+     "intake_json": "{\n  \"recipient_relation\": \"pursuit\",\n  \"closeness\": \"limited\",\n  \"occasion\": \"birthday\",\n  \"budget_amount\": \"200.00\",\n  \"currency\": \"CNY\",\n  \"deadline_days\": 2,\n  \"interests\": [\n    \"coffee_food\",\n    \"design_art\"\n  ],\n  \"interest_confidence\": {\n    \"coffee_food\": \"confirmed\",\n    \"design_art\": \"inferred\"\n  },\n  \"gift_styles\": [\n    \"practical\",\n    \"understated\"\n  ],\n  \"hard_exclusions\": {\n    \"tags\": [],\n    \"terms\": [\n      \"巧克力\"\n    ],\n    \"unresolved\": []\n  },\n  \"additional_context\": \"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\"\n}",
+     "trusted_repair_count": 0
+    },
+    "outputs": {
+     "intake_json": "{\n  \"recipient_relation\": \"pursuit\",\n  \"closeness\": \"limited\",\n  \"occasion\": \"birthday\",\n  \"budget_amount\": \"200.00\",\n  \"currency\": \"CNY\",\n  \"deadline_days\": 2,\n  \"interests\": [\n    \"coffee_food\",\n    \"design_art\"\n  ],\n  \"interest_confidence\": {\n    \"coffee_food\": \"confirmed\",\n    \"design_art\": \"inferred\"\n  },\n  \"gift_styles\": [\n    \"practical\",\n    \"understated\"\n  ],\n  \"hard_exclusions\": {\n    \"tags\": [],\n    \"terms\": [\n      \"巧克力\"\n    ],\n    \"unresolved\": []\n  },\n  \"additional_context\": \"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\"\n}",
+     "trusted_repair_count": 0
+    },
+    "elapsed": 0.00011,
+    "status": "succeeded",
+    "created_at": 1793377323,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "N1 用户输入与确定性适配",
+    "node_id": "1793357958534",
+    "node_type": "code",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377323,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "N1 用户输入与确定性适配",
+    "node_id": "1793357958534",
+    "node_type": "code",
+    "inputs": {
+     "intake_json": "{\n  \"recipient_relation\": \"pursuit\",\n  \"closeness\": \"limited\",\n  \"occasion\": \"birthday\",\n  \"budget_amount\": \"200.00\",\n  \"currency\": \"CNY\",\n  \"deadline_days\": 2,\n  \"interests\": [\n    \"coffee_food\",\n    \"design_art\"\n  ],\n  \"interest_confidence\": {\n    \"coffee_food\": \"confirmed\",\n    \"design_art\": \"inferred\"\n  },\n  \"gift_styles\": [\n    \"practical\",\n    \"understated\"\n  ],\n  \"hard_exclusions\": {\n    \"tags\": [],\n    \"terms\": [\n      \"巧克力\"\n    ],\n    \"unresolved\": []\n  },\n  \"additional_context\": \"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\"\n}"
+    },
+    "outputs": {
+     "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}}",
+     "errors_json": "[]",
+     "status": "ready"
+    },
+    "elapsed": 0.356941,
+    "status": "succeeded",
+    "created_at": 1793377323,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "N2 需求分析与三候选（真实 LLM）",
+    "node_id": "1793400000001",
+    "node_type": "llm",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377324,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "N2 需求分析与三候选（真实 LLM）",
+    "node_id": "1793400000001",
+    "node_type": "llm",
+    "inputs": {
+     "#1793357958534.request_json#": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}}",
+     "model_provider": "langgenius/deepseek/deepseek",
+     "model_name": "deepseek-v4-flash"
+    },
+    "outputs": {
+     "text": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}]}",
+     "reasoning_content": "",
+     "usage": {
+      "completion_price": "0",
+      "completion_price_unit": "0",
+      "completion_tokens": 594,
+      "completion_unit_price": "0",
+      "currency": "USD",
+      "latency": 5.241,
+      "prompt_price": "0",
+      "prompt_price_unit": "0",
+      "prompt_tokens": 920,
+      "prompt_unit_price": "0",
+      "time_to_first_token": 1.207,
+      "time_to_generate": 4.034,
+      "total_price": "0",
+      "total_tokens": 1514
+     },
+     "finish_reason": "stop"
+    },
+    "elapsed": 5.245046,
+    "status": "succeeded",
+    "created_at": 1793377324,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "N3 Code 首次校验",
+    "node_id": "1793400000002",
+    "node_type": "code",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "N3 Code 首次校验",
+    "node_id": "1793400000002",
+    "node_type": "code",
+    "inputs": {
+     "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}}",
+     "candidates_json": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}]}",
+     "repair_count": 0
+    },
+    "outputs": {
+     "envelope_json": "{\"request_json\":\"{\\\"recipient_relation\\\":\\\"追求对象\\\",\\\"recipient_relation_id\\\":\\\"pursuit\\\",\\\"occasion\\\":\\\"生日\\\",\\\"budget_amount\\\":\\\"200.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"available_days\\\":2,\\\"facts\\\":[{\\\"id\\\":\\\"interest:coffee_food\\\",\\\"text\\\":\\\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\\"}],\\\"forbidden_tags\\\":[],\\\"forbidden_terms\\\":[\\\"巧克力\\\"],\\\"notes\\\":\\\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\\\",\\\"closeness\\\":\\\"limited\\\",\\\"preference_inferences\\\":[{\\\"interest_id\\\":\\\"design_art\\\",\\\"text\\\":\\\"用户猜测：对方可能对“设计与艺术”感兴趣\\\"}],\\\"gift_styles\\\":[\\\"practical\\\",\\\"understated\\\"],\\\"hard_exclusions_original\\\":{\\\"tags\\\":[],\\\"terms\\\":[\\\"巧克力\\\"],\\\"unresolved\\\":[]}}\",\"candidates_json\":\"{\\\"candidates\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"精品咖啡豆小礼盒\\\",\\\"description\\\":\\\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\\",\\\"estimated_total\\\":\\\"168.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":1,\\\"tags\\\":[\\\"food\\\"],\\\"reason\\\":\\\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\\\",\\\"小份量、可日常消耗的礼物可能比摆设类更合适\\\"],\\\"unknowns\\\":[\\\"对方偏好的咖啡风味与烘焙程度未知\\\",\\\"对方是否有冲泡器具未知\\\",\\\"具体购买渠道与库存未核实\\\"]},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"美食体验小份组合\\\",\\\"description\\\":\\\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\\",\\\"estimated_total\\\":\\\"150.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":1,\\\"tags\\\":[\\\"food\\\"],\\\"reason\\\":\\\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能愿意尝试不同风味的小食\\\",\\\"多样小份组合可能比单一大件更稳妥\\\"],\\\"unknowns\\\":[\\\"对方的具体口味偏好与忌口未知\\\",\\\"对方是否偏好甜味或咸味未知\\\",\\\"具体购买渠道与保质期未核实\\\"]},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"咖啡主题实用小物\\\",\\\"description\\\":\\\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\\",\\\"estimated_total\\\":\\\"180.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":2,\\\"tags\\\":[\\\"other\\\"],\\\"reason\\\":\\\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能日常有饮用咖啡的习惯\\\",\\\"实用类小物可能比装饰类更符合低调表达\\\"],\\\"unknowns\\\":[\\\"对方是否已有同类器具未知\\\",\\\"对方偏好的材质与颜色未知\\\",\\\"具体购买渠道与到货时间未核实\\\"]}]}\",\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"repair_count\":0,\"repairable\":false,\"workflow_errors\":[]}",
+     "status": "passed",
+     "all_passed": true,
+     "repairable": false,
+     "repair_count": 0,
+     "validation_json": "{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"}",
+     "preserved_candidates_json": "{\"c1\":{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},\"c2\":{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},\"c3\":{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}}"
+    },
+    "elapsed": 0.135754,
+    "status": "succeeded",
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "N4 校验结果分支",
+    "node_id": "1793400000003",
+    "node_type": "if-else",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "N4 校验结果分支",
+    "node_id": "1793400000003",
+    "node_type": "if-else",
+    "inputs": {
+     "conditions": [
+      {
+       "actual_value": true,
+       "comparison_operator": "is",
+       "expected_value": true
+      }
+     ]
+    },
+    "outputs": {
+     "result": true,
+     "selected_case_id": "true"
+    },
+    "elapsed": 0.000107,
+    "status": "succeeded",
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "N7a 未修订报告",
+    "node_id": "1793400000006",
+    "node_type": "code",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "N7a 未修订报告",
+    "node_id": "1793400000006",
+    "node_type": "code",
+    "inputs": {
+     "state_json": "{\"request_json\":\"{\\\"recipient_relation\\\":\\\"追求对象\\\",\\\"recipient_relation_id\\\":\\\"pursuit\\\",\\\"occasion\\\":\\\"生日\\\",\\\"budget_amount\\\":\\\"200.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"available_days\\\":2,\\\"facts\\\":[{\\\"id\\\":\\\"interest:coffee_food\\\",\\\"text\\\":\\\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\\"}],\\\"forbidden_tags\\\":[],\\\"forbidden_terms\\\":[\\\"巧克力\\\"],\\\"notes\\\":\\\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\\\",\\\"closeness\\\":\\\"limited\\\",\\\"preference_inferences\\\":[{\\\"interest_id\\\":\\\"design_art\\\",\\\"text\\\":\\\"用户猜测：对方可能对“设计与艺术”感兴趣\\\"}],\\\"gift_styles\\\":[\\\"practical\\\",\\\"understated\\\"],\\\"hard_exclusions_original\\\":{\\\"tags\\\":[],\\\"terms\\\":[\\\"巧克力\\\"],\\\"unresolved\\\":[]}}\",\"candidates_json\":\"{\\\"candidates\\\":[{\\\"id\\\":\\\"c1\\\",\\\"name\\\":\\\"精品咖啡豆小礼盒\\\",\\\"description\\\":\\\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\\",\\\"estimated_total\\\":\\\"168.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":1,\\\"tags\\\":[\\\"food\\\"],\\\"reason\\\":\\\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\\\",\\\"小份量、可日常消耗的礼物可能比摆设类更合适\\\"],\\\"unknowns\\\":[\\\"对方偏好的咖啡风味与烘焙程度未知\\\",\\\"对方是否有冲泡器具未知\\\",\\\"具体购买渠道与库存未核实\\\"]},{\\\"id\\\":\\\"c2\\\",\\\"name\\\":\\\"美食体验小份组合\\\",\\\"description\\\":\\\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\\",\\\"estimated_total\\\":\\\"150.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":1,\\\"tags\\\":[\\\"food\\\"],\\\"reason\\\":\\\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能愿意尝试不同风味的小食\\\",\\\"多样小份组合可能比单一大件更稳妥\\\"],\\\"unknowns\\\":[\\\"对方的具体口味偏好与忌口未知\\\",\\\"对方是否偏好甜味或咸味未知\\\",\\\"具体购买渠道与保质期未核实\\\"]},{\\\"id\\\":\\\"c3\\\",\\\"name\\\":\\\"咖啡主题实用小物\\\",\\\"description\\\":\\\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\\",\\\"estimated_total\\\":\\\"180.00\\\",\\\"currency\\\":\\\"CNY\\\",\\\"estimated_preparation_days\\\":2,\\\"tags\\\":[\\\"other\\\"],\\\"reason\\\":\\\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\\",\\\"fact_refs\\\":[\\\"interest:coffee_food\\\"],\\\"inferences\\\":[\\\"对方可能日常有饮用咖啡的习惯\\\",\\\"实用类小物可能比装饰类更符合低调表达\\\"],\\\"unknowns\\\":[\\\"对方是否已有同类器具未知\\\",\\\"对方偏好的材质与颜色未知\\\",\\\"具体购买渠道与到货时间未核实\\\"]}]}\",\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"repair_count\":0,\"repairable\":false,\"workflow_errors\":[]}"
+    },
+    "outputs": {
+     "envelope_json": "{\"status\":\"passed\",\"all_passed\":true,\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}},\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"report_text\":\"三个方案均通过代码规则检查，请自行选择。\\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\\n已用自动修订次数：0 / 1。\\n\\nc1：精品咖啡豆小礼盒\\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\\n全量估算：168.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc2：美食体验小份组合\\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\\n全量估算：150.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc3：咖啡主题实用小物\\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\\n全量估算：180.00 CNY；准备天数：2\\n代码检查：通过，可选择\\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。\"}",
+     "status": "passed",
+     "all_passed": true,
+     "repairable": false,
+     "repair_count": 0,
+     "report_text": "三个方案均通过代码规则检查，请自行选择。\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\n已用自动修订次数：0 / 1。\n\nc1：精品咖啡豆小礼盒\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\n全量估算：168.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc2：美食体验小份组合\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\n全量估算：150.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc3：咖啡主题实用小物\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\n全量估算：180.00 CNY；准备天数：2\n代码检查：通过，可选择\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。"
+    },
+    "elapsed": 0.080403,
+    "status": "succeeded",
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_started",
+    "node": "End A 未修订输出",
+    "node_id": "1793400000008",
+    "node_type": "end",
+    "inputs": null,
+    "outputs": null,
+    "elapsed": null,
+    "status": null,
+    "created_at": 1793377329,
+    "error": null
+   },
+   {
+    "event": "node_finished",
+    "node": "End A 未修订输出",
+    "node_id": "1793400000008",
+    "node_type": "end",
+    "inputs": {
+     "status": "passed",
+     "all_passed": true,
+     "repair_count": 0,
+     "report_json": "{\"status\":\"passed\",\"all_passed\":true,\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}},\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"report_text\":\"三个方案均通过代码规则检查，请自行选择。\\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\\n已用自动修订次数：0 / 1。\\n\\nc1：精品咖啡豆小礼盒\\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\\n全量估算：168.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc2：美食体验小份组合\\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\\n全量估算：150.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc3：咖啡主题实用小物\\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\\n全量估算：180.00 CNY；准备天数：2\\n代码检查：通过，可选择\\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。\"}",
+     "report_text": "三个方案均通过代码规则检查，请自行选择。\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\n已用自动修订次数：0 / 1。\n\nc1：精品咖啡豆小礼盒\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\n全量估算：168.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc2：美食体验小份组合\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\n全量估算：150.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc3：咖啡主题实用小物\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\n全量估算：180.00 CNY；准备天数：2\n代码检查：通过，可选择\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。"
+    },
+    "outputs": {
+     "status": "passed",
+     "all_passed": true,
+     "repair_count": 0,
+     "report_json": "{\"status\":\"passed\",\"all_passed\":true,\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}},\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"report_text\":\"三个方案均通过代码规则检查，请自行选择。\\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\\n已用自动修订次数：0 / 1。\\n\\nc1：精品咖啡豆小礼盒\\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\\n全量估算：168.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc2：美食体验小份组合\\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\\n全量估算：150.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc3：咖啡主题实用小物\\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\\n全量估算：180.00 CNY；准备天数：2\\n代码检查：通过，可选择\\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。\"}",
+     "report_text": "三个方案均通过代码规则检查，请自行选择。\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\n已用自动修订次数：0 / 1。\n\nc1：精品咖啡豆小礼盒\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\n全量估算：168.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc2：美食体验小份组合\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\n全量估算：150.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc3：咖啡主题实用小物\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\n全量估算：180.00 CNY；准备天数：2\n代码检查：通过，可选择\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。"
+    },
+    "elapsed": 6.8e-05,
+    "status": "succeeded",
+    "created_at": 1793377329,
+    "error": null
+   }
+  ],
+  "other": [
+   {
+    "event": "workflow_started",
+    "data": {
+     "id": "0e2e169d-0b0b-4c4a-988d-feb2e6058775",
+     "workflow_id": "095b12b9-6cea-48b1-aa47-88473b91f30d",
+     "inputs": {
+      "intake_json": "{\n  \"recipient_relation\": \"pursuit\",\n  \"closeness\": \"limited\",\n  \"occasion\": \"birthday\",\n  \"budget_amount\": \"200.00\",\n  \"currency\": \"CNY\",\n  \"deadline_days\": 2,\n  \"interests\": [\n    \"coffee_food\",\n    \"design_art\"\n  ],\n  \"interest_confidence\": {\n    \"coffee_food\": \"confirmed\",\n    \"design_art\": \"inferred\"\n  },\n  \"gift_styles\": [\n    \"practical\",\n    \"understated\"\n  ],\n  \"hard_exclusions\": {\n    \"tags\": [],\n    \"terms\": [\n      \"巧克力\"\n    ],\n    \"unresolved\": []\n  },\n  \"additional_context\": \"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\"\n}",
+      "trusted_repair_count": 0,
+      "sys.files": [],
+      "sys.user_id": "8fb7e7d7-34b8-4a7d-9523-bae8faebd212",
+      "sys.app_id": "5abdb13c-a633-4a9c-96c3-dabd44072511",
+      "sys.workflow_id": "095b12b9-6cea-48b1-aa47-88473b91f30d",
+      "sys.workflow_run_id": "0e2e169d-0b0b-4c4a-988d-feb2e6058775"
+     },
+     "created_at": 1793377323,
+     "reason": "initial"
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "passed",
+     "from_variable_selector": [
+      "1793400000006",
+      "status"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "\n",
+     "from_variable_selector": [
+      "1793400000008",
+      "answer"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "True",
+     "from_variable_selector": [
+      "1793400000006",
+      "all_passed"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "\n",
+     "from_variable_selector": [
+      "1793400000008",
+      "answer"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "0",
+     "from_variable_selector": [
+      "1793400000006",
+      "repair_count"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "\n",
+     "from_variable_selector": [
+      "1793400000008",
+      "answer"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "{\"status\":\"passed\",\"all_passed\":true,\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}},\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"report_text\":\"三个方案均通过代码规则检查，请自行选择。\\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\\n已用自动修订次数：0 / 1。\\n\\nc1：精品咖啡豆小礼盒\\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\\n全量估算：168.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc2：美食体验小份组合\\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\\n全量估算：150.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc3：咖啡主题实用小物\\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\\n全量估算：180.00 CNY；准备天数：2\\n代码检查：通过，可选择\\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。\"}",
+     "from_variable_selector": [
+      "1793400000006",
+      "envelope_json"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "\n",
+     "from_variable_selector": [
+      "1793400000008",
+      "answer"
+     ]
+    }
+   },
+   {
+    "event": "text_chunk",
+    "data": {
+     "text": "三个方案均通过代码规则检查，请自行选择。\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\n已用自动修订次数：0 / 1。\n\nc1：精品咖啡豆小礼盒\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\n全量估算：168.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc2：美食体验小份组合\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\n全量估算：150.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc3：咖啡主题实用小物\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\n全量估算：180.00 CNY；准备天数：2\n代码检查：通过，可选择\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。",
+     "from_variable_selector": [
+      "1793400000006",
+      "report_text"
+     ]
+    }
+   }
+  ],
+  "workflow": {
+   "id": "0e2e169d-0b0b-4c4a-988d-feb2e6058775",
+   "workflow_id": "095b12b9-6cea-48b1-aa47-88473b91f30d",
+   "status": "succeeded",
+   "outputs": {
+    "status": "passed",
+    "all_passed": true,
+    "repair_count": 0,
+    "report_json": "{\"status\":\"passed\",\"all_passed\":true,\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"200.00\",\"currency\":\"CNY\",\"available_days\":2,\"facts\":[{\"id\":\"interest:coffee_food\",\"text\":\"用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\"}],\"forbidden_tags\":[],\"forbidden_terms\":[\"巧克力\"],\"notes\":\"完全虚构的现场演示请求。评委临时指定禁忌词：不要任何巧克力相关。追求对象默认低压力表达，不假定对方心意或已有双向好感。\",\"closeness\":\"limited\",\"preference_inferences\":[{\"interest_id\":\"design_art\",\"text\":\"用户猜测：对方可能对“设计与艺术”感兴趣\"}],\"gift_styles\":[\"practical\",\"understated\"],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[\"巧克力\"],\"unresolved\":[]}},\"candidates\":[{\"id\":\"c1\",\"name\":\"精品咖啡豆小礼盒\",\"description\":\"选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\",\"estimated_total\":\"168.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能喜欢咖啡类饮品，但组内具体偏好未确认\",\"小份量、可日常消耗的礼物可能比摆设类更合适\"],\"unknowns\":[\"对方偏好的咖啡风味与烘焙程度未知\",\"对方是否有冲泡器具未知\",\"具体购买渠道与库存未核实\"]},{\"id\":\"c2\",\"name\":\"美食体验小份组合\",\"description\":\"挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\",\"estimated_total\":\"150.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意尝试不同风味的小食\",\"多样小份组合可能比单一大件更稳妥\"],\"unknowns\":[\"对方的具体口味偏好与忌口未知\",\"对方是否偏好甜味或咸味未知\",\"具体购买渠道与保质期未核实\"]},{\"id\":\"c3\",\"name\":\"咖啡主题实用小物\",\"description\":\"选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\",\"estimated_total\":\"180.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能日常有饮用咖啡的习惯\",\"实用类小物可能比装饰类更符合低调表达\"],\"unknowns\":[\"对方是否已有同类器具未知\",\"对方偏好的材质与颜色未知\",\"具体购买渠道与到货时间未核实\"]}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"report_text\":\"三个方案均通过代码规则检查，请自行选择。\\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\\n已用自动修订次数：0 / 1。\\n\\nc1：精品咖啡豆小礼盒\\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\\n全量估算：168.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc2：美食体验小份组合\\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\\n全量估算：150.00 CNY；准备天数：1\\n代码检查：通过，可选择\\n\\nc3：咖啡主题实用小物\\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\\n全量估算：180.00 CNY；准备天数：2\\n代码检查：通过，可选择\\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。\"}",
+    "report_text": "三个方案均通过代码规则检查，请自行选择。\n费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\n已用自动修订次数：0 / 1。\n\nc1：精品咖啡豆小礼盒\n选择小包装的单一产地咖啡豆或挂耳咖啡组合，搭配简洁纸盒与一张生日贺卡，控制在预算内，适合作为生日时轻量的心意表达。\n理由：对方对咖啡与美食有兴趣，咖啡方向与已知信息贴合，且小份量礼盒关系压力较低，适合追求初期表达心意；具体风味与器具偏好尚不明确，因此选择通用性较强的小包装组合。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能喜欢咖啡类饮品，但组内具体偏好未确认；小份量、可日常消耗的礼物可能比摆设类更合适\n未知：对方偏好的咖啡风味与烘焙程度未知；对方是否有冲泡器具未知；具体购买渠道与库存未核实\n全量估算：168.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc2：美食体验小份组合\n挑选几款独立包装的地方风味小食或点心组合，配简单包装与贺卡，作为生日当天可分享品尝的小礼物。\n理由：已知对方对咖啡与美食感兴趣，美食方向覆盖面较广，选择多样小份组合可以降低押注单一品类的风险，也便于对方按自己口味挑选；口味与忌口仍需确认。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能愿意尝试不同风味的小食；多样小份组合可能比单一大件更稳妥\n未知：对方的具体口味偏好与忌口未知；对方是否偏好甜味或咸味未知；具体购买渠道与保质期未核实\n全量估算：150.00 CNY；准备天数：1\n代码检查：通过，可选择\n\nc3：咖啡主题实用小物\n选择与日常饮用相关的实用小物，例如简洁的保温杯或咖啡滤杯，搭配基础包装与生日贺卡，作为低调实用的生日礼物。\n理由：结合对方对咖啡与美食的兴趣，以及送礼者希望实用、低调的方向，选择日常可用的小物，避免过于私人化的表达；但对方是否已有同类物品、是否习惯自制咖啡尚不确定。\n用户事实：interest:coffee_food＝用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）\n推断：对方可能日常有饮用咖啡的习惯；实用类小物可能比装饰类更符合低调表达\n未知：对方是否已有同类器具未知；对方偏好的材质与颜色未知；具体购买渠道与到货时间未核实\n全量估算：180.00 CNY；准备天数：2\n代码检查：通过，可选择\n等待你选择合格方案；选择后才进入详细包装与贺卡阶段。"
+   },
+   "error": null,
+   "elapsed_time": 6.065458409953862,
+   "total_tokens": 1514,
+   "total_steps": 7,
+   "created_by": {
+    "id": "8fb7e7d7-34b8-4a7d-9523-bae8faebd212",
+    "name": "Dify",
+    "email": "sunny.yang0822@gmail.com"
+   },
+   "created_at": 1793377323,
+   "finished_at": 1793377330,
+   "exceptions_count": 0,
+   "files": []
+  }
+ }
+]

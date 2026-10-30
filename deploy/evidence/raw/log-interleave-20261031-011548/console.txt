@@ -1,0 +1,15 @@
+修复前对照镜像构建 exit=0
+
+===== 修复前（裸 print）：giftwise-validator:log-prefix =====
+/healthz 200：True
+并发 60 请求后：docker logs 共 55 行 = 正常请求日志 47 行 + 启动行 1 行 + **粘连行 7 行**
+粘连样例（最多 3 条）：
+   172.17.0.1 - "POST /validate HTTP/1.1" 200 -172.17.0.1 - "POST /validate HTTP/1.1" 200 -
+   172.17.0.1 - "POST /validate HTTP/1.1" 200 -172.17.0.1 - "GET /nope-17 HTTP/1.1" 404 -
+   172.17.0.1 - "POST /validate HTTP/1.1" 200 -172.17.0.1 - "GET /healthz HTTP/1.1" 200 -
+→ 如预期：粘连 > 0（复现缺陷）
+
+===== 修复后1：giftwise-validator:submission-20261101 =====
+/healthz 200：True
+并发 60 请求后：docker logs 共 62 行 = 正常请求日志 61 行 + 启动行 1 行 + **粘连行 0 行**
+→ 如预期：粘连 == 0（已修复）

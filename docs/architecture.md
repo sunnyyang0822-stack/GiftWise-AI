@@ -4,7 +4,9 @@
 - 更新日期：2026-10-30（亚洲／上海，UTC+8）
 - 交付截止：2026-11-01 10:30（北京时间）
 - 产品定位以 [Issue #1](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/1) 正文为唯一权威；字段以[工作流规范](../workflow/workflow-spec.md)与[三步输入契约](intake-contract.md)为准；需求基线与成功标准 SC-1…SC-9 见[需求分析](requirements-analysis.md)。
-- **本文只描述真实状态。所有能力都标注证据等级，未实测的一律写明"未实测"。**
+- **本文只描述真实状态。所有能力都标注证据等级，未实测的一律写明「未实测」。**
+
+> **口径时点声明（2026-10-31 由数字口径统一扫描线追加）**：本文正文的**已实测表格**与 **§10 的逐字命令 / HTTP 输出**是 **2026-10-30 21:17–22:5x** 的转录（该时点真值，按纪律**保留原文不改写**）。其后的现行真值一律以 `docs/acceptance-criteria.md` 第 1 节与第 13 节为权威：单元测试 **329**（原 322）、独立验收套件**四条互不包含、合计 688**（329＋275＋39＋45）、容器检查项 **14 项**（原 9/9）、JS↔Python parity **74 组**（原 55 组；越界与格式 17 组已覆盖；另 1 组仅错误顺序不同，`days=10**20` 在网格之外、两侧都拒绝）、冷构建**两个合法值**（2026-10-30 基线 **1.720 s**、2026-10-31 重建版 **3,662 ms**；原记 2.2 s 无归档）、镜像体积（构建时基线 **177,582,258 字节＝169.36 MiB**、交付镜像 **177,918,474 字节＝169.676 MiB**）、规则哈希 **`1f389dad…`**（旧值 `4782255b…` 已作废）、模型调用**双口径**（主批次 10 次 / 34,127；**累计 13 次 / 38,326**）、Dify **已发布并创建版本（v1/v2）**、交付镜像**已于 2026-10-31 01:13:59 重建并复核**（`submission-20261101` = `latest` = `d9a4a35763ee`）。**§10 中的旧数字因此是历史转录，不是当前结论。**
 
 ## 0. 本文件回答什么问题（对齐评分规则赛道 B）
 
@@ -38,38 +40,40 @@
 | 事实 | 证据出处 |
 | --- | --- |
 | 本地规则探针 **46 项通过、0 失败**，`model calls: 0`、`cloud verified: false` | 本次复跑：`python workflow/verify_local.py`（见 §10） |
-| 单元测试 **322 项通过** | 本次复跑：`python -m unittest discover -s tests -q` → `Ran 322 tests in 0.176s / OK` |
+| 单元测试 **329 项通过**（原记 322，为 2026-10-30 时点值） | 本次复跑：`python -m unittest discover -s tests -q` → `Ran 329 tests / OK`（2026-10-31） |
 | 阶段 C 独立验收套件 **39 项通过** | 本次复跑：`python -m unittest discover -s tests/acceptance/stage_c -q` → `Ran 39 tests / OK` |
+| 独立验收套件**四条互不包含**、合计 **688 项**（329 ＋ 275 ＋ 39 ＋ 45） | 本次复跑四条全绿（2026-10-31）；`discover -s tests` **只覆盖第一条**（`tests/acceptance/**` 无 `__init__.py`），故「329 项通过」**≠**「全仓通过」；口径出处 `docs/test-plan.md:214` 起 |
 | 规则源码与 5 个生成物哈希一致、非 STALE | `workflow/generated/manifest.json`；本次复跑输出的 `sources_sha256`／`artifacts_sha256` |
 | **N1–N7 + 双 End 已在真实 Dify Cloud 1.18.0 草稿接线**：11 节点／11 边、含 `if-else` 三分支 | WF-003（`workflow/evidence/WF-003-2026-10-30.md` §3.2，服务端实读回执 `dify-draft-server-readback.txt`） |
-| **五类用例在真实 Dify 上跑通**（正常三候选／超预算／禁忌／损坏 JSON／持续失败），分支路径与预期一致，`total_tokens` 全为 **0** | WF-003 §3.4；节点级原文 `workflow/evidence/WF-003-2026-10-30/dify-node-io-*.md` |
+| **五类用例在真实 Dify 上跑通（第一轮·注入路径）**（正常三候选／超预算／禁忌／损坏 JSON／持续失败），分支路径与预期一致，该轮 `total_tokens` 全为 **0** | WF-003 §3.4；节点级原文 `workflow/evidence/WF-003-2026-10-30/dify-node-io-*.md` |
+| **真实模型链路已跑通（第二轮，2026-10-30 21:11–21:17）**：N2／N5 为真实 `type: llm` 节点（provider `langgenius/deepseek/deepseek`、model `deepseek-v4-flash`），3 批 **6 次真实运行、主批次 10 次调用 / 34,127 tokens**（**累计 13 次 / 38,326 tokens**）；含真实生成、**真实自然违规**（模型写出「不含酒精」被 `FORBIDDEN_TERM` 拒绝）、**真实修订成功 1 次**、**真实持续失败 1 次**；`selected_candidate_id` 全程 `null` | WF-003 §4.5–§4.7；`workflow/evidence/WF-003-2026-10-30/dify-real-node-io-*.md` |
 | 单个 Code 节点 **28,682–28,951 字符**可在 Dify Cloud 保存并执行；工作流服务端耗时 **0.587–0.888 s**（**无模型**） | WF-003 §3.4 |
 | Dify Code 节点沙箱可用：`json`／`re`(含 `re.ASCII`)／`unicodedata`(NFKC)／`decimal` 四项能力均为 true | WF-002（`workflow/evidence/WF-002-2026-10-30.md`）；QA 独立复跑复核（`docs/test-reports/stage-c/acceptance-2026-10-30.md` §1） |
 | Dify 租户 **无平台级追踪**：`trace-runs` 返回 `not_collected` | WF-002；QA 复核 §1.3 |
 | `deploy/server.py` 可运行：`/healthz` 200、`/validate` 200 且响应与 `validator.rules.validate` **逐字段一致**、400 `INVALID_PAYLOAD`、404 `NOT_FOUND`、413 `REQUEST_TOO_LARGE` | 本次实测（见 §10.3，含我自己发现的启动方式问题） |
-| JS 接入层与 Python 参考实现**语义一致**：55 组样例 0 处差异 | 本次实测：`node web/tools/parity-check.mjs` |
+| JS 接入层与 Python 参考实现**语义一致**：**74 组**样例 0 处差异（越界与格式 17 组已覆盖；另 1 组仅**错误顺序**不同；**网格之外** 1 项 `days=10**20` 分类口径，两侧都拒绝） | 本次复跑：`node web/tools/parity-check.mjs` |
 | 本地单次确定性校验 p50 **0.166 ms**；无模型端到端固定夹具 p50 **0.640 ms** | 本次实测：`.tmp/measure_arch.py`（方法与其缺陷见 §8.2） |
 | 契约已冻结 **8 个关系 ID**（含 `pursuit`），`pursuit` 与 `partner` 并列互斥 | `docs/intake-contract.md`；`workflow/labels.py`；QA §3.2 |
-| **容器化已实测（2026-10-30 晚）**：镜像 `giftwise-validator:latest`（ID `b42f408b4f07`，`docker images` **178 MB**，inspect 169.4 MB）构建成功；容器内 `/healthz` 200（启动 **0.75–1.01 s**）、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行 | `deploy/evidence/docker-2026-10-30.md`（9/9）；12 个原始输出 `deploy/evidence/raw/docker-2026-10-30/` |
+| **容器化已实测（2026-10-30 晚；2026-10-31 01:13:59 重建并复核）**：镜像 `giftwise-validator:latest` 构建成功（`docker images` **178 MB** 十进制；`docker inspect` Size **177,582,258 字节＝169.36 MiB**）；容器内 `/healthz` 200 且规则哈希与本机一致、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、以**非 root（uid 10001）**运行、镜像内无密钥、文件树 9 行 | `deploy/evidence/docker-2026-10-30.md`（D-0…D-13 共 **14 项**；原记 9/9）；`deploy/evidence/image-audit-2026-10-31.md`、`deploy/evidence/image-rebuild-n1n4-2026-10-31.md`（**已重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`，体积 **177,918,474 字节＝169.676 MiB**，冷构建 **3,662 ms**，规则哈希 `1f389dad…` 与本机一致）；`deploy/evidence/raw/docker-2026-10-30/`（12 份原始输出 + 5 份安装日志）；**本架构 Agent 已独立复跑复核（§10.6）** |
 
 ### 1.2 未实现／未实测（不得读作已完成）
 
 | 项 | 真实状态 |
 | --- | --- |
-| **真实模型生成与修订** | **未发生**。N2／N5 是**占位节点**（`placeholder: true`、`model_called: false`），只做固定快照透传（WF-003 §3.5）。本轮**零模型调用、零 token** |
-| Dify 草稿发布 | **未发布**（`tool_published: false`、`version: draft`）；未创建版本（WF-003 §3.2） |
-| DeepSeek 在该租户的可用性 | **不可用**：`system_configuration.enabled = false`、`custom_configuration.status = "no-configure"`、凭据为空（WF-003 §4.2）。平台托管 `openai`／`gemini`／`tongyi`／`anthropic`／`x` 为 `enabled = true` |
+| **真实模型生成与修订** | **已发生（2026-10-30 21:11–21:17）**：N2／N5 已替换为真实 `type: llm` 节点（`deepseek-v4-flash`），**10 次调用 / 34,127 tokens**（服务端 `total_tokens` 累加；**累计 13 次 / 38,326 tokens**）。**早期 20:58 那一轮仍是占位节点（0 tokens）**，两轮必须分开读。**仍未取得**：修正提示词后的真实修订运行时证据（第 3 批两条首次即通过）、自然 `OVER_BUDGET`、标签级 `FORBIDDEN_TAG` 触发、模型稳定性样本（仅 6 次） |
+| Dify 草稿发布 | **已发布并创建版本**（v1 于 2026-10-30 23:04 +08:00；v2 已重发布）。⚠️ `tool_published: false` 与 `version: "draft"` **不是发布状态判据**——前者只表示「是否作为工具供其他应用调用」，后者描述**当前草稿行**；原记「未发布／未创建版本」**已不成立**（WF-003 §3.2 为该时点观测） |
+| DeepSeek 在该租户的可用性 | **已配置并真实调用成功**（`custom_configuration.status = active`、4 个模型 `active`；WF-003 任务 C）。早期观测（`enabled = false`、凭据为空）**已被取代**。平台托管 `openai`／`gemini`／`tongyi`／`anthropic`／`x` **仍未使用** |
 | 选择后呈现阶段（包装／配色／贺卡／赠送方式） | 产品侧**未实现**；接入层仅有 mock 呈现（E2） |
 | 跨调用可信修订计数持久化 | **未实现**；当前 `trusted_repair_count` 由 Start 输入提供，**不是防篡改机制**（WF-003 §6.5） |
 | 可信快照持久化 | **未实现**；接入层为**进程内存**（重启即丢失），见 §3.3 |
 | 云部署 | **从未发生**；`publish-to-uhost.ps1` **从未上传**；无云主机、无 EIP、无镜像仓库推送、无编排平台 |
 | 前端页面验收 | **未验收**；QA 的 14 项为 mock 模式有界冒烟，**不构成 WEB-001 验收判定** |
-| 成本与业务延迟 | **全部未测量**；无计费即无费率依据，记 `not_measured`（不得填 0） |
+| 成本（金额）与浏览器端到端延迟 | **仍未测量**：token 与调用次数**已有服务端依据**（主批次 10 次 / 34,127 tokens；累计 13 次 / 38,326 tokens），但**供应商单价未取得真实账单**，金额记 `not_measured`（不得按公开牌价推算）；「用户点击→三方案可用」的浏览器端到端延迟未测（接入层未接真实模型） |
 | 真实商品价格／库存／物流 | **完全没有**；价格与准备时间仅为估算 |
 
-> **2026-10-30 晚更新（容器化）**：本表原有「Docker 构建｜从未构建」一行，**已被真实构建取代，该行移入 §1.1 已实测项**（镜像 `giftwise-validator:latest`，ID `b42f408b4f07`，178 MB；容器内 `/healthz` 200、`/validate` 与本机纯函数逐字节一致）。本表保留的否定项**只针对云部署与编排**：仍无云主机、无 EIP、无镜像仓库推送、无多副本、无弹性伸缩、无资源调度、无分布式状态。
+> **2026-10-30 晚两次更新**：①**容器化**——本表原有「Docker 构建｜从未构建」一行**已被真实构建取代，该行移入 §1.1**（镜像 `giftwise-validator:latest` 178 MB；容器内 `/healthz` 200、`/validate` 与本机纯函数逐字节一致）。②**真实模型**——原「真实模型生成与修订｜未发生」一行**已被真实 DeepSeek 节点取代**（N2／N5 为 `type: llm`，主批次 10 次调用 / 34,127 tokens；累计 13 次 / 38,326 tokens）。本表保留的否定项**只针对云部署、编排与呈现阶段**：仍无云主机、无 EIP、无镜像仓库推送、无多副本、无弹性伸缩、无资源调度、无分布式状态、无选择后呈现。
 
-> **与任务书的一处事实校正（已与 PM 确认）**：任务书写"N1–N7 未接线"。该结论在 QA-001 观测时刻（2026-10-30 20:53）成立，但已被 WF-003（20:58 起）的真实接线与五类用例运行**取代**。本文采用后者：**接线已实测，模型未接**。二者不矛盾的关键在于"接线"与"模型调用"是两件事，必须分开陈述。
+> **与任务书的一处事实校正（已与 PM 确认）**：任务书写"N1–N7 未接线"。该结论在 QA-001 观测时刻（2026-10-30 20:53）成立，但已被 WF-003（20:58 起）的真实接线与五类用例运行**取代**。本文采用后者：**接线已实测**；模型部分再由 WF-003 任务 C 更新为**已接真实 DeepSeek（主批次 10 次调用 / 34,127 tokens；累计 13 次 / 38,326 tokens）**。"接线"与"模型调用"是两件事，且**早期占位轮（0 tokens）与真实模型轮必须分开陈述**。
 
 ## 2. 架构图与组件、边界、数据流
 
@@ -95,13 +99,13 @@ flowchart TB
         MOCK["mock-model.mjs 固定模拟数据<br/>显著标注·不得冒充真实输出"]
     end
 
-    subgraph Z3["③ 编排层｜Dify Cloud 1.18.0 草稿（未发布）"]
-        START["Start 用户输入<br/>intake_json · trusted_repair_count<br/>inject_* 仅占位期测试注入口"]
+    subgraph Z3["③ 编排层｜已发布并创建版本（v1 2026-10-30 23:04／当前 v2）｜Dify Cloud 1.18.0（实读，未复核）"]
+        START["Start 用户输入<br/>intake_json · trusted_repair_count<br/>（计数非防篡改，见正文 §3.3）"]
         N1["N1 Code 确定性适配"]
-        N2["N2 需求分析与三候选<br/>占位节点：不调用模型"]
+        N2["N2 需求分析与三候选<br/>真实 LLM：deepseek-v4-flash<br/>真实生成 6 次 · 约 4.5–6.0 s"]
         N3["N3 Code 首次校验"]
         N4{"N4 If/Else 结果分支<br/>true · repairable · else"}
-        N5["N5 一次修订<br/>占位节点：不调用模型"]
+        N5["N5 一次修订<br/>真实 LLM 修订 · 约 3.0–3.1 s<br/>真实成功 1 次／未修好 1 次"]
         N6["N6 Code 再校验<br/>已通过项保护"]
         N7A["N7a 未修订报告"]
         N7B["N7b 修订后报告"]
@@ -117,7 +121,7 @@ flowchart TB
 
     subgraph Z5["⑤ 条件性独立规则 API｜deploy/（归属 CLOUD-001）"]
         SRV["deploy/server.py<br/>GET /healthz · POST /validate"]
-        DOCKER["Dockerfile · publish-to-uhost.ps1"]
+        DOCKER["Dockerfile（镜像已构建·实测）<br/>publish-to-uhost.ps1（未上传）"]
     end
 
     subgraph Z6["⑥ 证据与可观测（无平台级 trace，走替代路径）"]
@@ -167,9 +171,9 @@ flowchart TB
     classDef placeholder fill:#ffe8cc,stroke:#d9480f,color:#000
     classDef planned fill:#e9ecef,stroke:#868e96,color:#000
 
-    class RULES,RUNTIME,BUILD,N1,N3,N6,N7A,N7B,EA,EB,HASH,EVID,SRV measured
+    class RULES,RUNTIME,BUILD,N1,N2,N3,N5,N6,N7A,N7B,EA,EB,HASH,EVID,SRV,START measured
     class ROUTE,ADAPTER,PIPE,STORE,JCHK,DCLIENT,UI unverified
-    class START,N2,N5,MOCK placeholder
+    class MOCK placeholder
     class DOCKER planned
     class L_MEASURED measured
     class L_UNVERIFIED unverified
@@ -190,11 +194,11 @@ flowchart TB
 | `store.mjs` | 可信任务快照：运行 ID、两版候选、校验输出、修订计数、幂等选择 | ← 编排写入 | E2 |
 | `checker.mjs` | `validator/rules.py` 的 JS 镜像，供 Node 接入层直接调用 | 镜像 → Python 参考实现 | E2（parity 已实测一致） |
 | `dify.mjs` | 服务端调用 Dify `/workflows/run`；密钥仅服务端 | → Dify Cloud | E2（**从未成功调用过一次**） |
-| Dify 编排 N1–N7 | 多步骤 Agent 链路：适配 → 生成 → 校验 → 分支 → 修订 → 重检 → 报告 | 调用 Code 节点 | E1（接线与五类用例）／N2·N5 为 P |
+| Dify 编排 N1–N7 | 多步骤 Agent 链路：适配 → 生成 → 校验 → 分支 → 修订 → 重检 → 报告 | 调用 Code 节点 | E1（接线与五类用例；**N2／N5 已为真实 `type=llm`／`deepseek-v4-flash` 并完成真实调用**） |
 | `validator/rules.py` | 确定性规则纯函数：预算、币种、禁忌、必填、准备时间；**不调用模型、不访问网络** | 被依赖，不依赖他人 | E1 |
 | `workflow/runtime.py` | 包装层：`check`／`recheck`／`report`、已通过项保护、修订额度不回滚 | → 规则纯函数 | E1 |
 | `workflow/build_code_node.py` | 把规则打包成自包含节点源码（Dify Code 无法 import 仓库模块，见 §4.2） | ← 规则源码 | E1 |
-| `deploy/server.py` | 条件性独立规则 API，直接复用同一纯函数 | → 规则纯函数 | E1（可运行，未容器化/未部署） |
+| `deploy/server.py` | 条件性独立规则 API，直接复用同一纯函数 | → 规则纯函数 | E1（可运行；**已容器化**，未部署到云端） |
 | `workflow/evidence/` | 真实运行原文、节点级 I/O、哈希 | ← 各执行点 | E1 |
 
 **边界（不可信 → 可信的唯一入口）**：浏览器提交的一切都是数据，不是结论。`passed`、`estimated_total`、`repair_count`、`recipient_relation_id` 若由前端提交会被拒绝（`INTAKE_UNKNOWN_FIELD`）。可信状态只由服务端产出与保存。
@@ -233,7 +237,8 @@ flowchart TB
 | 请求类型 | 低频、单用户、会话式；**一次送礼任务 = 1–2 次模型调用**（正常 1 次生成，触发修订时 2 次；呈现阶段另计） | `workflow/workflow-spec.md` §调用次数；`store.mjs` 的 `call_counts` |
 | 计算量 | 确定性规则极轻：单次 p50 **0.166 ms**、p95 0.362 ms（本机单进程串行） | 本次实测 §1.1 |
 | 端到端（无模型） | 固定夹具 intake→check→report p50 **0.640 ms**；Dify 工作流服务端 **0.587–0.888 s**（含 7 个 Code 节点，无模型） | 本次实测；WF-003 §3.4 |
-| 真实业务延迟 | **未知（U）**。模型未接，任何"几十秒"的说法都无依据 | 见 §8.3 |
+| 真实业务延迟（模型段） | **模型段已实测**：N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 7 个 Code 节点）**5.2–8.9 s** | WF-003 §4.7；§8.1 |
+| 浏览器端到端延迟 | **仍未知（U）**：接入层未接真实模型，"用户点击→三方案可用"从未端到端测过 | 见 §8.3 |
 | 并发 | **无任何并发测试**；接入层与规则 API 均无并发上限治理 | 见 §3.4 |
 
 **结论与取舍**：当前负载下，瓶颈**不在规则层、也不在 CPU**，而在（a）外部模型往返与配额、（b）网络传输与控制台 I/O。因此架构选择：**规则层用纯函数内联执行**（本地 0.166 ms／Dify Code 节点内进程执行），而不是为它单独部署一个微服务；**模型调用集中在一个可替换的客户端**（`dify.mjs`），便于在模型授权后切换供应商而不动其余代码。
@@ -311,7 +316,7 @@ flowchart TB
 | **Dify Code 节点无法 `import` 仓库模块** | `workflow/build_code_node.py` 把 `validator/rules.py` + `workflow/intake.py` + `runtime.py` + `labels.py` 打包成**自包含单文件源码**，写入 Code 节点 | **E1**：28,682–28,951 字符的 7 个 Code 节点在 Dify Cloud 1.18.0 同时在线、保存并执行成功；服务端实读 sha256 与本地生成物**在行尾归一化后一致**（WF-003 §3.2） |
 | **Dify 沙箱标准库受限** | 只用 `json`／`re`(含 `re.ASCII`)／`unicodedata`(NFKC)／`decimal` | **E1**：四项能力探针全 true（WF-002 + QA 独立复跑） |
 | **无平台级追踪（`trace-runs` = `not_collected`）** | 改用 `POST .../workflows/draft/run` 的 **SSE 节点级事件** + `GET .../nodes/<id>/last-run` | **E1**：五类用例的节点级 `status`／`error`／`elapsed_time`／`outputs`／`inputs` 已逐字归档；Dify 控制台接口需页面携带 CSRF 头，脚本已适配（QA §1.6、WF-003 §3.3 失败 4） |
-| **接入层与 Dify 的模型字段不一致风险** | Python 与 JS 两套实现**用同一批字面样例做 parity 比对** | **E1**：55 组样例（intake 27 + 校验批次 28）**0 处语义差异**（本次实测） |
+| **接入层与 Dify 的模型字段不一致风险** | Python 与 JS 两套实现**用同一批字面样例做 parity 比对** | **E1**：**74 组**样例（intake 27 / 候选批次 26 / 请求侧越界与格式 17 / 损坏样例 4）**0 处语义差异**（本次复跑；原记 55 组＝intake 27 + 校验批次 28）；另 1 组仅**错误顺序**不同，**网格之外** 1 项 `days=10**20` 分类口径（两侧都拒绝） |
 | **大体积源码写入草稿需正确载荷** | 载荷必须是 `{graph, features, hash}`，`hash` 取写入前 `GET draft` 当前值 | **E1**：实测 400／409／200 三种结果，结论见 WF-003 §3.3 失败 1 |
 
 **未解决的替代风险（必须披露）**：目前**规则有两套实现**（Python 权威 + JS 镜像）。镜像靠 parity 工具与用例约束，**不是编译期保证**；一旦两侧独立演进，可能出现语义漂移。缓解方向（未实现）：让接入层改为调用独立规则 API 或直接使用打包产物，收敛为单一实现。
@@ -320,10 +325,10 @@ flowchart TB
 
 | 选型 | 当前判断 | 实测证据（E1） | 仅计划／未做（E3） |
 | --- | --- | --- | --- |
-| **Dify Cloud**（编排与模型网关） | **采用** | 1.18.0 版本实读；草稿 11 节点接线；Code 节点沙箱执行成功；五类用例跑通；`0 Tokens` | 真实模型调用、发布、配额与费率 |
-| **确定性规则内联**（Code 节点 + 纯函数） | **采用（核心）** | 46／322／39 项测试；打包后云端执行成功；本地 p50 0.166 ms | — |
-| **Docker**（可复现打包） | **已采用（实测）** | 镜像 `giftwise-validator:latest`（ID `b42f408b4f07`，**178 MB**）；冷构建 **2.2 s**／热构建 **0.6 s**；容器启动到 `/healthz` 200 **0.75–1.01 s**；运行内存 **14.41–17.86 MiB**；CPU 0.01%；容器内 `/validate` 与本机纯函数**逐字节一致**；非 root（uid 10001）。证据 `deploy/evidence/docker-2026-10-30.md`（9/9） | 镜像仓库推送、多副本、编排（K8S 不采用）、云主机部署 |
-| **独立规则 API**（`deploy/server.py`） | **已存在，未部署** | `/healthz` 200、`/validate` 200 且与纯函数逐字段一致、400／404／413 正确；localhost 往返 p50 12.5 ms | 容器化、反向代理、并发治理、TLS、鉴权 |
+| **Dify Cloud**（编排与模型网关） | **采用** | 1.18.0 版本实读；11 节点接线；Code 节点沙箱执行成功；注入轮五类用例跑通；**真实 DeepSeek 节点主批次 10 次调用 / 34,127 tokens、累计 13 次 / 38,326 tokens**；**已发布并创建版本（v1/v2）** | 配额与费率、镜像仓库 |
+| **确定性规则内联**（Code 节点 + 纯函数） | **采用（核心）** | 46 探针 / **329** 单测 / 39 阶段 C（另有 stage_b **275**、boundary **45**；四条互不包含，合计 **688**）；打包后云端执行成功；本地 p50 0.166 ms | — |
+| **Docker**（可复现打包） | **已采用（实测）** | 镜像 `giftwise-validator:latest` **178 MB** 十进制（`docker inspect` Size 177,582,258 字节＝**169.36 MiB**）；**热构建 0.6 s**（D-1／D-8，有归档）、**冷构建两个合法值**：2026-10-30 基线 **1.720 s**（D-9 `--no-cache` 有归档；原记 2.2 s **无归档**，已由部署线补采更正）、2026-10-31 重建版 **3,662 ms**（`deploy/evidence/raw/image-rebuild-n1n4/build-timing.txt`）；容器启动到 `/healthz` 200 **0.750–0.939 s**（原记上限 1.01 s 无归档）；运行内存 **14.45–17.08 MiB**（原记两端 14.41／17.86 MiB 无归档；**本架构 Agent 独立复测 14.71 MiB**，落在区间内）；CPU 0.01%；容器内 `/validate` 与本机纯函数**逐字节一致**；非 root（uid 10001）。**交付镜像已于 2026-10-31 01:13:59 重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`（177,918,474 字节＝169.676 MiB），`/healthz` 规则哈希 `1f389dad…` 与本机一致 | 镜像仓库推送、多副本、编排（K8S 不采用）、云主机部署 |
+| **独立规则 API**（`deploy/server.py`） | **已存在，已容器化，未部署** | `/healthz` 200、`/validate` 200 且与纯函数逐字段一致、400／404／413 正确；localhost 往返 p50 12.5 ms；**容器内 `/validate` 与本机逐字节一致（已实测）** | 云端部署、反向代理、并发治理、TLS、鉴权 |
 | **UCloud UHost**（托管） | **未采用，未采购** | 无：`publish-to-uhost.ps1` **从未上传** | 实例、EIP、安全组、费用 |
 | **Kubernetes** | **明确不采用（当前）** | 无，且**未做任何压测** | — |
 | **微服务拆分** | **不采用** | 规则层本地 0.166 ms，拆服务只会增加网络与运维成本（实测 HTTP 往返 p50 12.5 ms ≫ 计算 0.166 ms） | — |
@@ -331,7 +336,7 @@ flowchart TB
 | **弹性伸缩／资源调度** | **未实现** | 无 | 全部 |
 | **GitHub**（公开规范与源码） | **采用** | 仓库与 Issue 驱动协作；只放经审查资料与虚构数据 | 版本快照与提交（由 PM 统一处理） |
 
-> **诚实声明**：评分规则赛道 B 的"云原生架构"维度包含 Docker/K8S、弹性伸缩、资源调度、分布式状态。**截至 2026-10-30 晚：容器化已有真实验证**（本机 Docker **单一实例**：镜像 `giftwise-validator:latest`，ID `b42f408b4f07`，178 MB；容器内 `/healthz` 200、`/validate` 与本机纯函数**逐字节一致**；证据 `deploy/evidence/docker-2026-10-30.md`）；**但部署上云、弹性伸缩、资源调度与分布式状态仍无任何真实验证**（无云主机、无 EIP、无镜像仓库推送、无多副本、无编排平台）。本文不把未做成的部分写成已具备；这一项的得分应取决于已实测的编排链路、规则独立性、容器化实测证据与证据完整性，而不是容器化程度本身。
+> **诚实声明**：评分规则赛道 B 的"云原生架构"维度包含 Docker/K8S、弹性伸缩、资源调度、分布式状态。**截至 2026-10-30 晚：容器化已有真实验证**（本机 Docker **单一实例**：镜像 `giftwise-validator:latest`，ID `b42f408b4f07`，178 MB；容器内 `/healthz` 200、`/validate` 与本机纯函数**逐字节一致**；证据 `deploy/evidence/docker-2026-10-30.md`）；**但部署上云、弹性伸缩、资源调度与分布式状态仍无任何真实验证**（无云主机、无 EIP、无镜像仓库推送、无多副本、无编排平台），**`publish-to-uhost.ps1` 从未执行**。本文既不把未做成的部分写成已具备，也不把已做成的部分写成未做；这一项的得分应取决于已实测的编排链路、规则独立性、容器化实测证据与证据完整性，而不是容器化规模（单机单实例 vs 集群）。
 
 ## 6. 异常处理说明（评分规则 1.2 明确要求，独立成节）
 
@@ -459,9 +464,11 @@ flowchart TD
 | 无模型端到端固定夹具（intake→check→report） | p50 **0.640 ms**、p95 1.322 ms | 同上 |
 | 一次修订路径（check→recheck，含已通过项保护） | p50 **0.739 ms**、p95 0.828 ms | 同上 |
 | 独立规则 API localhost 往返 | p50 **12.545 ms**、p95 21.885 ms、min 0.756 ms | 本机回环、每请求新建连接（未复用）、串行、n=200，不含模型 |
-| Dify 工作流服务端耗时（无模型） | **0.587–0.888 s**（5 例） | WF-003 §3.4；**不可当作业务延迟** |
+| Dify 工作流服务端耗时（注入轮·无模型） | **0.587–0.888 s**（5 例） | WF-003 §3.4；**不可当作业务延迟** |
 | N1 Code 节点耗时 | **0.0667–0.2377 s**（5 次） | 同上 |
-| 模型 token 与调用次数 | **0 Tokens、0 次调用** | 全部真实运行均无模型 |
+| 模型 token 与调用次数（真实 DeepSeek 轮） | **主批次 34,127 tokens / 10 次调用**（23,704 + 7,396 + 3,027）；**累计 38,326 tokens / 13 次调用** | WF-003 §4.5；服务端 `workflow_finished.total_tokens`；模型 `deepseek-v4-flash` |
+| 模型段延迟（真实 DeepSeek 轮） | N2 约 **4.5–6.0 s**、N5 约 **3.0–3.1 s**、端到端（含 7 个 Code 节点）**5.2–8.9 s** | WF-003 §4.7；6 次真实运行 |
+| 确定性检查的模型用量 | **0 Tokens**（注入轮 5 例、纯 Code 节点） | 规则在 Code 节点内执行，不消耗模型用量 |
 | 成本 | **`not_measured`** | 无计费即无费率依据，**不填 0** |
 
 ### 8.2 测量方法学（含一次真实失败，作为方法可信度证据）
@@ -472,7 +479,7 @@ flowchart TD
 
 ### 8.3 当前未知项（U）
 
-真实业务端到端延迟、P50/P95、模型输入/输出 token、单次任务成本、并发容量、资源消耗、失败率、修订触发率、供应商费率与试用额度余额——**全部未知**，且多数被**模型未授权（OPEN-5）**阻塞。
+**已有实测**：模型段延迟、token 总量与调用次数、容器镜像／启动／内存基线（见 §8.1）。**仍未知（U）**：浏览器端到端延迟与 P50/P95、输入/输出 token 拆分、**金额成本**（供应商单价无真实账单）、并发容量与限流、云资源消耗、失败率与修订触发率的分布、模型输出稳定性（仅 6 次运行样本）。
 
 ## 9. 未解决问题与风险（含本次实测新发现）
 
@@ -484,8 +491,9 @@ flowchart TD
 | A-4 | **规则两套实现**（Python 权威 + JS 镜像），一致性靠用例而非编译期保证 | 长期语义漂移风险 | 架构建议见 §4.2；收敛方案未实现 |
 | A-5 | **可信状态在进程内存**，重启丢失，多副本不可用 | 无法声称"网页选择闭环"与防篡改 | 需持久化（未实现） |
 | A-6 | **`workflow_errors` 与顶层 `all_passed` 的字段位置**：QA 观察到接入层 `publicReport` 未在顶层暴露 `all_passed`（实际在 `validation.all_passed`），与契约报告字段清单不一致 | 前后端字段口径 | 报前端线／契约线（QA 已登记） |
-| A-7 | **`inject_candidates_json`／`inject_repair_json` 是占位期测试注入口**，出现在 Start 节点上 | 换真实模型节点时必须移除，否则等于给生产留了绕过模型的入口 | 报工作流线／PM（WF-003 §6.4 已自陈） |
-| A-8 | **模型未授权**（DeepSeek 未配置；平台托管模型可用但未调用） | 真实三候选、真实修订、成本与延迟全部阻塞 | 产品负责人／PM（OPEN-5） |
+| A-7 | ~~`inject_candidates_json`／`inject_repair_json` 占位期测试注入口~~ **已由工作流线移除**（Start 只剩 `intake_json`／`trusted_repair_count`；最终状态 JSON 中 `inject_*` 与 `placeholder` 命中均为 **0**，本架构 Agent 已复核） | 原风险（生产绕过模型入口）**已消除** | **已闭环**；后续若再引入测试注入口，须与生产变量分离 |
+| A-8 | ~~模型未授权~~ **已解除**：DeepSeek 已配置并真实调用成功（4 个模型 `active`；主批次 10 次调用 / 34,127 tokens；累计 13 次 / 38,326 tokens） | 真实生成、真实自然违规、真实修订、真实持续失败均**已取得运行时证据**；**金额成本**仍无账单依据 | **已闭环（OPEN-5 部分解除）**；金额成本待产品负责人提供账单 |
+| A-11 | **容器证据的三处口径缺口**（属 `deploy/`，由本架构 Agent 复核发现，**仅报告不代改**）：①证据引用镜像 ID `b42f408b4f07`，而 2026-10-30 22:5x 复核时 `latest` 已是 `61321052b48b`（`b42f408b4f07` 现存于 tag `pm-baseline-20261030`）；②冷构建 **2.2 s** 与启动上限 **1.01 s**、内存两端 **14.41／17.86 MiB** 在 `raw/` 中**均无原始输出**，且证据表 D-8 写「0.6s（首次 0.6s）」与「冷 2.2 s」**自相矛盾**；③`169.4 MB` 应为 **169.4 MiB**（177,582,258 字节） | 评委按原始证据复核时会对不上；**不影响「容器化已实测」的成立**（我已独立复跑通过，见 §10.6） | **已于 2026-10-31 由部署线逐条核实并闭合**：① 镜像 ID 判据改用 tag＋构建日期＋`rules_source_sha256`（D-12 已取证漂移）；② 冷构建补采 **1.720 s**、启动 **0.750–0.939 s**、内存 **14.45–17.08 MiB**（D-9／D-11）；③ 单位更正为 **169.36 MiB**（D-10）。见 `deploy/evidence/docker-2026-10-30.md` 修订表与 `deploy/evidence/image-audit-2026-10-31.md` |
 | A-9 | **无平台级 trace** | 赛道 B"工具调用轨迹"需靠 SSE 替代证据 | 已用替代路径补足（§7）；如可开启租户 trace 更佳 |
 | A-10 | **D1 文档缺陷仍在**：`docs/demo-script.md` 首场景仍为"同事"，与"同事完全移出产品场景"的冻结决定冲突 | 现场 Demo 口径与验收标准冲突 | 发布线（QA D-1 已登记，我未修改） |
 
@@ -523,6 +531,8 @@ JS↔Python 语义比对：共 55 组样例（intake 27 条 / 校验批次 28 �
 附加检查：通过（拒绝且不静默映射）
 ```
 
+> **现行复跑（2026-10-31，本机）**：`JS↔Python 语义比对：共 74 组样例（intake 27 / 候选批次 26 / 请求侧越界与格式 17 / 损坏样例 4）` → `结果：全部一致（0 处语义差异）`；另有 **1 组仅错误顺序**不同。**网格之外**（网格天数只到 365／366）独立登记 1 项 `days=10**20` 分类口径差异，**两侧都拒绝**。以上 §10.2 转录为 **2026-10-30** 时点，非当前结论。
+
 ### 10.3 独立规则 API 实测（本机）
 
 ```text
@@ -559,12 +569,37 @@ $ python .tmp/render_mermaid.py        # 本机 Chrome(headless) + mermaid 11
 ### 10.5 外部证据（他人执行，已标注出处）
 
 - `workflow/evidence/WF-002-2026-10-30.md`（PM：Dify Code 节点沙箱探针）
-- `workflow/evidence/WF-003-2026-10-30.md`（工作流线：N1–N7 接线 + 五类用例 + DeepSeek 可用性）
+- `workflow/evidence/WF-003-2026-10-30.md`（工作流线：N1–N7 接线 + 注入轮五类用例 + **真实 DeepSeek 6 次运行 / 主批次 10 次调用 / 34,127 tokens；累计 13 次 / 38,326 tokens**）
+- `workflow/evidence/WF-003-2026-10-30/dify-real-node-io-*.md`（真实模型节点级输入输出逐字原文）
+- `deploy/evidence/docker-2026-10-30.md` + `deploy/evidence/raw/docker-2026-10-30/`（PM：容器化 **D-0…D-13 共 14 项**；原记 D-0…D-10）
 - `docs/test-reports/stage-c/acceptance-2026-10-30.md`（测试验收 Agent 独立复核，含 §7 三段清单）
+
+### 10.6 容器化的独立复核（本架构 Agent，2026-10-30 22:5x 北京时间）
+
+不采信转述，用 Docker CLI 直接复核当前 `giftwise-validator:latest`：
+
+```text
+$ docker version --format '{{.Client.Version}} / {{.Server.Version}}'  → 29.9.2 / 29.9.2
+$ docker images giftwise-validator  → latest=61321052b48b 178MB；pm-baseline-20261030=b42f408b4f07 178MB
+$ docker run -d --name gw-arch-verify -p 127.0.0.1:8899:8000 giftwise-validator:latest
+$ curl .../healthz   → http=200
+  {"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48…"}  ← 与本机 rules.py 一致
+$ curl -s -X POST .../validate  （真实 request_json + candidates_json）
+  → http=200；容器响应 271 字节；与本机 validator.rules.validate 逐字节一致 = True；status=passed
+$ docker exec gw-arch-verify id          → uid=10001(giftwise) gid=10001(giftwise)   ← 非 root 复现
+$ docker run --rm --entrypoint /usr/bin/find … /app | wc -l  → 9                     ← 「9 行文件树」复现
+$ docker run --rm --entrypoint /bin/sh … 'grep -rIl -E "sk-|API_KEY=|password=" /app'  → 命中 0
+$ docker stats --no-stream gw-arch-verify → 14.71MiB / 7.618GiB | 0.01%              ← 落在文档区间内
+$ docker rm -f gw-arch-verify           → 已清理（8899 不再响应）
+```
+
+**复核结论**：容器化"已实测"**成立**——健康检查 200、`/validate` 逐字节一致、非 root、无密钥、9 行文件树、内存与 CPU 基线**均独立复现**。
+**同时发现三处口径缺口**（镜像 ID 与 `latest` 不一致、冷构建 2.2 s 无原始归档、`169.4` 应为 MiB）→ 已登记为 §9 A-11，**报 PM／部署线，我未修改 `deploy/`**。（**2026-10-31 状态**：三处已由部署线逐条核实并闭合，见 §9 A-11。）
 
 ## 11. 变更记录
 
 | 日期 | 变更 |
 | --- | --- |
 | 2026-10-29 | 初版草案（设计方案，尚未部署） |
-| 2026-10-30 | **ARCH-001 升级**：按赛道 B 评分规则逐项映射；新增可渲染架构图 3 张并实测渲染；补"为什么采用该架构"（负载／状态／扩缩容／故障恢复）；异常处理独立成节并六项对照；新增可观测性设计与成本性能指标清单；标注证据等级；记录与任务书的事实校正（N1–N7 接线已实测）；登记 10 项未解决问题（含本次实测新发现 A-1） |
+| 2026-10-31 | **数字口径统一扫描线（本轮）**：追加头部《口径时点声明》；正文现行值刷新——单元测试 322→**329**、独立验收套件补登 275／45 与合计 **688**、parity 55→**74 组**（越界与格式 17 组已覆盖）、容器检查项 9/9→**14 项**（D-0…D-13）、冷构建 2.2 s→**1.720 s**、镜像体积 **169.36 MiB**、模型调用补登**累计 13 次 / 38,326 tokens**、Dify「未发布」→「**已发布并创建版本（v1/v2）**」、交付镜像**已重建并复核**、§9 A-11 三处缺口标记**闭合**。§10 的 2026-10-30 逐字输出按纪律**保留原文**，由头部声明覆盖 |
+| 2026-10-30 | **ARCH-001 升级**：按赛道 B 评分规则逐项映射；新增可渲染架构图 3 张并实测渲染；补「为什么采用该架构」（负载／状态／扩缩容／故障恢复）；异常处理独立成节并六项对照；新增可观测性设计与成本性能指标清单；标注证据等级；记录与任务书的事实校正（N1–N7 接线已实测）；登记 10 项未解决问题（含本次实测新发现 A-1） |

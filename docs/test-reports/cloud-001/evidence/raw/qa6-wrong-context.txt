@@ -1,0 +1,9 @@
+=== 反例：context=deploy/ 是否如 PM 所说失败 ===
+--------------------
+  10 |     
+  11 |     WORKDIR /app
+  12 | >>> COPY validator /app/validator
+  13 |     COPY deploy/server.py /app/deploy/server.py
+  14 |     
+--------------------
+ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref pl06rs7a0smvdn9h2ekhwdtvu::luhbdl3s0cub0evxt2u39m22t: "/validator": not found

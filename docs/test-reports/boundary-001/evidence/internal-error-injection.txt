@@ -1,0 +1,20 @@
+=== 基线（不注入）===
+  validator: status=passed codes=[]
+  intake   : status=ready codes=[]
+
+=== 注入后：validator/rules.py 顶层 except → path='$' ===
+  status=error all_passed=False
+  codes=[('INTERNAL_ERROR', '$')]
+  business_data_verification=not_verified
+  响应中含堆栈文本=False（必须为 False）
+
+=== 注入后：workflow/intake.py status=='error' → path='intake' ===
+  status=needs_input codes=[('INTERNAL_ERROR', 'intake')]
+  是否释放 request_json=False（必须为 False）
+
+=== 还原后自证 ===
+  _norm 已还原=True
+  validator: status=passed codes=[]
+
+两条路径均已触达=True
+证据: C:/Users/lenovo/Desktop/giftwise/docs/test-reports/boundary-001/evidence/internal-error-injection.json

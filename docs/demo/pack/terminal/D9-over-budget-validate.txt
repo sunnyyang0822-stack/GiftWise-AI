@@ -1,0 +1,13 @@
+# 证据：超预算被真实校验器拒绝（OVER_BUDGET）—— 对交付容器直接发请求
+# 执行时间：2026-10-31 02:08:07 +0800
+# 执行目录：/c/Users/lenovo/Desktop/giftwise   （目标：本机容器 http://127.0.0.1:8010）
+# 命令来源：docs/demo-script.md §5.2（把候选 1 的 estimated_total 改成 250.00，请求侧预算上限 200.00）
+# 编码：PYTHONIOENCODING=utf-8（否则中文错误信息会被本机代码页转成乱码）
+
+$ python - <<PY ... POST /validate ... PY
+status      : failed
+all_passed  : False
+candidate c1: OVER_BUDGET @ candidates[0].estimated_total — 估算总费用超过预算
+
+# 结论：status=failed，且候选 1 报出 OVER_BUDGET。
+# 边界声明：这是**本机交付镜像**的真实校验结果，不是 Dify 现场跑出来的。

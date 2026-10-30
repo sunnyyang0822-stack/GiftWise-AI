@@ -88,10 +88,10 @@ GET /console/api/apps/<app_id>/trace-runs/workflow/<run_id> → 200
 
 | 字段 | 语义 | 现状 |
 | --- | --- | --- |
-| `recommend` | 推荐阶段模型调用次数 | E2：mock 下计数；**真实模型未接，实际为 0** |
-| `recommend_revision` | 推荐阶段修订调用次数 | 同上 |
-| `presentation` | 呈现阶段调用次数 | 同上 |
-| `presentation_revision` | 呈现阶段修订调用次数 | 同上 |
+| `recommend` | 推荐阶段模型调用次数 | **接入层（E2）**：mock 下计数，未接真实模型故为 0；**工作流侧真实调用已实测**（WF-003 §4.5：含 N5 修订**主批次共 10 次**；**累计 13 次 / 38,326 tokens**），但**不在接入层计数内** |
+| `recommend_revision` | 推荐阶段修订调用次数 | **接入层（E2）**未接；**工作流侧真实修订 2 次已实测**（WF-003 §4.5 第 2 批） |
+| `presentation` | 呈现阶段调用次数 | **未实现**；选择前必须为 0（SC-5 的可观测断言） |
+| `presentation_revision` | 呈现阶段修订调用次数 | **未实现** |
 
 模型调用总次数、token 与成本**必须分别记录**，不能沿用"全程一至两次"的粗口径。
 
@@ -100,7 +100,7 @@ GET /console/api/apps/<app_id>/trace-runs/workflow/<run_id> → 200
 | 字段 | 来源 | 现状 |
 | --- | --- | --- |
 | `elapsed_time`（节点级／工作流级） | Dify `draft/run` SSE | **E1 已实测可采集**：如 `node_finished.elapsed_time = 0.094046`、`workflow_finished.elapsed_time = 0.154` |
-| `total_tokens`、`total_steps`、`exceptions_count` | Dify `workflow_finished` | **E1**：五类用例实测 `total_tokens = 0` |
+| `total_tokens`、`total_steps`、`exceptions_count` | Dify `workflow_finished` | **E1**：注入轮 5 例 `total_tokens = 0`；**真实模型轮主批次 10 次调用合计 34,127 tokens；累计 13 次 / 38,326 tokens**（WF-003 §4.5；v2 复跑见 `workflow/evidence/WF-003-2026-10-31-publish-v2/README.md`） |
 | 分段耗时（intake／check／recheck／report） | 本地 `time.perf_counter()` | E2：阶段 C 已用 `time.monotonic` 记录；**本机 Windows 分辨率不足，须批量计时**（见成本性能清单 §2） |
 | 接入层请求耗时（HTTP） | 计划 | **E3 未实现** |
 
@@ -203,7 +203,7 @@ flowchart LR
 
 ### 4.3 ③ 版本锚定哈希（**E1 已实测**）
 
-- `GET /healthz` → `rules_source_sha256`（实测 `4782255b…`）。
+- `GET /healthz` → `rules_source_sha256`（**现行实测 `1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500`**；旧值 `4782255b…` 为 2026-10-30 时点，交付镜像重建后**已作废**）。
 - `python workflow/build_code_node.py` → `sources_sha256` + `artifacts_sha256`。
 - 云端节点哈希与本地比对须**先做行尾归一化**（CRLF→LF），否则字节数会差"行数个字节"（WF-003 §3.2 已更正过一次不准确表述）。
 
@@ -221,6 +221,7 @@ flowchart LR
 | 调用计数 | 已实现（字段随报告返回） | E2 |
 | 节点级耗时与 token | 可采集（SSE） | E1 |
 | 版本指纹 | 已实现 | E1 |
+| **容器内版本指纹一致性** | **已实测**：容器内 `/healthz` 的 `rules_source_sha256` 与本机 `validator/rules.py` 一致（独立复核） | E1 |
 | 结构化日志落盘 | **未实现** | E3 |
 | 指标聚合（P50/P95、错误率） | **未实现** | E3 |
 | 面板／告警／阈值 | **未实现** | E3 |
@@ -241,6 +242,9 @@ flowchart LR
 | --- | --- |
 | 字段名 | 以本文 §3 为准；部署侧不得另起同义字段 |
 | 采集落点 | 部署线决定（`deploy/` 内或部署期日志），本文不预设路径 |
-| 需部署线实测 | 容器内日志落盘、日志轮转、采集开销、`/healthz` 版本指纹在容器内是否一致 |
+| 需部署线实测 | 容器内日志落盘、日志轮转、采集开销（~~`/healthz` 版本指纹在容器内是否一致~~ **已实测：一致**——2026-10-30 22:5x 独立复核，容器内 `rules_source_sha256` = 本机 `validator/rules.py` 哈希，见 `docs/architecture.md` §10.6） |
+| **`run_id` 命名空间（新增，须回填）** | 部署侧若按 `run_id` 聚合，**必须明确指接入层任务级 `recommendation_run_id`**（`gw-{base36}-{uuid8}`），**不得与 Dify `workflow_run_id` 混用**——两者不同源（§2）。归档/日志里应同时保留两者并各自标注字段名 |
+| **成本与模型用量口径（新增，已核对一致）** | 部署线 `deploy/observability.py` 的 `cost {unit: CNY, amount: 0.0, source: "deterministic_rules_only"}` 与 `giftwise_model_calls_total 0` **与本文件一致**：规则 API 不调模型，故其成本恒为 0。**金额成本的全链路值仍记 `not_measured`**（无供应商真实账单），不得把该服务的 0 当作业务成本 |
+| 容器化状态（新增） | **容器化已实测**（本机单一实例；**D-0…D-13 汇总 14 项**，部署线自纠，原文记 9/9；见 `deploy/evidence/docker-2026-10-30.md`。**交付镜像已于 2026-10-31 01:13:59 重建并复核**：`submission-20261101` = `latest` = `d9a4a35763ee`）；**云端部署、镜像仓库推送、多副本仍未发生**——本文件的「落点」设计对二者同样适用 |
 | 需部署线回填 | 真实部署后的端口、时区（必须 +08:00）、保留期、采集方式 |
 | 本文件不修改 `deploy/` | 遵守文件边界；如需调整 `deploy/`，由部署线执行 |

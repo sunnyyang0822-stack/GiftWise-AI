@@ -1,0 +1,43 @@
+{
+  "suite": "CLOUD-001 攻击实验：停滞连接是否无限占用线程",
+  "container": "gw-qa",
+  "base_url": "http://127.0.0.1:18000",
+  "declared_vs_actual": "Content-Length: 100，实际只发 5 字节后停住",
+  "hold_seconds": 45.0,
+  "verdict": {
+    "server_blocked_indefinitely": true,
+    "thread_growth": 9,
+    "threads_reclaimed_after_client_close": true,
+    "service_still_responsive": true
+  },
+  "trace": [
+    {
+      "step": "baseline",
+      "threads": 1,
+      "healthz": 200
+    },
+    {
+      "step": "single_stalled_connection",
+      "waited_seconds": 45.5,
+      "any_response": [],
+      "threads": 2,
+      "healthz": 200
+    },
+    {
+      "step": "after_8_stalled",
+      "opened_stalled_sockets": 8,
+      "threads": 10,
+      "healthz": 200
+    },
+    {
+      "step": "after_10_more_seconds",
+      "threads": 10,
+      "healthz": 200
+    },
+    {
+      "step": "after_client_close",
+      "threads": 1,
+      "healthz": 200
+    }
+  ]
+}
