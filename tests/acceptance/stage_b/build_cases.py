@@ -62,14 +62,27 @@ def build():
         return change
 
     add("B001_base", "T01", passed=[True, True, True])
+    # 请求预算范围 [1, 10000]；候选估算不受范围约束，零估算与越界分别由语义码处理。
+    allowed_money = {"request": ("1", "12", "12.3", "12.30", "9999.99", "10000", "10000.00"),
+                     "candidate": ("0", "0.0", "0.00", "12", "12.3", "12.30")}
     for side, name in (("request", "budget_amount"), ("candidate", "estimated_total")):
-        for i, value in enumerate(("0", "0.0", "0.00", "12", "12.3", "12.30")):
+        for i, value in enumerate(allowed_money[side]):
             def valid_money(r, b, side=side, name=name, value=value):
                 field(side, name, value)(r, b)
                 if side == "request":
                     for candidate in b["candidates"]:
                         candidate["estimated_total"] = "0"
-            add(f"money_allowed_{side}_{i}", "T02_T11", valid_money)
+            add(f"money_allowed_{side}_{i}", "T02_T11", valid_money,
+                absent=["LIMIT_EXCEEDED"] if side == "candidate" else None)
+        if side == "request":
+            for i, value in enumerate(("0", "0.0", "0.00", "0.99", "10000.01", "10001")):
+                def out_of_range(r, b, value=value):
+                    field("request", name, value)(r, b)
+                    for candidate in b["candidates"]:
+                        candidate["estimated_total"] = "0"
+                add(f"money_range_reject_request_{i}", "T02_T11", out_of_range, "needs_input",
+                    "LIMIT_EXCEEDED", "request.budget_amount", "top",
+                    message="预算须在 1 至 10000 之间")
         bad_values = ("-0", "-1.00", "00", "01.00", "+1", "1e1", "1,000", "¥1",
                       "１.００", " 1", "1 ", ".5", "1.", "1.001", "NaN", "Infinity", "", "1\n")
         for i, value in enumerate(bad_values + (1, True, None, [], {})):
@@ -92,6 +105,34 @@ def build():
         add(f"days_boundary_{days}", "T04", field("candidate", "estimated_preparation_days", days),
             "failed" if days == 4 else "passed", "PREPARATION_TOO_LONG" if days == 4 else None,
             "candidates[0].estimated_preparation_days", 0)
+    # 请求天数范围 [0, 365]，0 仍允许；候选准备天数不受范围约束。
+    for i, value in enumerate((0, 1, 365)):
+        def days_allowed(r, b, value=value):
+            field("request", "available_days", value)(r, b)
+            for candidate in b["candidates"]:
+                candidate["estimated_preparation_days"] = 0
+        add(f"days_range_allowed_request_{i}", "T04", days_allowed)
+    for i, value in enumerate((366, 400, 10000)):
+        def days_out_of_range(r, b, value=value):
+            field("request", "available_days", value)(r, b)
+            for candidate in b["candidates"]:
+                candidate["estimated_preparation_days"] = 0
+        add(f"days_range_reject_request_{i}", "T04_T11", days_out_of_range, "needs_input",
+            "LIMIT_EXCEEDED", "request.available_days", "top",
+            message="可用天数须在 0 至 365 天之间")
+    def candidate_days_over_range(r, b):
+        field("request", "available_days", 365)(r, b)
+        b["candidates"][0]["estimated_preparation_days"] = 400
+    add("days_candidate_over_range_uses_semantic_code", "T04", candidate_days_over_range, "failed",
+        "PREPARATION_TOO_LONG", "candidates[0].estimated_preparation_days", 0,
+        passed=[False, True, True], absent=["LIMIT_EXCEEDED"])
+    def candidate_money_over_range(r, b):
+        field("request", "budget_amount", "10000")(r, b)
+        b["candidates"][0]["estimated_total"] = "10001"
+        b["candidates"][1]["estimated_total"] = "10000.00"
+    add("money_candidate_over_range_uses_semantic_code", "T02", candidate_money_over_range, "failed",
+        "OVER_BUDGET", "candidates[0].estimated_total", 0,
+        passed=[False, True, True], absent=["LIMIT_EXCEEDED"])
     for side, fields in (("request", ("recipient_relation", "occasion", "budget_amount", "currency", "available_days")),
                          ("candidate", tuple(k for k in BATCH["candidates"][0] if k != "presentation"))):
         for name in fields:

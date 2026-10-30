@@ -21460,8 +21460,11 @@
         ]
       },
       "expected": {
-        "status": "passed",
-        "all_passed": true
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
       }
     },
     {
@@ -21975,8 +21978,11 @@
         ]
       },
       "expected": {
-        "status": "passed",
-        "all_passed": true
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
       }
     },
     {
@@ -22071,8 +22077,11 @@
         ]
       },
       "expected": {
-        "status": "passed",
-        "all_passed": true
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
       }
     },
     {
@@ -22167,8 +22176,11 @@
         ]
       },
       "expected": {
-        "status": "passed",
-        "all_passed": true
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
       }
     },
     {
@@ -30113,6 +30125,687 @@
           true,
           true
         ]
+      }
+    },
+    {
+      "id": "T02_budget_min_1",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "1",
+        "currency": "CNY",
+        "available_days": 2,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "1.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.50",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "passed",
+        "all_passed": true
+      }
+    },
+    {
+      "id": "T02_budget_max_10000",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "10000",
+        "currency": "CNY",
+        "available_days": 2,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "9999.99",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "120.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "80.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "passed",
+        "all_passed": true
+      }
+    },
+    {
+      "id": "T02_budget_below_min",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "0.99",
+        "currency": "CNY",
+        "available_days": 2,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
+      }
+    },
+    {
+      "id": "T02_budget_above_max",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "10000.01",
+        "currency": "CNY",
+        "available_days": 2,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.budget_amount",
+        "message": "预算须在 1 至 10000 之间"
+      }
+    },
+    {
+      "id": "T04_days_max_365",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "200.00",
+        "currency": "CNY",
+        "available_days": 365,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "150.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "120.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "80.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "passed",
+        "all_passed": true
+      }
+    },
+    {
+      "id": "T04_days_above_max",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "200.00",
+        "currency": "CNY",
+        "available_days": 366,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "150.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "120.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 2,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "80.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 1,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "needs_input",
+        "all_passed": false,
+        "code": "LIMIT_EXCEEDED",
+        "path": "request.available_days",
+        "message": "可用天数须在 0 至 365 天之间"
+      }
+    },
+    {
+      "id": "T02_T04_zero_estimates_candidate_allowed",
+      "request": {
+        "recipient_relation": "青年用户与关系不错但不太熟悉的同事",
+        "occasion": "生日",
+        "budget_amount": "100.00",
+        "currency": "CNY",
+        "available_days": 0,
+        "facts": [
+          {
+            "id": "f1",
+            "text": "喜欢咖啡"
+          }
+        ],
+        "forbidden_tags": [
+          "alcohol"
+        ],
+        "forbidden_terms": [
+          "酒"
+        ],
+        "notes": "希望表达祝福，不造成关系压力"
+      },
+      "candidate_batch": {
+        "candidates": [
+          {
+            "id": "c1",
+            "name": "咖啡主题杯垫与马克杯",
+            "description": "桌面杯具组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0",
+            "currency": "CNY",
+            "estimated_preparation_days": 0,
+            "tags": [
+              "other"
+            ],
+            "reason": "呼应用户提供的咖啡兴趣，不假定具体口味",
+            "fact_refs": [
+              "f1"
+            ],
+            "inferences": [
+              "桌面实用品可能适合同事关系"
+            ],
+            "unknowns": [
+              "是否已有同类物品",
+              "实际售价与供应情况"
+            ],
+            "presentation": "简洁中性包装，详细方案待选择后生成"
+          },
+          {
+            "id": "c2",
+            "name": "桌面收纳套装",
+            "description": "小型收纳组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.0",
+            "currency": "CNY",
+            "estimated_preparation_days": 0,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供不同于咖啡主题的实用方向，不假定收纳偏好",
+            "fact_refs": [],
+            "inferences": [
+              "收纳用品可能适合工作桌面"
+            ],
+            "unknowns": [
+              "桌面空间和收纳习惯",
+              "实际售价与供应情况"
+            ],
+            "presentation": "素色材料，详细方案待选择后生成"
+          },
+          {
+            "id": "c3",
+            "name": "便携笔记本与书签",
+            "description": "纸品组合，估算包括礼物、基础包装、贺卡及配送",
+            "estimated_total": "0.00",
+            "currency": "CNY",
+            "estimated_preparation_days": 0,
+            "tags": [
+              "other"
+            ],
+            "reason": "提供轻量书写方向，不把书写习惯当成已知事实",
+            "fact_refs": [],
+            "inferences": [
+              "轻量礼物可能较少造成关系压力"
+            ],
+            "unknowns": [
+              "是否使用纸质笔记本",
+              "实际售价与供应情况"
+            ],
+            "presentation": "基础纸包装，详细方案待选择后生成"
+          }
+        ]
+      },
+      "expected": {
+        "status": "passed",
+        "all_passed": true
       }
     }
   ]
