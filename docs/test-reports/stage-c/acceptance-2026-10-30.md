@@ -13,7 +13,7 @@
 | 复核对象 | 我的判定 | 依据 |
 | --- | --- | --- |
 | Dify Cloud 版本 1.18.0 | **已核实** | `GET /console/api/version` → 200 `{"version":"1.18.0"}` |
-| 草稿 `GiftWise｜推荐工作流开发草稿` 未发布 | **已核实** | 服务端 `tool_published: false`；UI「未发布」；**我未点击发布** |
+| 草稿 `GiftWise｜推荐工作流开发草稿` 未发布 | **已核实** | 服务端 `tool_published: false`（**10-30 时点；现行：已发布并创建版本 v1/v2**）；UI「未发布」；**我未点击发布** |
 | 草稿只有 2 节点 1 边、无结束节点、工作流级输出 `{}` | **已核实** | 服务端 draft 实读 + 我自己触发的运行 SSE |
 | Code 节点在真实 Dify 沙箱执行成功，`compatible: true`、四项标准库能力全 true | **已核实（独立复跑，未引用 PM 数字）** | 我自己的两次「测试运行」，含完整节点级 SSE 轨迹 |
 | `0 Tokens`／无模型调用 | **已核实** | `total_tokens: 0`、`exceptions_count: 0` |

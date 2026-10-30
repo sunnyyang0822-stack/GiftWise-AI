@@ -165,7 +165,7 @@ WSL 没有安装（连 Appx 与注册表项都没有），Hyper-V 的计算服�
 | 原记述 | 真值（有归档） |
 | --- | --- |
 | 冷构建 **2.2 s** | **1.720 s**（`docker build --no-cache`，`raw/docker-2026-10-30/d9-coldbuild.txt`） |
-| 启动 **0.75–1.01 s** | **0.750–0.939 s**（`d7-baseline.txt` 0.7506 s；`d11-startup-memory.txt` 5 次 0.786–0.939 s） |
+| 启动 **0.75–1.01 s** | **0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值）**（`d7-baseline.txt` 0.7506 s；`d11-startup-memory.txt` 5 次 0.786–0.939 s） |
 | 运行内存 **14.41–17.86 MiB** | **14.45–17.08 MiB**（`d7-baseline.txt` 14.45；`d11` 15.5–17.08） |
 | `inspect 169.4 MB` | **169.36 MiB**（177,582,258 字节；`docker images` 的 178 MB 是十进制 MB） |
 | 镜像 ID `b42f408b4f07` 作为标识 | **ID 每次重建都会变**（`d12-image-id-drift.txt`：同内容三次重建＝三个 ID）。判据用基础镜像 digest、`rules_source_sha256`、字节数。<br>**口径更正（2026-10-31）**：ID 是 **config digest**；镜像未推仓库，**manifest digest 不存在**，`RepoDigests` 里那个与 ID 同值。稳定标识＝tag + 构建日期 + `rules_source_sha256` |

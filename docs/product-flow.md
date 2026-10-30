@@ -89,7 +89,7 @@ flowchart TD
 
 ## 运行记录与可观测性流向（G-2 收编）
 
-**字段语义的唯一权威是 [`architecture/observability.md`](architecture/observability.md)**；本节只描述流程上的产生点与流向。采集实现归属阶段 14（Issue [#10](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/10)），方案见 [observability-collection.md](../deploy/observability-collection.md)，**当前为纯设计、未实现落盘**。
+**字段语义的唯一权威是 [`architecture/observability.md`](architecture/observability.md)**；本节只描述流程上的产生点与流向。采集实现归属阶段 14（Issue [#10](https://github.com/sunnyyang0822-stack/GiftWise-AI/issues/10)），方案见 [observability-collection.md](../deploy/observability-collection.md)，****已落地 JSONL 落盘**（本机 39/39、容器 24/24 实测），但**非默认入口、未在交付镜像内实测****。
 
 ```mermaid
 flowchart LR

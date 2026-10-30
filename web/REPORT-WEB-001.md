@@ -103,7 +103,7 @@ $ node web/tests/access-layer.test.mjs
 同理 `python workflow/verify_local.py` 在我这里跑不起来（同一 `PermissionError: WinError 5`，
 卡在它自己的 `subprocess.check_output(["git", ...])`），**这不是规则线的回归**，
 我也不会去改那个文件；它的既有结论仍以 `docs/requirements-analysis.md` 记录的
-46 项探针 / 322 项 unittest 为准。
+46 项探针 / 322 项 unittest 为准（**322 为 2026-10-30 时点值；现行 `tests/` 329，四条互不包含套件合计 688 = 329+275+39+45**）。
 
 ### 2.2 JS↔Python 语义比对（55 组样例，0 处语义差异）
 
