@@ -134,7 +134,7 @@ curl -sS http://127.0.0.1:8000/healthz
 
 ## 复现命令总表
 
-| 目标 | 命令 | 实测结果（2026-10-30） |
+| 目标 | 命令 | 实测结果 |
 | --- | --- | --- |
 | 推荐阶段单元测试 | `python -m unittest discover -s tests -q` | `Ran 329 tests` / `OK`（2026-10-31 复跑，约 0.2–0.3 s） |
 | 阶段 C 独立套件 | `python -m unittest discover -s tests/acceptance/stage_c -q` | `Ran 39 tests` / `OK`（**`discover -s tests` 不覆盖**） |
@@ -145,6 +145,7 @@ curl -sS http://127.0.0.1:8000/healthz
 | 规则 API | `python -m deploy.server` | `/healthz` 200 |
 | 前端接入层自测 | `cd web && node tests/access-layer.test.mjs` | `pass 40 / fail 0` |
 | JS↔Python 语义比对 | `cd web && node tools/parity-check.mjs` | **74 组**样例，0 处语义差异（**样例级**；越界网格已覆盖，剩余 1 项为错误码口径差异、两侧都拒绝） |
+> **总量口径（重要）**：这四条套件**互不包含**，合计 **329 ＋ 275 ＋ 39 ＋ 45 ＝ 688 项**；`python -m unittest discover -s tests` **只覆盖第一条 329**，照读「329 全过」会被误读成「全仓全过」。
 > ⚠️ **本表只列评委可现场复跑的命令。** 需要本地第三方包或已登录外部会话的命令**不在本表**，见下面「仅内部复现」小节。
 
 ### 仅内部复现（评委现场**无法**复核，故不列入上表）

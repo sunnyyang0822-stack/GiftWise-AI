@@ -107,7 +107,7 @@ curl -sS http://127.0.0.1:8000/healthz
 
 完整 9/9 汇总见 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)；12 个原始输出文件见 [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)。
 
-## 可观测入口（阶段 14，已实测）
+## 可观测入口（阶段 14：**本机采集探针已实测 39/39 与 24/24**；代码**已随镜像交付、但不是默认入口**——`/metrics`/`/readyz` 默认不暴露且 `/metrics` 未鉴权，**采集本身未在交付镜像内实测**）
 
 采集能力实现在**新入口** `deploy/observable_server.py` 里：它**子类化** `deploy.server.Handler` 并只覆写钩子，
 因此 `/healthz`、`/`、`/validate` 的响应**体**仍由原实现逐字节产出。
