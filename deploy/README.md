@@ -84,7 +84,7 @@ curl -sS -X POST http://127.0.0.1:8000/validate \
 # 1) 构建（必须在仓库根执行）
 docker build -t giftwise-validator:latest -f deploy/Dockerfile .
 # 实测：冷构建 1.72 s（--no-cache；归档 deploy/evidence/raw/docker-2026-10-30/d9-coldbuild.txt）；热构建 0.6 s；二次构建可复现成功
-# 镜像：giftwise-validator:latest  docker images 178 MB（inspect 177,582,258 字节 = 169.36 MiB）
+# 镜像：giftwise-validator:latest  docker images 178 MB（重建前基线 inspect 177,582,258 字节 = 169.36 MiB；**交付镜像 `submission-20261101` = 177,918,474 字节 = 169.676 MiB**）
 # 注意：镜像 ID / config digest 每次重建都会变，不要当一致性判据；判据用 tag + 构建日期 + rules_source_sha256 与字节数
 # 注意：镜像从未推送仓库，所以【没有】manifest digest；docker inspect 的 RepoDigests 只是本地 config digest（≡ 镜像 ID）
 # 基础镜像：python:3.12-slim  digest sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159
@@ -288,7 +288,7 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
 **当前进度**
 
 - **2026-10-30 晚新增（容器化，真实执行）**：Docker Desktop 29.9.2 安装成功（经 DISM + 官方离线 MSI 绕过 Store 的 `禁止(403)`）
-  → `docker build` 成功（镜像 `giftwise-validator:latest`，178 MB＝169.36 MiB；冷 1.72 s／热 0.6 s）
+  → `docker build` 成功（镜像 `giftwise-validator:latest`，178 MB＝169.36 MiB 为重建前基线；**交付镜像 169.676 MiB**；冷 1.72 s／热 0.6 s）
   → 容器内 `/healthz` 200（启动 0.750–0.939 s（10-30 基线）｜交付镜像 **0.668 s**（均值））、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约、非 root（uid 10001）。
   完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（24 个原始输出（19 份 D 系输出 ＋ 5 份 Docker/WSL 安装日志））。
 - 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
