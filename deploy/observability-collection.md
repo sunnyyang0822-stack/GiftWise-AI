@@ -9,7 +9,14 @@
 - 文件名协调：#10 要求"新增可观测性方案文档须先与 ARCH-001 协调文件名"。任务单已指定本题使用
   `deploy/observability-collection.md`；架构 Agent 的对应内容在 `docs/architecture.md`（**我没有修改该文件**）。
   如需单一权威位置，请 PM 指定，我按指示合并或改名。
-- 状态：**纯设计，未实现任何采集代码**。本文件里所有"建议/待实现"都不是已完成的功。
+- **状态（2026-10-30 晚更新）：L1 与 L2 已实现并真跑通过**，L3 未做。
+  - 实现：`deploy/observability.py`（`Metrics` / `AccessLog` / `summarize_jsonl`）、
+    `deploy/observable_server.py`（可观测入口，**子类化** `deploy/server.py` 的 `Handler`，未修改原文件）。
+  - 证据：`deploy/evidence/observability-2026-10-30.md`；本机 **39/39** 断言、容器内 **24/24** 断言通过；
+    原始输出在 `deploy/evidence/raw/observability-2026-10-30-*`。
+  - **尚未接入镜像**：`deploy/Dockerfile` 的 `CMD` 仍是 `python -m deploy.server`（QA 冻结期不能改），
+    容器内验证用的是"命令覆盖 + 只读挂载"。**不得表述为"镜像已默认启用可观测性"。**
+  - 下文第 1、3、4、6、7 节保留为设计记录；与实现不一致处已就地标注日期。
 
 ## 1. 现状（实测，非设计）
 
@@ -25,6 +32,11 @@
 
 结论：当前可观测性**不足以支撑评分规则 1.2「可观测性证据：关键日志、运行状态、调用记录或指标」**，
 也不足以支撑「成本、性能与工程化分析」里的"调用记录"。需要下面的最小实现。
+
+> **2026-10-30 晚更新**：上表是**改造前**的真实基线（自 `deploy/server.py` 这条路径采集）。
+> 新入口 `deploy/observable_server.py` 已把前四行问题修掉，实测：154 行 JSONL **零交错**、
+> 每行带 `duration_ms`/`request_id`/`run_id`/成本字段、并新增 `/metrics` 指标与 `/readyz`。
+> 但**冻结中的 `deploy/server.py` 本身未改**，所以走 `python -m deploy.server` 时仍是上表的旧行为。
 
 ## 2. 采集字段的来源分工（语义见 #5，本表只说明"谁产出、谁采集"）
 
@@ -45,9 +57,11 @@
 
 ## 3. 落点方案（三档，按实现成本递增）
 
-### L1（推荐最小实现，约 1–2 小时）：单行 JSON 结构化日志到文件
+### L1（**已实现**，2026-10-30 晚）：单行 JSON 结构化日志到文件
 
-- 落点：`GIFTWISE_LOG_PATH` 指定文件，默认 `deploy/evidence/runtime/validator-access.jsonl`（容器内可挂载卷）。
+- 落点：`GIFTWISE_ACCESS_LOG` 指定文件（**默认不落文件，只写 stdout**，避免在只读镜像里静默失败）；
+  容器内可挂载卷或写 `/tmp`（本次容器验证写的 `/tmp/access.jsonl`）。
+- 实现位置：`deploy/observability.py` 的 `AccessLog`（`TimedRotatingFileHandler`，按天、默认保留 7 天）。
 - 格式：**每行一个 JSON 对象**（JSONL），字段示例（机器名，语义对应 #5）：
 
 ```json
@@ -59,13 +73,11 @@
 - 轮转：按天（`TimedRotatingFileHandler`）或按大小，保留 7 天；容器内 stdout 仍保留一份给 `docker logs`。
 - 为什么是 L1：零依赖（只用标准库）、可被 `grep`/`jq` 直接统计、无需新服务、无额外费用。
 
-### L2（阶段 14 汇总，约 2–4 小时）：JSONL → 统计报告
+### L2（**已实现**，2026-10-30 晚）：JSONL → 统计报告
 
-- 落点：`deploy/evidence/runtime/summary-<date>.json` + Markdown。
-- 统计项（全部来自 L1 的原始行，不做二次估算）：
-  调用总次数、按 `http_status`/`error_codes` 分布、`duration_ms` 的 min/median/p95/max、
-  每个 `run_id` 的调用次数、`stage` 分布、`model_calls` 合计、`cost.amount` 合计。
-- 实现：一个只读脚本（放在 `deploy/evidence/`），无网络、无第三方依赖。
+- 实现：`deploy/observability.summarize_jsonl()`（只读、无网络、无第三方依赖）。
+  另外 `/metrics?format=json` 直接给出运行中的同一份统计（`raw/observability-*/metrics-summary*.json`）。
+- **未做**：把统计渲染成固定格式的"阶段 14 报告模板"（数据已可得，模板未定）。
 
 ### L3（可选，未评估成本）：云上集中式采集
 
@@ -74,18 +86,19 @@
 - 建议：比赛 Demo 阶段**不做 L3**，用 L1+L2 即可满足"关键日志、调用记录或指标"的要求；
   若做，必须在 PPT 里如实标注"未做成本实测"。
 
-## 4. 采集实现点（精确位置，全部在 `deploy/` 内）
+## 4. 采集实现点（**实际实现**，2026-10-30 晚；全部在 `deploy/` 内）
 
-| 位置 | 改动 | 说明 |
+| 位置 | 实际改动 | 说明 |
 | --- | --- | --- |
-| 新增 `deploy/observability.py` | `record_request(...)`：写一行 JSONL | 新文件，不碰现有契约 |
-| `deploy/server.py` `Handler.do_POST` | 进入校验前记 `t0` 与请求头，响应前调用 `record_request` | **需要动 server.py**，本轮**未改**（见第 6 节） |
-| `deploy/server.py` `Handler.log_message` | 保持只记方法/路径/状态码，或改为写 JSONL | 现状已"不记录请求内容"，保持不变即可 |
-| `deploy/Dockerfile` | 可选 `ENV GIFTWISE_LOG_PATH=/var/log/giftwise/validator-access.jsonl` + `VOLUME` | 容器里日志持久化的落点；未构建验证 |
-| `deploy/evidence/summarize_runtime.py` | 读 JSONL 出统计 | 新增脚本，只读 |
+| 新增 `deploy/observability.py` | `Metrics`、`AccessLog`、`summarize_jsonl`、`process_rss_bytes`、`route_label`、`sanitize_path` | 新文件，不碰任何既有契约 |
+| 新增 `deploy/observable_server.py` | `ObservableHandler(BaseHandler)`：覆写 `handle_one_request`／`parse_request`／`send_response`／`end_headers`／`_send`／`log_message`／`do_GET`／`do_POST`；新增 `/metrics`、`/readyz`；SIGTERM 优雅退出 | **不改 `deploy/server.py`**：响应体仍由父类产出，可逐字节回归 |
+| `deploy/server.py` | **未改动**（`git diff --quiet` 通过） | 冻结期纪律；原入口行为完全不变 |
+| `deploy/Dockerfile` | **未改动**；`CMD` 仍是 `python -m deploy.server` | **待办**：解除冻结后改成 `python -m deploy.observable_server` |
+| 新增 `deploy/evidence/observability_check.py` | 本机双进程对照 + 39 项断言 | 期望值来自"实际请求账本"，不写死规格 |
+| 新增 `deploy/evidence/observability_container_check.py` | 容器内 24 项断言（独立 tag + 只读挂载 + 命令覆盖） | 不修改 Dockerfile 也能验证新入口 |
 
-**建议的实现顺序**：先写 `observability.py` + 单元测试（用假 handler 直接调 `record_request`），
-再接 `server.py` 一行调用，最后写汇总脚本。这样 `server.py` 的改动面只有一行，便于测试验收独立复核。
+**为什么不用"改 `server.py` 加一行"的路线**：该文件正被 QA 独立复核（含无缓存重建），改动会让复核失效。
+子类化路线把改动面收敛到新文件，同时用"三方逐字节一致"证明契约未被破坏。
 
 ## 5. 隐私、安全与不记录的内容
 
@@ -95,50 +108,76 @@
 4. `run_id` 若由接入层生成，必须是非个人信息标识（不得含手机号、邮箱、姓名）——语义以 #5 为准。
 5. 日志文件权限：容器内 `0600`，仅 `giftwise` 用户可读。
 6. 公网部署时（见 `security-review.md` S-3），日志**不得**回传外部分析服务。
+7. **指标标签基数保护（已实现）**：`method`/`route`/`status` 只取已知路由
+   （`/`、`/healthz`、`/validate`、`/metrics`、`/readyz`，未匹配一律 `__unmatched__`），
+   避免被任意 URL 打爆指标内存。
+8. **日志注入防护（已实现）**：日志里的 `path` 字段剔除控制字符（ESC/CR/LF/TAB）并限长 160，
+   实测 `/a\x1bb` 被记为 `/a?b`，因此**恶意路径无法伪造或截断 JSONL 行**。
+9. **不记录的身份信息**：只记 `remote`（对端 IP）与调用方自带的 `run_id`/`stage`；不记 `Authorization`/Cookie。
 
-## 6. 为什么本轮没有实现（以及需要谁批准）
+## 6. 原"未实现"的原因，以及本轮如何绕开（2026-10-30 晚更新）
 
-- 实现必须给 `deploy/server.py` 加调用点。该文件的 `/validate` 行为已被独立测试与 VAL-001 契约固定，
-  本轮集中做"如实取证"，**同一轮改代码会让证据与版本对应关系变模糊**，因此我选择不改，
-  把改动点、字段来源与落点写成可执行方案，交由 PM 排期。
-- `deploy/` 属于我负责范围，因此代码改动**无需他人文件授权**；但需要与测试验收 Agent 约定回归范围
-  （至少要复跑 `/validate` 的 200/400/413/404 契约与 `validator` 保留测试）。
+- 原计划需要给 `deploy/server.py` 加调用点；但该文件正被 QA 独立复核，**任何改动都会让复核失效**。
+- 因此改为**子类化**：新入口只覆写钩子，响应体仍由父类原样产出。
+  已用三方逐字节对比（冻结实现 / 可观测实现 / 进程内纯函数）证明契约未变。
+- 残留：`Dockerfile` 的 `CMD` 未改（同样处于冻结期），所以**镜像默认入口仍是不可观测的那条**。
+  这一步已登记为待办，解除冻结后一行即可完成并重跑容器验证。
 
 ## 7. 如何证明采集真的在工作（验收方法）
 
-1. 启动服务 → 连续发 20 次 `POST /validate`（含 3 次故意 400、1 次 413）。
-2. 断言：JSONL 行数 **== 21**（20 次 + 1 次健康检查可另行计数）、
-   `http_status` 分布 == `{200: 17, 400: 3, 413: 1}`、`duration_ms` 全部 > 0、
-   `error_codes` 中出现预期代码、`model_calls` 合计 == 0。
-3. 汇总脚本输出与手算一致 → 才算"采集已验证"。
-4. 对比 `docker logs`（若在容器内运行）与 JSONL 行数一致。
+**本节的方法已在 2026-10-30 晚实跑**（规模比原设计更大）：本机 69 个串行请求 + 80 个并发请求，
+容器内 9 个请求。实际采用的断言（比原设计更严）：
+
+1. 请求方法/路由/状态码/预期错误码/预期校验结果**随每次请求登记成账本**，再与 `/metrics?format=json` 逐键比对
+   —— 全部相等才算通过（不写死人工规格，避免"用错的期望去验证实现"）。
+2. `/metrics` 的计数**不含它自身**（渲染在前、记账在后），因此断言写成"账本 + 本次抓取"。
+3. 关机汇总（`"event":"shutdown"`）在**所有请求之后**输出，用它做最终口径：`requests_total == JSONL 行数`。
+4. **不记录请求体**用哨兵串证明：把 `SENTINEL_...` 注入 `notes` 与 `facts[0].text`，
+   跑完后在整份 JSONL 里 grep —— 必须 **0 命中**（同时检查 `request_json`/`candidates_json` 字段名 0 命中）。
+5. 并发下"零交错"的判据：**每一行都能 `json.loads`**（旧实现会出现两行粘连，必然解析失败）。
+6. 容器内额外验证：`platform=Linux`（证明 `/proc` 分支真跑）、HEALTHCHECK healthy、
+   `docker stop` 后 exit code 0 且打印末次汇总。
+7. 明细与原始输出：`deploy/evidence/observability-2026-10-30.md`。
 
 ---
 
 ## 当前进度 / 未完成清单 / 阻塞
 
-**当前进度**：交付物 5 的**方案**已完成（本文件）。实际执行过的命令与真实结果：
+（本节 2026-10-30 晚按实现后的真实结果重写；上方设计内容原样保留）
 
-- `python deploy/evidence/local_check.py` → exit 0：取得"现状可观测性"的真实基线——
-  服务端日志 215 行、格式仅 `地址 - "方法 路径" 状态码`、并发下出现行交错粘连、
-  无延迟/无运行 ID/无成本字段（即本文件第 1 节全部为实测，不是推测）。
-- 该次运行同时证明本服务 `model_calls = 0`、无外部网络依赖（源码只 import 标准库 + `validator.rules`）。
-- 采集代码：**未写**（第 4 节的 `observability.py`、`summarize_runtime.py` 均不存在）。
+**当前进度**：交付物 5 的**方案 + L1/L2 实现 + 真跑证据**均已完成。
 
-**未完成清单（计划，未实现）**：
+- `python deploy/evidence/observability_check.py` → **exit 0，39/39 断言通过**（本机双进程对照）。
+  产出 `raw/observability-20261030-224746/`：`access.jsonl` 154 行零交错、`metrics-prometheus.txt`、
+  `metrics-summary.json`、`metrics-summary-after-concurrency.json`、`observability-check.json`、两服务端日志。
+  关键真实数字：`/validate` p50 0.781 ms / p95 1.816 ms / p99 2.979 ms / max 4.018 ms；
+  并发 8×10 = 80 请求 / 0.659 s（≈121 rps，同机客户端、HTTP/1.0 每请求新建 TCP，非容量结论）；
+  RSS 26.96 MiB；`requests_total 154`、`errors_total 22`（可完全对账）；哨兵串 **0 命中**。
+- `python deploy/evidence/observability_container_check.py` → **exit 0，24/24 断言通过**（容器内）。
+  镜像 `giftwise-validator:obs-check`／`61bdb8815bd9`／178 MB（0.8 s 构建，**独立 tag，未改 Dockerfile**）；
+  `user=giftwise`、HEALTHCHECK healthy、`platform=Linux`、RSS 27.82 MiB、
+  `docker stop` → **exit 0** 且打印末次汇总。请求数完全对账：`9 = 我发起 6 + 抓取 1 + 探活 1 + 容器 HEALTHCHECK 1`。
+- 首轮真跑暴露并修掉了我自己的一个**实现缺陷**（把 `/healthz` 的 `{"status":"ok"}` 误采为校验结果，
+  指标 34/6 与账本 31/3 不符）与两个**验证脚本口径错误**；首轮记录保留在
+  `raw/observability-20261030-224548/`（27/35）与 `raw/observability-container-20261030-224830/`（18/21），未删除。
 
-1. `deploy/observability.py` 的 `record_request()` 与单元测试。
-2. `deploy/server.py` 的一行接入点（计时 + 记 run_id 透传）。
-3. JSONL 轮转配置、容器内日志卷与权限（`0600`）。
-4. `deploy/evidence/summarize_runtime.py` 汇总脚本与阶段 14 报告模板。
-5. 第 7 节的验收方法实跑一次。
-6. 与 ARCH-001 的文件名/权威位置对齐结果（等 PM 指定）。
-7. 云端集中式采集（L3）的成本评估（**未知，未测量**）。
+**未完成清单（计划，未执行）**
 
-**阻塞**：
+1. **把可观测入口接进镜像**：改 `deploy/Dockerfile` 的 `CMD` 一行 —— 卡在 QA 冻结，**不能做**。
+   在此之前，任何"镜像已默认启用可观测性/监控"的说法都是不成立的。
+2. 阶段 14 报告模板（`summarize_jsonl()` 数据已可得，固定格式未定）。
+3. 日志按天轮转的真实触发（未跑满一天）。
+4. `/readyz` 的**失败**路径（日志目录不可写）未构造。
+5. `GIFTWISE_HIDE_PY_VERSION=1`（安全自查 S-4 的最小修复）未出证据。
+6. L3 云端集中式采集与成本评估（**未知，未测量**）。
+7. 与 ARCH-001 的文件名/权威位置对齐结果（等 PM 指定）。
 
-1. **依赖上游字段的产出方**：`run_id`、`stage`、修订计数、模型用量与成本由接入层/Dify/模型层产出，
-   本服务只能透传记录；在接入层未实现之前，这些字段只能记 `null`，无法产生有意义的调用链证据。
-2. **优先级**：阶段 14 排在阶段 12 之后，而阶段 12 卡在容器/云资源授权（见 `preprod-plan.md`）。
-3. **无法取得平台级追踪**：该 Dify 租户 `trace-runs` 为 `not_collected`（ARCH-001 结论），
-   因此"调用链追踪"只能用自建 JSONL 替代，需要 PM 认可这一替代路径。
+**阻塞**
+
+1. **QA 复核冻结**：`deploy/server.py` 与 `deploy/Dockerfile` 在 QA 出报告前不可改 →
+   "新入口成为镜像默认 CMD"与"server.py 原生埋点"两条路都不能走。
+2. **上游未产出 `run_id`/`stage`/修订计数**：本服务只能透传记录，缺失记 `null`；
+   本轮证据里的 run id 是测试构造值，**不得当作真实调用链证据**。
+3. **平台级追踪不可用**：该 Dify 租户 `trace-runs` 为 `not_collected`（ARCH-001 结论），
+   调用链只能用自建 JSONL 替代，需 PM 认可这一替代路径。
+4. **无云资源授权**：L3 与云端成本无法推进（不采购、不开通、不上传）。

@@ -1,52 +1,105 @@
- M README.md
- M deploy/.dockerignore
- M deploy/Dockerfile
  M deploy/README.md
- M deploy/publish-to-uhost.ps1
+ M deploy/evidence/README.md
+ M deploy/evidence/artifact_manifest.py
+ M deploy/evidence/raw/_git_head.txt
+ M deploy/evidence/raw/_git_status.txt
+ M deploy/evidence/raw/_manifest_branch.txt
+ M deploy/evidence/raw/_manifest_head.txt
+ M deploy/evidence/raw/_manifest_head_short.txt
+ M deploy/evidence/raw/_manifest_status.txt
+ M deploy/evidence/raw/_netstat_8000.txt
+ M deploy/evidence/raw/artifact-manifest.json
+ M deploy/evidence/raw/local-check-latest.json
+ M deploy/observability-collection.md
+ M deploy/preprod-plan.md
+ M deploy/security-review.md
+ M deploy/server.py
  M docs/acceptance-criteria.md
  M docs/architecture.md
+ M docs/architecture/ARCH-001-report-2026-10-30.md
+ M docs/architecture/README.md
+ M docs/architecture/adr/ADR-003-cloud-native-tradeoffs.md
+ M docs/architecture/cost-performance-metrics.md
+ M docs/architecture/diagrams/system-architecture.mmd
+ M docs/architecture/observability.md
+ M docs/architecture/rendered/failure-recovery.svg
+ M docs/architecture/rendered/observability-flow.svg
+ M docs/architecture/rendered/system-architecture.svg
+ M "docs/competition/\346\235\220\346\226\231\346\270\205\345\215\225\344\270\216\350\207\252\346\237\245.md"
+ M "docs/competition/\346\236\266\346\236\204\345\233\276-GiftWise.png"
+ M "docs/competition/\347\255\224\350\276\251PPT-GiftWise.pptx"
+ M "docs/competition/\347\255\224\350\276\251PPT\351\252\250\346\236\266.md"
  M docs/demo-script.md
- M docs/development-process.md
- M docs/intake-contract.md
  M docs/product-flow.md
  M docs/product-requirements.md
  M docs/test-plan.md
  M docs/user-stories.md
- M workflow/evidence/WF-002-2026-10-30.md
- M workflow/examples/candidates.json
- M workflow/examples/intake.json
- M workflow/generated/check_node.py
- M workflow/generated/code_node.py
- M workflow/generated/intake_node.py
- M workflow/generated/manifest.json
- M workflow/generated/recheck_node.py
- M workflow/generated/report_node.py
- M workflow/intake.py
- M workflow/labels.py
- M workflow/prompts/generate.md
- M workflow/prompts/repair.md
+ M tests/acceptance/stage_b/build_cases.py
+ M tests/acceptance/stage_b/cases.json
+ M tests/acceptance/stage_c/test_stage_c_workflow.py
+ M tests/test_cases.json
+ M tests/test_validator.py
+ M validator/rules.py
+ M web/README.md
+ M web/REPORT-WEB-001.md
+ M web/package.json
+ M web/public/app.js
+ M web/public/index.html
+ M web/public/styles.css
+ M web/server/mock-model.mjs
+ M web/server/pipeline.mjs
+ M workflow/evidence/WF-003-2026-10-30.md
+ M workflow/evidence/local-2026-10-29/results.json
  M workflow/verify_local.py
- M workflow/workflow-spec.md
-?? .tmp/
-?? deploy/evidence/
-?? deploy/observability-collection.md
-?? deploy/preprod-plan.md
-?? deploy/security-review.md
-?? docs/architecture/
-?? docs/competition/
-?? docs/pm-reviews/contract-decisions-draft-2026-10-30.md
-?? docs/pm-reviews/stage-2-acceptance-checklist-2026-10-30.md
-?? docs/product-data-research.md
-?? docs/requirements-analysis.md
-?? docs/research-evidence/
-?? docs/test-reports/stage-a/
-?? docs/test-reports/stage-c/
-?? tests/acceptance/stage-a/
-?? tests/acceptance/stage_c/
-?? web/
-?? workflow/evidence/WF-003-2026-10-30.md
-?? workflow/evidence/WF-003-2026-10-30/
-?? workflow/evidence/local-2026-10-29/
-?? workflow/evidence/local-2026-10-30/
-?? workflow/examples/intake-colleague.json
+?? deploy/evidence/observability-2026-10-30.md
+?? deploy/evidence/observability_check.py
+?? deploy/evidence/observability_container_check.py
+?? deploy/evidence/ps1_static_check.py
+?? deploy/evidence/raw/local-check-20261030-231353.json
+?? deploy/evidence/raw/local-check-20261030-232154.json
+?? deploy/evidence/raw/observability-20261030-224548/
+?? deploy/evidence/raw/observability-20261030-224746/
+?? deploy/evidence/raw/observability-20261030-231351/
+?? deploy/evidence/raw/observability-20261030-232152/
+?? deploy/evidence/raw/observability-container-20261030-224830/
+?? deploy/evidence/raw/observability-container-20261030-224951/
+?? deploy/evidence/raw/observability-container-20261030-231347/
+?? deploy/evidence/raw/observability-container-20261030-232002/
+?? deploy/evidence/raw/observability-container-latest.txt
+?? deploy/evidence/raw/observability-latest.txt
+?? deploy/evidence/raw/ps1-static-20261030-225356/
+?? deploy/evidence/raw/ps1-static-latest.txt
+?? deploy/evidence/raw/slowbody-20261030-230911/
+?? deploy/evidence/raw/slowbody-20261030-231148/
+?? deploy/evidence/raw/slowbody-20261030-232005/
+?? deploy/evidence/raw/slowbody-latest.txt
+?? deploy/evidence/raw/slowbody-prefix/
+?? deploy/evidence/slow-body-2026-10-30.md
+?? deploy/evidence/slow_body_check.py
+?? deploy/observability.py
+?? deploy/observable_server.py
+?? docs/test-reports/cloud-001/
+?? docs/test-reports/contract-001/
+?? docs/test-reports/stage-c/20261030-224243/
+?? tests/acceptance/cloud-001/
+?? tests/acceptance/contract/
+?? tests/acceptance/stage_c/fixtures/
+?? web/HANDOFF-2026-10-30.md
+?? web/tools/browser-check.mjs
+?? web/tools/page-probe.mjs
+?? workflow/evidence/WF-003-2026-10-30/dify-before-publish-2301.png
+?? workflow/evidence/WF-003-2026-10-30/dify-demo-node-io-demo_forbidden_term_chocolate.md
+?? workflow/evidence/WF-003-2026-10-30/dify-demo-run-node-events.json
+?? workflow/evidence/WF-003-2026-10-30/dify-demo-run-sse-raw.jsonl
+?? workflow/evidence/WF-003-2026-10-30/dify-demo-run-summary.json
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-blocked-dialog-2302.png
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-blocked-toast-2302.png
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-checklist-2-blockers-2302.png
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-checklist-before.txt
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-success-2304.png
+?? workflow/evidence/WF-003-2026-10-30/dify-publish-success-evidence.txt
+?? workflow/evidence/WF-003-2026-10-30/dify-published-header-2305.png
+?? workflow/evidence/WF-003-2026-10-30/dify-published-popover-version1-2305.png
+?? workflow/evidence/WF-003-2026-10-30/dify-published-state-2026-10-30T2305+0800.json
+?? workflow/evidence/local-2026-10-29/README.md
 ?? workflow/tools/

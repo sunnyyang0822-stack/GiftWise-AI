@@ -29,6 +29,15 @@ TRACKED = [
     "deploy/evidence/local_check.py",
     "deploy/evidence/container_layout_dryrun.py",
     "deploy/evidence/container_probe.py",
+    # 阶段 14（2026-10-30 晚）新增：可观测性实现与验证脚本
+    "deploy/observability.py",
+    "deploy/observable_server.py",
+    "deploy/evidence/observability_check.py",
+    "deploy/evidence/observability_container_check.py",
+    "deploy/evidence/ps1_static_check.py",
+    # 缺陷 I-2（= 安全自查 S-5，2026-10-30 晚第三轮）新增：半开正文修复前对照 + 修复后回归
+    "deploy/evidence/slow_body_check.py",
+    "deploy/evidence/raw/slowbody-prefix/server.py.before",
     "validator/rules.py",
     "validator/__init__.py",
     "workflow/examples/intake.json",

@@ -15,7 +15,9 @@
 | `.dockerignore` | 收窄构建上下文 | **已随真实构建实测生效**：Docker 只读取**构建上下文根目录**的 `.dockerignore`，因此实际生效的是**仓库根 `.dockerignore`**（本次新增：排除 `.git`、`.tmp`、`tests`、`workflow`、`docs`、`web`、`deploy/evidence`、`*.msi`、`*.exe` 等）；原 `deploy/.dockerignore` **保留**并加指向说明，仅在 context = `deploy/` 时才起作用 |
 | `publish-to-uhost.ps1` | 上传三个文件到 UHost 并远端构建启动 | **从未上传过任何主机**；本次修复两个致命缺陷并用 `-DryRun` 实测参数拼装 |
 | `evidence/` | 运行证据、探针脚本与原始输出 | 本次新增，见 `evidence/README.md` |
-| `observability-collection.md` | 阶段 14 采集与落点实现方案 | 本次新增，纯设计，未实现代码 |
+| `observability-collection.md` | 阶段 14 采集与落点方案 | **方案 + 已实现**（2026-10-30 晚）；实现代码见下两行，证据见 [`evidence/observability-2026-10-30.md`](evidence/observability-2026-10-30.md) |
+| `observability.py` | 采集实现：指标注册表、JSONL 访问日志、RSS（Win/Linux）、Prometheus 渲染、JSONL 汇总 | **已实现并真跑**（本机 + 容器）；只依赖标准库 |
+| `observable_server.py` | 可观测入口：**子类化** `server.Handler`，新增 `/metrics`、`/readyz`、JSONL 日志、优雅退出 | **已实现并真跑**；`server.py` 未被修改 |
 | `preprod-plan.md` | 预发候选方案、成本、风险与待确认事项 | 本次新增，纯方案，未采购未部署 |
 | `security-review.md` | 安全与健壮性自查 | 本次新增，含实测证据 |
 
@@ -103,6 +105,37 @@ curl -sS http://127.0.0.1:8000/healthz
 
 完整 9/9 汇总见 [`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)；12 个原始输出文件见 [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)。
 
+## 可观测入口（阶段 14，已实测）
+
+采集能力实现在**新入口** `deploy/observable_server.py` 里：它**子类化** `deploy.server.Handler` 并只覆写钩子，
+因此 `/healthz`、`/`、`/validate` 的响应**体**仍由原实现逐字节产出。
+**2026-10-30 晚第二轮更正**：`deploy/server.py` 因缺陷 I-2（= S-5，半开正文永久占用线程）已**按 QA 派发修改**
+（读超时 + 408，见 [`evidence/slow-body-2026-10-30.md`](evidence/slow-body-2026-10-30.md)）；
+`deploy/Dockerfile` 仍然未改。下列可观测性证据均在这次改动**之后**复跑通过（39/39、24/24）。
+
+```bash
+# 本机运行（JSONL 落到文件，同时写 stdout）
+cd <仓库根>
+GIFTWISE_BIND=127.0.0.1 GIFTWISE_PORT=8765 \
+GIFTWISE_ACCESS_LOG=deploy/evidence/runtime/access.jsonl \
+python -m deploy.observable_server
+
+curl -sS http://127.0.0.1:8765/healthz                 # 与冻结实现逐字节一致（135 B）
+curl -sS http://127.0.0.1:8765/readyz                  # 新增：就绪检查（含日志落点可写性）
+curl -sS http://127.0.0.1:8765/metrics                 # 新增：Prometheus 文本 v0.0.4
+curl -sS 'http://127.0.0.1:8765/metrics?format=json'   # 新增：同一份指标的 JSON 摘要
+```
+
+实测要点（原始输出见 [`evidence/observability-2026-10-30.md`](evidence/observability-2026-10-30.md) 与 `evidence/raw/observability-*`）：
+
+- 每请求一行 JSON：`request_id`/`run_id`/`method`/`route`/`http_status`/`val_status`/`error_codes`/`duration_ms`/`bytes_in`/`bytes_out`/`RSS` 无关的进程指标等；**不记录请求体**（哨兵串 0 命中）。
+- 并发 8×10 下 **0 行交错**（`logging` 自带锁），154 行全部可 `json.loads`。
+- `/metrics` 的请求数、错误码、校验结果分布与"实际发出的请求账本"**逐键相等**；`model_calls_total` 与 `cost_cny_total` 恒为 0。
+- 容器内也跑通（独立 tag + 只读挂载 + 命令覆盖，未改 `Dockerfile`）：`platform=Linux`、RSS 27.82 MiB、HEALTHCHECK healthy、`docker stop` 优雅退出 exit 0。
+
+> **未接进镜像**：`deploy/Dockerfile` 的 `CMD` 仍是 `python -m deploy.server`（QA 冻结期不能改）。
+> 解除冻结后只需把 CMD 换成 `python -m deploy.observable_server`（一行），届时才有"镜像默认带可观测性"的结论。
+
 ### 状态码契约（全部实测）
 
 | 场景 | 状态码 | 响应体 |
@@ -114,12 +147,20 @@ curl -sS http://127.0.0.1:8000/healthz
 | `POST /validate` 缺字段 / 字段非字符串 / 顶层非对象 | 400 | `{"error":"INVALID_PAYLOAD","message":"request_json 和 candidates_json 必须是 JSON 字符串"}` |
 | `POST /validate` 请求体不是合法 JSON 或非 UTF-8 | 400 | `{"error":"INVALID_JSON"}` |
 | `POST /validate` 请求体超过 65536 字节 | 413 | `{"error":"REQUEST_TOO_LARGE"}` |
+| `POST /validate` 正文没发完（声明长度 > 实发，超时） | **408** | `{"error":"REQUEST_TIMEOUT"}`，随后**关闭连接**（2026-10-30 晚新增，修 I-2/S-5） |
 | `POST /<其它路径>` | 404 | `{"error":"NOT_FOUND"}` |
 | `HEAD` / `PUT` 等未实现方法 | 501 | 标准库 HTML 错误页（**不是** JSON） |
 
 注意：**业务校验不通过时仍是 HTTP 200**，失败信息在响应体的 `status`/`all_passed`/`errors` 里
 （实测 `{"request_json":"{}"}` → 200 + `status=needs_input`）。这一点与 `validator.rules.validate` 的契约一致，
 调用方不能只看 HTTP 状态码。
+
+**超时口径（2026-10-30 晚新增，修缺陷 I-2/S-5）**：`Handler.timeout = 10` 秒（`GIFTWISE_READ_TIMEOUT` 可覆盖），
+作用于请求行、请求头、正文读取与响应写出。其中：
+
+- **正文没读完** → 明确的 `408 REQUEST_TIMEOUT` + 关闭连接（实测 10.00 s 返回）；
+- **请求行/请求头超时、连上不发数据** → 由标准库静默关闭（不返回响应，实测 3 s 回归用例）；
+- 正文读取用**总预算**（不是单次 recv），因此"每 9 秒发 1 字节"的滴流也会被截断。
 
 ## 已验证 / 未验证 / 无法执行
 
@@ -135,6 +176,11 @@ curl -sS http://127.0.0.1:8000/healthz
    两种目录都能用同一条 `CMD python -m deploy.server` 启动，`/healthz` 200、`/validate` 通过、
    Dockerfile 的 HEALTHCHECK 命令 exit 0（**这不是构建镜像**，详见 `evidence/container-probe.md`）。
 8. 修复后的 `publish-to-uhost.ps1 -DryRun` 可运行并打印完整计划命令，端口规格为 `0.0.0.0:8000:8000`。
+   **运行提示（2026-10-30 晚实测）**：本机 `LocalMachine` 执行策略为 `Restricted`，
+   直接 `powershell -File deploy\publish-to-uhost.ps1 …` 会被拒（exit 1 / `UnauthorizedAccess`）；
+   需加 `-ExecutionPolicy Bypass`（仅本次进程生效，不改机器设置）：
+   `powershell -NoProfile -ExecutionPolicy Bypass -File deploy\publish-to-uhost.ps1 -Host <主机> -KeyPath <私钥> -DryRun`。
+   静态校验（17 项，含凭证扫描与 DryRun 顺序）见 `evidence/observability-2026-10-30.md` §4.5 与 `evidence/ps1_static_check.py`。
 9. **镜像已真实构建并成功运行（2026-10-30 晚）**：`docker build -t giftwise-validator:latest -f deploy/Dockerfile .` 成功；
    冷构建 **1.72 s**（`--no-cache`，归档 `raw/d9-coldbuild.txt`）、热构建 0.6 s；`docker images` **178 MB**（inspect 177,582,258 字节＝**169.36 MiB**）；
    基础镜像 `python:3.12-slim` digest `sha256:aa943ce411423c7582288f18707ff66eddcbaeb510502d747a72aeb34f30d159`。
@@ -142,6 +188,20 @@ curl -sS http://127.0.0.1:8000/healthz
     5 项错误路径符合契约、容器以**非 root（uid 10001）**运行；运行内存 **14.45–17.08 MiB**、CPU 0.01–0.02%；
     镜像内文件树仅 9 行，`docker history` 对密钥模式零命中。
     证据：[`evidence/docker-2026-10-30.md`](evidence/docker-2026-10-30.md)（9/9）＋ [`evidence/raw/docker-2026-10-30/`](evidence/raw/docker-2026-10-30/)（12 个原始输出）。
+11. **阶段 14 采集已实现并真跑（2026-10-30 晚）**：`python deploy/evidence/observability_check.py` → **exit 0，39/39 断言**；
+    `python deploy/evidence/observability_container_check.py` → **exit 0，24/24 断言**。要点：JSONL 每行可解析、
+    并发 0 交错、**请求体 0 命中**、指标与请求账本逐键相等、`/healthz` 与 `/validate` 响应体与默认入口逐字节一致、
+    容器内 `platform=Linux` 且 `docker stop` 优雅退出（exit 0）。证据：[`evidence/observability-2026-10-30.md`](evidence/observability-2026-10-30.md)。
+12. **`publish-to-uhost.ps1` 静态校验 17/17**：`python deploy/evidence/ps1_static_check.py` → exit 0；
+    PowerShell AST 解析 0 错误、参数表 7 项与 `Host` 别名正确、无硬编码凭证、IP 字面量仅 `0.0.0.0` 与文档网段、
+    `-DryRun` 在首个 ssh/scp 之前 `exit 0`。**该脚本仍然从未上传过任何主机。**
+13. **慢连接缺陷 I-2（= S-5）已修并回归（2026-10-30 晚第二轮）**：`python deploy/evidence/slow_body_check.py`
+    → **exit 0，42/42 断言**。修复前对照：声明 `Content-Length: 100` 只发 5 字节 → 14 s 零响应、连接不关、
+    本机线程 4→**13**（12 s 后仍 13）、容器 PID 1 线程 1→**10**（12 s 后仍 10），而 `/healthz` 始终 200；
+    **修复后**：**10.00 s 返回 408 `REQUEST_TIMEOUT` 并关闭**、本机线程回落 **13→4**、容器 PID 1 **10→1**；
+    10 个端点用例修复前后**逐字节零差异**。证据：[`evidence/slow-body-2026-10-30.md`](evidence/slow-body-2026-10-30.md)。
+14. **改动后复跑既有回归全部通过**：`observability_check.py` **39/39**、`observability_container_check.py` **24/24**、
+    `local_check.py` `parity byte_identical = True`。
 
 ### 未验证
 
@@ -156,6 +216,16 @@ curl -sS http://127.0.0.1:8000/healthz
 4. 未做 TLS/反向代理/鉴权：当前 API 没有认证，任何能访问该端口的人都能调用。
 5. `/validate` 的 `INTERNAL_ERROR`（500）分支**未能诱导触发**（`validate()` 内部已捕获所有异常），
    仅做代码走查，未取得运行时证据。
+6. **可观测入口尚未成为镜像默认入口**：`deploy/Dockerfile` 的 `CMD` 仍是 `python -m deploy.server`，
+   容器内验证用的是"命令覆盖 + 只读挂载"，不是"镜像默认带可观测性"。
+   （2026-10-30 晚第二轮更正：原因为"QA 冻结 `Dockerfile`"，冻结已解除，但**本轮仍未改** `Dockerfile`。）
+7. **日志按天轮转未被真实触发**：`TimedRotatingFileHandler` 只在跨天或长时间运行时才会切割，本次未跑满一天。
+8. **`/readyz` 的落点探测只覆盖"可写"路径**：未构造日志目录不可写的失败场景。
+9. **可观测入口的 `GIFTWISE_HIDE_PY_VERSION=1`（安全自查 S-4 的最小修复）只有代码路径，未出证据**（默认关闭）。
+10. **并发连接数仍无上限（I-2 修复的边界）**：超时让每条连接**有界**，但 `ThreadingHTTPServer` 每连接一线程、
+    没有连接数上限 —— 10 秒内建立大量连接仍能把线程数堆高。**未做压测**（与第 3 条同源）。
+11. **请求行/请求头的超时仍是静默关闭（不返回 408）**：那是标准库 `handle_one_request` 的既有行为，
+    本轮未覆写；只有**正文**超时才返回 408。
 
 ### 无法执行（含原因）
 
@@ -179,6 +249,10 @@ curl -sS http://127.0.0.1:8000/healthz
 python deploy/evidence/local_check.py                # 本地运行取证（端点矩阵、延迟、内存、日志）
 python deploy/evidence/container_layout_dryrun.py    # 容器布局等价演练（两种文件集）
 python deploy/evidence/container_probe.py            # 容器运行时存在性探测
+python deploy/evidence/observability_check.py        # 阶段 14：双进程对照 + 39 项断言
+python deploy/evidence/observability_container_check.py  # 阶段 14：容器内 24 项断言（需 Docker）
+python deploy/evidence/ps1_static_check.py           # 发布脚本静态校验（17 项，不连接任何主机）
+python deploy/evidence/slow_body_check.py            # 缺陷 I-2/S-5：半开正文修复前对照 + 修复后回归（42 项，容器阶段需 Docker）
 python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha256
 ```
 
@@ -198,6 +272,20 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
   完整证据：`evidence/docker-2026-10-30.md`（9/9）＋ `evidence/raw/docker-2026-10-30/`（12 个原始输出）。
 - 已完成 Issue #10 的交付物 1、2、4、5 与交付物 3 中"如实记录未构建"的部分，以及任务 3 的安全自查。
   （**2026-10-30 晚更正**：交付物 3 中"如实记录未构建"的部分已由上述真实构建取代，该记录按纪律保留。）
+- **2026-10-30 晚第二轮新增（阶段 14 可观测性，真实执行）**：新增 `observability.py` + `observable_server.py`
+  （**子类化**，`server.py`/`Dockerfile` 一字未改），实现结构化 JSONL 日志（不含请求体）、`/metrics`、`/readyz`、
+  进程指标（请求数/错误数/延迟分位/RSS）与优雅退出。
+  `python deploy/evidence/observability_check.py` → **39/39 通过**；`python deploy/evidence/observability_container_check.py`
+  → **24/24 通过**；`python deploy/evidence/ps1_static_check.py` → **17/17 通过**（仍**从未上传**任何主机）。
+  完整证据：`evidence/observability-2026-10-30.md` ＋ `evidence/raw/observability-*`、`raw/ps1-static-*`。
+- **2026-10-30 晚第三轮新增（缺陷 I-2 = S-5，真实执行）**：QA-001 实验证明"声明 `Content-Length: 100` 只发 5 字节 →
+  45 s 零响应、连接永不关闭；9 条连接使容器 PID 1 线程 +9 且不回收，而 `/healthz` 仍 200"。
+  按 PM 派发在 `deploy/server.py` 落地读超时（默认 10 s，`GIFTWISE_READ_TIMEOUT` 可覆盖）+ **总预算**正文读取 +
+  **408 `REQUEST_TIMEOUT`**，`deploy/observable_server.py` 同一缺陷一并修复。
+  `python deploy/evidence/slow_body_check.py` → **exit 0，42/42 断言**（含修复前对照与容器 PID 1 采样）；
+  改完后复跑 `observability_check.py` **39/39**、`observability_container_check.py` **24/24**、
+  `local_check.py` `parity byte_identical = True`。证据：[`evidence/slow-body-2026-10-30.md`](evidence/slow-body-2026-10-30.md)
+  ＋ `evidence/raw/slowbody-20261030-232005/`（21 个原始输出，最终字节版本）。
 - 实际执行过的命令（全部在本机、无网络写操作、无费用）：
   - `python deploy/evidence/local_check.py` → exit 0，产出 `raw/local-check-latest.json`（stamp `20261030-212549`）
     与 `raw/server-8765.log`（215 行服务端日志）。
@@ -211,7 +299,8 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
   - 修复前对照组：`powershell -File deploy\publish-to-uhost.ps1 -Host ... -KeyPath ...` → exit 1，
     `VariableNotWritable`（该脚本此前**完全无法运行**）。
 - 已交付文件：`deploy/README.md`、`deploy/security-review.md`、`deploy/preprod-plan.md`、
-  `deploy/observability-collection.md`、`deploy/evidence/`（README + 报告 + 3 个脚本 + raw 输出）。
+  `deploy/observability-collection.md`、`deploy/evidence/`（README + 报告 + 多个校验脚本 + raw 原始输出；
+  完整索引与脚本清单见 [`evidence/README.md`](evidence/README.md)）。
 
 **未完成清单（除已标注"已完成"者外，均为计划，无真实执行）**
 
@@ -219,9 +308,16 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
    容器内 `/healthz` 200、`/validate` 与本机纯函数**逐字节一致**、5 项错误路径符合契约。证据：`evidence/docker-2026-10-30.md`（9/9）。
 2. `publish-to-uhost.ps1` 的远端上传与启动（计划：拿到真实主机、私钥与端口后执行）。
 3. 预发环境端到端验证（计划：Dockerfile → UHost → 安全组 → 公网 `/healthz`）。
-4. 阶段 14 采集方案的代码实现（`observability-collection.md` 目前只是设计，未写任何采集代码）。
-5. 成本数据（计划：拿到 UCloud 当期报价或额度后再填；当前一律记"未知，未测量"）。
-6. 鉴权/限流/TLS（计划，尚未决定是否列入比赛范围）。
+4. ~~阶段 14 采集方案的代码实现（`observability-collection.md` 目前只是设计，未写任何采集代码）~~
+   → **已完成（2026-10-30 晚）**：`observability.py` + `observable_server.py` 已实现并真跑（39/39 本机、24/24 容器）。
+   **残留**：尚未接进 `Dockerfile` 的 `CMD`，故"镜像默认带可观测性"仍未成立。
+5. 把可观测入口设为镜像默认入口：改 `deploy/Dockerfile` 一行 `CMD`，并重跑容器验证（计划）。
+   （2026-10-30 晚第二轮更正：原阻塞理由"QA 冻结期不能改"**已不成立**，本轮仍未改只是因为 PM 只派发了 I-2。）
+6. 成本数据（计划：拿到 UCloud 当期报价或额度后再填；当前一律记"未知，未测量"）。
+7. 鉴权/限流/TLS（计划，尚未决定是否列入比赛范围）。
+8. 日志轮转的真实触发与 `/readyz` 失败路径（计划）。
+9. **并发连接数上限 / 反向代理**（缺陷 I-2 的"更彻底做法"）：本轮只做了超时兜底，
+   未限制同时连接数、未压测。计划：前置反向代理或给 `ThreadingHTTPServer` 加并发上限。
 
 **阻塞**
 
@@ -235,8 +331,17 @@ python deploy/evidence/artifact_manifest.py          # 版本快照与文件 sha
    > **历史记录（当时为真，不得删除）**：本机无 docker/podman/WSL/containerd，无法构建镜像；安装需产品负责人授权
    > （估 30–60 分钟下载安装 + 需重启生效，且会改变本机环境）。
 2. **无云资源授权**：无 UHost、无 EIP、无额度确认，且按边界不得自行采购；这是任务 4/5 无法闭环的唯一原因。
-3. **无当前代码的提交**：工作区有 48 条未提交改动（含其他 Agent 的文件），本轮按纪律未 `git add`/未提交，
-   因此上述证据对应的是**工作区状态 + git HEAD `89d6624`**，不是某个提交。
-   > **更正（2026-10-30 晚）**：该限制已解除。全部工作已提交并推送到分支
-   > `release/2026-11-01-submission`（PR [#12](https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/12)），
-   > 容器化证据随该分支一并提交。上面第 2 条「无云资源授权」**仍然成立**（未采购、未上云）。
+3. ~~**QA 复核冻结（2026-10-30 晚新增）**~~ → **已解除（2026-10-30 晚第三轮）**：QA-001 结束独立复核并抛出
+   缺陷 **I-2**（= S-5，半开正文永久占用线程），PM 派发修复 → `deploy/server.py` **已按 QA 证据修改**
+   （默认入口 10 s 读超时 + 408，可观测入口同步修复），回归 42/42，见 [`evidence/slow-body-2026-10-30.md`](evidence/slow-body-2026-10-30.md)。
+   **仍然成立的约束**：`deploy/Dockerfile` 未改，所以"把可观测入口设为镜像默认 CMD"这一步**仍然没有做**；
+   本轮的可观测能力仍是**已实现并通过验证、但尚未成为镜像默认部署形态**，任何"镜像已默认启用可观测性/监控"的表述都不成立。
+   > **历史记录（当时为真，不得删除）**：`deploy/server.py` 与 `deploy/Dockerfile` 在 QA 出报告前不得修改。
+4. **上游未产出 `run_id`**：接入层/Dify 还没把 run id 传进来，本服务的 `run_id` 字段现在只能记 `null`
+   （本轮证据里的 run id 是**测试构造值**，不是真实调用链）。
+5. ~~**无当前代码的提交**~~ → 历史：本轮收集证据时工作区未提交。
+   **2026-10-30 晚第二轮现状**：PM 已把此前的交付推送到分支 `release/2026-11-01-submission`
+   （PR [#12](https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/12)）；
+   但**本轮（阶段 14）新增/修改的文件仍只在工作区，未提交**（按纪律不自行提交，由 PM 统一处理）。
+   因此本轮全部证据对应的版本与哈希见 `evidence/raw/artifact-manifest.json`（含 git HEAD 与逐文件 sha256）。
+   第 2 条「无云资源授权」**仍然成立**（未采购、未上云）。
