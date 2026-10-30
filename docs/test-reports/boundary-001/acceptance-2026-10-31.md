@@ -583,7 +583,7 @@ exit=0
 > `tests/acceptance/**` 下**没有任何 `__init__.py`**，因此 unittest 的 discover **不会递归进去**
 > （`python -m unittest discover -s tests -v | grep -c stage_c` → **0**；`find tests -name __init__.py | wc -l` → **0**，
 > 见 `evidence/discover-scope.txt`）。
-> 即 **329 与 39、25、87 是互不包含的集合**，不存在"329 已含 Stage C"。
+> 即 **329 与 39、45、87（以及 stage_b 的 275）是互不包含的集合**，不存在"329 已含 Stage C"。
 > 我**未添加任何 `__init__.py`**，以保持其他文件线依赖的 329 基线不变——代价是我的边界套件需显式指定路径运行。
 
 ## 11. 纪律记录：我修正的过时断言（含仓位与理由）
