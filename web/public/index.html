@@ -6,7 +6,9 @@
     <meta name="color-scheme" content="light" />
     <meta name="description" content="GiftWise AI · 青年送礼决策助手：三步中文输入、三个有依据的思路、独立规则校验、选择后才生成包装与贺卡。当前为模拟数据演示。" />
     <title>GiftWise AI · 找到那份刚好的心意</title>
+    <link rel="stylesheet" href="/tokens.css" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/landing.css" />
   </head>
   <body>
     <a class="skip-link" href="#view">跳到主要内容</a>
@@ -14,56 +16,80 @@
     <header class="site-header">
       <div class="site-header__inner">
         <a class="brand" href="/">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M12 0c.6 5.6 5.8 10.8 11.4 11.4v1.2C17.8 13.2 12.6 18.4 12 24c-.6-5.6-5.8-10.8-11.4-11.4v-1.2C6.2 10.8 11.4 5.6 12 0Z" />
+          <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z" />
+            <path fill="var(--gw-color-bg)" d="m23 16 2 6-2 7-3-7Z" />
+            <path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z" />
           </svg>
           <span>GiftWise AI</span>
         </a>
+        <!-- 模拟数据标识：放在常驻吸顶头部，任何滚动位置和窄屏都看得见 -->
+        <span class="mode-flag" id="mode-flag">模拟数据 · 未接真实模型</span>
         <nav class="site-nav" aria-label="主导航">
-          <a href="#how">怎么用</a>
+          <a href="#how">怎么运行</a>
           <a href="#view">送礼场合</a>
           <a href="#view">礼物思路</a>
         </nav>
         <button class="btn btn--primary btn--sm" type="button" id="cta-start">
-          开始选礼物 <span class="arrow" aria-hidden="true">→</span>
+          开始选礼物
         </button>
       </div>
     </header>
 
-    <section class="hero" id="hero">
-      <p class="overline">青年送礼决策助手 · 简体中文</p>
-      <h1>不知道送什么，<br />先把依据摆清楚。</h1>
-      <p class="hero__sub">三个不同思路，一条一条讲清理由、事实与仍未知的部分。</p>
-      <p class="hero__note">
-        恋人与追求对象是两套独立表达：追求对象默认低压力，不假定对方已接受或存在双向好感。
-        系统不会替你选择方案，也不会在你选择前生成包装与贺卡。
-      </p>
-      <div class="hero__cta">
-        <button class="btn btn--primary" type="button" id="cta-start-2">
-          填写三步需求 <span class="arrow" aria-hidden="true">→</span>
-        </button>
-        <a class="btn btn--ghost" href="#how">看看流程</a>
+    <section class="hero gw-hero" id="hero" aria-labelledby="hero-title">
+      <div class="gw-hero__art" role="img" aria-label="哑光黑色礼盒层层叠放，系着红色、珊瑚色和深蓝色缎带；品牌概念图，并非商品展示。"></div>
+      <div class="gw-hero__content">
+        <h1 id="hero-title">让心意，<br />送得刚刚好。</h1>
+        <p class="hero__sub">准备礼物的人，<br />先感到幸福。</p>
+        <p class="gw-hero__description">从你们的关系出发，<br />给你三个有依据的礼物思路。<br />把心意想清楚，把选择留给你。</p>
+        <div class="hero__cta">
+          <button class="btn btn--primary gw-button" type="button" id="cta-start-2">
+            开始选礼物
+            <svg width="28" height="24" viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 12h23m-8-8 8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </button>
+        </div>
+        <p class="hero__flag" id="hero-flag">当前为模拟数据演示；方案与呈现内容并非真实模型输出，价格、库存及送达未核实。</p>
+      </div>
+      <div class="gw-hero__bottom">
+        <a class="gw-scroll-link" href="#how" aria-label="下滑了解怎么运行"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" aria-hidden="true" focusable="false"><path d="M9 2v15m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
       </div>
     </section>
 
-    <section class="how" id="how" aria-label="流程说明">
-      <div class="how__grid">
-        <article class="how__item">
-          <p class="how__num">01</p>
-          <h3>三步输入</h3>
-          <p>关系、场合、预算与准备时间都要你确认明确值；兴趣与风格可跳过，未知就是未知，不静默补默认值。</p>
-        </article>
-        <article class="how__item">
-          <p class="how__num">02</p>
-          <h3>三方案 + 独立校验</h3>
-          <p>恰好三个不同思路，逐个标注理由、事实引用、推断、未知、全量估算费用与准备时间；规则检查独立于模型，失败项不可选。</p>
-        </article>
-        <article class="how__item">
-          <p class="how__num">03</p>
-          <h3>选择后才做呈现</h3>
-          <p>按风格配色 → 包装材料与步骤 → 贺卡与装饰物 → 赠送时机与话术依次生成，并复核总费用、准备时间与禁忌。</p>
-        </article>
+    <section class="how gw-how" id="how" aria-labelledby="how-title">
+      <div class="gw-how__heading">
+        <h2 id="how-title">好礼物，<span>从了解开始。</span></h2>
+        <p>不用一开始就有答案。<br />我们陪你，把心意一步步想清楚。</p>
       </div>
+      <ol class="gw-how__steps">
+        <li class="gw-how__step">
+          <div class="gw-how__copy">
+            <span class="gw-how__number" aria-label="第一步">01 <span>关于 TA</span></span>
+            <h3>说说你们的故事。</h3>
+            <p>确认关系、场合、预算和准备时间。<br />兴趣不了解，也可以留空。</p>
+            <p class="gw-how__detail">未知就留作未知，不替你猜。</p>
+          </div>
+          <div class="gw-how__gift gw-how__gift--red" aria-hidden="true"></div>
+        </li>
+        <li class="gw-how__step">
+          <div class="gw-how__copy">
+            <span class="gw-how__number" aria-label="第二步">02 <span>思考与校验</span></span>
+            <h3>三个思路，都有依据。</h3>
+            <p>AI 提出不同方向，独立规则再检查<br />预算、准备时间和禁忌。</p>
+            <p class="gw-how__detail">事实、推断与未知，分别说清。</p>
+          </div>
+          <div class="gw-how__gift gw-how__gift--blue" aria-hidden="true"></div>
+        </li>
+        <li class="gw-how__step">
+          <div class="gw-how__copy">
+            <span class="gw-how__number" aria-label="第三步">03 <span>由你决定</span></span>
+            <h3>选定后，再好好表达。</h3>
+            <p>你选中通过检查的方案后，再设计<br />配色、包装、贺卡与赠送方式。</p>
+            <p class="gw-how__detail"><span class="gw-how__target">目标设计</span> Dify 尚未实现此阶段。</p>
+          </div>
+          <div class="gw-how__gift gw-how__gift--card" aria-hidden="true"></div>
+        </li>
+      </ol>
+      <p class="gw-how__closing">把依据交代清楚，把选择留给你。<span>全局最多一次自动修订；费用与准备时间仅为估算。</span></p>
     </section>
 
     <div class="badges" id="badges" role="status" aria-live="polite"></div>
@@ -87,5 +113,6 @@
     <div class="aria-live" id="live" role="status" aria-live="polite"></div>
 
     <script type="module" src="/app.js"></script>
+    <script type="module" src="/js/landing.js"></script>
   </body>
 </html>
