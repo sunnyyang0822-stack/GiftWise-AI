@@ -1,6 +1,7 @@
 import { RetrievalWorker, unavailableProvider } from "./retrieval/worker.mjs";
 import { mediaProvider } from "./media/provider.mjs";
-const retrievalWorker = new RetrievalWorker(unavailableProvider);
+import { ApplePublicProvider } from "./retrieval/apple-provider.mjs";
+const retrievalWorker = new RetrievalWorker(process.env.GIFTWISE_RETRIEVAL === "apple-public" && process.env.OPENCLI_PACKAGE_ROOT ? new ApplePublicProvider(process.env.OPENCLI_PACKAGE_ROOT) : unavailableProvider, { timeoutMs: 25000 });
 /**
  * 接入层主流程：适配 → （真实/模拟）生成三候选 → 独立规则校验 → 最多一次自动修订 →
  * 等待用户选择 → 选择校验 → 呈现四段 → 呈现复核（含全局修订额度）。
@@ -225,7 +226,7 @@ export async function runRecommendation(input) {
     notices,
     idempotency_key: key,
   });
-  run.retrieval = await retrievalWorker.submit({ category: "home", keywords: [], limit: 3 });
+  run.retrieval = mode === "dify" ? await retrievalWorker.submit({ category: "home", keywords: [], limit: 3 }).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["模拟模式不执行真实检索"]};
   run.media = mediaProvider.candidates();
   run.call_counts = callCounts;
   run.demo = demo;
