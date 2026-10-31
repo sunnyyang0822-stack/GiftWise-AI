@@ -1,9 +1,0 @@
-python-unit	0	C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe -m unittest discover -s tests -q
-python-revision	0	C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe -m unittest tests.test_revision_budget -q
-python-stage-b	1	C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe -m unittest discover -s tests/acceptance/stage_b -q
-python-stage-c	1	C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe -m unittest discover -s tests/acceptance/stage_c -q
-python-boundary	1	C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe -m unittest discover -s tests/acceptance/boundary -q
-node-revision	0	node --test web/tests/revision-rules.test.mjs
-node-access	0	node web/tests/access-layer.test.mjs
-node-parity	0	node web/tools/parity-check.mjs
-git-diff-check	0	git diff --check

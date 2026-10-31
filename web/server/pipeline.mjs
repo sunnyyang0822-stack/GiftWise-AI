@@ -12,7 +12,8 @@ import { validate, validateRequestOnly, requestIsValid, checkPresentation, error
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
 import { GIFT_STYLE_TABLE, CLOSENESS_TABLE } from "./labels.mjs";
 import { requestCandidates, requestPresentation } from "./dify.mjs";
-import { createRun, getRun, publicReport } from "./store.mjs";
+import { createRun, getRun, getRunByRecommendationKey, publicReport } from "./store.mjs";
+import { checkAiExclusions } from "./exclusion-checker.mjs";
 import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT } from "./config.mjs";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -45,12 +46,22 @@ function computeSelectable(validation, workflowErrors) {
  * @param {{intake: unknown, demo?: string|null, mode?: string, pursuitReady?: boolean}} input
  */
 export async function runRecommendation(input) {
+  let effectiveIntake = input.intake;
+  if (input.analysis && input.exclusion_confirmation && Array.isArray(input.exclusion_confirmation.confirmed_ids)) {
+    const selected = input.analysis.candidates.filter(c => input.exclusion_confirmation.confirmed_ids.includes(c.id));
+    const prior = input.intake?.hard_exclusions && typeof input.intake.hard_exclusions === "object" ? input.intake.hard_exclusions : {};
+    effectiveIntake = { ...input.intake, hard_exclusions: {
+      tags: [...new Set([...(Array.isArray(prior.tags) ? prior.tags : []), ...selected.filter(c => c.kind === "tag").map(c => c.tag)])],
+      terms: [...new Set([...(Array.isArray(prior.terms) ? prior.terms : []), ...selected.filter(c => c.kind === "term").map(c => c.term)])],
+      unresolved: Array.isArray(prior.unresolved) ? prior.unresolved : [],
+    }};
+  }
   const demo = typeof input.demo === "string" ? input.demo : null;
   const mode = input.mode === "dify" ? "dify" : "mock";
   const notices = [];
   if (mode === "mock") notices.push(MOCK_MODE_NOTICE);
 
-  const adapterResult = adaptIntakeObject(input.intake, { pursuitReady: input.pursuitReady });
+  const adapterResult = adaptIntakeObject(effectiveIntake, { pursuitReady: input.pursuitReady });
   if (adapterResult.status !== "ready") {
     return {
       kind: "needs_input",
@@ -60,6 +71,25 @@ export async function runRecommendation(input) {
       notices,
     };
   }
+  if (typeof input.intake?.dislikes === "string" && input.intake.dislikes.trim()) {
+    const confirmation = input.exclusion_confirmation;
+    if (!confirmation || typeof confirmation.analysis_id !== "string" || !Array.isArray(confirmation.confirmed_ids)) {
+      return { kind: "needs_input", status: "needs_input", errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", path: "exclusion_confirmation", message: "请先完成不喜欢内容的识别与逐项确认。" }], mode, notices };
+    }
+    const analysis = input.analysis;
+    if (!analysis) return { kind: "needs_input", status: "needs_input", errors: [{ code: "EXCLUSION_ANALYSIS_STALE", path: "exclusion_confirmation.analysis_id", message: "排除项识别已过期或不存在，请重新识别。" }], mode, notices };
+    if (canonical(analysis.intake) !== canonical(input.intake) || analysis.status !== "needs_confirmation") {
+      return { kind: "needs_input", status: "needs_input", errors: [{ code: "EXCLUSION_ANALYSIS_STALE", path: "exclusion_confirmation.analysis_id", message: "排除项识别与当前输入不一致，请重新识别。" }], mode, notices };
+    }
+    const ids = analysis.candidates.map(c => c.id);
+    const unique = new Set(confirmation.confirmed_ids);
+    if (unique.size !== confirmation.confirmed_ids.length || unique.size !== ids.length || ids.some(id => !unique.has(id))) {
+      return { kind: "needs_input", status: "needs_input", errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", path: "exclusion_confirmation.confirmed_ids", message: "请确认全部识别到的排除项，且每项只能确认一次。" }], mode, notices };
+    }
+  }
+  const key = canonical({ intake: effectiveIntake, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
+  const cached = getRunByRecommendationKey(key);
+  if (cached) return { kind: "report", status: cached.status, run: cached, report: publicReport(cached), idempotent: true };
   const requestJson = adapterResult.request_json;
   const request = parseJsonOrNull(requestJson);
   const requestCheck = validateRequestOnly(requestJson, strictParse);
@@ -190,6 +220,7 @@ export async function runRecommendation(input) {
     status,
     selectable_candidate_ids: selectable,
     notices,
+    idempotency_key: key,
   });
   run.call_counts = callCounts;
   run.demo = demo;
@@ -221,8 +252,8 @@ function buildSections(presentation, candidate, request) {
       key: "packaging",
       title: "② 包装材料与步骤",
       items: [
-        ...presentation.packaging.materials.map((m) => `材料：${m}`),
-        ...presentation.packaging.steps.map((s, i) => `步骤 ${i + 1}：${s}`),
+        ...(presentation.packaging.materials || []).map((m) => `材料：${m}`),
+        ...(presentation.packaging.steps || []).map((s, i) => `步骤 ${i + 1}：${s}`),
       ],
     },
     {
@@ -259,15 +290,13 @@ function presentationView(run, candidate, presentation, recheck, extras) {
       estimated_preparation_days: candidate.estimated_preparation_days,
     },
     recheck_summary: {
-      original_total: candidate.estimated_total,
-      additional_cost: presentation.additional_cost,
-      revised_estimated_total: presentation.revised_estimated_total,
+      contract_version: run.request.contract_version || null,
+      gift_estimated_total: candidate.estimated_total,
+      budget_range: run.request.budget_range ?? null,
       budget_amount: run.request.budget_amount,
       currency: presentation.currency,
       revised_estimated_preparation_days: presentation.revised_estimated_preparation_days,
       available_days: run.request.available_days,
-      forbidden_tags: run.request.forbidden_tags,
-      forbidden_terms: run.request.forbidden_terms,
       passed: recheck.passed,
       business_data_verification: "not_verified",
     },
