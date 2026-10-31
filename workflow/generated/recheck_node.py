@@ -384,7 +384,7 @@ def adapt_intake(intake_json):
     if not isinstance(data, dict):
         return {"status": "needs_input", "errors": [{"code": "INVALID_TYPE", "path": "intake", "message": "输入根节点须为对象"}], "request_json": None}
 
-    fields = {"recipient_relation", "closeness", "occasion", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes"}
+    fields = {"recipient_relation", "recipient_relation_custom", "closeness", "occasion", "occasion_custom", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes"}
     for key in data:
         if key in fields:
             continue
@@ -433,6 +433,26 @@ def adapt_intake(intake_json):
 
     relation = choice("recipient_relation", RELATIONS)
     occasion = choice("occasion", OCCASIONS)
+    def custom_text(key):
+        if key not in data:
+            return None
+        value = data[key]
+        if not isinstance(value, str) or not value.strip():
+            err("INVALID_TYPE", "intake." + key, "自定义文本必须为非空字符串")
+            return None
+        if len(value) > 1000:
+            err("LIMIT_EXCEEDED", "intake." + key, "自定义文本最多 1000 个 Unicode 码点")
+        return value
+    relation_custom = custom_text("recipient_relation_custom")
+    occasion_custom = custom_text("occasion_custom")
+    if relation == "other" and relation_custom is None:
+        err("INTAKE_CLARIFICATION_REQUIRED", "intake.recipient_relation_custom", "选择其他关系时请填写自定义关系")
+    if relation != "other" and "recipient_relation_custom" in data:
+        err("INTAKE_UNKNOWN_FIELD", "intake.recipient_relation_custom", "只有选择其他关系时才能填写自定义关系")
+    if occasion == "other" and occasion_custom is None:
+        err("INTAKE_CLARIFICATION_REQUIRED", "intake.occasion_custom", "选择其他场合时请填写自定义场合")
+    if occasion != "other" and "occasion_custom" in data:
+        err("INTAKE_UNKNOWN_FIELD", "intake.occasion_custom", "只有选择其他场合时才能填写自定义场合")
     closeness = choice("closeness", CLOSENESS, "unknown")
     for key in ("recipient_relation", "occasion"):
         if data.get(key) == "unknown":
@@ -495,9 +515,11 @@ def adapt_intake(intake_json):
         # 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
         # recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值。
         # 它只由服务端 intake 产出，不在上面的 fields 输入白名单内，前端不得提交。
-        "recipient_relation": RELATIONS.get(relation, ""),
+        "recipient_relation": relation_custom if relation == "other" and relation_custom is not None else RELATIONS.get(relation, ""),
         "recipient_relation_id": relation if relation in RELATIONS else "",
-        "occasion": OCCASIONS.get(occasion, ""),
+        "recipient_relation_custom": relation_custom if relation == "other" else None,
+        "occasion": occasion_custom if occasion == "other" and occasion_custom is not None else OCCASIONS.get(occasion, ""),
+        "occasion_custom": occasion_custom if occasion == "other" else None,
         "budget_amount": budget, "currency": data.get("currency"),
         "available_days": data.get("deadline_days"),
         "facts": [{"id": "interest:" + key, "text": "用户明确知道：对方对“" + INTERESTS[key] + "”感兴趣（未确认该组内具体偏好）"} for key in interests if confidence.get(key, "inferred") == "confirmed"],

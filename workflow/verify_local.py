@@ -247,6 +247,29 @@ def verify_nov01():
     output = report(state)
     expect("新版报告仅礼物口径", "礼物本身估价：" in output["report_text"] and "不代表免费" in output["report_text"] and "全量估算：" not in output["report_text"])
     expect("等待选择且不替选", output["selected_candidate_id"] is None and "c1" not in output["selectable_candidate_ids"])
+    custom_payload = {
+        "contract_version": data["contract_version"], "recipient_relation": "other",
+        "recipient_relation_custom": "社团搭档", "occasion": "other",
+        "occasion_custom": "项目收尾感谢", "budget_mode": "other",
+        "budget_range": {"min": "125.50", "max": "275.75"}, "budget_amount": "275.75",
+        "currency": "CNY", "deadline_days": 5, "dislikes": "",
+        "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}
+    }
+    custom_result = adapt_intake(dump(custom_payload))
+    expect("自定义关系原样传递", custom_result["status"] == "ready" and json.loads(custom_result["request_json"])["recipient_relation"] == "社团搭档")
+    custom_request = json.loads(custom_result["request_json"])
+    expect("自定义场合原样传递", custom_request["occasion"] == "项目收尾感谢" and custom_request["occasion_custom"] == "项目收尾感谢")
+    expect("自定义预算区间和标量一致", custom_request["budget_range"] == {"min": "125.50", "max": "275.75"} and custom_request["budget_amount"] == "275.75")
+    for field, value in (("recipient_relation_custom", " "), ("occasion_custom", ""), ("recipient_relation_custom", "x" * 1001)):
+        invalid = dict(custom_payload)
+        invalid[field] = value
+        invalid_result = adapt_intake(dump(invalid))
+        expect("自定义字段非法值拒绝:" + field, invalid_result["status"] == "needs_input" and any(e["path"] == "intake." + field for e in invalid_result["errors"]))
+    unrelated = dict(custom_payload)
+    unrelated["recipient_relation"] = "friend"
+    unrelated["recipient_relation_custom"] = "社团搭档"
+    unrelated_result = adapt_intake(dump(unrelated))
+    expect("非其他关系拒绝自定义字段", unrelated_result["status"] == "needs_input" and any(e["code"] == "INTAKE_UNKNOWN_FIELD" and e["path"] == "intake.recipient_relation_custom" for e in unrelated_result["errors"]))
     legacy = dict(req)
     legacy.pop("contract_version")
     expect("旧版报告保留原口径", "全量估算：" in report(check(dump(legacy), dump(data["candidates"]))) ["report_text"])

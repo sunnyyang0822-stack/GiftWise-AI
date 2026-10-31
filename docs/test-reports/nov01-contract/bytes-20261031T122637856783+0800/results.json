@@ -1,0 +1,174 @@
+{
+  "tested_commit": "81291e8efaa6ed2e826a885759569d429b586557",
+  "online_calls": 0,
+  "Dify": "未执行",
+  "tokens": "未执行",
+  "model_latency": "未执行",
+  "cost": "未执行",
+  "committed_before_rebuild": [
+    {
+      "file": "validator/rules.py",
+      "expected": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "actual": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "passed": true
+    },
+    {
+      "file": "workflow/labels.py",
+      "expected": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "actual": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "passed": true
+    },
+    {
+      "file": "workflow/intake.py",
+      "expected": "3d09c787114bee2635c7370794b39be8212d08819e9f31ea7ddb16235b947b50",
+      "actual": "3d09c787114bee2635c7370794b39be8212d08819e9f31ea7ddb16235b947b50",
+      "passed": true
+    },
+    {
+      "file": "workflow/runtime.py",
+      "expected": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "actual": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "passed": true
+    },
+    {
+      "file": "code_node.py",
+      "expected": "ec77757cee942c2604682c3f709f262132e954aa0dbfdef92334e6f6ad5090e7",
+      "actual": "ec77757cee942c2604682c3f709f262132e954aa0dbfdef92334e6f6ad5090e7",
+      "passed": true
+    },
+    {
+      "file": "intake_node.py",
+      "expected": "23a2f43e8af35873c4c07eca95db9dc14b885a2be9e212063f02f5c64ee84af7",
+      "actual": "23a2f43e8af35873c4c07eca95db9dc14b885a2be9e212063f02f5c64ee84af7",
+      "passed": true
+    },
+    {
+      "file": "check_node.py",
+      "expected": "16186ce4bb9a22e4134bf803dc9ac47ff535d2a2ae3273143122401ab372cf24",
+      "actual": "16186ce4bb9a22e4134bf803dc9ac47ff535d2a2ae3273143122401ab372cf24",
+      "passed": true
+    },
+    {
+      "file": "recheck_node.py",
+      "expected": "17bef341fe340ddca32c03894691bb40dc7c3f404691088a52711eb87754bbc6",
+      "actual": "17bef341fe340ddca32c03894691bb40dc7c3f404691088a52711eb87754bbc6",
+      "passed": true
+    },
+    {
+      "file": "report_node.py",
+      "expected": "f88070c34f9b4eafa87a98929f51bbfd25803e9602d4b8de836f388d9f83334a",
+      "actual": "f88070c34f9b4eafa87a98929f51bbfd25803e9602d4b8de836f388d9f83334a",
+      "passed": true
+    }
+  ],
+  "commands": [
+    {
+      "label": "build",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/build_code_node.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "main",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "legacy",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py",
+        "--nov01"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "stage-c",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-v"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "after_rebuild": [
+    {
+      "file": "validator/rules.py",
+      "expected": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "actual": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "passed": true
+    },
+    {
+      "file": "workflow/labels.py",
+      "expected": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "actual": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "passed": true
+    },
+    {
+      "file": "workflow/intake.py",
+      "expected": "3d09c787114bee2635c7370794b39be8212d08819e9f31ea7ddb16235b947b50",
+      "actual": "3d09c787114bee2635c7370794b39be8212d08819e9f31ea7ddb16235b947b50",
+      "passed": true
+    },
+    {
+      "file": "workflow/runtime.py",
+      "expected": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "actual": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "passed": true
+    },
+    {
+      "file": "code_node.py",
+      "expected": "ec77757cee942c2604682c3f709f262132e954aa0dbfdef92334e6f6ad5090e7",
+      "actual": "ec77757cee942c2604682c3f709f262132e954aa0dbfdef92334e6f6ad5090e7",
+      "passed": true
+    },
+    {
+      "file": "intake_node.py",
+      "expected": "23a2f43e8af35873c4c07eca95db9dc14b885a2be9e212063f02f5c64ee84af7",
+      "actual": "23a2f43e8af35873c4c07eca95db9dc14b885a2be9e212063f02f5c64ee84af7",
+      "passed": true
+    },
+    {
+      "file": "check_node.py",
+      "expected": "16186ce4bb9a22e4134bf803dc9ac47ff535d2a2ae3273143122401ab372cf24",
+      "actual": "16186ce4bb9a22e4134bf803dc9ac47ff535d2a2ae3273143122401ab372cf24",
+      "passed": true
+    },
+    {
+      "file": "recheck_node.py",
+      "expected": "17bef341fe340ddca32c03894691bb40dc7c3f404691088a52711eb87754bbc6",
+      "actual": "17bef341fe340ddca32c03894691bb40dc7c3f404691088a52711eb87754bbc6",
+      "passed": true
+    },
+    {
+      "file": "report_node.py",
+      "expected": "f88070c34f9b4eafa87a98929f51bbfd25803e9602d4b8de836f388d9f83334a",
+      "actual": "f88070c34f9b4eafa87a98929f51bbfd25803e9602d4b8de836f388d9f83334a",
+      "passed": true
+    }
+  ],
+  "rebuild_byte_identical": true
+}

@@ -3,3 +3,10 @@ validator/__init__.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 validator/rules.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 tests/test_validator.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 tests/test_cases.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# 仅工作流构建输入/输出固定 LF；不改变已有 validator 原始字节策略。
+workflow/labels.py text eol=lf
+workflow/intake.py text eol=lf
+workflow/runtime.py text eol=lf
+workflow/build_code_node.py text eol=lf
+workflow/generated/*.py text eol=lf
+workflow/generated/manifest.json text eol=lf
