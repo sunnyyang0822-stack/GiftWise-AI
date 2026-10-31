@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validate, validateForDecision, validateRequestOnly, requestIsValid, checkPresentationForDecision } from '../server/checker.mjs';
+import { PURCHASE_WINDOW_CONFIG } from '../server/config.mjs';
 import { strictParse } from '../server/jsonstrict.mjs';
 import { buildRecommendEnvelope, buildRecommendMessages } from '../server/llm/prompt.mjs';
 import { buildMockCandidates } from '../server/mock-model.mjs';
@@ -82,6 +83,8 @@ test('recommendation envelopes omit deadlines and bands while preserving budget 
   assert.equal(JSON.parse(envelope.request_json).budget_amount,'800');
   assert.deepEqual(envelope.input_constraints.literal_preferences,['喜欢现场音乐']);
   assert.match(buildRecommendMessages(envelope)[0].content,/不得使用送礼时间筛选、排序或淘汰礼物/);
+  assert.match(buildRecommendMessages(envelope)[0].content,/不输出赶不上、来不及等时间风险警告/);
+  assert.doesNotMatch(PURCHASE_WINDOW_CONFIG.not_a_guarantee,/由你|赶不上|赶得上/);
   assert.equal(r.available_days,1);
 });
 

@@ -93,9 +93,9 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
     days_band: daysBand
       ? {
           ...daysBand,
-          enforced: "tolerance_warning",
+          enforced: "not_used_for_decision",
           enforced_note:
-            "时间仅作参考，是否赶得上由你判断。",
+            "时间不参与推荐筛选或排序。",
         }
       : null,
     literal_preferences: literals,
@@ -104,7 +104,6 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
     findings: [],
   };
   const byId = new Map((Array.isArray(candidates) ? candidates : []).map((candidate) => [candidate?.id, candidate]));
-  const deliveryOf = (id) => delivery?.per_candidate?.[id] ?? null;
   for (const result of validation.candidate_results ?? []) {
     const candidate = byId.get(result.id);
     if (!candidate) continue;
@@ -120,24 +119,6 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
         pushError(result.errors, "PRICE_OUT_OF_BAND", `${result.id}.estimated_total`, `估算总价 ${candidate.estimated_total} 超过用户所给金额 ${budgetBand.user_amount} 的上界 ${budgetBand.max}（带宽上下不超过 ${budgetBand.band_cny} 元）`);
         result.passed = false;
         audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side: "above", estimated_total: candidate.estimated_total, band: [budgetBand.min, budgetBand.max], level: "error" });
-      }
-    }
-    if (daysBand) {
-      const info = deliveryOf(result.id);
-      const lead = Number.isInteger(info?.total_days) ? info.total_days : null;
-      const tolerance = daysBand.user_days + daysBand.band_days;
-      if (lead !== null && lead > tolerance) {
-        const finding = {
-          candidate_id: result.id,
-          code: "DELIVERY_BEYOND_DAYS_TOLERANCE",
-          total_days: lead,
-          tolerance_days: tolerance,
-          message: `估算总时长上界为${lead}天，你的计划为${daysBand.user_days}天，是否赶得上由你判断。`,
-          level: "warning",
-        };
-        audit.findings.push(finding);
-        result.warnings = [...(result.warnings ?? []), finding];
-        notices.push(finding.message);
       }
     }
     if (literals.length > 0) {
@@ -437,10 +418,10 @@ async function runRecommendationCore(input, services = {}) {
     applicable: deliveryApplicable,
     reason: deliveryApplicable ? null : mode === "mock" ? "模拟数据没有真实物流信息" : "未提供送礼时间",
     policy: {
-      rule: "时间估算仅作提示，不影响候选选择；是否赶得上由用户判断",
+      rule: "时间不参与推荐筛选、排序或可选性判断",
       shipping: { ...SHIPPING_CONFIG },
       presale: { ...PRESALE_CONFIG },
-      presale_note: "预售发货时间请向商家确认。",
+      presale_note: "预售发货时长来自页面信息，缺失时保留未知。",
       purchase_window: { ...PURCHASE_WINDOW_CONFIG },
       tier_rule: "未知快递统一按3~5天估算，与用户选择的时间档位无关",
       not_a_guarantee: PURCHASE_WINDOW_CONFIG.not_a_guarantee,
@@ -857,7 +838,7 @@ async function runPresentationCore(input, services = {}) {
     recheck = checkPresentationForDecision(run.request, candidate, presentation);
     recheck.raw_validation = structuredClone(rawPresentationCheck);
     if (reportedDays !== candidate.estimated_preparation_days) {
-      recheck.warnings.push({ code: "PREPARATION_ESTIMATE_ALIGNED", path: "presentation.revised_estimated_preparation_days", message: `准备时间沿用所选礼物的${candidate.estimated_preparation_days}天估算；呈现模型原估算为${reportedDays}天。` });
+      recheck.preparation_estimate = { source: "selected_candidate", days: candidate.estimated_preparation_days, model_reported_days: reportedDays };
     }
   }
   /* 呈现文字与第 3–4 步方向的对齐：被禁颜色 → 硬错（「不喜欢的东西」绝对禁止）；

@@ -280,7 +280,7 @@ export const CLIENT_TIMEOUT_MS = 150000;
 export const PURCHASE_WINDOW_CONFIG = Object.freeze({
   min: 3, max: 5, used: 5, day_type: 'calendar',
   basis: '快递时长未知时暂按3~5天估算；used仅为估算上界',
-  not_a_guarantee: '时间为估算，是否赶得上由你判断。',
+  not_a_guarantee: '时间为估算。',
 });
 export const SHIPPING_CONFIG = Object.freeze({
   defaultDays: PURCHASE_WINDOW_CONFIG.max,
@@ -290,9 +290,9 @@ export const SHIPPING_CONFIG = Object.freeze({
 });
 export const PRESALE_CONFIG = Object.freeze({
   defaultDays: null,
-  basis: '预售发货时间未知时请向商家确认，不补成确定时长',
+  basis: '预售发货时间缺失时保留未知',
   is_estimate: true,
-  not_a_guarantee: '预售与发货时间请向商家确认。',
+  not_a_guarantee: '预售与发货时间来自页面信息或为未知。',
 });
 
 /**

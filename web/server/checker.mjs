@@ -85,7 +85,7 @@ export function resolvePurchaseWindow({
     detail: { observed, only: dispatch !== null ? "ships_within_days" : known(shipping_days) ? "shipping_days" : null, presale_unknown: is_preorder === true && dispatch === null, reason: observed === null ? "no_page_duration" : "partial_page_duration", used_upper_bound: max } };
 }
 
-/** 时间只提供比较信息，绝不影响可选性。数值字段合法性仍由独立规则检查。 */
+/** 时间仅保留中性事实元数据，不向推荐卡追加时间风险警告。 */
 export function deliveryDeadline({
   prep_days = null, presale_days = null, ships_within_days = null,
   shipping_days = null, purchase_days = null, available_days = null,
@@ -98,20 +98,6 @@ export function deliveryDeadline({
   const window = online ? resolvePurchaseWindow({ ships_within_days, shipping_days, purchase_days, is_preorder, presale_days }) : null;
   const effective = window?.days ?? null;
   const total = known(prep_days) && (!online || known(effective)) ? prep_days + (online ? effective : 0) : null;
-  const totalMin = total === null ? null : prep_days + (window?.min ?? 0);
-  if (window?.source === "default_estimate") {
-    const message = window.detail.only === "shipping_days"
-      ? `页面配送约${window.detail.observed}天，发货时间未知，请向商家确认完整到货时间。`
-      : "快递暂按3~5天估算，是否赶得上由你判断。" + (window.detail.observed !== null ? `页面发货时长约${window.detail.observed}天，估算合计还包含这段等待时间。` : "");
-    error(warnings, "SHIPPING_TIME_UNKNOWN", `${path}.estimated_shipping_days`, message);
-  }
-  if (window?.detail.presale_unknown) error(warnings, "PRESALE_TIME_UNKNOWN", `${path}.presale_days`, "预售发货时间未知，请向商家确认。当前快递估算不含未知预售等待时间。");
-  if (is_preorder === true) error(warnings, "PRESALE_ITEM", `${path}.is_preorder`, "这是预售商品，请确认发货时间。");
-  if (known(prep_days) && known(available_days) && prep_days > available_days) {
-    error(warnings, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, `准备时间约${prep_days}天，你的计划为${available_days}天，是否合适由你判断。`);
-  } else if (total !== null && known(available_days) && total > available_days) {
-    error(warnings, "DELIVERY_TOO_LONG", `${path}.estimated_shipping_days`, `准备与物流估算合计${totalMin === total ? total : `${totalMin}~${total}`}天，你的计划为${available_days}天，是否赶得上由你判断。`);
-  }
   return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window?.source ?? "not_applicable", shipping_days_source: window?.source ?? "not_applicable", fulfillment, fulfillment_confidence: FULFILLMENT_CONFIG.confidence, tier_inclusive: false, total_days: total, purchase_window: window };
 }
 
@@ -710,7 +696,7 @@ export function requestIsValid(requestCheck) {
   );
 }
 
-/** 服务端时间策略：保留原始规则结果，仅把准备超期降为提示。
+/** 服务端时间策略：保留原始规则结果，准备超期不进入决策或用户警告。
  * 字段缺失、类型错误、预算与批次错误仍是硬错误；不修改 Python/JS 镜像规则。
  */
 export function withTimeAdvisories(raw) {
@@ -720,7 +706,7 @@ export function withTimeAdvisories(raw) {
     const timed = item.errors.filter((e) => e.code === "PREPARATION_TOO_LONG" &&
       /^(?:candidates\[\d+\]\.estimated_preparation_days|presentation\.revised_estimated_preparation_days)$/.test(e.path));
     item.errors = item.errors.filter((e) => !timed.includes(e));
-    item.warnings = [...(item.warnings ?? []), ...timed.map((e) => ({ ...e, message: "估算准备时间超过你的计划时间，是否合适由你判断。" }))];
+    item.warnings = [...(item.warnings ?? [])];
     return timed.length;
   };
   if (Array.isArray(result.candidate_results)) {

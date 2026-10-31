@@ -22,7 +22,7 @@ test('time policy preserves untouched raw failures and allows three overdue cand
   assert.deepEqual(effective.raw_validation,saved);
   assert.equal(effective.all_passed,true);
   assert.equal(effective.status,'passed');
-  assert.ok(effective.candidate_results.every(r=>r.passed && !r.errors.length && r.warnings.some(w=>w.code==='PREPARATION_TOO_LONG')));
+  assert.ok(effective.candidate_results.every(r=>r.passed && !r.errors.length && !r.warnings.length));
 });
 
 for (const prep of [-1, '2', true, 1.5, null, undefined]) {
@@ -58,7 +58,8 @@ for (const available of [1,5,7,30]) {
     assert.equal(out.tier_inclusive,false);
     assert.equal(out.shipping_days_source,'default_estimate');
     assert.equal(out.total_days,13);
-    assert.match(out.warnings.find(w=>w.code==='SHIPPING_TIME_UNKNOWN').message,/3~5/);
+    assert.deepEqual(out.warnings,[]);
+    assert.match(out.purchase_window.default.basis,/3~5/);
   });
 }
 
@@ -73,11 +74,13 @@ test('observed full and partial logistics remain distinguishable', () => {
   assert.equal(partial.max,14);
   const shippingOnly=deliveryDeadline({prep_days:1,available_days:2,shipping_days:4});
   assert.equal(shippingOnly.total_days,null);
-  assert.match(shippingOnly.warnings[0].message,/发货时间未知/);
+  assert.equal(shippingOnly.purchase_window.detail.only,'shipping_days');
+  assert.deepEqual(shippingOnly.warnings,[]);
   const sale=deliveryDeadline({prep_days:1,available_days:1,is_preorder:true});
   assert.deepEqual(sale.errors,[]);
   assert.equal(sale.effective_presale_days,null);
-  assert.ok(sale.warnings.some(w=>w.code==='PRESALE_TIME_UNKNOWN'));
+  assert.equal(sale.purchase_window.detail.presale_unknown,true);
+  assert.deepEqual(sale.warnings,[]);
 });
 
 for (const fulfillment of ['offline','experience']) test(`${fulfillment} overtime is advisory without shipping`,()=>{
@@ -85,7 +88,7 @@ for (const fulfillment of ['offline','experience']) test(`${fulfillment} overtim
   assert.deepEqual(out.errors,[]);
   assert.equal(out.effective_shipping_days,null);
   assert.equal(out.total_days,8);
-  assert.ok(out.warnings.some(w=>w.code==='PREPARATION_TOO_LONG'));
+  assert.deepEqual(out.warnings,[]);
 });
 
 test('presentation time policy preserves raw candidate and presentation time failures', () => {
@@ -94,7 +97,7 @@ test('presentation time policy preserves raw candidate and presentation time fai
   const effective=withTimeAdvisories(raw);
   assert.equal(effective.passed,true);
   assert.equal(effective.raw_validation.passed,false);
-  assert.ok(effective.warnings.some(w=>w.path==='presentation.revised_estimated_preparation_days'));
+  assert.deepEqual(effective.warnings,[]);
 });
 
 const intake = (deadline = 7) => ({contract_version:'giftwise-20261031-v2',budget_mode:'other',budget_range:{min:'0',max:'800'},currency:'CNY',deadline_days:deadline,recipient_relation:'partner',closeness:'unknown',occasion:'birthday',interests:[],interest_confidence:{},gift_styles:[],dislikes:'',hard_exclusions:{tags:[],terms:[],unresolved:[]},additional_context:''});
@@ -115,7 +118,11 @@ test('pipeline keeps three overdue candidates eligible for catalog binding and s
   assert.deepEqual(out.report.selectable_candidate_ids,['c1','c2','c3']);
   assert.equal(out.run.repair_count,0);
   assert.ok(Object.values(out.run.delivery.per_candidate).every(d=>d.errors.length===0));
-  assert.ok(out.report.validation.candidate_results[0].warnings.some(w=>w.code==='DELIVERY_BEYOND_DAYS_TOLERANCE'));
+  assert.equal(out.report.validation.input_parse_gates.days_band.enforced,'not_used_for_decision');
+  assert.ok(!out.report.validation.input_parse_gates.findings.some(w=>w.code==='DELIVERY_BEYOND_DAYS_TOLERANCE'));
+  assert.ok(out.report.validation.candidate_results.every(r=>!r.warnings.some(w=>/TIME|PREPARATION|DELIVERY|PRESALE/.test(w.code))));
+  assert.ok(!out.report.notices.some(t=>/赶不上|赶得上|由你|自行判断|来不及/.test(t)));
+  assert.ok(Object.values(out.report.delivery.per_candidate).every(d=>d.warnings.length===0));
 });
 
 test('aligned presentation removes obsolete model overtime warning but retains raw evidence',async()=>{
@@ -137,7 +144,8 @@ test('pipeline aligns valid presentation 3 days to selected 2 days without spend
   assert.equal(result.view.recheck_summary.revised_estimated_preparation_days,2);
   assert.equal(result.view.shipping.total_days,7);
   assert.equal(result.view.repair_count,0);
-  assert.ok(result.view.presentation_check.warnings.some(w=>w.code==='PREPARATION_ESTIMATE_ALIGNED'));
+  assert.deepEqual(result.view.presentation_check.preparation_estimate,{source:'selected_candidate',days:2,model_reported_days:3});
+  assert.ok(!result.view.presentation_check.warnings.some(w=>/TIME|PREPARATION|DELIVERY|PRESALE/.test(w.code)));
   assert.equal(result.view.presentation_check.raw_validation.passed,false);
 });
 
