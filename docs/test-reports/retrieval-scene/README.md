@@ -131,3 +131,20 @@ PASS 仅表示固定代码和夹具的离线结构/规则行为。SKIP：Dify、
 六类均 PASS：省略/空白为 ready 且不造硬约束；合法文本 ready 并原样保留；非字符串为 `INVALID_TYPE` / `intake.previous_gifts`；超长为 `LIMIT_EXCEEDED` / `intake.previous_gifts`；源节点和 generated 节点结果完全一致。
 
 本轮命令退出码：build=0、probe=0、verify_local=0、nov01=0、avoid-history=0、retrieval-media=0、retrieval-media-v2=0、compileall=0、diff-check=0。Dify、Seedream、OpenCLI、模型调用均为0。
+
+## 同步提交与全量回归（本次交付）
+
+远端 `origin/codex/workflow-avoid-history` 已包含 `bd330f4`；本次未重写 previous_gifts 逻辑，仅重新执行并归档新证据。
+
+实际退出码全部为 0：
+
+- `previous_gifts_release_probe.py`：六类输入 PASS，源/generated 六类结果一致。
+- `workflow/verify_local.py`：46 passed, 0 failed，model calls 0。
+- `workflow/verify_local.py --nov01`：29 passed，cloud_not_verified。
+- `avoid-history/verify.py`：26 passed；历史明确排除门禁仍按既有边界 BLOCKED。
+- `retrieval-media/verify.py`：49 passed；真实 provider/视觉定位 SKIP。
+- `retrieval-media/verify_v2.py`：PASS。
+- `python -m compileall workflow`：0。
+- `git diff --check`：0。
+
+新增运行证据目录为 `workflow/evidence/local-2026-10-29/runs/20261031T161919+0800/`，历史证据未删除。Dify、Seedream、OpenCLI、模型和付费服务调用数均为 0。
