@@ -1,0 +1,20 @@
+{
+  "REPORT.md": "0bd7f864e8e63b86b8023e731106f68bfaa5d011c4ba2ff28d67d474f10200ce",
+  "evidence/compshare-timer.json": "940b48fa24839897e8d94efd468107586d151165816b63f544bb8c46a929b4be",
+  "evidence/current-assets-and-material.json": "f34455500b0f481077fc4f904e32f5a190a084431271bd1ff23ecafe36a7577c",
+  "evidence/handoff-checksums-147e45a.json": "1e4db27c5cadabb835e8362aef3f9cb45a4c7ca10f647380d9b2f3c7ce54ee2c",
+  "evidence/intake-fictional.json": "f615f5dbf50ae1bf2affd56a517ba6d6e1aa4530b8cbd4eaa54c41a11c13392e",
+  "evidence/material-portability-tests.txt": "e02d34ee5e1c01c80e038e493c28f85f419f2d1cf8d44ee9517f80a72e445bd5",
+  "evidence/media-task-latest.json": "8bb0bf9ecc7a7bfff5eddb1326fac8466f9368c4f6d67e52f78c96ab3bc85224",
+  "evidence/online-inspection.png": "64eb45901db3434b13c68c8f114c2e5cd2f0ffa2553e902bf3fd38f2f090ac1b",
+  "evidence/presentation-initial.json": "ef492714347a5e1577de0bb31c474d4007bbb06d70e6796a17e5cd881ae50271",
+  "evidence/public-health-final.json": "6ca0f31b0e1e5c5085296c923c425d4036439db87c7d86e2bf7a3d3e300bfec0",
+  "evidence/public-static-assets.json": "f83bd9a094790136f9cc308151f916568fa52200bef4160554b422620dee900d",
+  "evidence/recommendation.json": "f48831d3fb6f11b6bdf003a82bfe3c240fca95820955929a65289209531ec034",
+  "evidence/requests-summary.json": "1882e5845e1e79dfa02a01f3ec12f3befab806ff939bf146140a5916926f99bd",
+  "evidence/runtime-observations.json": "9bbb4b1731beafd8ba56edddcb82af35c6590d864ebd79c636393eef63b54603",
+  "evidence/runtime-state.png": "0e1c5528942bd46e9e47953ea04711ab9c3e8d7855866b0b3011645ec5680c19",
+  "evidence/secret-screening.json": "f46072a94c33348baa14db7c0f7e0403698e6bbf6322a35812da2b78ac900f7c",
+  "evidence/selected-ai-image.jpg": "e0c0caaa7938686c1905fedfb0ce2348e44ed59d8480938947685f60f45bda9f",
+  "evidence/validate.json": "ba6f2876fdcb59df66e56d984c75b31d279e538c20890fab55f7556f1eaab213"
+}

@@ -1,0 +1,426 @@
+[
+  {
+    "file": ".gitattributes",
+    "passed": true
+  },
+  {
+    "file": "HANDOFF-REPORT.md",
+    "passed": true
+  },
+  {
+    "file": "MAIN-RELEASE.md",
+    "passed": true
+  },
+  {
+    "file": "README.md",
+    "passed": true
+  },
+  {
+    "file": "api-b/api-contract.md",
+    "passed": true
+  },
+  {
+    "file": "api-b/api-examples.json",
+    "passed": true
+  },
+  {
+    "file": "api-b/env.example",
+    "passed": true
+  },
+  {
+    "file": "api-b/runtime-dependencies.md",
+    "passed": true
+  },
+  {
+    "file": "api-b/sessions-timeouts.md",
+    "passed": true
+  },
+  {
+    "file": "assembly-inputs.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence-index.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/font-fontprobe-ff.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/font-probe-dynamic.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/font-probe-home.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/font-subset-run.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/media-runs.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/media-v3-1440-log.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/media-v3-390-log.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/pr102-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/pr95-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/review-evidence-manifest.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/static-audit.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-102-95/uncovered-material-probe-raw.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/historical-ai83/summary.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/network-attempts.jsonl",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/offline-guard.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/run-targeted.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/targeted-environment.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/targeted-raw.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr115/targeted-result.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/check-preserved-selected.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/delivery-correction.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/network-attempts.jsonl",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/offline-guard.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/run-targeted.mjs",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/selected-preservation-check.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/selected-preservation-raw.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/targeted-environment.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/targeted-raw.txt",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/evidence/pr120/targeted-result.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/frontend-handoff.md",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/material-audit.json",
+    "passed": true
+  },
+  {
+    "file": "frontend-e/static-assets-manifest.json",
+    "passed": true
+  },
+  {
+    "file": "publication-checks.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/execution.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/network-guard-used.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/probe-used.test.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/runner-used.py",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/stderr.txt",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-2/stdout.tap",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/execution.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/network-guard-used.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/probe-used.test.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/runner-used.py",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/stderr.txt",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http-attempt-3/stdout.tap",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/execution.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/network-guard-used.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/probe-used.test.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/runner-used.py",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/stderr.txt",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/http/stdout.tap",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/offline/execution.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/offline/network-guard-used.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/offline/stderr.txt",
+    "passed": true
+  },
+  {
+    "file": "qa-d/artifacts/offline/stdout.tap",
+    "passed": true
+  },
+  {
+    "file": "qa-d/commands.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/final-code-state.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/index.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr102-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr115-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr117-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr120-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr121-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr83-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr84-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/history/pr95-independent-review.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/independent-qa-eceef056.md",
+    "passed": true
+  },
+  {
+    "file": "qa-d/publication-manifest.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/results-index.json",
+    "passed": true
+  },
+  {
+    "file": "qa-d/tools/combined-http.test.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/tools/network-guard.mjs",
+    "passed": true
+  },
+  {
+    "file": "qa-d/tools/prepare-publication.py",
+    "passed": true
+  },
+  {
+    "file": "qa-d/tools/run-qa.py",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/SHA256SUMS.txt",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/controlled-no-images.txt",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/controlled-selected-ai.txt",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/controlled-text-integration.txt",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/derived-source-use.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/measurement-plan.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/model-ledger.jsonl",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/new-recommendation-provider.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/new-recommendation-response.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/public-material-manifest.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/public-material-receipt.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/retrieval-audit.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/text-observation-plan.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/text-observation.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/evidence/timing.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/final-code-static-hashes.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/release-manifest.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/source-data.md",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/source-index.json",
+    "passed": true
+  },
+  {
+    "file": "runtime-c/storage-portability.md",
+    "passed": true
+  },
+  {
+    "file": "source-secret-screening.json",
+    "passed": true
+  },
+  {
+    "file": "version-manifest.json",
+    "passed": true
+  }
+]

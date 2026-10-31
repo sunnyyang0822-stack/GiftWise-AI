@@ -1,0 +1,43 @@
+{
+  "observed_via": "OpenCLI authenticated terminal; online-inspection.png",
+  "active_sha": "19b6819fe80787717571beb7cc0d17f89587c2d9",
+  "tree": "d6b7dca13a3779e55b58816eb0224f681663d849",
+  "service_state": "active",
+  "pid": 8301,
+  "node": "v24.16.0",
+  "linux_portability_tests": {
+    "tests": 18,
+    "pass": 18,
+    "fail": 0,
+    "source": "terminal observation; original log on instance /var/lib/giftwise/linux-portability-tests.txt"
+  },
+  "llm_calls": 5,
+  "by_kind": {
+    "recommend": 2,
+    "recommend_revision": 1,
+    "style_direction": 1,
+    "present": 1
+  },
+  "outcomes": {
+    "ok": 5
+  },
+  "total_tokens": 29513,
+  "retrieval_audit": {
+    "status": "completed",
+    "calls_total": 2,
+    "material_basis_count": 2,
+    "basis_cached": [
+      true,
+      true
+    ]
+  },
+  "runtime_file_count": 6,
+  "asset_count": 1,
+  "sqlite_backup_integrity": "ok",
+  "backup_directory": "/var/backups/giftwise/20261031T213544Z",
+  "runtime_backup_consistency": "file_copy_during_service_operation_not_transactional",
+  "restart_tested": false,
+  "browser_homepage_user_confirmed": true,
+  "opencli_browser_visual_walkthrough": "not_completed_empty_chrome_error_page",
+  "shutdown_at": "2026-11-03T05:11:00+08:00"
+}

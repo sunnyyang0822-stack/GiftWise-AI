@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "data": {
+    "configured": true,
+    "instance": "uhost-1x5rd7gtinrq",
+    "running": true,
+    "timer_text": "定时关机时间\n2026-11-03 05:11修改取消\n收费项\n实例：0.38元/小时 按量\n关机不收费\n|\n系统盘：0.00 元/小时 按量\n创建时间: 2026-11-01 05:11\n共 1 条",
+    "verified_after_reload": true
+  }
+}

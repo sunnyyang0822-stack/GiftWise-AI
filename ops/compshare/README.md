@@ -2,7 +2,7 @@
 
 关联 Issue #109、路径兼容缺陷 #124。部署基础为 main `15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879`，QA 树 `2772f6d022a15ca98d0d8be9ec0f82033445c182`。部署时固定完整提交，不跟随浮动分支。
 
-本目录采用 Ubuntu 22.04 + Node v24.16.0 + systemd + Nginx；不使用历史 Python Dockerfile。应用零 npm 依赖、无需前端打包。此目录脚本已做本地语法核查，**尚未在实例执行，不是公网验收证据**。
+本目录采用 Ubuntu 22.04 + Node v24.16.0 + systemd + Nginx；不使用历史 Python Dockerfile。应用零 npm 依赖、无需前端打包。本目录已在独立实例实际执行；固定部署 SHA 和公网验收证据见 [部署报告](../../docs/deployment/2026-11-01/REPORT.md)。后续文档提交不会使实例自动升级。
 
 ## 目标与状态
 
