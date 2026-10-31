@@ -61,10 +61,10 @@ export function packagingMedia(view, options = {}) {
   const safe = image && Object.hasOwn(kinds, image.kind) && localMediaUrl(image.url);
   const phase = options.pending ? "pending" : safe && status === "ready" ? "ready"
     : status === "failed" ? "failed" : options.blocked ? "blocked" : status === "pending" ? "waiting" : "unavailable";
-  const section = node("section", { class: `packaging-media packaging-media--${phase}`, "data-media-state": phase, "aria-label": "所选礼物包装效果示意" });
+  const section = node("section", { class: `packaging-media packaging-media--${phase}`, "data-media-state": phase, "aria-label": "所选礼物赠送效果示意" });
   section.append(node("div", { class: "packaging-media__head" }, [
-    node("span", { class: "media-kind", text: "包装效果示意" }),
-    node("h2", { text: "把心意，好好包起来" }),
+    node("span", { class: "media-kind", text: image?.kind ? kinds[image.kind] || "赠送效果示意" : "AI 效果示意" }),
+    node("h2", { text: "把心意，好好呈现" }),
   ]));
   if (phase === "ready") {
     const annotations = view.media?.contract_version === "retrieval-media-v2" && !image.version ? [] : selected.annotations;
@@ -84,7 +84,7 @@ export function packagingMedia(view, options = {}) {
     ]));
     return section.append(figure), section;
   }
-  const sub = { failed: "这次没画出来，包装和贺卡建议不受影响。", waiting: "图还在路上，文字建议已经可以照着准备。", blocked: "图片状态暂时没读到，文字建议不受影响。", unavailable: "包装和贺卡建议已经准备好了。" }[phase];
+  const sub = { failed: "这次没画出来，文字建议不受影响。", waiting: "图还在路上，文字建议已经可以照着准备。", blocked: "图片状态暂时没读到，文字建议不受影响。", unavailable: "赠送建议已经准备好了。" }[phase];
   figure.append(node("div", { class: "media-rest" }, [
     node("span", { class: "media-rest__icon", "aria-hidden": "true" }, [icon(phase === "unavailable" ? "ribbon" : "gift", { size: 26 })]),
     node("p", { class: "media-status", role: "status", "aria-live": "polite", text: message }),
@@ -114,7 +114,7 @@ function readyFigure(image, url, annotations) {
   const retry = node("button", { type: "button", class: "btn btn--sm media-retry", text: "重试加载图片" }); retry.hidden = true;
   const load = () => {
     retry.hidden = true; notice.textContent = ""; stage.replaceChildren(); figure.querySelector(".media-active-note")?.remove();
-    const img = node("img", { alt: image.alt || "礼物包装效果示意", decoding: "async" });
+    const img = node("img", { alt: image.alt || "礼物赠送效果示意", decoding: "async" });
     img.addEventListener("load", () => {
       const real = img.naturalWidth / img.naturalHeight;
       if (Number.isFinite(real) && real > 0) { stage.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`; stage.style.setProperty("--media-aspect", String(real)); }

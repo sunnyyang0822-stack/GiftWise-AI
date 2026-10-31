@@ -231,12 +231,11 @@ export function createResultViews(ctx) {
       mediaSlot = next;
     });
     mediaSlot = packagingMedia(view, mediaOptions(view, poll));
-    const sections = view.sections || [];
+    // 只呈现实际建议；不为无内容的栏目补包装或其他默认指引。
+    const sections = (view.sections || []).map(sec => ({ ...sec, items: (Array.isArray(sec.items) ? sec.items : []).filter(item => typeof item === "string" && item.trim()) })).filter(sec => sec.items.length);
     const card = sections.find(sec => sec.title.includes("贺卡"));
-    // 贺卡之外的段落按原顺序读成一条「照着这样准备」的时间线；某段暂无条目时仍保留这一步，只给一句指引，不编造材料。
+    // 贺卡之外的实际段落按服务端顺序形成时间线，不固定数量或礼物类别。
     const steps = sections.filter(sec => sec !== card);
-    const hasImage = ["ready", "pending"].includes(view.media?.status) && view.media?.selected?.candidate_id === view.selected_candidate_id;
-    const emptyHint = title => title.includes("包装") ? (hasImage ? "照着上面效果图的感觉来包，颜色参考上一步的配色。" : "颜色参考上一步的配色就好。") : "这一步按你们平时的习惯来就好。";
     const main = el("div", { class: "present-main" }, [
       mediaSlot,
       card ? el("article", { class: "greeting-card", "aria-label": "贺卡" }, [
@@ -250,15 +249,13 @@ export function createResultViews(ctx) {
           el("span", { class: "guide-step__no", "aria-hidden": "true", text: String(i + 1).padStart(2, "0") }),
           el("div", { class: "guide-step__body" }, [
             el("h3", { class: "guide-step__title" }, [icon(sectionIcon(sec.title), { size: 20 }), cleanTitle(sec.title)]),
-            (sec.items || []).some(Boolean)
-              ? el("ul", { class: "list" }, sec.items.filter(Boolean).map(item => el("li", { text: item })))
-              : el("p", { class: "guide-step__hint", text: emptyHint(sec.title) }),
+            el("ul", { class: "list" }, sec.items.map(item => el("li", { text: item }))),
           ]),
         ]))),
       ]) : null,
       view.revised_once && view.repaired_checks?.length ? errorBox(view.repaired_checks, "第一次检查发现的问题（已自动修订一次）") : null,
     ]);
-    return { body: [...body, el("div", { class: "present-layout" }, [main, summaryAside(view, s)])], actions: [] };
+    return { body: [...body, el("div", { class: "present-layout" }, [main, summaryAside(view, s, sections)])], actions: [] };
   }
 
   function presentHead(name, s) {
@@ -275,7 +272,7 @@ export function createResultViews(ctx) {
   }
 
   // 右侧摘要：像结账栏一样一直在手边——礼物、花费、是否符合要求，以及下一步。
-  function summaryAside(view, s) {
+  function summaryAside(view, s, sections) {
     const tags = (s.forbidden_tags || []).join("、");
     const terms = (s.forbidden_terms || []).join("、");
     const row = (iconName, term, detail, cls = "") => el("div", { class: `bill__row ${cls}` }, [icon(iconName, { size: 18 }), el("dt", { text: term }), el("dd", {}, [].concat(detail))]);
@@ -286,7 +283,7 @@ export function createResultViews(ctx) {
         el("p", { class: "present-summary__price", text: s.gift_estimated_total !== undefined ? `参考 ${money(s.gift_estimated_total, s.currency)}` : "价格待了解" }),
         el("dl", { class: "bill" }, [
           row("coins", "你的预算", s.budget_range ? `${s.budget_range.min}–${s.budget_range.max} 元` : "—"),
-          row("ribbon", "包装与贺卡", "风格与色调建议"),
+          sections.length ? row("ribbon", "赠送建议", sections.map(sec => cleanTitle(sec.title)).join("、")) : null,
           Number.isFinite(s.revised_estimated_preparation_days) ? row("clock", "准备时间", `约 ${s.revised_estimated_preparation_days} 天${Number.isFinite(s.available_days) ? ` / 可用 ${s.available_days} 天` : ""}`) : null,
           tags || terms ? row("ban", "已避开", [tags, terms].filter(Boolean).join("、")) : null,
           row("shield", "符合你的要求", el("span", { class: `bill-status ${s.passed ? "" : "bill-status--fail"}` }, [icon(s.passed ? "check" : "x", { size: 16 }), s.passed ? "都符合" : "有不符合"])),
