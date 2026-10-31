@@ -345,6 +345,20 @@ export function buildMockPresentation(request, candidate, options = {}) {
   const totalCents = originalCents + forced;
   const total = textOf(totalCents);
 
+  if (request.contract_version === "giftwise-20261031-v2") {
+    const presentation = {
+      contract_version: "giftwise-20261031-v2",
+      style: isPursuit ? "低压力、简洁" : "简洁实用",
+      packaging: { color_palette: attempt === 2 ? ["原色", "米白"] : ["米白", "浅木色", "雾霾蓝"] },
+      card_text: flavor.card_text,
+      giving_advice: { timing: flavor.timing, wording: flavor.wording, relationship_cautions: flavor.cautions },
+      unknowns: ["实际价格、库存、配送时效均未核实"],
+      currency: "CNY",
+      revised_estimated_preparation_days: candidate.estimated_preparation_days,
+    };
+    return { presentation, presentation_json: dump(presentation), notice: MOCK_PRESENTATION_NOTICE, mock: true };
+  }
+
   const presentation = {
     selected_candidate_id: candidate.id,
     packaging: {

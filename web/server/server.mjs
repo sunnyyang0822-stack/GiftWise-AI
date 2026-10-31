@@ -35,6 +35,8 @@ import {
   PORT,
   HOST,
   CLIENT_TIMEOUT_MS,
+  budget_slider,
+  budget_modes,
 } from "./config.mjs";
 import {
   PRODUCT_RELATIONS,
@@ -48,6 +50,9 @@ import {
 import { adaptIntakeObject } from "./intake.mjs";
 import { runRecommendation, runPresentation } from "./pipeline.mjs";
 import { getRun, runCount } from "./store.mjs";
+import { recognizeExclusions } from "./exclusion-provider.mjs";
+import { checkAiExclusions } from "./exclusion-checker.mjs";
+import { createAnalysis, getAnalysis } from "./exclusion-store.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(here, "..", "public");
@@ -161,6 +166,8 @@ function apiConfig() {
       exclusions: EXCLUSIONS,
     },
     ranges: { budget: BUDGET_RANGES, deadline: DEADLINE_RANGES },
+    budget_slider,
+    budget_modes,
     limits: {
       currency: "CNY",
       intake_bytes: LIMITS.intakeBytes,
@@ -226,6 +233,10 @@ async function handleApi(req, res, url) {
 
   if (pathname === "/api/intake/validate") {
     const result = adaptIntakeObject(payload.intake);
+    if (result.status === "ready" && typeof payload.intake?.dislikes === "string" && payload.intake.dislikes.trim()) {
+      result.status = "needs_input";
+      result.errors = [...result.errors, { code: "INTAKE_CLARIFICATION_REQUIRED", path: "intake.dislikes", message: "请先完成不喜欢内容的识别与确认。" }];
+    }
     sendJson(res, 200, {
       // 这里**不**回显 request_json：派生请求只留在服务端，避免前端误把派生值当输入。
       status: result.status,
@@ -238,8 +249,33 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  if (pathname === "/api/exclusions/analyze") {
+    const basic = adaptIntakeObject(payload.intake);
+    if (basic.status !== "ready") {
+      sendJson(res, 200, { status: "needs_input", mode: MODE.current, analysis_id: null, candidates: [], errors: basic.errors });
+      return true;
+    }
+    const dislikes = typeof payload.intake?.dislikes === "string" ? payload.intake.dislikes : "";
+    const provider = MODE.current === "dify" ? undefined : undefined;
+    const recognized = await recognizeExclusions({ dislikes, mode: MODE.current, provider });
+    if (!recognized.ok) {
+      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: recognized.errors });
+      return true;
+    }
+    if (recognized.ai_json === null) {
+      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: [] });
+      return true;
+    }
+    const checked = checkAiExclusions(recognized.ai_json, dislikes);
+    const analysisId = createAnalysis({ intake: payload.intake, mode: recognized.mode, candidates: checked.candidates, status: checked.status, errors: checked.errors });
+    sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, errors: checked.errors });
+    return true;
+  }
+
   if (pathname === "/api/recommendations") {
-    const outcome = await runRecommendation({ intake: payload.intake, demo: payload.demo, mode: MODE.current });
+    let analysis = null;
+    if (payload.exclusion_confirmation?.analysis_id) analysis = getAnalysis(payload.exclusion_confirmation.analysis_id);
+    const outcome = await runRecommendation({ intake: payload.intake, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis });
     if (outcome.kind === "report") {
       sendJson(res, 200, outcome.report);
       return true;
