@@ -1,0 +1,9 @@
+{
+  "command": [
+    "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "workflow/verify_local.py"
+  ],
+  "exit_code": 0,
+  "stdout": "{\"sources_sha256\": {\"validator/rules.py\": \"f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258\", \"workflow/labels.py\": \"f339d171872cbb88a4132071d69d9f9778bf54f117fa94c10b2d47a4d576e37d\", \"workflow/intake.py\": \"776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381\", \"workflow/runtime.py\": \"32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683\"}, \"artifacts_sha256\": {\"code_node.py\": \"3735236df5763f9dd6bc58d5f9cbe84a8910eacb51716df8175878c95574397e\", \"intake_node.py\": \"1866fd08d81429eb0361fe37479eaeb8464e20ab889081c9afb7d2bbd08a7e02\", \"check_node.py\": \"e439a40ec4da4882a5f5705684222295b2d9761115aaaaf91f19a00ff4f6f863\", \"recheck_node.py\": \"53278bcb385ea967041fb92a2a22d60d785307ce949a04fab5dd9f6fb9d82894\", \"report_node.py\": \"c752d205307f25bb3b736d455fd6a26dfbd73a05bbd794913f5979c26d0d17ab\"}, \"format\": \"python-source-not-dsl\", \"cloud_verified\": false}\nlocal probes: 46 passed; 0 failed; model calls: 0; cloud verified: false\nrun dir: workflow/evidence/local-2026-10-29/runs/20261031T112227+0800  (latest 鎸囬拡 -> workflow/evidence/local-2026-10-29/latest.json)\n",
+  "stderr": ""
+}

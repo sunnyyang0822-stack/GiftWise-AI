@@ -1,0 +1,10 @@
+{
+  "command": [
+    "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "workflow/verify_local.py",
+    "--nov01"
+  ],
+  "exit_code": 0,
+  "stdout": "nov01 local assertions: 22 passed; cloud_not_verified; model_calls=0\n",
+  "stderr": ""
+}
