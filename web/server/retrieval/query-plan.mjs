@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
-import { DOMESTIC_SOURCE_HOSTS } from '../catalog/db.mjs';
+// Planning source IDs are independent from product-binding domains. An allowed
+// planning ID does not claim that its adapter is connected or currently available.
+export const DOMESTIC_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','smzdm','damai','maoyan','bilibili','zhihu','weibo','douban','rednote','xiaohongshu','huodongxing']);
 
+export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','damai','maoyan']);
 const PROMPT = readFileSync(new URL('../../../workflow/prompts/retrieval-plan.md', import.meta.url), 'utf8');
 const GENERIC = new Set(['礼物', '礼品', '送人', '生日礼物', '其他', 'unknown']);
 const clean = value => typeof value === 'string' ? value.trim() : '';
@@ -30,16 +33,19 @@ export function normalizeRetrievalPlan(plan = {}) {
   let rejectedQueries = 0;
   if (plan.needs_retrieval === true && Array.isArray(plan.queries)) for (const raw of plan.queries) {
     const keyword = clean(raw?.keyword);
-    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => Object.hasOwn(DOMESTIC_SOURCE_HOSTS, id)))];
+    const purpose = ['purchase', 'inspiration'].includes(raw?.purpose) ? raw.purpose : null;
+    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => DOMESTIC_RETRIEVAL_SOURCES.includes(id) && (purpose !== 'purchase' || PURCHASE_RETRIEVAL_SOURCES.includes(id))))];
     // No implicit source expansion: each query must name the domestic platforms
     // selected by the model. Missing/overseas-only sources make this query unusable.
-    if (!keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }
+    if (!purpose || !keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }
     const query = {
-      keyword, kind: ['physical', 'experience', 'ticket'].includes(raw.kind) ? raw.kind : null,
+      keyword, purpose, kind: ['physical', 'experience', 'ticket', 'content', 'video', 'event'].includes(raw.kind) ? raw.kind : null,
+      intent: ['products', 'experience', 'inspiration', 'images'].includes(raw.intent) ? raw.intent : null,
       city: clean(raw.city) || null, sources,
     };
     if (!queries.some(q => JSON.stringify(q) === JSON.stringify(query))) queries.push(query);
   }
+  const previousStatus = ['model_unavailable','model_error','cancelled','missing_decision','no_executable_query','decided'].includes(plan.audit?.decision_status) ? plan.audit.decision_status : null;
   const needsRetrieval = hasDecision && plan.needs_retrieval && queries.length > 0;
   return {
     category: 'domestic', needs_retrieval: needsRetrieval,
@@ -47,8 +53,8 @@ export function normalizeRetrievalPlan(plan = {}) {
     limit: null, coverage: 'requested_accessible',
     audit: {
       decision_reason: decisionReason || null,
-      decision_status: !hasDecision ? 'missing_decision' : plan.needs_retrieval && !queries.length ? 'no_executable_query' : 'decided',
-      rejected_queries: rejectedQueries,
+      decision_status: previousStatus ?? (!hasDecision ? 'missing_decision' : plan.needs_retrieval && !queries.length ? 'no_executable_query' : 'decided'),
+      rejected_queries: Math.max(rejectedQueries, Number.isSafeInteger(plan.audit?.rejected_queries) ? plan.audit.rejected_queries : 0),
     },
   };
 }

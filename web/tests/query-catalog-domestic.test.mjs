@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { openDb, startRun, upsertProduct } from '../server/localdb/db.mjs';
 import { openCatalogDb, listProducts, isDomesticProduct, searchProducts } from '../server/catalog/db.mjs';
 import { matchCandidates, libraryPreview, scorePair } from '../server/catalog/match.mjs';
-import { buildRetrievalPlan, retrievalContext } from '../server/retrieval/query-plan.mjs';
+import { buildRetrievalPlan, retrievalContext, normalizeRetrievalPlan } from '../server/retrieval/query-plan.mjs';
 import { provideRealProducts, scrapeKeywordFor } from '../server/catalog/provide.mjs';
 
 const dir = resolve('.tmp/query-catalog-tests');
@@ -22,7 +22,7 @@ function fixture(name, entries) {
 test('model receives open literal preferences, custom occasion and multiple needs, never names/time',async()=>{
  let seen;
  const request = {recipient_name:'小明',available_days:1,intake:{additional_context:'小明喜欢冷门的星图和看演出',occasion_custom:'重逢纪念',interests:['music']},inputParse:{literal_preferences:['星图','即兴剧场'],city:'杭州'}};
- const p = await buildRetrievalPlan(request,{planImpl:async context=>{seen=context;return {needs_retrieval:true,decision_reason:'核对具体商品与演出信息',queries:[{keyword:'星图海报',kind:'physical',sources:['jd']},{keyword:'即兴剧场',kind:'ticket',city:'杭州',sources:['damai']}]};}});
+ const p = await buildRetrievalPlan(request,{planImpl:async context=>{seen=context;return {needs_retrieval:true,decision_reason:'核对具体商品与演出信息',queries:[{keyword:'星图海报',purpose:'purchase',kind:'physical',sources:['jd']},{keyword:'即兴剧场',purpose:'purchase',kind:'ticket',city:'杭州',sources:['damai']}]};}});
  assert.equal(p.queries.length,2);assert.equal(p.limit,null); assert.equal(seen.occasion_custom,'重逢纪念');
  assert.deepEqual(seen.literal_preferences,['星图','即兴剧场']);assert.ok(!JSON.stringify(seen).includes('小明'));assert.ok(!('available_days' in seen));
  assert.equal(p.queries[0].city,null);
@@ -33,7 +33,7 @@ test('no model or no information never substitutes generic gifts or enum queries
  assert.equal(scrapeKeywordFor({}).keyword,null);
 });
 test('concert wording never forces a form and timing never changes plan',async()=>{
- const queries=[{keyword:'演唱会周边丝巾',kind:'physical',sources:['taobao']},{keyword:'独立音乐现场',kind:'ticket',sources:['damai']},{keyword:'陶艺',kind:'experience',sources:['amazon','dianping']}];
+ const queries=[{keyword:'演唱会周边丝巾',purpose:'purchase',kind:'physical',sources:['taobao']},{keyword:'独立音乐现场',purpose:'purchase',kind:'ticket',sources:['damai']},{keyword:'陶艺',purpose:'purchase',kind:'experience',sources:['amazon','dianping']}];
  const a=await buildRetrievalPlan({available_days:0,needs_retrieval:true},{queries});const b=await buildRetrievalPlan({available_days:30,needs_retrieval:true},{queries});
  assert.deepEqual(a,b);assert.deepEqual(a.queries[2].sources,['dianping']);
 });
@@ -65,12 +65,12 @@ test('predefined theme aliases cannot attach unrelated goods',()=>{
 });
 test('all explicit queries reach search and partial failures remain supplemental',async()=>{
  let count=0;
- const value=await provideRealProducts({candidates:[{id:'x',name:'星图海报'},{id:'y',name:'即兴剧场'}],dbPath:resolve(dir,'missing.sqlite'),scrapeEnabled:true,searchPlan:{needs_retrieval:true,queries:[{keyword:'星图海报',kind:'physical',sources:['jd']},{keyword:'即兴剧场',kind:'ticket',sources:['damai']}]},domesticSearch:async plan=>{count=plan.queries.length;return {status:'partial',products:[],coverage:[{source:'jd',pages:2,total:42,status:'complete'},{source:'dianping',pages:0,status:'login_required'}],warnings:['大众点评待登录']};}});
+ const value=await provideRealProducts({candidates:[{id:'x',name:'星图海报'},{id:'y',name:'即兴剧场'}],dbPath:resolve(dir,'missing.sqlite'),scrapeEnabled:true,searchPlan:{needs_retrieval:true,queries:[{keyword:'星图海报',purpose:'purchase',kind:'physical',sources:['jd']},{keyword:'即兴剧场',purpose:'purchase',kind:'ticket',sources:['damai']}]},domesticSearch:async plan=>{count=plan.queries.length;return {status:'partial',products:[],coverage:[{source:'jd',pages:2,total:42,status:'complete'},{source:'dianping',pages:0,status:'login_required'}],warnings:['大众点评待登录']};}});
  assert.equal(count,2);assert.equal(value.catalog.coverage.length,2);assert.equal(value.catalog.recommendations_available,true);assert.equal(value.catalog.results.length,2);
 });
 test('retrieval supplements library gaps and preserves first bindings',async()=>{
  const path=fixture('supplement',[{title:'天文望远镜',price_amount:'10'}]);
- const value=await provideRealProducts({candidates:[{id:'x',name:'天文望远镜'},{id:'y',name:'玻璃吹制体验'}],dbPath:path,scrapeEnabled:true,searchPlan:{needs_retrieval:true,queries:[{keyword:'玻璃吹制体验',kind:'experience',sources:['dianping']}]},domesticSearch:async()=>{
+ const value=await provideRealProducts({candidates:[{id:'x',name:'天文望远镜'},{id:'y',name:'玻璃吹制体验'}],dbPath:path,scrapeEnabled:true,searchPlan:{needs_retrieval:true,queries:[{keyword:'玻璃吹制体验',purpose:'purchase',kind:'experience',sources:['dianping']}]},domesticSearch:async()=>{
   const db=openDb(path);const run_id=startRun(db,{source_site:'dianping',capability:'fixture',query_params:{}});
   upsertProduct(db,{source_site:'dianping',capability:'fixture',external_id:'experience',title:'玻璃吹制体验',product_url:'https://www.dianping.com/shop/abc',currency:null,run_id});db.close();return {status:'ok',coverage:[]};
  }});
@@ -78,7 +78,7 @@ test('retrieval supplements library gaps and preserves first bindings',async()=>
 });
 test('search timeout cancels own search without failing model suggestions',async()=>{
  let aborted=false;
- const value=await provideRealProducts({candidates:[{id:'x',name:'卫星模型'}],scrapeEnabled:true,scrapeTimeoutMs:15,searchPlan:{needs_retrieval:true,queries:[{keyword:'卫星模型',sources:['jd']}]},domesticSearch:(_plan,{signal})=>new Promise(resolve=>signal.addEventListener('abort',()=>{aborted=true;resolve({status:'cancelled'});},{once:true}))});
+ const value=await provideRealProducts({candidates:[{id:'x',name:'卫星模型'}],scrapeEnabled:true,scrapeTimeoutMs:15,searchPlan:{needs_retrieval:true,queries:[{keyword:'卫星模型',purpose:'purchase',sources:['jd']}]},domesticSearch:(_plan,{signal})=>new Promise(resolve=>signal.addEventListener('abort',()=>{aborted=true;resolve({status:'cancelled'});},{once:true}))});
  assert.equal(aborted,true);assert.equal(value.catalog.recommendations_available,true);
 });
 
@@ -86,8 +86,8 @@ test('search timeout cancels own search without failing model suggestions',async
 test('same DIY or concert context can receive either model decision without keyword routing',async()=>{
  for (const literal of ['DIY音乐盒','想一起看演唱会']) {
   const request={literal_preferences:[literal]};
-  const skip=await buildRetrievalPlan(request,{planImpl:async()=>({needs_retrieval:false,decision_reason:'已有安排，无需新增外部信息',queries:[{keyword:literal,sources:['jd']}]})});
-  const search=await buildRetrievalPlan(request,{planImpl:async()=>({needs_retrieval:true,decision_reason:'需要核实本次购买信息',queries:[{keyword:literal,sources:['taobao']}]})});
+  const skip=await buildRetrievalPlan(request,{planImpl:async()=>({needs_retrieval:false,decision_reason:'已有安排，无需新增外部信息',queries:[{keyword:literal,purpose:'purchase',sources:['jd']}]})});
+  const search=await buildRetrievalPlan(request,{planImpl:async()=>({needs_retrieval:true,decision_reason:'需要核实本次购买信息',queries:[{keyword:literal,purpose:'purchase',sources:['taobao']}]})});
   assert.equal(skip.needs_retrieval,false);assert.deepEqual(skip.queries,[]);
   assert.equal(search.needs_retrieval,true);assert.deepEqual(search.queries[0].sources,['taobao']);
  }
@@ -95,17 +95,47 @@ test('same DIY or concert context can receive either model decision without keyw
 test('false decision never searches and true decision calls only specified sources once',async()=>{
  let calls=0;let searched;
  const common={candidates:[{id:'x',name:'音乐盒材料'}],scrapeEnabled:true,domesticSearch:async plan=>{calls++;searched=plan;return {status:'unavailable',coverage:[],warnings:[]};}};
- const no=await provideRealProducts({...common,searchPlan:{needs_retrieval:false,decision_reason:'使用已有材料',queries:[{keyword:'音乐盒材料',sources:['jd']}]}});
+ const no=await provideRealProducts({...common,searchPlan:{needs_retrieval:false,decision_reason:'使用已有材料',queries:[{keyword:'音乐盒材料',purpose:'purchase',sources:['jd']}]}});
  assert.equal(calls,0);assert.equal(no.catalog.recommendations_available,true);
- await provideRealProducts({...common,searchPlan:{needs_retrieval:true,decision_reason:'需要补充材料',queries:[{keyword:'音乐盒材料',sources:['taobao']}]}});
+ await provideRealProducts({...common,searchPlan:{needs_retrieval:true,decision_reason:'需要补充材料',queries:[{keyword:'音乐盒材料',purpose:'purchase',sources:['taobao']}]}});
  assert.equal(calls,1);assert.deepEqual(searched.queries[0].sources,['taobao']);
 });
 test('missing sources, overseas-only sources, unavailable model and model errors all skip external search',async()=>{
- for (const decision of [{needs_retrieval:true,queries:[{keyword:'星图'}]},{needs_retrieval:true,queries:[{keyword:'星图',sources:['amazon']}]},null]) {
+ for (const decision of [{needs_retrieval:true,queries:[{keyword:'星图',purpose:'purchase'}]},{needs_retrieval:true,queries:[{keyword:'星图',purpose:'purchase',sources:['amazon']}]},null]) {
   const p=await buildRetrievalPlan({literal_preferences:['星图']},{planImpl:async()=>decision});
   assert.equal(p.needs_retrieval,false);assert.deepEqual(p.queries,[]);assert.deepEqual(p.warnings,[]);
  }
  const failed=await buildRetrievalPlan({literal_preferences:['星图']},{planImpl:async()=>{throw new Error('secret upstream body');}});
  assert.equal(failed.audit.decision_status,'model_error');assert.equal(failed.needs_retrieval,false);assert.deepEqual(failed.warnings,[]);
  assert.ok(!JSON.stringify(failed).includes('secret'));
+});
+
+
+test('model may select domestic contents and images without a purchase or SKU requirement',async()=>{
+ const p=await buildRetrievalPlan({literal_preferences:['用现有材料做一本旅行手账']},{planImpl:async()=>({needs_retrieval:true,decision_reason:'参考手账教程和版式图片',queries:[{keyword:'旅行手账装帧教程',purpose:'inspiration',intent:'inspiration',kind:'video',sources:['bilibili']},{keyword:'手账版式参考',purpose:'inspiration',intent:'images',kind:'content',sources:['xiaohongshu']},{keyword:'周末手账交流活动',purpose:'inspiration',intent:'inspiration',kind:'event',sources:['huodongxing']}]})});
+ assert.equal(p.needs_retrieval,true);assert.equal(p.queries.length,3);
+ assert.deepEqual(p.queries.map(q=>q.sources),[['bilibili'],['xiaohongshu'],['huodongxing']]);
+ assert.deepEqual(p.queries.map(q=>q.intent),['inspiration','images','inspiration']);
+ assert.deepEqual(p.queries.map(q=>q.kind),['video','content','event']);
+ assert.ok(p.queries.every(q=>!('price_amount' in q)&&!('product_id' in q)));
+});
+test('content sources remain exact selections with no inferred platforms',async()=>{
+ const p=await buildRetrievalPlan({}, {planImpl:async()=>({needs_retrieval:true,decision_reason:'阅读主题资料',queries:[{keyword:'古代天文星图',purpose:'inspiration',intent:'inspiration',sources:['zhihu','weibo','douban','rednote','amazon']}]})});
+ assert.deepEqual(p.queries[0].sources,['zhihu','weibo','douban','rednote']);assert.equal(p.queries[0].kind,null);
+});
+
+
+test('purchase rejects content sources while inspiration retains their declared role',async()=>{
+ const purchase=await buildRetrievalPlan({}, {planImpl:async()=>({needs_retrieval:true,decision_reason:'用户已决定购买',queries:[{keyword:'天文望远镜',purpose:'purchase',sources:['bilibili','zhihu','jd']},{keyword:'天文望远镜',purpose:'purchase',sources:['douban']}]})});
+ assert.equal(purchase.queries.length,1);assert.deepEqual(purchase.queries[0].sources,['jd']);assert.equal(purchase.audit.rejected_queries,1);
+ const inspiration=await buildRetrievalPlan({}, {planImpl:async()=>({needs_retrieval:true,decision_reason:'尚未决定买什么，寻找灵感',queries:[{keyword:'天文主题惊喜',purpose:'inspiration',intent:'images',sources:['bilibili','zhihu']}]})});
+ assert.deepEqual(inspiration.queries[0].sources,['bilibili','zhihu']);assert.equal(inspiration.queries[0].purpose,'inspiration');
+ const unknown=await buildRetrievalPlan({}, {planImpl:async()=>({needs_retrieval:true,queries:[{keyword:'天文望远镜',sources:['jd']}]})});
+ assert.equal(unknown.needs_retrieval,false);assert.equal(unknown.queries.length,0);
+});
+
+test('normalizing a skipped decision preserves its internal failure audit',async()=>{
+ const p=await buildRetrievalPlan({}, {planImpl:async()=>{throw new Error('unavailable');}});
+ const normalized=normalizeRetrievalPlan(p);
+ assert.equal(normalized.needs_retrieval,false);assert.equal(normalized.audit.decision_status,'model_error');assert.deepEqual(normalized.queries,[]);
 });
