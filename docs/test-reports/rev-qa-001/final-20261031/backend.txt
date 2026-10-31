@@ -1,0 +1,12 @@
+PASS zero-free
+PASS zero-paid-fails
+PASS below-min-warning-only
+PASS three-prices-not-summed
+PASS presentation-v2-structure
+PASS quote-fields-rejected
+PASS packaging-time-and-taboo
+PASS cannot-lower-selected-price
+PASS original-constraints-and-input-not-rewritten
+PASS before-selection-zero-presentation
+PASS global-repair-limit
+PASS frozen-gift-in-bill

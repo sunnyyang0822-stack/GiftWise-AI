@@ -1,0 +1,9 @@
+{
+  "smoke": "docs/test-reports/rev-qa-001/final-20261031/http-smoke.txt",
+  "server_stdout": "docs/test-reports/rev-qa-001/final-20261031/http-server.stdout.txt",
+  "exit_code": 2,
+  "health_status": 200,
+  "port": 8797,
+  "mode": "mock",
+  "server_stderr": "docs/test-reports/rev-qa-001/final-20261031/http-server.stderr.txt"
+}

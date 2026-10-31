@@ -1,0 +1,1194 @@
+[
+  {
+    "started": "2026-10-31T03:10:43.079Z",
+    "path": "/api/config",
+    "http_status": 200,
+    "raw": "{\"mode\":\"mock\",\"dify_configured\":false,\"dify_published_verified\":false,\"pursuit_contract_ready\":true,\"pursuit_notice\":\"「追求对象」在本地仓库的契约中已经落地（工作区未提交改动 + 生成物已重建），模拟模式下可以正常生成低压力方案；接入层未接真实模型（无凭证），真实调用仍以服务端返回为准。\",\"notices\":{\"mock_mode\":\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"mock_candidates\":\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"mock_presentation\":\"以下呈现内容为模拟数据，用于演示「选择后」的四段呈现与复核流程。\"},\"unknown_interests_hint\":\"「暂时不知道」是界面上的互斥状态，不是机器值：选择它时提交 interests: [] 与 interest_confidence: {}，不会生成任何用户事实。\",\"labels\":{\"relations\":[{\"id\":\"partner\",\"zh\":\"恋人\",\"scene\":\"恋人之间，可以表达亲密与纪念，但不能承诺对方反应。\"},{\"id\":\"pursuit\",\"zh\":\"追求对象\",\"scene\":\"追求关系，不代表对方已接受或存在双向好感；默认低压力表达，不暗示关系已确定。\"},{\"id\":\"friend\",\"zh\":\"朋友\",\"scene\":\"朋友之间，按熟悉程度和使用场合选择，避免过度亲密。\"},{\"id\":\"family\",\"zh\":\"家人\",\"scene\":\"家人之间，重实用与陪伴感。\"},{\"id\":\"classmate\",\"zh\":\"同学\",\"scene\":\"同学之间，重共同经历与实用。\"},{\"id\":\"mentor\",\"zh\":\"老师/导师\",\"scene\":\"师生或指导关系，分寸优先，避免私人化过强。\"},{\"id\":\"client_partner\",\"zh\":\"客户/合作伙伴\",\"scene\":\"商务往来，得体、通用、不私人化。\"},{\"id\":\"other\",\"zh\":\"其他\",\"scene\":\"其他关系；如不确定可如实选择，不做关系推断。\"}],\"closeness\":[{\"id\":\"very_familiar\",\"zh\":\"非常熟悉\"},{\"id\":\"familiar\",\"zh\":\"比较熟悉\"},{\"id\":\"limited\",\"zh\":\"了解不多\"},{\"id\":\"unfamiliar\",\"zh\":\"几乎不了解\"},{\"id\":\"unknown\",\"zh\":\"不确定\"}],\"occasions\":[{\"id\":\"birthday\",\"zh\":\"生日\"},{\"id\":\"festival\",\"zh\":\"节日\"},{\"id\":\"thanks\",\"zh\":\"感谢\"},{\"id\":\"anniversary\",\"zh\":\"纪念日\"},{\"id\":\"graduation_promotion\",\"zh\":\"毕业/升职祝贺\"},{\"id\":\"other\",\"zh\":\"其他\"}],\"interests\":[{\"id\":\"design_art\",\"zh\":\"设计与艺术\"},{\"id\":\"coffee_food\",\"zh\":\"咖啡与美食\"},{\"id\":\"reading_learning\",\"zh\":\"阅读与学习\"},{\"id\":\"tech_digital\",\"zh\":\"科技与数码\"},{\"id\":\"sports_outdoors\",\"zh\":\"运动与户外\"},{\"id\":\"music_movies\",\"zh\":\"音乐与电影\"},{\"id\":\"games_anime\",\"zh\":\"游戏与动漫\"},{\"id\":\"travel_exploration\",\"zh\":\"旅行与探索\"},{\"id\":\"home_living\",\"zh\":\"家居与生活\"},{\"id\":\"plants_nature\",\"zh\":\"植物与自然\"},{\"id\":\"fashion_accessories\",\"zh\":\"时尚与配饰\"},{\"id\":\"experiences_activities\",\"zh\":\"体验与活动\"}],\"gift_styles\":[{\"id\":\"design\",\"zh\":\"有设计感\"},{\"id\":\"practical\",\"zh\":\"实用型\"},{\"id\":\"personalized\",\"zh\":\"个性化定制\"},{\"id\":\"surprising\",\"zh\":\"有趣且能带来惊喜\"},{\"id\":\"memorable\",\"zh\":\"有纪念意义\"},{\"id\":\"experiential\",\"zh\":\"体验型\"},{\"id\":\"understated\",\"zh\":\"精致但不张扬\"}],\"exclusions\":[{\"id\":\"alcohol\",\"zh\":\"酒类\"},{\"id\":\"food\",\"zh\":\"食品\"},{\"id\":\"fragrance\",\"zh\":\"香氛\"},{\"id\":\"jewelry\",\"zh\":\"珠宝首饰\"},{\"id\":\"plant\",\"zh\":\"植物\"},{\"id\":\"other\",\"zh\":\"其他类别\"}]},\"ranges\":{\"budget\":[{\"id\":\"r1\",\"label\":\"100 元以内\",\"min\":\"0\",\"max\":\"100\"},{\"id\":\"r2\",\"label\":\"100–200 元\",\"min\":\"100\",\"max\":\"200\"},{\"id\":\"r3\",\"label\":\"200–500 元\",\"min\":\"200\",\"max\":\"500\"},{\"id\":\"r4\",\"label\":\"500–1000 元\",\"min\":\"500\",\"max\":\"1000\"},{\"id\":\"r5\",\"label\":\"1000 元以上\",\"min\":\"1000\",\"max\":null}],\"deadline\":[{\"id\":\"d0\",\"label\":\"明天\",\"value\":1,\"hint\":\"按 1 天上限检查\",\"minDays\":0,\"maxDays\":1},{\"id\":\"d1\",\"label\":\"3–5 天\",\"value\":5,\"hint\":\"按 5 天上限检查\",\"minDays\":3,\"maxDays\":5},{\"id\":\"d2\",\"label\":\"一周以内\",\"value\":7,\"hint\":\"按 7 天上限检查\",\"minDays\":0,\"maxDays\":7},{\"id\":\"d3\",\"label\":\"一月以内\",\"value\":30,\"hint\":\"按 30 天上限检查\",\"minDays\":0,\"maxDays\":30},{\"id\":\"d4\",\"label\":\"一季度以内\",\"value\":90,\"hint\":\"按 90 天上限检查\",\"minDays\":0,\"maxDays\":90},{\"id\":\"d5\",\"label\":\"一年以内\",\"value\":365,\"hint\":\"按 365 天上限检查\",\"minDays\":0,\"maxDays\":365}]},\"budget_slider\":{\"min\":0,\"max\":1000,\"step\":50},\"budget_modes\":[\"slider\",\"zero\",\"other\"],\"limits\":{\"currency\":\"CNY\",\"intake_bytes\":32768,\"max_array_items\":20,\"max_string_code_points\":1000,\"candidates\":3,\"global_repair_limit\":1},\"client_timeout_ms\":20000}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.083Z",
+    "path": "/healthz",
+    "http_status": 200,
+    "raw": "{\"status\":\"ok\",\"mode\":\"mock\",\"runs\":5}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.084Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": ""
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"选择其他关系时请填写自定义关系\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.recipient_relation\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.089Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": " "
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"选择其他关系时请填写自定义关系\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.recipient_relation\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.092Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": "字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"自定义文本最多 1000 个 Unicode 码点\"},{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"request.recipient_relation\",\"message\":\"字段字符串超过 1000 个 Unicode 码点\"},{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"request.recipient_relation_custom\",\"message\":\"字段字符串超过 1000 个 Unicode 码点\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.093Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": null
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"选择其他关系时请填写自定义关系\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.recipient_relation\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.095Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": 3
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"选择其他关系时请填写自定义关系\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.recipient_relation\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.097Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": "社团指导老师"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"选择其他关系时请填写自定义关系\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.recipient_relation\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.100Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "other",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": "社团指导老师"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtpizr-ab2edc40\",\"created_at\":\"2026-10-31T11:10:13.863+08:00\",\"mode\":\"mock\",\"status\":\"passed\",\"request\":{\"recipient_relation\":\"社团指导老师\",\"recipient_relation_id\":\"other\",\"recipient_relation_custom\":\"社团指导老师\",\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"dislikes\":\"\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"无标识香氛蜡烛\",\"description\":\"以居家氛围类方向为主，气味为清淡型。\",\"estimated_total\":\"128.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"fragrance\"],\"reason\":\"依送礼者选择的有设计感、精致但不张扬方向，选择居家氛围类物件。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"scented_candle\"}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":0,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.102Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "recipient_relation_custom": "虚构自定义"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_UNKNOWN_FIELD\",\"path\":\"intake.recipient_relation_custom\",\"message\":\"只有选择其他关系时才能填写自定义关系\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.104Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": ""
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.occasion_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.occasion_custom\",\"message\":\"选择其他场合时请填写自定义场合\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.occasion\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.106Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": " "
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.occasion_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.occasion_custom\",\"message\":\"选择其他场合时请填写自定义场合\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.occasion\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.107Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": "字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字字"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"intake.occasion_custom\",\"message\":\"自定义文本最多 1000 个 Unicode 码点\"},{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"request.occasion\",\"message\":\"字段字符串超过 1000 个 Unicode 码点\"},{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"request.occasion_custom\",\"message\":\"字段字符串超过 1000 个 Unicode 码点\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.108Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": null
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.occasion_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.occasion_custom\",\"message\":\"选择其他场合时请填写自定义场合\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.occasion\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.110Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": 3
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_TYPE\",\"path\":\"intake.occasion_custom\",\"message\":\"自定义文本必须为非空字符串\"},{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.occasion_custom\",\"message\":\"选择其他场合时请填写自定义场合\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.occasion\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.111Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": "搬家答谢"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"intake.occasion_custom\",\"message\":\"选择其他场合时请填写自定义场合\"},{\"code\":\"INVALID_TYPE\",\"path\":\"request.occasion\",\"message\":\"必须为非空字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.113Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "other",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": "搬家答谢"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtpj05-0fe5a161\",\"created_at\":\"2026-10-31T11:10:13.877+08:00\",\"mode\":\"mock\",\"status\":\"passed\",\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"搬家答谢\",\"occasion_custom\":\"搬家答谢\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"dislikes\":\"\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"无标识香氛蜡烛\",\"description\":\"以居家氛围类方向为主，气味为清淡型。\",\"estimated_total\":\"128.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"fragrance\"],\"reason\":\"依送礼者选择的有设计感、精致但不张扬方向，选择居家氛围类物件。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"scented_candle\"}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":0,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.114Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感",
+        "occasion_custom": "虚构自定义"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_UNKNOWN_FIELD\",\"path\":\"intake.occasion_custom\",\"message\":\"只有选择其他场合时才能填写自定义场合\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.115Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_BUDGET_RANGE\",\"path\":\"intake.budget_range.min\",\"message\":\"预算区间两端均须填写\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.117Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_BUDGET_RANGE\",\"path\":\"intake.budget_range.max\",\"message\":\"预算区间两端均须填写\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.118Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_AMOUNT\",\"path\":\"intake.budget_range.min\",\"message\":\"金额必须为有限非负、至多两位小数的 ASCII 十进制字符串\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.120Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "301",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_BUDGET_RANGE\",\"path\":\"intake.budget_range\",\"message\":\"预算区间下限不能超过上限\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.121Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "0",
+          "max": "10000.01"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"LIMIT_EXCEEDED\",\"path\":\"intake.budget_range.max\",\"message\":\"预算区间端点须在 0 至 10000 之间\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.122Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "slider",
+        "budget_range": {
+          "min": "1.01",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INVALID_BUDGET_RANGE\",\"path\":\"intake.budget_range\",\"message\":\"滑条两端须在 0 至 1000 之间，步长为 50 元\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.124Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "zero",
+        "budget_range": {
+          "min": "0",
+          "max": "0"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtpj0f-52c55264\",\"created_at\":\"2026-10-31T11:10:13.887+08:00\",\"mode\":\"mock\",\"status\":\"passed\",\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"0\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"0\"},\"dislikes\":\"\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫（改小规格）\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"0.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）（据首次检查反馈改为更小规格以符合预算上限）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒（改小规格）\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"0.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）（据首次检查反馈改为更小规格以符合预算上限）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"无标识香氛蜡烛（改小规格）\",\"description\":\"以居家氛围类方向为主，气味为清淡型。\",\"estimated_total\":\"0.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"fragrance\"],\"reason\":\"依送礼者选择的有设计感、精致但不张扬方向，选择居家氛围类物件。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）（据首次检查反馈改为更小规格以符合预算上限）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"scented_candle\"}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":1,\"remaining_repairs\":0,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"一次自动修订（模拟）：只调整未通过项，已通过项保持不变。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":1,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.125Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "1000",
+          "max": "1000"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtpj0h-b5f7ad8f\",\"created_at\":\"2026-10-31T11:10:13.889+08:00\",\"mode\":\"mock\",\"status\":\"passed\",\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"1000\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"1000\",\"max\":\"1000\"},\"dislikes\":\"\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"无标识香氛蜡烛\",\"description\":\"以居家氛围类方向为主，气味为清淡型。\",\"estimated_total\":\"128.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"fragrance\"],\"reason\":\"依送礼者选择的有设计感、精致但不张扬方向，选择居家氛围类物件。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"scented_candle\"}],\"validation\":{\"status\":\"passed\",\"all_passed\":true,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":true,\"errors\":[],\"warnings\":[{\"code\":\"BELOW_BUDGET_RANGE\",\"path\":\"candidates[0].estimated_total\",\"message\":\"礼物估价低于预算区间下限，仍可选择\"}]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[{\"code\":\"BELOW_BUDGET_RANGE\",\"path\":\"candidates[1].estimated_total\",\"message\":\"礼物估价低于预算区间下限，仍可选择\"}]},{\"id\":\"c3\",\"passed\":true,\"errors\":[],\"warnings\":[{\"code\":\"BELOW_BUDGET_RANGE\",\"path\":\"candidates[2].estimated_total\",\"message\":\"礼物估价低于预算区间下限，仍可选择\"}]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":0,\"remaining_repairs\":1,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c1\",\"c2\",\"c3\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":0,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.127Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"exclusion_confirmation\",\"message\":\"请先完成不喜欢内容的识别与逐项确认。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.129Z",
+    "path": "/api/exclusions/analyze",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"status\":\"needs_input\",\"mode\":\"mock\",\"analysis_id\":null,\"candidates\":[],\"errors\":[]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.130Z",
+    "path": "/api/exclusions/analyze",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"status\":\"needs_confirmation\",\"mode\":\"mock\",\"analysis_id\":\"xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4\",\"candidates\":[{\"id\":\"xc1\",\"kind\":\"tag\",\"tag\":\"fragrance\",\"term\":null,\"source_span\":\"不要香水\",\"confidence\":\"high\",\"why\":\"虚构模拟夹具：原文提到香水，仍需用户确认\",\"evidence\":\"user_text\"}],\"errors\":[]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.132Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-forged",
+        "confirmed_ids": [
+          "xc1"
+        ]
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"EXCLUSION_ANALYSIS_STALE\",\"path\":\"exclusion_confirmation.analysis_id\",\"message\":\"排除项识别已过期或不存在，请重新识别。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.133Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": [
+          "xc9"
+        ]
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"exclusion_confirmation.confirmed_ids\",\"message\":\"请确认全部识别到的排除项，且每项只能确认一次。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.134Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": [
+          "xc1",
+          "xc1"
+        ]
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"exclusion_confirmation.confirmed_ids\",\"message\":\"请确认全部识别到的排除项，且每项只能确认一次。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.136Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": []
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"exclusion_confirmation.confirmed_ids\",\"message\":\"请确认全部识别到的排除项，且每项只能确认一次。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.137Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "已变更的虚构输入"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": [
+          "xc1"
+        ]
+      }
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"needs_input\",\"errors\":[{\"code\":\"EXCLUSION_ANALYSIS_STALE\",\"path\":\"exclusion_confirmation.analysis_id\",\"message\":\"排除项识别与当前输入不一致，请重新识别。\"}],\"mode\":\"mock\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\"]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.138Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": [
+          "xc1"
+        ]
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtq5l0-7470be76\",\"created_at\":\"2026-10-31T11:10:43.140+08:00\",\"mode\":\"mock\",\"status\":\"failed\",\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[\"fragrance\"],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[\"fragrance\"],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"dislikes\":\"不要香水\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"据首次检查反馈调整：围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"}],\"validation\":{\"status\":\"failed\",\"all_passed\":false,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":false,\"errors\":[{\"code\":\"DUPLICATE_CANDIDATE_CONTENT\",\"path\":\"candidates[0]\",\"message\":\"不同候选的名称和描述标准化后重复\"}],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":false,\"errors\":[{\"code\":\"DUPLICATE_CANDIDATE_CONTENT\",\"path\":\"candidates[2]\",\"message\":\"不同候选的名称和描述标准化后重复\"}],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":1,\"remaining_repairs\":0,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c2\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"一次自动修订（模拟）：只调整未通过项，已通过项保持不变。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":1,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.141Z",
+    "path": "/api/recommendations",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "不要香水",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      },
+      "exclusion_confirmation": {
+        "analysis_id": "xa-bcc65a85-3fa3-4647-8e26-8071bafa7ed4",
+        "confirmed_ids": [
+          "xc1"
+        ]
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtq5l0-7470be76\",\"created_at\":\"2026-10-31T11:10:43.140+08:00\",\"mode\":\"mock\",\"status\":\"failed\",\"request\":{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[\"fragrance\"],\"forbidden_terms\":[],\"notes\":\"QA 虚构请求，不假定双向好感\",\"closeness\":\"limited\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[\"fragrance\"],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"dislikes\":\"不要香水\"},\"candidates\":[{\"id\":\"c1\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，简洁杯具与杯垫属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否已有同类物品\",\"具体规格与颜色偏好\",\"实际价格、库存和送达均未核实；估算含基础包装、贺卡和配送\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"},{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"description\":\"以食品类方向回应咖啡兴趣，口味为通用拼配。\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"food\"],\"reason\":\"兴趣组包含咖啡与美食，食品方向直接相关；仍不确认对方对具体口味的偏好。（依据：未提供兴趣信息，按低风险通用方向处理；送礼者风格要求：未指定）\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，单品咖啡豆礼盒属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方是否饮用咖啡或有器具\",\"口味与烘焙度偏好\",\"保质期与实际价格未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"coffee_beans\"},{\"id\":\"c3\",\"name\":\"简洁杯具与杯垫\",\"description\":\"以日常饮用器具为方向，不涉及具体豆种或食品口味。\",\"estimated_total\":\"138.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"据首次检查反馈调整：围绕已确认的宽泛兴趣选择相关但较少依赖口味的方向；未确认对方具体偏好。\",\"fact_refs\":[],\"inferences\":[\"在了解不多时，无标识香氛蜡烛属于相对稳妥的方向，但不保证对方喜欢。\"],\"unknowns\":[\"对方对气味是否敏感\",\"实际价格与库存未核实\"],\"presentation\":\"可采用简洁中性包装；详细方案待用户选择后生成\",\"_mock_source\":\"drinkware\"}],\"validation\":{\"status\":\"failed\",\"all_passed\":false,\"errors\":[],\"candidate_results\":[{\"id\":\"c1\",\"passed\":false,\"errors\":[{\"code\":\"DUPLICATE_CANDIDATE_CONTENT\",\"path\":\"candidates[0]\",\"message\":\"不同候选的名称和描述标准化后重复\"}],\"warnings\":[]},{\"id\":\"c2\",\"passed\":true,\"errors\":[],\"warnings\":[]},{\"id\":\"c3\",\"passed\":false,\"errors\":[{\"code\":\"DUPLICATE_CANDIDATE_CONTENT\",\"path\":\"candidates[2]\",\"message\":\"不同候选的名称和描述标准化后重复\"}],\"warnings\":[]}],\"business_data_verification\":\"not_verified\"},\"workflow_errors\":[],\"repair_count\":1,\"remaining_repairs\":0,\"selected_candidate_id\":null,\"selectable_candidate_ids\":[\"c2\"],\"business_data_verification\":\"not_verified\",\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"一次自动修订（模拟）：只调整未通过项，已通过项保持不变。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":1,\"presentation\":0,\"presentation_revision\":0},\"limits\":{\"currency\":\"CNY\",\"note\":\"费用与准备时间仅为估算；未核实真实价格、库存或实际送达。\"}}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.142Z",
+    "path": "/api/presentations",
+    "payload": {
+      "recommendation_run_id": "gw-mvvtq5l0-7470be76",
+      "selected_candidate_id": "c9"
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"selection_rejected\",\"errors\":[{\"code\":\"INVALID_SELECTION\",\"path\":\"selected_candidate_id\",\"message\":\"该候选 ID 不属于本次推荐记录，已拒绝；请从当前三个方案中重新选择。\"}]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.143Z",
+    "path": "/api/presentations",
+    "payload": {
+      "recommendation_run_id": "gw-mvvtq5l0-7470be76",
+      "selected_candidate_id": "c1"
+    },
+    "http_status": 400,
+    "raw": "{\"status\":\"selection_rejected\",\"errors\":[{\"code\":\"CANDIDATE_NOT_PASSED\",\"path\":\"selected_candidate_id\",\"message\":\"该方案未通过独立规则检查，不能选择；失败项需要你调整需求后重新生成。\"}]}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.144Z",
+    "path": "/api/presentations",
+    "payload": {
+      "recommendation_run_id": "gw-mvvtq5l0-7470be76",
+      "selected_candidate_id": "c2"
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtq5l0-7470be76\",\"selected_candidate_id\":\"c2\",\"status\":\"completed\",\"mode\":\"mock\",\"sections\":[{\"key\":\"style\",\"title\":\"① 风格与配色\",\"items\":[\"配色：米白、浅木色、雾霾蓝\",\"风格取向：未指定，按低风险通用方向处理\",\"关系与场合：追求对象 · 生日（熟悉程度 了解不多）\",\"围绕方案：单品咖啡豆礼盒 —— 以食品类方向回应咖啡兴趣，口味为通用拼配。\"]},{\"key\":\"packaging\",\"title\":\"② 包装材料与步骤\",\"items\":[]},{\"key\":\"card\",\"title\":\"③ 贺卡正文与装饰物建议\",\"items\":[\"贺卡正文：生日快乐！看到合适的小东西就顺手带了一份，希望新的一岁顺顺利利，做想做的事。\"]},{\"key\":\"giving\",\"title\":\"④ 赠送时机、方式与话术\",\"items\":[\"时机与方式：挑对方方便、环境轻松的时候单独送出，简单聊几句就结束，不安排需要回应的话题。\",\"话术：这是顺手准备的一点生日心意，祝你生日快乐，别有负担。\",\"关系提示：不暗示双方已确定关系\",\"关系提示：不默认告白或要求回应\",\"关系提示：避免在公开场合制造回应压力\"]}],\"presentation_json\":{\"contract_version\":\"giftwise-20261031-v2\",\"style\":\"低压力、简洁\",\"packaging\":{\"color_palette\":[\"米白\",\"浅木色\",\"雾霾蓝\"]},\"card_text\":\"生日快乐！看到合适的小东西就顺手带了一份，希望新的一岁顺顺利利，做想做的事。\",\"giving_advice\":{\"timing\":\"挑对方方便、环境轻松的时候单独送出，简单聊几句就结束，不安排需要回应的话题。\",\"wording\":\"这是顺手准备的一点生日心意，祝你生日快乐，别有负担。\",\"relationship_cautions\":[\"不暗示双方已确定关系\",\"不默认告白或要求回应\",\"避免在公开场合制造回应压力\"]},\"unknowns\":[\"实际价格、库存、配送时效均未核实\"],\"currency\":\"CNY\",\"revised_estimated_preparation_days\":1},\"presentation_check\":{\"passed\":true,\"errors\":[],\"warnings\":[]},\"candidate\":{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1},\"recheck_summary\":{\"contract_version\":\"giftwise-20261031-v2\",\"gift_estimated_total\":\"118.00\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"budget_amount\":\"300\",\"currency\":\"CNY\",\"revised_estimated_preparation_days\":1,\"available_days\":5,\"passed\":true,\"business_data_verification\":\"not_verified\"},\"repair_count\":1,\"remaining_repairs\":0,\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"一次自动修订（模拟）：只调整未通过项，已通过项保持不变。\",\"以下呈现内容为模拟数据，用于演示「选择后」的四段呈现与复核流程。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":1,\"presentation\":1,\"presentation_revision\":0},\"generated_by\":\"mock\"}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.147Z",
+    "path": "/api/presentations",
+    "payload": {
+      "recommendation_run_id": "gw-mvvtq5l0-7470be76",
+      "selected_candidate_id": "c2"
+    },
+    "http_status": 200,
+    "raw": "{\"recommendation_run_id\":\"gw-mvvtq5l0-7470be76\",\"selected_candidate_id\":\"c2\",\"status\":\"completed\",\"mode\":\"mock\",\"sections\":[{\"key\":\"style\",\"title\":\"① 风格与配色\",\"items\":[\"配色：米白、浅木色、雾霾蓝\",\"风格取向：未指定，按低风险通用方向处理\",\"关系与场合：追求对象 · 生日（熟悉程度 了解不多）\",\"围绕方案：单品咖啡豆礼盒 —— 以食品类方向回应咖啡兴趣，口味为通用拼配。\"]},{\"key\":\"packaging\",\"title\":\"② 包装材料与步骤\",\"items\":[]},{\"key\":\"card\",\"title\":\"③ 贺卡正文与装饰物建议\",\"items\":[\"贺卡正文：生日快乐！看到合适的小东西就顺手带了一份，希望新的一岁顺顺利利，做想做的事。\"]},{\"key\":\"giving\",\"title\":\"④ 赠送时机、方式与话术\",\"items\":[\"时机与方式：挑对方方便、环境轻松的时候单独送出，简单聊几句就结束，不安排需要回应的话题。\",\"话术：这是顺手准备的一点生日心意，祝你生日快乐，别有负担。\",\"关系提示：不暗示双方已确定关系\",\"关系提示：不默认告白或要求回应\",\"关系提示：避免在公开场合制造回应压力\"]}],\"presentation_json\":{\"contract_version\":\"giftwise-20261031-v2\",\"style\":\"低压力、简洁\",\"packaging\":{\"color_palette\":[\"米白\",\"浅木色\",\"雾霾蓝\"]},\"card_text\":\"生日快乐！看到合适的小东西就顺手带了一份，希望新的一岁顺顺利利，做想做的事。\",\"giving_advice\":{\"timing\":\"挑对方方便、环境轻松的时候单独送出，简单聊几句就结束，不安排需要回应的话题。\",\"wording\":\"这是顺手准备的一点生日心意，祝你生日快乐，别有负担。\",\"relationship_cautions\":[\"不暗示双方已确定关系\",\"不默认告白或要求回应\",\"避免在公开场合制造回应压力\"]},\"unknowns\":[\"实际价格、库存、配送时效均未核实\"],\"currency\":\"CNY\",\"revised_estimated_preparation_days\":1},\"presentation_check\":{\"passed\":true,\"errors\":[],\"warnings\":[]},\"candidate\":{\"id\":\"c2\",\"name\":\"单品咖啡豆礼盒\",\"estimated_total\":\"118.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1},\"recheck_summary\":{\"contract_version\":\"giftwise-20261031-v2\",\"gift_estimated_total\":\"118.00\",\"budget_range\":{\"min\":\"100\",\"max\":\"300\"},\"budget_amount\":\"300\",\"currency\":\"CNY\",\"revised_estimated_preparation_days\":1,\"available_days\":5,\"passed\":true,\"business_data_verification\":\"not_verified\"},\"repair_count\":1,\"remaining_repairs\":0,\"notices\":[\"⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。\",\"以下三个方案为模拟数据，用于演示校验与选择流程。\",\"一次自动修订（模拟）：只调整未通过项，已通过项保持不变。\",\"以下呈现内容为模拟数据，用于演示「选择后」的四段呈现与复核流程。\"],\"call_counts\":{\"recommend\":1,\"recommend_revision\":1,\"presentation\":1,\"presentation_revision\":0},\"generated_by\":\"mock\",\"idempotent_replay\":true}"
+  },
+  {
+    "started": "2026-10-31T03:10:43.148Z",
+    "path": "/api/exclusions/analyze",
+    "payload": {
+      "intake": {
+        "contract_version": "giftwise-20261031-v2",
+        "recipient_relation": "pursuit",
+        "closeness": "limited",
+        "occasion": "birthday",
+        "budget_mode": "other",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "currency": "CNY",
+        "deadline_days": 5,
+        "interests": [],
+        "interest_confidence": {},
+        "gift_styles": [],
+        "dislikes": "虚构且无法映射的偏好",
+        "hard_exclusions": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "additional_context": "QA 虚构请求，不假定双向好感"
+      }
+    },
+    "http_status": 200,
+    "raw": "{\"status\":\"needs_input\",\"mode\":\"mock\",\"analysis_id\":null,\"candidates\":[],\"errors\":[{\"code\":\"INTAKE_CLARIFICATION_REQUIRED\",\"path\":\"dislikes\",\"message\":\"模拟模式仅支持标注的虚构固定夹具，请修改输入或配置真实提供者\"}]}"
+  }
+]

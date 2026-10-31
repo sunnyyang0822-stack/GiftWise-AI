@@ -1,0 +1,53 @@
+{
+  "layer": "offline-mock-modules",
+  "results": [
+    {
+      "id": "zero-free",
+      "status": "PASS"
+    },
+    {
+      "id": "zero-paid-fails",
+      "status": "PASS"
+    },
+    {
+      "id": "below-min-warning-only",
+      "status": "PASS"
+    },
+    {
+      "id": "three-prices-not-summed",
+      "status": "PASS"
+    },
+    {
+      "id": "presentation-v2-structure",
+      "status": "PASS"
+    },
+    {
+      "id": "quote-fields-rejected",
+      "status": "PASS"
+    },
+    {
+      "id": "packaging-time-and-taboo",
+      "status": "PASS"
+    },
+    {
+      "id": "cannot-lower-selected-price",
+      "status": "PASS"
+    },
+    {
+      "id": "original-constraints-and-input-not-rewritten",
+      "status": "PASS"
+    },
+    {
+      "id": "before-selection-zero-presentation",
+      "status": "PASS"
+    },
+    {
+      "id": "global-repair-limit",
+      "status": "PASS"
+    },
+    {
+      "id": "frozen-gift-in-bill",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "start": "2026-10-31T11:09:14.447455+08:00",
+  "head": "ce5fd11af5581a8f10f82dc995ec24bfd1b3e4b1",
+  "initial_status": " M web/tools/browser-check.mjs\n M web/tools/smoke-http.mjs\n?? docs/test-reports/rev-qa-001/\n?? tests/acceptance/nov01_revision/browser-revision.mjs\n?? tests/acceptance/nov01_revision/run_final_commands.py\n",
+  "commands": [
+    {
+      "name": "old-main",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "start": "2026-10-31T11:09:14.670598+08:00",
+      "end": "2026-10-31T11:09:15.682455+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "old-stage-b",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_b",
+        "-q"
+      ],
+      "start": "2026-10-31T11:09:15.682455+08:00",
+      "end": "2026-10-31T11:09:16.494861+08:00",
+      "exit_code": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "old-stage-c",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-q"
+      ],
+      "start": "2026-10-31T11:09:16.494861+08:00",
+      "end": "2026-10-31T11:09:17.013834+08:00",
+      "exit_code": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "old-boundary",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/boundary",
+        "-q"
+      ],
+      "start": "2026-10-31T11:09:17.013834+08:00",
+      "end": "2026-10-31T11:09:17.434334+08:00",
+      "exit_code": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "exclusions",
+      "command": [
+        "node",
+        "web/tests/exclusions.test.mjs"
+      ],
+      "start": "2026-10-31T11:09:17.434334+08:00",
+      "end": "2026-10-31T11:09:17.551389+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "revision-rules",
+      "command": [
+        "node",
+        "web/tests/revision-rules.test.mjs"
+      ],
+      "start": "2026-10-31T11:09:17.551389+08:00",
+      "end": "2026-10-31T11:09:17.682654+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "revision-api",
+      "command": [
+        "node",
+        "web/tests/revision-api.test.mjs"
+      ],
+      "start": "2026-10-31T11:09:17.682654+08:00",
+      "end": "2026-10-31T11:09:18.054362+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "access-layer",
+      "command": [
+        "node",
+        "web/tests/access-layer.test.mjs"
+      ],
+      "start": "2026-10-31T11:09:18.054362+08:00",
+      "end": "2026-10-31T11:09:18.244360+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prepare-fixtures",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/acceptance/nov01_revision/prepare_fixtures.py"
+      ],
+      "start": "2026-10-31T11:09:18.244360+08:00",
+      "end": "2026-10-31T11:09:18.503679+08:00",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/acceptance/nov01_revision/run_nov01.py"
+      ],
+      "start": "2026-10-31T11:09:18.503679+08:00",
+      "end": "2026-10-31T11:09:18.864983+08:00",
+      "exit_code": 1,
+      "status": "FAIL"
+    }
+  ],
+  "business_hashes_before": {
+    "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+    "workflow/intake.py": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+    "web/server/checker.mjs": "c1e9074bf6f986a66ab4250ffc4cae00f2764679fb53f508e08df11b24c63292",
+    "web/server/pipeline.mjs": "8563b4e7141011061e83f4f585ed7f29f01e5d62d22844b43c112ef4644adc5a",
+    "web/server/server.mjs": "0ed22d3518b9e1bf766a2783fd208e95f0553d5fb90039a0766f869a174609e6",
+    "web/server/config.mjs": "f2211ecf92568d95dad68ba308b2a5157d807d9facb92ed7b2ac82ba251ca41e",
+    "web/public/app.js": "7e1e5ae0fce766ef2fd6b177ea92597df42768e82909e0ff7214adeb00904b38",
+    "web/public/index.html": "ebf89afe5957dbd86fc23ea50821fc4a965b06b731bfa498c68fe7d08f99edb2"
+  },
+  "business_hashes_after": {
+    "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+    "workflow/intake.py": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+    "web/server/checker.mjs": "c1e9074bf6f986a66ab4250ffc4cae00f2764679fb53f508e08df11b24c63292",
+    "web/server/pipeline.mjs": "8563b4e7141011061e83f4f585ed7f29f01e5d62d22844b43c112ef4644adc5a",
+    "web/server/server.mjs": "0ed22d3518b9e1bf766a2783fd208e95f0553d5fb90039a0766f869a174609e6",
+    "web/server/config.mjs": "f2211ecf92568d95dad68ba308b2a5157d807d9facb92ed7b2ac82ba251ca41e",
+    "web/public/app.js": "7e1e5ae0fce766ef2fd6b177ea92597df42768e82909e0ff7214adeb00904b38",
+    "web/public/index.html": "ebf89afe5957dbd86fc23ea50821fc4a965b06b731bfa498c68fe7d08f99edb2"
+  },
+  "end": "2026-10-31T11:09:18.871765+08:00"
+}
