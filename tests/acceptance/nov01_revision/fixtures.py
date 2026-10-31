@@ -42,15 +42,15 @@ def rule_cases():
     add("R10-over-max", price="150.01", status="failed", code="OVER_BUDGET", path="candidates[0].estimated_total")
     invalid = [
         ("null", None, "INVALID_BUDGET_RANGE", "request.budget_range"),
-        ("missing-min", {"max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
-        ("missing-max", {"min": "100"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
+        ("missing-min", {"max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range.min"),
+        ("missing-max", {"min": "100"}, "INVALID_BUDGET_RANGE", "request.budget_range.max"),
         ("reversed", {"min": "151", "max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
         ("null-min", {"min": None, "max": "150"}, "INVALID_TYPE", "request.budget_range.min"),
         ("leading-zero", {"min": "00", "max": "150"}, "INVALID_AMOUNT", "request.budget_range.min"),
         ("exponent", {"min": "1e2", "max": "150"}, "INVALID_AMOUNT", "request.budget_range.min"),
         ("bool", {"min": False, "max": "150"}, "INVALID_TYPE", "request.budget_range.min"),
         ("over-limit", {"min": "0", "max": "10000.01"}, "LIMIT_EXCEEDED", "request.budget_range.max"),
-        ("mismatch", {"min": "100", "max": "149"}, "BUDGET_RANGE_MISMATCH", "request.budget_range"),
+        ("mismatch", {"min": "100", "max": "149"}, "BUDGET_RANGE_MISMATCH", "request.budget_amount"),
     ]
     for suffix, value, code, path in invalid:
         add("R-invalid-" + suffix, {"budget_range": value}, status="needs_input", code=code, path=path)

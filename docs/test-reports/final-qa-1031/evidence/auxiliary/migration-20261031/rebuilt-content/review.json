@@ -1,0 +1,165 @@
+{
+  "release_sha": "3dfb186b74a4afabfef82c7213401fb60587f946",
+  "qa_head": "3dfb186b74a4afabfef82c7213401fb60587f946",
+  "time": "2026-10-31T12:29:25.466231+08:00",
+  "content_first": true,
+  "generated_comparisons": {
+    "code_node.py": {
+      "actual_content_matches_rebuild_after_lf": true
+    },
+    "intake_node.py": {
+      "actual_content_matches_rebuild_after_lf": true
+    },
+    "check_node.py": {
+      "actual_content_matches_rebuild_after_lf": true
+    },
+    "recheck_node.py": {
+      "actual_content_matches_rebuild_after_lf": true
+    },
+    "report_node.py": {
+      "actual_content_matches_rebuild_after_lf": true
+    }
+  },
+  "generated_semantics": [
+    {
+      "case": "R01-three-prices-not-summed",
+      "status": "PASS"
+    },
+    {
+      "case": "R02-zero-free",
+      "status": "PASS"
+    },
+    {
+      "case": "R03-zero-paid",
+      "status": "PASS"
+    },
+    {
+      "case": "R04-fraction",
+      "status": "PASS"
+    },
+    {
+      "case": "R05-thousand",
+      "status": "PASS"
+    },
+    {
+      "case": "R06-ten-thousand",
+      "status": "PASS"
+    },
+    {
+      "case": "R07-min-equal",
+      "status": "PASS"
+    },
+    {
+      "case": "R08-max-equal",
+      "status": "PASS"
+    },
+    {
+      "case": "R09-below-min-selectable",
+      "status": "PASS"
+    },
+    {
+      "case": "R10-over-max",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-null",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-missing-min",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-missing-max",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-reversed",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-null-min",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-leading-zero",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-exponent",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-bool",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-over-limit",
+      "status": "PASS"
+    },
+    {
+      "case": "R-invalid-mismatch",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-0",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-1",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-5",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-7",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-30",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-90",
+      "status": "PASS"
+    },
+    {
+      "case": "R-days-365",
+      "status": "PASS"
+    },
+    {
+      "case": "R-zero-plus-366-still-reject",
+      "status": "PASS"
+    },
+    {
+      "case": "R-legacy-0",
+      "status": "PASS"
+    },
+    {
+      "case": "R-legacy-0.99",
+      "status": "PASS"
+    },
+    {
+      "case": "R-legacy-150",
+      "status": "PASS"
+    }
+  ],
+  "source_hashes": {
+    "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+    "workflow/labels.py": "f339d171872cbb88a4132071d69d9f9778bf54f117fa94c10b2d47a4d576e37d",
+    "workflow/intake.py": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+    "workflow/runtime.py": "89a9bb22b52ba3c20c0f7b55914d1c64608dafc78090170be8505542d6802373"
+  },
+  "rebuilt_artifact_hashes": {
+    "code_node.py": "0984db6b4f7022378c43afbfeb69d811d4c60c27392662eeee20f91203e3d4b3",
+    "intake_node.py": "2c1e2926d2e82a8872089b17b5ec0b6be23d512cb7fb6536d4f9689e58dcdfce",
+    "check_node.py": "fcdedcf7a842b0514ee948fe3956106af674ae12944fa269a9c6263268c669c1",
+    "recheck_node.py": "424dc74286b88c363b4976c85e79cccf35e16aa137e49f19ed26825871baf5e9",
+    "report_node.py": "2461afe13e39b9fbdc69d28dd021e381500781ae600c2a994e1403eff9f5d2de"
+  },
+  "pin_update_performed": false,
+  "workflow_changed_by_qa": false,
+  "dify_calls": 0
+}

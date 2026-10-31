@@ -1,0 +1,67 @@
+test_js_friend (__main__.IntakeParity.test_js_friend) ... ok
+test_js_occasion_custom_illegal_combination (__main__.IntakeParity.test_js_occasion_custom_illegal_combination) ... ok
+test_js_occasion_custom_missing (__main__.IntakeParity.test_js_occasion_custom_missing) ... ok
+test_js_occasion_custom_valid (__main__.IntakeParity.test_js_occasion_custom_valid) ... ok
+test_js_partner (__main__.IntakeParity.test_js_partner) ... ok
+test_js_pursuit (__main__.IntakeParity.test_js_pursuit) ... ok
+test_js_recipient_relation_custom_illegal_combination (__main__.IntakeParity.test_js_recipient_relation_custom_illegal_combination) ... ok
+test_js_recipient_relation_custom_missing (__main__.IntakeParity.test_js_recipient_relation_custom_missing) ... ok
+test_js_recipient_relation_custom_valid (__main__.IntakeParity.test_js_recipient_relation_custom_valid) ... ok
+test_python_friend (__main__.IntakeParity.test_python_friend) ... ok
+test_python_occasion_custom_illegal_combination (__main__.IntakeParity.test_python_occasion_custom_illegal_combination) ... ok
+test_python_occasion_custom_missing (__main__.IntakeParity.test_python_occasion_custom_missing) ... FAIL
+test_python_occasion_custom_valid (__main__.IntakeParity.test_python_occasion_custom_valid) ... FAIL
+test_python_partner (__main__.IntakeParity.test_python_partner) ... ok
+test_python_pursuit (__main__.IntakeParity.test_python_pursuit) ... ok
+test_python_recipient_relation_custom_illegal_combination (__main__.IntakeParity.test_python_recipient_relation_custom_illegal_combination) ... ok
+test_python_recipient_relation_custom_missing (__main__.IntakeParity.test_python_recipient_relation_custom_missing) ... FAIL
+test_python_recipient_relation_custom_valid (__main__.IntakeParity.test_python_recipient_relation_custom_valid) ... FAIL
+
+======================================================================
+FAIL: test_python_occasion_custom_missing (__main__.IntakeParity.test_python_occasion_custom_missing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\final_qa_1031\test_intake_parity.py", line 47, in test
+    self.assertEqual(actual['status'],status,json.dumps(record,ensure_ascii=False))
+AssertionError: 'ready' != 'needs_input'
+- ready
++ needs_input
+ : {"layer": "python", "id": "occasion_custom_missing", "input": {"contract_version": "giftwise-20261031-v2", "recipient_relation": "pursuit", "occasion": "other", "budget_mode": "other", "budget_range": {"min": "0", "max": "300"}, "currency": "CNY", "deadline_days": 5, "closeness": "unknown", "interests": [], "interest_confidence": {}, "gift_styles": [], "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}, "additional_context": "QA虚构案例"}, "expected_status": "needs_input", "actual": {"status": "ready", "errors": [], "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"其他\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"}}
+
+======================================================================
+FAIL: test_python_occasion_custom_valid (__main__.IntakeParity.test_python_occasion_custom_valid)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\final_qa_1031\test_intake_parity.py", line 47, in test
+    self.assertEqual(actual['status'],status,json.dumps(record,ensure_ascii=False))
+AssertionError: 'needs_input' != 'ready'
+- needs_input
++ ready
+ : {"layer": "python", "id": "occasion_custom_valid", "input": {"contract_version": "giftwise-20261031-v2", "recipient_relation": "pursuit", "occasion": "other", "budget_mode": "other", "budget_range": {"min": "0", "max": "300"}, "currency": "CNY", "deadline_days": 5, "closeness": "unknown", "interests": [], "interest_confidence": {}, "gift_styles": [], "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}, "additional_context": "QA虚构案例", "occasion_custom": "虚构补充说明"}, "expected_status": "ready", "actual": {"status": "needs_input", "errors": [{"code": "INTAKE_UNKNOWN_FIELD", "path": "intake.occasion_custom", "message": "未声明的输入字段，请确认契约版本"}], "request_json": null}}
+
+======================================================================
+FAIL: test_python_recipient_relation_custom_missing (__main__.IntakeParity.test_python_recipient_relation_custom_missing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\final_qa_1031\test_intake_parity.py", line 47, in test
+    self.assertEqual(actual['status'],status,json.dumps(record,ensure_ascii=False))
+AssertionError: 'ready' != 'needs_input'
+- ready
++ needs_input
+ : {"layer": "python", "id": "recipient_relation_custom_missing", "input": {"contract_version": "giftwise-20261031-v2", "recipient_relation": "other", "occasion": "birthday", "budget_mode": "other", "budget_range": {"min": "0", "max": "300"}, "currency": "CNY", "deadline_days": 5, "closeness": "unknown", "interests": [], "interest_confidence": {}, "gift_styles": [], "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}, "additional_context": "QA虚构案例"}, "expected_status": "needs_input", "actual": {"status": "ready", "errors": [], "request_json": "{\"recipient_relation\":\"其他\",\"recipient_relation_id\":\"other\",\"occasion\":\"生日\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"}}
+
+======================================================================
+FAIL: test_python_recipient_relation_custom_valid (__main__.IntakeParity.test_python_recipient_relation_custom_valid)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\final_qa_1031\test_intake_parity.py", line 47, in test
+    self.assertEqual(actual['status'],status,json.dumps(record,ensure_ascii=False))
+AssertionError: 'needs_input' != 'ready'
+- needs_input
++ ready
+ : {"layer": "python", "id": "recipient_relation_custom_valid", "input": {"contract_version": "giftwise-20261031-v2", "recipient_relation": "other", "occasion": "birthday", "budget_mode": "other", "budget_range": {"min": "0", "max": "300"}, "currency": "CNY", "deadline_days": 5, "closeness": "unknown", "interests": [], "interest_confidence": {}, "gift_styles": [], "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}, "additional_context": "QA虚构案例", "recipient_relation_custom": "虚构补充说明"}, "expected_status": "ready", "actual": {"status": "needs_input", "errors": [{"code": "INTAKE_UNKNOWN_FIELD", "path": "intake.recipient_relation_custom", "message": "未声明的输入字段，请确认契约版本"}], "request_json": null}}
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.914s
+
+FAILED (failures=4)

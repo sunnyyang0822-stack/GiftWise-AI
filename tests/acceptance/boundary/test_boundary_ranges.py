@@ -1,6 +1,7 @@
-"""QA-001 独立边界套件：请求侧数值范围 [1,10000] / [0,365] 及其"不下沉到候选侧"。
+"""QA-001 独立边界套件：请求侧数值范围 [0,10000] / [0,365] 及其"不下沉到候选侧"。
 
-依据：`docs/validator-contract-decisions.md` §5（2026-10-30 修订：请求预算 [1,10000] 含端点）、
+依据：2026-10-31 交付变更契约与本轮 PM 决定：请求预算 [0,10000] 含端点；旧依据
+`docs/validator-contract-decisions.md` §5 的禁止零预算规则已被覆盖。
 §6（可用天数 [0,365] 含端点，保留 0）。两者均复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。
 
 **本文件不复用规则线的 `tests/test_cases.json`**：夹具全部在此自建（虚构人物、虚构礼物），
@@ -124,14 +125,39 @@ class BoundaryAssertMixin:
 # ================================================================= 预算：范围
 
 class RequestBudgetRange(BoundaryAssertMixin, unittest.TestCase):
-    """请求预算 [1, 10000] 含端点（§5 2026-10-30 修订）。"""
+    """请求预算 [0, 10000]；合法预算仍须独立检查候选费用。"""
 
     def test_zero_and_zero_decimals_are_rejected(self):
+        """保留历史测试 ID；现在拒绝的是有价候选，不是零预算请求。"""
         for value in ("0", "0.0", "0.00"):
             with self.subTest(budget=value):
                 result = self.run_validate(my_request(budget_amount=value), my_batch())
-                self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
-                self.assert_status(result, "needs_input", f"budget={value}")
+                self.assert_no_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
+                self.assert_status(result, "failed", f"budget={value}")
+                for index, candidate in enumerate(result["candidate_results"]):
+                    self.assertFalse(candidate["passed"])
+                    self.assert_code_at(result, "OVER_BUDGET", f"candidates[{index}].estimated_total")
+
+    def test_zero_and_fractional_budget_with_affordable_candidates_pass(self):
+        for value in ("0", "0.0", "0.00", "0.99"):
+            with self.subTest(budget=value):
+                batch = my_batch()
+                for candidate in batch["candidates"]:
+                    candidate["estimated_total"] = value
+                result = self.run_validate(my_request(budget_amount=value), batch)
+                self.assert_status(result, "passed")
+                self.assertEqual([], all_errors(result))
+                self.assertTrue(all(c["passed"] for c in result["candidate_results"]))
+
+    def test_zero_budget_does_not_bypass_invalid_days(self):
+        batch = my_batch()
+        for candidate in batch["candidates"]:
+            candidate["estimated_total"] = "0"
+        result = self.run_validate(my_request(budget_amount="0", available_days=366), batch)
+        self.assert_status(result, "needs_input")
+        self.assert_no_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount")
+        self.assert_code_at(result, "LIMIT_EXCEEDED", "request.available_days")
+        self.assertFalse(any(c["passed"] for c in result["candidate_results"]))
 
     def test_lower_bound_is_inclusive(self):
         for value in ("1", "1.00"):
@@ -308,7 +334,7 @@ class RequestErrorDominates(BoundaryAssertMixin, unittest.TestCase):
     def test_request_range_error_and_candidate_error_together(self):
         batch = my_batch()
         batch["candidates"][0]["estimated_total"] = "99999"
-        result = self.run_validate(my_request(budget_amount="0"), batch)
+        result = self.run_validate(my_request(budget_amount="10000.01"), batch)
         self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount")
         self.assert_status(result, "needs_input", "请求侧错误优先级更高")
         self.assertFalse(result["all_passed"], "有错误时 all_passed 必须为 false")

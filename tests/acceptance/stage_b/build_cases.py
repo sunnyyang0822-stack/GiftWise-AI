@@ -62,7 +62,7 @@ def build():
         return change
 
     add("B001_base", "T01", passed=[True, True, True])
-    # 请求预算范围 [1, 10000]；候选估算不受范围约束，零估算与越界分别由语义码处理。
+    # 当前发布契约 [0,10000]；保持旧 case ID，逐项迁移记录见本轮 QA 报告。
     allowed_money = {"request": ("1", "12", "12.3", "12.30", "9999.99", "10000", "10000.00"),
                      "candidate": ("0", "0.0", "0.00", "12", "12.3", "12.30")}
     for side, name in (("request", "budget_amount"), ("candidate", "estimated_total")):
@@ -80,9 +80,14 @@ def build():
                     field("request", name, value)(r, b)
                     for candidate in b["candidates"]:
                         candidate["estimated_total"] = "0"
-                add(f"money_range_reject_request_{i}", "T02_T11", out_of_range, "needs_input",
-                    "LIMIT_EXCEEDED", "request.budget_amount", "top",
-                    message="预算须在 1 至 10000 之间")
+                # 历史 ID 包含 reject，不更换/移除用例；前四项现在验证低值预算合法。
+                if i < 4:
+                    add(f"money_range_reject_request_{i}", "T02_T11", out_of_range,
+                        passed=[True, True, True], absent=["LIMIT_EXCEEDED", "OVER_BUDGET"])
+                else:
+                    add(f"money_range_reject_request_{i}", "T02_T11", out_of_range, "needs_input",
+                        "LIMIT_EXCEEDED", "request.budget_amount", "top",
+                        message="预算须在 0 至 10000 之间")
         bad_values = ("-0", "-1.00", "00", "01.00", "+1", "1e1", "1,000", "¥1",
                       "１.００", " 1", "1 ", ".5", "1.", "1.001", "NaN", "Infinity", "", "1\n")
         for i, value in enumerate(bad_values + (1, True, None, [], {})):

@@ -1,0 +1,360 @@
+{
+  "executed_commands": 25,
+  "counts": {
+    "PASS": 18,
+    "FAIL": 7
+  },
+  "commands": [
+    {
+      "name": "release-nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/acceptance/nov01_revision/run_nov01.py"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:34.985918+08:00",
+      "finished": "2026-10-31T12:26:35.465213+08:00",
+      "exit_code": 1
+    },
+    {
+      "name": "release-main",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:35.468088+08:00",
+      "finished": "2026-10-31T12:26:36.474622+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "release-stage-b",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_b",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:36.476626+08:00",
+      "finished": "2026-10-31T12:26:37.605935+08:00",
+      "exit_code": 1
+    },
+    {
+      "name": "release-stage-c",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:37.606935+08:00",
+      "finished": "2026-10-31T12:26:38.440556+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "release-boundary",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/boundary",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:38.441556+08:00",
+      "finished": "2026-10-31T12:26:38.973458+08:00",
+      "exit_code": 1
+    },
+    {
+      "name": "exclusions",
+      "command": [
+        "node",
+        "web/tests/exclusions.test.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:38.974458+08:00",
+      "finished": "2026-10-31T12:26:39.111322+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "revision-rules",
+      "command": [
+        "node",
+        "web/tests/revision-rules.test.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:39.113975+08:00",
+      "finished": "2026-10-31T12:26:39.258499+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "revision-api",
+      "command": [
+        "node",
+        "web/tests/revision-api.test.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:39.260307+08:00",
+      "finished": "2026-10-31T12:26:39.631610+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "access-layer",
+      "command": [
+        "node",
+        "web/tests/access-layer.test.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:39.633607+08:00",
+      "finished": "2026-10-31T12:26:39.820410+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "qa-migrated-nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/acceptance/nov01_revision/run_nov01.py"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:41.996155+08:00",
+      "finished": "2026-10-31T12:26:42.461337+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "qa-migrated-main",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:42.462340+08:00",
+      "finished": "2026-10-31T12:26:43.307605+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "qa-migrated-stage-b",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_b",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:43.308915+08:00",
+      "finished": "2026-10-31T12:26:44.253128+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "qa-migrated-stage-c",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:44.255784+08:00",
+      "finished": "2026-10-31T12:26:45.347153+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "qa-migrated-boundary",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/boundary",
+        "-q"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:45.349392+08:00",
+      "finished": "2026-10-31T12:26:45.960158+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "fixture-check",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/acceptance/nov01_revision/prepare_fixtures.py",
+        "--check"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:45.962160+08:00",
+      "finished": "2026-10-31T12:26:46.307378+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "backend",
+      "command": [
+        "node",
+        "tests/acceptance/nov01_revision/backend-revision.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:46.310215+08:00",
+      "finished": "2026-10-31T12:26:46.474971+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "snapshot",
+      "command": [
+        "node",
+        "tests/acceptance/nov01_revision/snapshot-revision.mjs"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:46.476826+08:00",
+      "finished": "2026-10-31T12:26:46.633545+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "workflow-default",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:46.636146+08:00",
+      "finished": "2026-10-31T12:26:47.830288+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "workflow-nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py",
+        "--nov01"
+      ],
+      "cwd": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031",
+      "started": "2026-10-31T12:26:47.834428+08:00",
+      "finished": "2026-10-31T12:26:48.239882+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "http-legacy",
+      "command": [
+        "node",
+        "web/tools/smoke-http.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:37.804156+08:00",
+      "finished": "2026-10-31T12:27:38.012546+08:00",
+      "exit_code": 2
+    },
+    {
+      "name": "http-revision",
+      "command": [
+        "node",
+        "tests/acceptance/nov01_revision/http-revision.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:38.014547+08:00",
+      "finished": "2026-10-31T12:27:38.229395+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "browser-legacy",
+      "command": [
+        "node",
+        "web/tools/browser-check.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:39.406552+08:00",
+      "finished": "2026-10-31T12:27:41.490911+08:00",
+      "exit_code": 2
+    },
+    {
+      "name": "browser-revision",
+      "command": [
+        "node",
+        "web/tools/browser-check.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": {
+        "GW_REVISION_QA": "1"
+      },
+      "started": "2026-10-31T12:27:41.491921+08:00",
+      "finished": "2026-10-31T12:27:47.037925+08:00",
+      "exit_code": 1
+    },
+    {
+      "name": "intake-parity",
+      "command": [
+        "C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/acceptance/final_qa_1031/test_intake_parity.py"
+      ],
+      "started": "2026-10-31T12:29:22.974596+08:00",
+      "exit_code": 1
+    },
+    {
+      "name": "content-review",
+      "command": [
+        "C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/acceptance/nov01_revision/review_rebuilt_content.py"
+      ],
+      "started": "2026-10-31T12:29:24.393035+08:00",
+      "exit_code": 0
+    }
+  ]
+}

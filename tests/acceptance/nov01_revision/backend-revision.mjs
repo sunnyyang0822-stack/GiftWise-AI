@@ -1,0 +1,31 @@
+// REV-QA-001 独立服务端模块验收；所有生成内容为固定 mock，不访问 Dify。
+import assert from 'node:assert/strict';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {validate,checkPresentation} from '../../../web/server/checker.mjs';
+import {strictParse} from '../../../web/server/jsonstrict.mjs';
+import {runRecommendation,runPresentation} from '../../../web/server/pipeline.mjs';
+import * as store from '../../../web/server/store.mjs';
+const results=[];
+async function test(id,fn){try{await fn();results.push({id,status:'PASS'});console.log('PASS',id);}catch(e){results.push({id,status:'FAIL',actual:e.stack});console.error('FAIL',id,e);}}
+const request={contract_version:'giftwise-20261031-v2',recipient_relation:'追求对象',occasion:'生日',budget_amount:'150',budget_range:{min:'100',max:'150'},currency:'CNY',available_days:5,facts:[],forbidden_tags:[],forbidden_terms:[]};
+const batch=(price)=>({candidates:[1,2,3].map(n=>({id:'c'+n,name:'虚构礼物'+n,description:'虚构方向'+n,estimated_total:price,currency:'CNY',estimated_preparation_days:0,tags:['other'],reason:'虚构理由，不保证适合',fact_refs:[],inferences:[],unknowns:['价格未核实']}))});
+const check=(r,b)=>validate(JSON.stringify(r),JSON.stringify(b),strictParse);
+await test('zero-free',()=>assert.equal(check({...request,budget_amount:'0',budget_range:{min:'0',max:'0'}},batch('0.00')).status,'passed'));
+await test('zero-paid-fails',()=>{const r=check({...request,budget_amount:'0',budget_range:{min:'0',max:'0'}},batch('0.01'));assert.equal(r.status,'failed');assert(r.candidate_results.every(c=>!c.passed&&c.errors.some(e=>e.code==='OVER_BUDGET')));});
+await test('below-min-warning-only',()=>{const r=check(request,batch('99.99'));assert.equal(r.status,'passed');assert(r.candidate_results.every(c=>c.errors.length===0&&c.warnings.some(w=>w.code==='BELOW_BUDGET_RANGE')));});
+await test('three-prices-not-summed',()=>assert.equal(check(request,batch('138.00')).status,'passed'));
+const c=batch('138.00').candidates[0];
+const p={contract_version:request.contract_version,style:'简洁低压力',packaging:{color_palette:['米白']},card_text:'祝一切顺利',giving_advice:{timing:'方便时',wording:'一点心意',relationship_cautions:[]},unknowns:['不代表免费'],currency:'CNY',revised_estimated_preparation_days:1};
+await test('presentation-v2-structure',()=>assert.equal(checkPresentation(request,c,p).passed,true));
+await test('quote-fields-rejected',()=>{for(const k of ['additional_cost','revised_estimated_total']) assert(checkPresentation(request,c,{...p,[k]:'0.00'}).errors.some(e=>e.code==='PRESENTATION_INVALID'));});
+await test('packaging-time-and-taboo',()=>{const r=checkPresentation({...request,forbidden_terms:['米白']},c,{...p,revised_estimated_preparation_days:6});assert(r.errors.some(e=>e.code==='FORBIDDEN_TERM'));assert(r.errors.some(e=>e.code==='PREPARATION_TOO_LONG'));});
+await test('cannot-lower-selected-price',()=>{const expensive={...c,estimated_total:'150.01'};const r=checkPresentation(request,expensive,{...p,gift_estimated_total:'0.00'});assert.equal(r.passed,false);});
+const intake={contract_version:request.contract_version,recipient_relation:'pursuit',occasion:'birthday',budget_mode:'other',budget_range:{min:'0',max:'10'},currency:'CNY',deadline_days:5,interests:[],interest_confidence:{},gift_styles:[],dislikes:'',hard_exclusions:{tags:[],terms:[],unresolved:[]},additional_context:'虚构独立约束冻结测试'};
+let outcome;
+await test('original-constraints-and-input-not-rewritten',async()=>{store.reset();const before=JSON.stringify(intake);outcome=await runRecommendation({intake,mode:'mock'});assert.equal(JSON.stringify(intake),before);assert.equal(outcome.run.request.budget_amount,'10');assert.equal(outcome.run.request.available_days,5);assert.equal(outcome.run.request.recipient_relation_id,'pursuit');});
+await test('before-selection-zero-presentation',()=>{assert.equal(outcome.report.selected_candidate_id,null);assert.equal(outcome.run.call_counts.presentation,0);});
+await test('global-repair-limit',async()=>{assert.equal(outcome.run.repair_count,1);const id=outcome.run.selectable_candidate_ids[0];assert(id);const r=await runPresentation({runId:outcome.run.run_id,selectedCandidateId:id,demo:'presentation_over_budget'});assert.equal(outcome.run.repair_count,1);assert.equal(outcome.run.call_counts.presentation_revision,0);assert(r.view.repair_count<=1);});
+await test('frozen-gift-in-bill',async()=>{const id=outcome.run.selectable_candidate_ids[0];const frozen=outcome.run.candidates.find(c=>c.id===id).estimated_total;const r=await runPresentation({runId:outcome.run.run_id,selectedCandidateId:id});assert.equal(r.view.recheck_summary.gift_estimated_total,frozen);assert.equal(outcome.run.request.budget_amount,'10');});
+mkdirSync('docs/test-reports/rev-qa-001/final-20261031',{recursive:true});
+writeFileSync('docs/test-reports/rev-qa-001/final-20261031/backend-results.json',JSON.stringify({layer:'offline-mock-modules',results},null,2));
+process.exitCode=results.some(r=>r.status==='FAIL')?1:0;

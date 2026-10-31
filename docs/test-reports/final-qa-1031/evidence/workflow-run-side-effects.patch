@@ -1,0 +1,27 @@
+diff --git a/workflow/evidence/local-2026-10-29/latest.json b/workflow/evidence/local-2026-10-29/latest.json
+index ff08721..bbcccfc 100644
+--- a/workflow/evidence/local-2026-10-29/latest.json
++++ b/workflow/evidence/local-2026-10-29/latest.json
+@@ -1,9 +1,9 @@
+ {
+   "_note": "本文件是「最新一次运行」的指针，是唯一每次运行都会被重写的文件；它不是证据。证据在 latest_run 指向的时间戳目录内，写一次即冻结，从不被覆盖。",
+-  "updated_at": "2026-10-31T02:53:09.257961+08:00",
+-  "latest_run": "workflow/evidence/local-2026-10-29/runs/20261031T025309+0800",
+-  "results": "workflow/evidence/local-2026-10-29/runs/20261031T025309+0800/results.json",
+-  "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd",
++  "updated_at": "2026-10-31T12:26:47.305469+08:00",
++  "latest_run": "workflow/evidence/local-2026-10-29/runs/20261031T122647+0800",
++  "results": "workflow/evidence/local-2026-10-29/runs/20261031T122647+0800/results.json",
++  "head": "3dfb186b74a4afabfef82c7213401fb60587f946",
+   "passed": 46,
+   "failed": 0,
+   "model_calls": 0,
+diff --git a/workflow/evidence/local-2026-10-29/runs-index.jsonl b/workflow/evidence/local-2026-10-29/runs-index.jsonl
+index acef2fe..cd9151f 100644
+--- a/workflow/evidence/local-2026-10-29/runs-index.jsonl
++++ b/workflow/evidence/local-2026-10-29/runs-index.jsonl
+@@ -26,3 +26,4 @@
+ {"timestamp": "2026-10-31T02:33:55.145281+08:00", "run_dir": "workflow/evidence/local-2026-10-29/runs/20261031T023354+0800", "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd", "passed": 46, "failed": 0}
+ {"timestamp": "2026-10-31T02:50:02.384565+08:00", "run_dir": "workflow/evidence/local-2026-10-29/runs/20261031T025002+0800", "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd", "passed": 46, "failed": 0}
+ {"timestamp": "2026-10-31T02:53:09.257961+08:00", "run_dir": "workflow/evidence/local-2026-10-29/runs/20261031T025309+0800", "head": "ae0ea580006c3bc90f6ddeec57abe02732446edd", "passed": 46, "failed": 0}
++{"timestamp": "2026-10-31T12:26:47.305469+08:00", "run_dir": "workflow/evidence/local-2026-10-29/runs/20261031T122647+0800", "head": "3dfb186b74a4afabfef82c7213401fb60587f946", "passed": 46, "failed": 0}

@@ -1,0 +1,8 @@
+{
+  "release_sha": "3dfb186b74a4afabfef82c7213401fb60587f946",
+  "mode": "mock",
+  "base": "http://127.0.0.1:18793",
+  "cdp": "http://127.0.0.1:9341",
+  "runs": [],
+  "infrastructure_error": "OSError(10048, '通常每个套接字地址(协议/网络地址/端口)只允许使用一次。', None, 10048, None)"
+}
