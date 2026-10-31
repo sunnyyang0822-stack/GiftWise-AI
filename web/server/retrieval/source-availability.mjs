@@ -10,7 +10,7 @@ const RISK = new Map([
   ['risk_control', 'risk_control'], ['rate_limited', 'rate_limited'], ['too_many_requests', 'rate_limited'],
 ]);
 const SUCCESS = new Set(['ok', 'ready', 'partial']);
-const LOGIN = new Set(['login_required', 'requires_login', 'not_logged_in']);
+const LOGIN = new Set(['login_required', 'requires_login', 'not_logged_in','auth_required']);
 const sourceName = value => typeof value === 'string' && /^[a-z0-9_-]{1,50}$/.test(value) ? value : null;
 const statusName = value => typeof value === 'string' ? value.trim().toLowerCase() : '';
 

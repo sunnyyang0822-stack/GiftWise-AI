@@ -2,10 +2,11 @@
 import { importOpencli } from './domestic-browser.mjs';
 
 const SHOP_URL = /^https:\/\/www\.dianping\.com\/shop\/[A-Za-z0-9_-]+(?:[/?#]|$)/;
+const ACCESS_STOPS = new Set(['ACCESS_RESTRICTED','AUTH_REQUIRED']);
 export function dianpingFailure(snapshot = {}) {
   const text = String(snapshot.text ?? snapshot.sample ?? '');
   const url = String(snapshot.url ?? '');
-  if (/verify|captcha|verify\.meituan|验证中心/.test(url) || /验证码|访问验证|安全验证|异常访问|操作频繁/.test(text)) return 'ACCESS_RESTRICTED';
+  if (/verify|captcha|verify\.meituan|验证中心/i.test(url) || /验证码|访问验证|安全验证|异常访问|访问受限|访问过于频繁|请求太频繁|操作频繁/.test(text)) return 'ACCESS_RESTRICTED';
   if (/account\.dianping\.com|login/.test(url) || /登录后.{0,12}(查看|继续|访问)|请先登录|扫码登录|短信登录/.test(text)) return 'AUTH_REQUIRED';
   if (/没有找到|暂无结果|暂无商户|未找到相关/.test(text)) return 'EMPTY';
   return 'PAGE_UNRECOGNIZED';
@@ -50,7 +51,7 @@ function extraSearchFields() {
   const next = Array.from(document.querySelectorAll('.page a, .pageLink a, a.next')).find(a => /下一页|下页|next/i.test(a.textContent || a.className));
   const totalText = document.querySelector('.shop-wrap .search-info, .shop-count, .search-result-count')?.textContent?.trim() || null;
   return { rows, next_url: next?.href || null, total_text: totalText, url: location.href,
-    text: rows.length ? '' : (document.body?.innerText || '').slice(0, 800) };
+    text: (document.body?.innerText || '').slice(0, 800) };
 }
 function extraShopFields() {
   const main = document.querySelector('.shop-head, #basic-info, .shop-info');
@@ -64,7 +65,7 @@ function extraShopFields() {
   }).filter(p => p.name);
   return { image_url: imageSrc ? new URL(imageSrc, location.href).href.replace(/^http:/, 'https:') : null,
     price_text: main?.querySelector('.avg-price, .mean-price, #avgPriceTitle')?.textContent?.trim() || null,
-    packages, url: location.href, text: main ? '' : (document.body?.innerText || '').slice(0, 800) };
+    packages, url: location.href, text: (document.body?.innerText || '').slice(0, 800) };
 }
 export async function searchDianping(page, { keyword, city = null, packageRoot, maxPages = 50, signal, onProgress = () => {} } = {}) {
   const [{ extractSearchRows }, { extractShopFields }, { resolveCityIdAsync }] = await Promise.all([
@@ -75,6 +76,11 @@ export async function searchDianping(page, { keyword, city = null, packageRoot, 
     observed_count: 0, reported_total: null, complete: false, status: 'pending', limitations: [] };
   const records = new Map();
   const seen = new Set();
+  function stopAccess(status,stage){
+    if(!ACCESS_STOPS.has(status))return false;
+    coverage.status=status;coverage.complete=false;coverage.blocked_stage=stage;
+    coverage.limitations.push(status);onProgress({...coverage});return true;
+  }
   try {
     const cityId = await resolveCityIdAsync(page, city);
     if (city == null) coverage.limitations.push('未指定城市；仅观察来源当前展示地区，建议未受阻断');
@@ -86,6 +92,7 @@ export async function searchDianping(page, { keyword, city = null, packageRoot, 
       await page.goto(url); await page.wait(2);
       const raw = await page.evaluate(`(${extractSearchRows.toString()})()`);
       const extra = await page.evaluate(`(${extraSearchFields.toString()})()`);
+      if(stopAccess(dianpingFailure(extra),'search'))break;
       if (!raw?.ok) { coverage.status = dianpingFailure(extra); coverage.limitations.push(coverage.status); break; }
       coverage.pages_completed++;
       coverage.reported_total = extra.total_text;
@@ -106,20 +113,25 @@ export async function searchDianping(page, { keyword, city = null, packageRoot, 
     }
     if (!coverage.complete && coverage.pages_completed >= maxPages) coverage.limitations.push(`达到本次安全页数上限 ${maxPages}，未声明全量`);
     for (const [url, record] of records) {
+      if(ACCESS_STOPS.has(coverage.status))break;
       if (signal?.aborted) throw new Error('RETRIEVAL_CANCELLED');
       try {
         await page.goto(url); await page.wait(2);
         const raw = await page.evaluate(`(${extractShopFields.toString()})()`);
         const extra = await page.evaluate(`(${extraShopFields.toString()})()`);
+        if(stopAccess(dianpingFailure(extra),'detail'))break;
         if (!raw?.ok || !SHOP_URL.test(extra.url)) { coverage.limitations.push(`详情未取得：${dianpingFailure(extra)}`); continue; }
         const normalized = normalizeDianping({ ...raw, ...extra, shop_id: record.external_id,
           price_text: extra.price_text || (raw.priceRaw ? `人均${raw.priceRaw}` : null),
           image_url: extra.image_url || record.image_url }, { keyword, city, detail: true });
         if (normalized) records.set(url, normalized);
         coverage.detail_pages_completed++;
-      } catch (error) { coverage.limitations.push(`详情读取失败：${error.code ?? error.message}`); }
+      } catch (error) {
+        if(stopAccess(error.code??error.message,'detail'))break;
+        coverage.limitations.push(`详情读取失败：${error.code ?? error.message}`);
+      }
     }
-  } catch (error) { coverage.status = signal?.aborted ? 'cancelled' : (error.code ?? error.message); coverage.limitations.push(coverage.status); }
+  } catch (error) { coverage.status = signal?.aborted ? 'cancelled' : (error.code ?? error.message); coverage.complete=false;coverage.limitations.push(coverage.status); }
   coverage.status = coverage.status === 'pending' ? (records.size ? 'partial' : 'unavailable') : coverage.status;
   coverage.observed_count = records.size;
   if (coverage.detail_pages_completed < records.size) coverage.limitations.push('部分记录只有搜索页观察，不冒充已核实套餐详情');
