@@ -250,12 +250,12 @@ export const budget_slider = Object.freeze({ min: 0, max: 1000, step: 50 });
 export const budget_modes = Object.freeze(["slider", "zero", "other"]);
 
 export const DEADLINE_RANGES = [
-  { id: "d0", label: "明天", value: 1, hint: "按 1 天上限检查", minDays: 0, maxDays: 1 },
-  { id: "d1", label: "3–5 天", value: 5, hint: "按 5 天上限检查", minDays: 3, maxDays: 5 },
-  { id: "d2", label: "一周以内", value: 7, hint: "按 7 天上限检查", minDays: 0, maxDays: 7 },
-  { id: "d3", label: "一月以内", value: 30, hint: "按 30 天上限检查", minDays: 0, maxDays: 30 },
-  { id: "d4", label: "一季度以内", value: 90, hint: "按 90 天上限检查", minDays: 0, maxDays: 90 },
-  { id: "d5", label: "一年以内", value: 365, hint: "按 365 天上限检查", minDays: 0, maxDays: 365 },
+  { id: "d0", label: "明天", value: 1, hint: "计划时间 1 天", minDays: 0, maxDays: 1 },
+  { id: "d1", label: "3–5 天", value: 5, hint: "计划时间 3–5 天", minDays: 3, maxDays: 5 },
+  { id: "d2", label: "一周以内", value: 7, hint: "计划时间 7 天", minDays: 0, maxDays: 7 },
+  { id: "d3", label: "一月以内", value: 30, hint: "计划时间 30 天", minDays: 0, maxDays: 30 },
+  { id: "d4", label: "一季度以内", value: 90, hint: "计划时间 90 天", minDays: 0, maxDays: 90 },
+  { id: "d5", label: "一年以内", value: 365, hint: "计划时间 365 天", minDays: 0, maxDays: 365 },
 ];
 
 export const PORT = Number(process.env.GW_PORT || process.env.PORT || 8787);
@@ -276,66 +276,23 @@ export const HOST = process.env.GW_HOST || "127.0.0.1";
  */
 export const CLIENT_TIMEOUT_MS = 150000;
 
-/**
- * 运输时间口径（产品负责人 2026-10-31 新增：时间对齐必须含运输，且不许假装知道物流）。
- *
- * 判据：`准备时间 + 运输时间 <= 可用天数` 才算通过。
- * `estimated_shipping_days` **允许未知**；未知时按 `default_days` 参与判定，
- * 并一律在响应里标注来源（数据层字段，界面不显示）。
- */
+/** 时间仅作提示；used 保留为估算区间上界，不能解释为真实物流时长。 */
 export const PURCHASE_WINDOW_CONFIG = Object.freeze({
-  min: 3,
-  max: 5,
-  used: 5,
-  day_type: 'calendar',
-  basis: '拿不到页面时长时的统一口径：快递网购 3~5 天，判定取上界 5 天',
-  not_a_guarantee: '网购时长为页面原文或保守默认值，不构成发货或送达保证。',
+  min: 3, max: 5, used: 5, day_type: 'calendar',
+  basis: '快递时长未知时暂按3~5天估算；used仅为估算上界',
+  not_a_guarantee: '时间为估算。',
 });
-
-/**
- * 运输时间口径（保留：只在页面**给了一部分**时效时用于兜底取较大值）。
- *
- * 判据：`准备时间 + 网购时长 <= 可用天数` 才算通过。
- * ⚠️ 不重复计算：页面同时给了发货时效与配送时效时两者相加；只给其一时不与默认值相加，
- *    而是取「观测值」与「默认下界 3 天」的较大者（宁可保守）。
- */
 export const SHIPPING_CONFIG = Object.freeze({
-  defaultDays: (() => {
-    const raw = (process.env.GIFTWISE_SHIPPING_DEFAULT_DAYS || '').trim().toLowerCase();
-    if (!raw) return PURCHASE_WINDOW_CONFIG.used;
-    if (raw === 'off' || raw === 'none') return null;
-    const value = Number(raw);
-    return Number.isFinite(value) && value >= 0 ? value : PURCHASE_WINDOW_CONFIG.used;
-  })(),
-  basis: '国内普通快递主流时效 2–4 天，取上限 4 天作为保守默认；不含偏远地区、节假日、天气、大促爆仓等无法估算的因素',
+  defaultDays: PURCHASE_WINDOW_CONFIG.max,
+  basis: '快递时长未知时暂按3~5天估算，上界不是实测时长',
   is_estimate: true,
-  not_a_guarantee: '运输与预售时长为页面原文或保守默认值，不构成发货或送达保证。',
+  not_a_guarantee: PURCHASE_WINDOW_CONFIG.not_a_guarantee,
 });
-
-/**
- * 预售/发货时长口径（产品负责人 2026-10-31 更正：预售不是「排除」，而是**算进判定**）。
- *
- * 判定式：`准备时长 + 预售（发货）时长 + 运输时长 <= 用户可用时长`。
- * 预售时长从采集字段读取（`presale_days` / `ships_within_days` / `ships_within_text` /
- * `shipping_time_text`），并保留**原文 + 解析值**以便追溯。
- * 只有页面**确实没给**时长时才标未知，并按 `defaultDays` 参与判定。
- * ⛔ 绝不把「没解析出来」当成「没有预售」。
- *
- * 默认值 7 天的依据：预售类商品常见发货时效为 7–15 天；取区间**下限 7 天**，
- * 理由是完全没信息时不应把所有预售商品一律判死，但在「7 天以内」的紧迫需求上
- * 一律判为不通过（7 天预售 + 保守运输 4 天 > 7 天）。
- */
 export const PRESALE_CONFIG = Object.freeze({
-  defaultDays: (() => {
-    const raw = (process.env.GIFTWISE_PRESALE_DEFAULT_DAYS || '').trim().toLowerCase();
-    if (!raw) return 7;
-    if (raw === 'off' || raw === 'none') return null;
-    const value = Number(raw);
-    return Number.isFinite(value) && value >= 0 ? value : 7;
-  })(),
-  basis: '预售类常见发货时效 7–15 天；完全没给时长时取区间下限 7 天作为保守默认，并一律标注为估算',
+  defaultDays: null,
+  basis: '预售发货时间缺失时保留未知',
   is_estimate: true,
-  not_a_guarantee: '预售与发货时长为页面原文/估算，不构成发货或送达保证。',
+  not_a_guarantee: '预售与发货时间来自页面信息或为未知。',
 });
 
 /**
