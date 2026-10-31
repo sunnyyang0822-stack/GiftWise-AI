@@ -20,8 +20,10 @@ import { validate, checkBudgetRange, CONTRACT_VERSION, amountToCents } from "./c
 
 export const INTAKE_FIELDS = new Set([
   "recipient_relation",
+  "recipient_relation_custom",
   "closeness",
   "occasion",
+  "occasion_custom",
   "budget_amount",
   "currency",
   "deadline_days",
@@ -121,6 +123,22 @@ export function adaptIntake(intakeJson, options = {}) {
 
   const relation = choice("recipient_relation", RELATIONS_FULL);
   const occasion = choice("occasion", OCCASION_TABLE);
+  const customText = (key) => {
+    if (!Object.hasOwn(data, key)) return null;
+    const value = data[key];
+    if (typeof value !== "string" || !value.trim()) {
+      err("INVALID_TYPE", `intake.${key}`, "自定义文本必须为非空字符串");
+      return null;
+    }
+    if ([...value].length > 1000) err("LIMIT_EXCEEDED", `intake.${key}`, "自定义文本最多 1000 个 Unicode 码点");
+    return value;
+  };
+  const relationCustom = customText("recipient_relation_custom");
+  const occasionCustom = customText("occasion_custom");
+  if (relation === "other" && relationCustom === null) err("INTAKE_CLARIFICATION_REQUIRED", "intake.recipient_relation_custom", "选择其他关系时请填写自定义关系");
+  if (relation !== "other" && Object.hasOwn(data, "recipient_relation_custom")) err("INTAKE_UNKNOWN_FIELD", "intake.recipient_relation_custom", "只有选择其他关系时才能填写自定义关系");
+  if (occasion === "other" && occasionCustom === null) err("INTAKE_CLARIFICATION_REQUIRED", "intake.occasion_custom", "选择其他场合时请填写自定义场合");
+  if (occasion !== "other" && Object.hasOwn(data, "occasion_custom")) err("INTAKE_UNKNOWN_FIELD", "intake.occasion_custom", "只有选择其他场合时才能填写自定义场合");
   const closeness = choice("closeness", CLOSENESS_TABLE, "unknown");
   for (const key of ["recipient_relation", "occasion"]) {
     if (data[key] === "unknown") {
@@ -211,9 +229,11 @@ export function adaptIntake(intakeJson, options = {}) {
     // 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
     // recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值，
     // 只由服务端产出，不在输入白名单内，前端提交会被 INTAKE_UNKNOWN_FIELD 拒绝。
-    recipient_relation: relation && relation in RELATIONS_FULL ? RELATIONS_FULL[relation] : "",
+    recipient_relation: relation && relation in RELATIONS_FULL ? (relation === "other" ? relationCustom : RELATIONS_FULL[relation]) : "",
     recipient_relation_id: relation && relation in RELATIONS_FULL ? relation : "",
-    occasion: occasion && occasion in OCCASION_TABLE ? OCCASION_TABLE[occasion] : "",
+    recipient_relation_custom: relation === "other" ? relationCustom : null,
+    occasion: occasion && occasion in OCCASION_TABLE ? (occasion === "other" ? occasionCustom : OCCASION_TABLE[occasion]) : "",
+    occasion_custom: occasion === "other" ? occasionCustom : null,
     budget_amount: budget,
     currency: "currency" in data ? data.currency : null,
     available_days: "deadline_days" in data ? data.deadline_days : null,

@@ -205,6 +205,11 @@ function request(request, errors) {
       text(request[field], `request.${field}`, errors, field === "notes");
     }
   }
+  for (const field of ["recipient_relation_custom", "occasion_custom"]) {
+    if (Object.hasOwn(request, field) && request[field] !== null) {
+      text(request[field], `request.${field}`, errors);
+    }
+  }
   const interval = Object.hasOwn(request, "budget_range") ? checkBudgetRange(request.budget_range, "request.budget_range", errors) : null;
   const budget = Object.prototype.hasOwnProperty.call(request, "budget_amount")
     ? amount(request.budget_amount, "request.budget_amount", errors)
