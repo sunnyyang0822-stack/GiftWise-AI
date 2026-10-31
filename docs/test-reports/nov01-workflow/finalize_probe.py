@@ -7,13 +7,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timezone, timedelta
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from workflow.intake import adapt_intake, dump
 
-OUT = Path(__file__).parent / 'final-baseline-ce5fd11'
-OUT.mkdir(exist_ok=True)
+stamp = datetime.now(timezone(timedelta(hours=8))).strftime('%Y%m%dT%H%M%S%f+0800')
+OUT = Path(__file__).parent / ('recheck-' + stamp)
+OUT.mkdir(exist_ok=False)
 
 def write(name, value):
     with (OUT / name).open('x', encoding='utf-8') as f:
