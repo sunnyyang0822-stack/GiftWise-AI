@@ -76,3 +76,11 @@ test('仅格式修复一次不再调用工具，只映射已有已验证ID，且
  const job=startReferenceImages(run,{session,requestJson:'{}',requestImages:input=>provider.requestReferenceImages({...input,executeTool:async()=>{toolsCalled++;throw Error('format cannot search');}})});await job.promise;
  assert.equal(calls,2);assert.equal(toolsCalled,0);assert.deepEqual(run.reference_image_slots.map(s=>s.status),['ready','ready','unavailable']);assert.equal(run.call_counts.reference_images,2);
 });
+
+test('部分已绑定合法图保留；补图只用已有资料且没有新tool时不丢来源',async()=>{
+ const run=makeRun(),records=refs();run.retrieval.references=records;
+ run.media.candidates=[{candidate_id:'c1',reference_id:records[0].reference_id,image:{id:records[0].image_id,url:'/api/reference/images/'+records[0].image_id,kind:'reference_image'}}];
+ const session=createOpencliToolSession({search:async()=>{throw Error('must not search');}});
+ const job=startReferenceImages(run,{session,requestJson:'{}',requestImages:async input=>{assert.deepEqual(input.missingCandidateIds,['c2','c3']);return{ok:true,reference_references:[citations()[1],null,{candidate_id:'c3',reference_id:'missing'}]};}});await job.promise;
+ assert.deepEqual(run.reference_image_slots.map(s=>s.status),['ready','ready','unavailable']);assert.equal(run.retrieval.references.length,3);assert.equal(run.retrieval.status,'partial');
+});

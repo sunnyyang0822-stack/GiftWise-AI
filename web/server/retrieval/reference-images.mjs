@@ -49,7 +49,10 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
    const result=await Promise.race([request,cancelled]);
    run.call_counts.reference_images=(run.call_counts.reference_images??0)+(result.model_calls??0);
    if(!current()||controller.signal.aborted)throw Error('REFERENCE_CANCELLED');
-   run.retrieval=session.retrieval;
+   const previous=run.retrieval,latest=session.retrieval;
+   const merge=(key,field)=>[...new Map([...(previous[key]??[]),...(latest[key]??[])].map(r=>[r[field],r])).values()];
+   run.retrieval={...previous,...latest,products:merge('products','product_id'),references:merge('references','reference_id'),contents:merge('contents','source_url'),images:merge('images','url')};
+   if(latest.status==='skipped'&&(run.retrieval.references.length||run.retrieval.products.length))run.retrieval.status='partial';
    const citations=(Array.isArray(result.reference_references)?result.reference_references:[]).filter(r=>r&&typeof r==='object'&&missing.includes(r.candidate_id));
    const selected=bindingsFromReferences(run.retrieval.references??[],run.candidates,citations);
    job.rejected_references=selected.rejected;
