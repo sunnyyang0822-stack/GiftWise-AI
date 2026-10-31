@@ -101,17 +101,30 @@ test('presentation time policy preserves raw candidate and presentation time fai
 });
 
 const intake = (deadline = 7) => ({contract_version:'giftwise-20261031-v2',budget_mode:'other',budget_range:{min:'0',max:'800'},currency:'CNY',deadline_days:deadline,recipient_relation:'partner',closeness:'unknown',occasion:'birthday',interests:[],interest_confidence:{},gift_styles:[],dislikes:'',hard_exclusions:{tags:[],terms:[],unresolved:[]},additional_context:''});
-const services = (items, capture = ()=>{}) => ({
+const services = (items, capture = ()=>{}, extra = {}) => ({
   requestCandidates:async()=>({ok:true,outputs:{candidates_json:JSON.stringify({candidates:items})}}),
-  libraryEnabled:false,catalogScrape:false,
+  libraryEnabled:false,retrievalEnabled:false,catalogScrape:false,
   provideRealProducts:async({candidates})=>{capture(candidates);return {catalog:{status:'unavailable',results:[]}};},
   visualDirectionProvider:defaultProvider({channel:'rules'}),
+  ...extra,
 });
 
-test('pipeline keeps three overdue candidates eligible for catalog binding and selection',async()=>{
+for (const explicitBinding of [false,true]) test(`three overdue candidates remain selectable; explicit source binding=${explicitBinding}`,async()=>{
   let offered;
-  const out=await runRecommendation({mode:'llm',intake:{...intake(1),additional_context:'catalog binding regression'},inputParse:{constraints:{days_band:{user_days:1,band_days:1}}}},services(batch().candidates,items=>offered=items));
-  assert.equal(offered.length,3);
+  const items=batch().candidates;
+  // Synthetic observed records only. No collection, shared DB or image requests.
+  const products=items.map(c=>({product_id:`fixture-${c.id}`,name:c.name,variant:'',price_amount:c.estimated_total,currency:'CNY',price_source:'browser_observed',price_conditions:[],source_site:'jd',source_url:`https://item.jd.com/${c.id.slice(1)}.html`,observed_at:new Date().toISOString()}));
+  const refs=items.map((c,i)=>({candidate_id:c.id,product_id:products[i].product_id}));
+  const bindingServices=explicitBinding?{
+    retrievalEnabled:true,
+    planRetrieval:async()=>({needs_retrieval:true,queries:[]}),
+    retrievalWorker:{submit:async()=>({status:'ready',products,coverage:[],warnings:[]})},
+    requestCandidates:async()=>({ok:true,outputs:{candidates_json:JSON.stringify({candidates:items}),product_references_json:JSON.stringify(refs)}}),
+  }:{};
+  const out=await runRecommendation({mode:'llm',intake:{...intake(1),additional_context:`catalog binding regression ${explicitBinding}`},inputParse:{constraints:{days_band:{user_days:1,band_days:1}}}},services(items,candidates=>offered=candidates,bindingServices));
+  assert.equal(out.kind,'report');
+  assert.equal(offered.length,explicitBinding?3:0);
+  assert.equal(out.run.product_bindings.size,explicitBinding?3:0);
   assert.equal(out.run.initial_validation.all_passed,false);
   assert.equal(out.run.initial_validation.candidate_results[0].warnings.length,0);
   assert.equal(out.run.validation.raw_validation.all_passed,false);
