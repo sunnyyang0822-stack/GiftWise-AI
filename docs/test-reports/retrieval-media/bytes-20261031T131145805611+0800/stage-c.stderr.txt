@@ -1,0 +1,49 @@
+test_c1_01_local_stdlib_probe (test_stage_c_workflow.C1SandboxProbe.test_c1_01_local_stdlib_probe) ... ok
+test_c1_02_dify_real_probe_evidence (test_stage_c_workflow.C1SandboxProbe.test_c1_02_dify_real_probe_evidence)
+真机结论只能来自独立浏览器实跑捕获的证据文件，不能引用 PM 数字。 ... ok
+test_c1_03_dify_probe_latency_and_tokens_recorded (test_stage_c_workflow.C1SandboxProbe.test_c1_03_dify_probe_latency_and_tokens_recorded) ... ok
+test_c2_01_pursuit_now_has_machine_value (test_stage_c_workflow.C2ContractGaps.test_c2_01_pursuit_now_has_machine_value) ... ok
+test_c2_02_pursuit_and_partner_are_distinct_and_accepted (test_stage_c_workflow.C2ContractGaps.test_c2_02_pursuit_and_partner_are_distinct_and_accepted) ... ok
+test_c2_03_pursuit_was_rejected_before_the_change (test_stage_c_workflow.C2ContractGaps.test_c2_03_pursuit_was_rejected_before_the_change)
+用**逐字节固定的历史夹具**复现变更前被拒的行为，证明 PM 的 INTAKE_UNKNOWN_LABEL 声明。 ... ok
+test_c2_04_unknown_confidence_rejected (test_stage_c_workflow.C2ContractGaps.test_c2_04_unknown_confidence_rejected) ... ok
+test_c2_05_extra_confidence_key_rejected (test_stage_c_workflow.C2ContractGaps.test_c2_05_extra_confidence_key_rejected) ... ok
+test_c2_06_unknown_interest_label_rejected (test_stage_c_workflow.C2ContractGaps.test_c2_06_unknown_interest_label_rejected) ... ok
+test_c2_07_frontend_cannot_submit_relation_id (test_stage_c_workflow.C2ContractGaps.test_c2_07_frontend_cannot_submit_relation_id) ... ok
+test_c2_08_colleague_kept_for_technical_regression (test_stage_c_workflow.C2ContractGaps.test_c2_08_colleague_kept_for_technical_regression) ... ok
+test_c2_09_adding_relation_id_does_not_break_validator (test_stage_c_workflow.C2ContractGaps.test_c2_09_adding_relation_id_does_not_break_validator) ... ok
+test_c2_10_internal_error_documented_in_contract (test_stage_c_workflow.C2ContractGaps.test_c2_10_internal_error_documented_in_contract) ... ok
+test_c2_11_contract_lists_pursuit_and_marks_colleague (test_stage_c_workflow.C2ContractGaps.test_c2_11_contract_lists_pursuit_and_marks_colleague) ... ok
+test_c3_01_normal_three_candidates_pass (test_stage_c_workflow.C3Validation.test_c3_01_normal_three_candidates_pass) ... ok
+test_c3_02_over_budget_boundary_200_00_passes (test_stage_c_workflow.C3Validation.test_c3_02_over_budget_boundary_200_00_passes) ... ok
+test_c3_03_over_budget_by_one_cent_fails (test_stage_c_workflow.C3Validation.test_c3_03_over_budget_by_one_cent_fails) ... ok
+test_c3_04_forbidden_tag_alcohol (test_stage_c_workflow.C3Validation.test_c3_04_forbidden_tag_alcohol) ... ok
+test_c3_05_forbidden_term_literal (test_stage_c_workflow.C3Validation.test_c3_05_forbidden_term_literal) ... ok
+test_c3_06_full_width_variant_still_caught (test_stage_c_workflow.C3Validation.test_c3_06_full_width_variant_still_caught)
+字面禁忌走 NFKC + casefold 归一化（rules.py:107、:157、:207），全角/大小写变体不得绕过。 ... ok
+test_c3_07_broken_json_candidates_is_error_and_repairable (test_stage_c_workflow.C3Validation.test_c3_07_broken_json_candidates_is_error_and_repairable) ... ok
+test_c3_08_missing_budget_with_broken_candidates_not_repairable (test_stage_c_workflow.C3Validation.test_c3_08_missing_budget_with_broken_candidates_not_repairable) ... ok
+test_c3_09_currency_mismatch_not_converted (test_stage_c_workflow.C3Validation.test_c3_09_currency_mismatch_not_converted) ... ok
+test_c4_01_first_check_over_budget_is_repairable (test_stage_c_workflow.C4Repair.test_c4_01_first_check_over_budget_is_repairable) ... ok
+test_c4_02_revision_success_reserves_quota (test_stage_c_workflow.C4Repair.test_c4_02_revision_success_reserves_quota) ... ok
+test_c4_03_repair_quota_exhausted_after_one (test_stage_c_workflow.C4Repair.test_c4_03_repair_quota_exhausted_after_one) ... ok
+test_c4_04_persistent_failure_stops_with_no_selectable (test_stage_c_workflow.C4Repair.test_c4_04_persistent_failure_stops_with_no_selectable) ... ok
+test_c4_05_total_failure_has_no_selectable (test_stage_c_workflow.C4Repair.test_c4_05_total_failure_has_no_selectable) ... ok
+test_c4_06_passed_candidate_tampering_rejected (test_stage_c_workflow.C4Repair.test_c4_06_passed_candidate_tampering_rejected) ... ok
+test_c4_07_reordered_keys_are_not_tampering (test_stage_c_workflow.C4Repair.test_c4_07_reordered_keys_are_not_tampering) ... ok
+test_c4_08_recheck_blocks_when_not_repairable (test_stage_c_workflow.C4Repair.test_c4_08_recheck_blocks_when_not_repairable) ... ok
+test_c4_09_report_never_selects_for_user (test_stage_c_workflow.C4Repair.test_c4_09_report_never_selects_for_user) ... ok
+test_c4_10_forbidden_tag_not_repairable_into_selection (test_stage_c_workflow.C4Repair.test_c4_10_forbidden_tag_not_repairable_into_selection) ... ok
+test_c5_01_four_entrypoints_match_repository (test_stage_c_workflow.C5GeneratedNodes.test_c5_01_four_entrypoints_match_repository) ... ok
+test_c5_02_manifest_matches_generated_artifacts (test_stage_c_workflow.C5GeneratedNodes.test_c5_02_manifest_matches_generated_artifacts) ... ok
+test_c5_03_node_entrypoint_rejects_empty_inputs (test_stage_c_workflow.C5GeneratedNodes.test_c5_03_node_entrypoint_rejects_empty_inputs) ... ok
+test_c5_04_dispatch_failure_is_chinese_and_consumes_quota (test_stage_c_workflow.C5GeneratedNodes.test_c5_04_dispatch_failure_is_chinese_and_consumes_quota)
+真正的工作流变量损坏路径：Code 节点调度器异常兜底。 ... ok
+test_c6_01_offline_pipeline_records_calls_latency_cost (test_stage_c_workflow.C6Metrics.test_c6_01_offline_pipeline_records_calls_latency_cost)
+离线全链路记录：真实测量延迟，调用次数如实为 0，成本标未知而非 0。 ... ok
+test_c6_02_dify_run_record_exists_and_is_traceable (test_stage_c_workflow.C6Metrics.test_c6_02_dify_run_record_exists_and_is_traceable) ... ok
+
+----------------------------------------------------------------------
+Ran 39 tests in 0.354s
+
+OK
