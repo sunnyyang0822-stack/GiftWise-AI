@@ -8,17 +8,19 @@ const configs = [
   { id: 'douban', name: '豆瓣', domain: 'douban.com', kind: 'content', base: 'https://search.douban.com/movie/subject_search', query: 'search_text', cards: '.item-root, .result-list .result-item', links: '.title a, h3 a, a[href*="/subject/"]', title: '.title-text, .title h3, h3', author: '.author', summary: '.meta.abstract, .meta, .abstract, .subject-abstract, p', paths: '^/(subject/[0-9]+|note/[0-9]+|event/[0-9]+)', cliArgs: ['keyword', '--type', '--limit'] },
   { id: 'douyin', name: '抖音', domain: 'douyin.com', kind: 'video', base: 'https://www.douyin.com/search/', cards: '[data-e2e="scroll-list"] li', links: 'a[href*="/video/"]', title: '[data-e2e="video-desc"], [class*="desc"], [class*="title"]', author: '[data-e2e="video-author"], [class*="author"]', summary: '[data-e2e="video-desc"], [class*="desc"]', paths: '^/video/[0-9]+', cliArgs: ['query', '--limit'] },
   { id: 'huodongxing', name: '活动行', domain: 'huodongxing.com', kind: 'event', base: 'https://www.huodongxing.com/events', query: 'search', cards: '.event-item, .activity-item', links: 'a[href*="/event/"]', title: '.event-title, .title, h3', author: '.organizer', summary: '.event-desc, .description', paths: '^/event/[0-9]+', cliArgs: null },
+  { id: 'pinterest', name: 'Pinterest', domain: 'pinterest.com', kind: 'content', base: 'https://www.pinterest.com/search/pins/', query: 'q', cards: '[data-test-id="pin"], [data-test-id="pinWrapper"]', links: 'a[href*="/pin/"]', title: '[data-test-id="pinTitle"], h3', author: '[data-test-id="creator-profile-name"]', summary: '[data-test-id="pin-description"]', paths: '^/pin/[0-9]+', cliCommand: 'search-pins', cliArgs: ['query', '--limit'] },
+  { id: 'pixiv', name: 'Pixiv', domain: 'pixiv.net', kind: 'content', base: 'https://www.pixiv.net/tags/', cards: 'li:has(a[href*="/artworks/"])', links: 'a[href*="/artworks/"]', title: '[title], h3', author: 'a[href*="/users/"]', summary: '[class*="description"]', paths: '^/(en/)?artworks/[0-9]+', cliArgs: ['query', '--limit', '--order', '--mode', '--page'] },
 ];
 
 export const DOMESTIC_CONTENT_SOURCES = Object.freeze(Object.fromEntries(configs.map(c => [c.id, Object.freeze({
   id: c.id, name: c.name, source_site: c.domain, purpose: 'inspiration', record_kind: c.kind,
   implementation: 'readonly_dom', verification_status: 'not_live_verified', pagination: c.pageKey ? 'url_page' : 'first_page_only',
-  opencli: c.cliArgs ? { command: `${c.id} search`, access: 'read', inspected_version: '1.8.8', adapter_file: `clis/${c.id}/search.js`, arguments: c.cliArgs, native_executed: false } : null,
+  opencli: c.cliArgs ? { command: `${c.id} ${c.cliCommand || 'search'}`, access: 'read', inspected_version: '1.8.8', adapter_file: `clis/${c.id}/${c.cliCommand || 'search'}.js`, arguments: c.cliArgs, native_executed: false } : null,
   limitations: c.cliArgs ? ['已静态盘点安装适配器；DOM检索未真实验证', '只读取搜索卡片，不提取全文'] : ['安装包未发现活动行适配器；Web入口及选择器未真实验证'],
   searchUrl(keyword, city, page = 1) {
     const q = clean(keyword, 500);
     if (!q) throw new TypeError('灵感检索关键词不能为空');
-    const url = new URL(c.base + (c.id === 'douyin' ? encodeURIComponent(q) : ''));
+    const url = new URL(c.base + (c.id === 'douyin' ? encodeURIComponent(q) : c.id === 'pixiv' ? `${encodeURIComponent(q)}/artworks` : ''));
     if (c.query) url.searchParams.set(c.query, q);
     if (c.id === 'douyin') url.searchParams.set('type', 'video');
     if (c.pageKey) url.searchParams.set(c.pageKey, String(Math.max(1, Math.floor(Number(page) || 1))));
@@ -55,6 +57,7 @@ export function normalizeDomesticContent(source, raw, { observedAt, keyword, cit
     location: clean(raw.location, 120) || null, source_time_text: clean(raw.source_time_text, 80) || null,
     observed_at: observedAt && Number.isFinite(Date.parse(observedAt)) ? observedAt : null,
     query_params: { keyword: keyword ?? null, city: city ?? null },
+    relevance: { keyword: keyword ?? null, basis: 'model_selected_query', verified: false },
   };
 }
 
@@ -74,10 +77,10 @@ function readCards(config) {
   if (sameSite && !restricted && !login) for (const card of document.querySelectorAll(config.cards)) {
     const link = card.querySelector(config.links);
     if (!link) continue;
-    const titleNode = card.querySelector(config.title);
-    const title = text(titleNode, 120) || link.getAttribute('title') || text(link, 120);
-    if (!title) continue;
     const image = card.querySelector('img:not(.avatar):not([class*="avatar"]):not([class*="Avatar"])');
+    const titleNode = card.querySelector(config.title);
+    const title = text(titleNode, 120) || link.getAttribute('title') || image?.alt || text(link, 120);
+    if (!title) continue;
     records.push({ title, source_url: link.href, summary: text(card.querySelector(config.summary)), author: text(card.querySelector(config.author), 80), image_url: image?.currentSrc || image?.getAttribute('data-src') || image?.src || null, image_provenance: 'content_card' });
   }
   return { status: restricted ? 'restricted' : login ? 'login_required' : !sameSite ? 'redirected' : records.length ? 'ok' : 'empty_or_selector_changed', records, next_available: Boolean(document.querySelector('a[rel="next"], .pagination-next:not(.disabled), .woo-pagination-next:not(.woo-pagination-disabled)')) };

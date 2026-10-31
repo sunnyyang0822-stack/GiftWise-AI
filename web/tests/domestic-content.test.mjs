@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import { DOMESTIC_CONTENT_SOURCES as sources, normalizeDomesticContent, buildDomesticContentReadScript, runDomesticContentSearch } from '../server/collect/domestic-content.mjs';
 
 test('安装能力如实登记、仅灵感能力，不默认为商品', () => {
-  assert.deepEqual(Object.keys(sources), ['xiaohongshu', 'bilibili', 'zhihu', 'weibo', 'douban', 'douyin', 'huodongxing']);
+  for (const id of ['xiaohongshu', 'bilibili', 'zhihu', 'weibo', 'douban', 'douyin', 'huodongxing']) assert.ok(sources[id]);
   for (const source of Object.values(sources)) {
     assert.equal(source.purpose, 'inspiration');
     assert.equal(source.verification_status, 'not_live_verified');
@@ -85,4 +85,24 @@ test('DOM返回外站或商城链接时不标覆盖完成', async () => {
   assert.equal(result.coverage.status, 'no_valid_content');
   assert.equal(result.coverage.pages_completed, 0);
   assert.equal(result.coverage.complete, false);
+});
+
+test('全球灵感源白名单、原生命令与真实卡片图归一化', () => {
+  assert.equal(sources.pinterest.opencli.command, 'pinterest search-pins');
+  assert.equal(sources.pixiv.opencli.command, 'pixiv search');
+  assert.equal(sources.pinterest.opencli.native_executed, false);
+  assert.equal(sources.pixiv.verification_status, 'not_live_verified');
+  assert.equal(new URL(sources.pinterest.searchUrl('gift wrapping')).searchParams.get('q'), 'gift wrapping');
+  assert.equal(new URL(sources.pixiv.searchUrl('花束')).pathname, '/tags/%E8%8A%B1%E6%9D%9F/artworks');
+  for (const [source, url, image] of [['pinterest', 'https://www.pinterest.com/pin/123/', 'https://i.pinimg.com/736x/example.jpg'], ['pixiv', 'https://www.pixiv.net/artworks/123', 'https://i.pximg.net/img-master/example.jpg']]) {
+    const record = normalizeDomesticContent(source, { title: '包装参考图', source_url: url, image_url: image, image_provenance: 'content_card' }, { keyword: '包装' });
+    assert.equal(record.image_url, image);
+    assert.equal(record.product_url, null);
+    assert.equal(record.purpose, 'inspiration');
+    assert.equal(record.relevance.keyword, '包装');
+    assert.equal(record.relevance.verified, false);
+    assert.equal(record.image_role, 'inspiration_reference');
+    assert.equal(normalizeDomesticContent(source, { title: '错域', source_url: 'https://pixiv.net.evil.test/artworks/1' }), null);
+    assert.doesNotThrow(() => new Function(`return ${buildDomesticContentReadScript(source)}`));
+  }
 });
