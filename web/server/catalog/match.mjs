@@ -8,7 +8,7 @@
  * ── 为什么要有「命中层级」，而不是简单 LIKE ──────────────────────────────
  * 库里只有真实抓取来的少量记录。如果只按「礼物」这种泛词去 LIKE，任何候选都能
  * 命中任意一条记录，那是**假装匹配**。所以这里把命中判据分成三级，并如实写清依据：
- *   `theme`   主题别名命中（如候选提到「手工/DIY/扭扭棒」，库里是扭扭棒礼盒）；
+ *   偏好与形式交给模型理解；绑定仅使用原文字面依据。
  *   `literal` 与商品标题有 ≥3 个汉字的连续公共子串；
  *   （泛词如「礼物/礼品」单独出现**不算命中** —— 库本来就是按「礼物」抓的，
  *     拿它当匹配依据等于说「所有礼物都是这个候选」，属假装匹配。）
@@ -32,16 +32,11 @@ export const CATALOG_REASON = Object.freeze({
 });
 
 /**
- * 主题别名表：`user_terms` 出现在候选文字里、且 `db_terms` 出现在商品标题里，即算主题命中。
- * 这是一份**人工维护的映射表**，不是模型生成的猜测；表里没有任何商品数据本身。
+ * 旧主题别名接口（当前为空）。
+ * 旧接口导出保留为空，当前不使用人工类目映射。
  */
-export const THEME_ALIASES = Object.freeze([
-  { id: 'handcraft', zh: '手工/DIY/创意', user_terms: ['手工', '手作', 'diy', '创意', '扭扭棒', '益智', '亲子', '儿童', '女孩', '男孩'], db_terms: ['扭扭棒', '手工', '创意', 'diy', '益智'] },
-  { id: 'plush', zh: '毛绒玩偶/陪伴', user_terms: ['毛绒', '玩偶', '公仔', '娃娃', '陪伴', '安抚', '仿真', '宠物'], db_terms: ['毛绒', '玩偶', '仿真', '宠物', '玩偶'] },
-  { id: 'jewelry', zh: '首饰/银饰/小众', user_terms: ['首饰', '饰品', '手链', '项链', '银', '镯', '耳饰'], db_terms: ['银镯', '首饰', '原创', '小众'] },
-  { id: 'drinkware', zh: '杯具/咖啡', user_terms: ['杯', '咖啡', '茶', '保温'], db_terms: ['杯', '咖啡', '茶'] },
-  { id: 'stationery', zh: '文具/书写', user_terms: ['本子', '手账', '笔', '笔记本', '书写'], db_terms: ['本', '手账', '笔'] },
-]);
+// 保留旧导出供调用方兼容；偏好理解交给模型，目录仅核对原文字面依据。
+export const THEME_ALIASES = Object.freeze([]);
 
 /** 泛词：单独命中不构成匹配依据（库就是按这些词抓的）。 */
 const GENERIC_TERMS = Object.freeze(['礼物', '礼品', '送人', '生日', '节日', '礼盒', '心意']);
@@ -95,14 +90,12 @@ export function longestCjkOverlap(a, b) {
  */
 export function scorePair(text, product) {
   const title = String(product.title ?? '').toLowerCase();
-  for (const theme of THEME_ALIASES) {
-    const userHit = theme.user_terms.find((term) => text.includes(term));
-    const dbHit = theme.db_terms.find((term) => title.includes(term));
-    if (userHit && dbHit) {
-      return { hit: true, basis: 'theme', confidence: 'medium', detail: `主题「${theme.zh}」：候选关键词“${userHit}” ↔ 商品标题关键词“${dbHit}”` };
-    }
-  }
-  const overlap = longestCjkOverlap(text, title);
+  const words = text.match(/[a-z0-9][a-z0-9-]{2,}/gi) ?? [];
+  const commonWord = words.find(word => title.includes(word));
+  if (commonWord) return { hit: true, basis: 'literal', confidence: 'medium', detail: `与商品标题有原文关键词「${commonWord}」` };
+  const specificText = GENERIC_TERMS.reduce((value,term) => value.replaceAll(term,''), text);
+  const specificTitle = GENERIC_TERMS.reduce((value,term) => value.replaceAll(term,''), title);
+  const overlap = longestCjkOverlap(specificText, specificTitle);
   if (overlap.length >= MIN_CJK_OVERLAP) {
     return { hit: true, basis: 'literal', confidence: 'medium', detail: `与商品标题有连续公共子串「${overlap}」（${overlap.length} 个汉字）` };
   }
@@ -134,7 +127,7 @@ function cents(amount) {
  */
 export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxItems = 3, excludeProductIds = [] } = {}) {
   const list = Array.isArray(candidates) ? candidates.filter((item) => item && typeof item === 'object' && typeof item.id === 'string') : [];
-  const base = { source: 'localdb', db_path: dbPath ?? null, hit_kind: 'degraded', reason_code: null, stats: null };
+  const base = { source: 'localdb', db_path: dbPath ?? null, hit_kind: 'degraded', reason_code: null, stats: null, enrichment_only: true, recommendations_available: true };
   const empty = list.map((candidate) => ({
     candidate_id: candidate.id,
     status: 'no_match',
@@ -164,7 +157,7 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
     if (stats.total === 0) {
       return { ...base, status: 'unavailable', reason_code: 'CATALOG_DB_EMPTY', stats, results: list.map((c) => ({ ...empty[0], candidate_id: c.id, reason_code: 'CATALOG_DB_EMPTY', match_detail: CATALOG_REASON.CATALOG_DB_EMPTY })) };
     }
-    const products = listProducts(db, { limit: 500 }).filter((product) => product.currency === 'CNY' && cents(product.price_amount) !== null);
+    const products = listProducts(db, { limit: null }).filter((product) => product.currency === 'CNY' || product.currency == null);
     if (products.length === 0) {
       return { ...base, status: 'unavailable', reason_code: 'CATALOG_NO_CNY_PRICE', stats, results: list.map((c) => ({ ...empty[0], candidate_id: c.id, reason_code: 'CATALOG_NO_CNY_PRICE', match_detail: CATALOG_REASON.CATALOG_NO_CNY_PRICE })) };
     }
@@ -199,7 +192,7 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
         });
         continue;
       }
-      const budgetOk = scored.filter((entry) => budgetCents === null || (cents(entry.product.price_amount) ?? 0) <= budgetCents);
+      const budgetOk = scored.filter((entry) => budgetCents === null || (cents(entry.product.price_amount) === null || cents(entry.product.price_amount) <= budgetCents));
       const chosen = budgetOk[0] ?? null;
       if (!chosen) {
         results.push({
@@ -225,12 +218,20 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
         product: {
           product_id: chosen.product.product_id,
           title: chosen.product.title,
+          price_unit: chosen.product.price_unit,
+          city: chosen.product.city,
+          address: chosen.product.address,
+          location: chosen.product.location,
+          observed_at: chosen.product.observed_at,
+          record_kind: chosen.product.record_kind,
           variant: '',
           quantity: 1,
           currency: chosen.product.currency,
           price_amount: chosen.product.price_amount,
           price_text: chosen.product.price_text,
-          price_basis: 'page_observed',
+          price_basis: chosen.product.price_basis,
+          price_status: chosen.product.price_status,
+          source_type: chosen.product.source_type,
           price_observed_at: chosen.product.price_observed_at,
           price_conditions: chosen.product.price_conditions,
           page_url: chosen.product.page_url,
@@ -257,10 +258,12 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
             source: 'localdb.product_page',
           },
           evidence_ref: `localdb:${chosen.product.product_id}`,
+          specifications:chosen.product.specifications??null,
+          image_validation:chosen.product.image_validation??null,
           attribution: `真实商品来源：${chosen.product.source_site}${chosen.product.seller ? ` / ${chosen.product.seller}` : ''}（页面观察价，非结算价）`,
         },
       });
-      if (results.filter((entry) => entry.status === 'matched').length >= Math.max(1, Math.min(maxItems, list.length))) break;
+
     }
     const matched = results.filter((entry) => entry.status === 'matched');
     return {
@@ -291,7 +294,7 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
  *
  * @returns {{products: Array<object>, db_path: string, total: number, note: string}|null}
  */
-export function libraryPreview({ dbPath, budgetAmount = null, limit = 8, forbiddenTerms = [], forbiddenTags = [], keywords = [] } = {}) {
+export function libraryPreview({ dbPath, budgetAmount = null, limit = 8, forbiddenTerms = [], forbiddenTags = [], keywords = [], searchPlan = null } = {}) {
   let db = null;
   try {
     db = openCatalogDb(dbPath ?? CATALOG_CONFIG.dbPath);
@@ -299,9 +302,10 @@ export function libraryPreview({ dbPath, budgetAmount = null, limit = 8, forbidd
     if (!stats || stats.total === 0) return null;
     const budgetCents = cents(budgetAmount);
     const terms = [...(forbiddenTerms ?? []), ...(forbiddenTags ?? [])].filter((t) => typeof t === 'string' && t.trim());
-    const wanted = (keywords ?? []).filter((k) => typeof k === 'string' && k.trim());
-    const products = listProducts(db, { limit: 500 })
-      .filter((product) => product.currency === 'CNY' && cents(product.price_amount) !== null)
+    const wanted = [...(searchPlan?.keywords ?? []), ...(keywords ?? [])].filter((k) => typeof k === 'string' && k.trim());
+    const products = listProducts(db, { limit: null })
+      .filter((product) => product.currency === 'CNY' || product.currency == null)
+      .filter((product) => wanted.length === 0 || wanted.some(k => String(product.title ?? '').toLowerCase().includes(k.toLowerCase())))
       .filter((product) => budgetCents === null || (cents(product.price_amount) ?? 0) <= budgetCents)
       .filter((product) => !terms.some((term) => String(product.title ?? '').includes(term)))
       .sort((a, b) => {
@@ -317,7 +321,9 @@ export function libraryPreview({ dbPath, budgetAmount = null, limit = 8, forbidd
         title: product.title,
         price_amount: product.price_amount,
         currency: product.currency,
-        price_basis: 'page_observed',
+        price_basis: product.price_basis,
+        price_status: product.price_status,
+        source_type: product.source_type,
         price_observed_at: product.price_observed_at ?? null,
         page_url: product.page_url,
         source_site: product.source_site ?? null,

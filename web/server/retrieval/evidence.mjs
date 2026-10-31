@@ -1,6 +1,7 @@
 import {unknownPhysical,validatePhysical} from '../media/scene.mjs';
 import { randomUUID } from 'node:crypto';
 import { cents,checkPrice } from './worker.mjs';
+import { isDomesticProduct } from '../catalog/db.mjs';
 function deepFreeze(v){if(v&&typeof v==='object'){for(const child of Object.values(v))deepFreeze(child);Object.freeze(v);}return v;}
 // 只由服务端来源适配器调用，不接受客户端或模型上传的证据。
 export function freezeEvidence(records,{source='unknown',now=new Date().toISOString(),taskId=null}={}) {
@@ -28,4 +29,32 @@ export function verifyCandidateEvidence(evidence,candidates,references,budget){
  if(evidence.products.some(p=>p.price_source==='browser_observed'&&(!Number.isFinite(Date.parse(p.observed_at))||Date.now()-Date.parse(p.observed_at)>600000||Date.parse(p.observed_at)>Date.now()+60000)))throw new Error('EVIDENCE_STALE');
  const seen=new Set();const refs=candidates.map(c=>{const matches=references.filter(r=>r.candidate_id===c.id);if(matches.length!==1)throw new Error('PRODUCT_REFERENCES_REQUIRED');const r=matches[0];if(Object.keys(r).some(k=>!['candidate_id','product_id'].includes(k)))throw new Error('INVALID_PRODUCT_REFERENCE');if(seen.has(r.product_id))throw new Error('DUPLICATE_PRODUCT');seen.add(r.product_id);const product=evidence.products.find(p=>p.product_id===r.product_id);if(!product||c.name!==product.name+' · '+product.variant)throw new Error('PRODUCT_SPEC_MISMATCH');return {...r,estimated_total:c.estimated_total};});
  return bindCandidates(evidence,refs,budget);
+}
+
+/** Optional references enrich individual suggestions; missing/stale references never reject a batch. */
+export function bindOptionalCandidateEvidence(evidence, candidates, references, budget) {
+ const bindings=new Map(), rejected=[],knownOverBudget=[];
+ if(!Array.isArray(references))return {bindings,rejected,knownOverBudget};
+ const seen=new Set();
+ for(const reference of references){
+  try{
+   if(!reference||seen.has(reference.product_id))throw new Error('DUPLICATE_PRODUCT');
+   const candidate=candidates.find(c=>c.id===reference.candidate_id);
+   if(!candidate||references.filter(r=>r?.candidate_id===candidate.id).length!==1)throw new Error('INVALID_PRODUCT_REFERENCE');
+   const product=evidence.products?.find(p=>p.product_id===reference.product_id);
+   if(!product)throw new Error('UNKNOWN_PRODUCT');
+   if(product.price_source==='browser_observed'&&!isDomesticProduct({...product,source_site:product.source_site??new URL(product.source_url).hostname,product_url:product.source_url}))throw new Error('FOREIGN_PURCHASE_SOURCE');
+   const identityText=s=>String(s??'').normalize('NFKC').replace(/[\p{P}\p{Z}\s]+/gu,'').toLowerCase();
+   const exactName=identityText(candidate.name)===identityText(product.name+' '+product.variant)||identityText(candidate.name)===identityText(product.name);
+   const specCompatible=!product.variant||identityText(candidate.name+' '+candidate.description).includes(identityText(product.variant));
+   if(!exactName&&!specCompatible)throw new Error('PRODUCT_SPEC_MISMATCH');
+   const observedMs=Date.parse(product.observed_at);
+   const observationFresh=Number.isFinite(observedMs)&&observedMs<=Date.now()+60000&&Date.now()-observedMs<=600000;
+   // This binds an observed item/photo, not a claim that conditional prices are universally available.
+   const priceEqual=product.price_amount!==null&&cents(candidate.estimated_total)===cents(product.price_amount);
+   if(observationFresh&&product.price_amount!==null&&!(product.price_conditions??[]).length&&cents(product.price_amount)>cents(budget))knownOverBudget.push(candidate.id);
+   bindings.set(candidate.id,{...product,observation_freshness:observationFresh?'recent_observation':'historical_observation',price_binding_status:priceEqual?'observed_amount_used':'model_estimate_separate_from_observation'});seen.add(product.product_id);
+  }catch(error){rejected.push({candidate_id:reference?.candidate_id??null,code:error.message});}
+ }
+ return {bindings,rejected,knownOverBudget};
 }

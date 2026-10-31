@@ -1,10 +1,13 @@
-import { verifyCandidateEvidence } from "./retrieval/evidence.mjs";
-import { RetrievalWorker, unavailableProvider, checkPrice } from "./retrieval/worker.mjs";
+import { verifyCandidateEvidence, bindOptionalCandidateEvidence } from "./retrieval/evidence.mjs";
+import { RetrievalWorker, unavailableProvider } from "./retrieval/worker.mjs";
 import { mediaProvider } from "./media/provider.mjs";
 import { mintReferenceGrant } from "./media/plan.mjs";
-import { DfrobotPublicProvider } from "./retrieval/dfrobot-provider.mjs";
+import { DomesticProvider,runDomesticDetails } from "./retrieval/domestic-provider.mjs";
+import { normalizeRetrievalPlan } from "./retrieval/query-plan.mjs";
+import { createOpencliToolSession } from "./retrieval/agent-tool.mjs";
+import { bindReferenceEvidence } from './retrieval/reference-evidence.mjs';
 import { RETRIEVAL_CONFIG } from "./config.mjs";
-const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrobot-public" && RETRIEVAL_CONFIG.packageRoot ? new DfrobotPublicProvider(RETRIEVAL_CONFIG.packageRoot) : unavailableProvider, RETRIEVAL_CONFIG);
+const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider !== "unavailable" ? new DomesticProvider({packageRoot:RETRIEVAL_CONFIG.packageRoot || undefined}) : unavailableProvider, RETRIEVAL_CONFIG);
 /**
  * 接入层主流程：适配 → （真实/模拟）生成三候选 → 独立规则校验 → 最多一次自动修订 →
  * 等待用户选择 → 选择校验 → 呈现四段 → 呈现复核（含全局修订额度）。
@@ -30,7 +33,7 @@ import { presentationAlignmentErrors } from "./visual/direction.mjs";
 // 阶段二：本地真实商品库匹配（纯读库）+ 缺失才补抓 opencli（单请求最多 1 次）。
 import { provideRealProducts } from "./catalog/provide.mjs";
 import { libraryPreview } from "./catalog/match.mjs";
-import { createRun, getRun, getRunByRecommendationKey, publicReport } from "./store.mjs";
+import { createRun, getRun, getRunByRecommendationKey, publicReport, retrievalView } from "./store.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
 import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, LIMITS, INTAKE_PARSE_CONFIG, localDbPath } from "./config.mjs";
 
@@ -153,7 +156,7 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
  */
 const pendingRecommendations=new Map();
 export async function runRecommendation(input, services = {}) {
- const key=canonical({owner:input.ownerScope||'internal',intake:input.intake,confirmation:input.exclusion_confirmation||null,mode:input.mode,demo:input.demo||null});
+ const key=canonical({owner:input.ownerScope||'internal',intake:input.intake,analysis:input.analysis??null,inputParse:input.inputParse??null,confirmation:input.exclusion_confirmation||null,mode:input.mode,demo:input.demo||null});
  if(pendingRecommendations.has(key))return pendingRecommendations.get(key);
  if(pendingRecommendations.size>=200)return {kind:'infrastructure_error',status:'error',mode:input.mode,errors:[{code:'RETRIEVAL_QUEUE_FULL',path:'retrieval',message:'后台任务繁忙，请稍后重试。'}]};
  const job=runRecommendationCore(input,services);pendingRecommendations.set(key,job);
@@ -205,7 +208,7 @@ async function runRecommendationCore(input, services = {}) {
       return { kind: "needs_input", status: "needs_input", errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", path: "exclusion_confirmation.confirmed_ids", message: "请确认全部识别到的排除项，且每项只能确认一次。" }], mode, notices };
     }
   }
-  const key = canonical({ owner:input.ownerScope || "internal", intake: effectiveIntake, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
+  const key = canonical({ owner:input.ownerScope || "internal", intake: effectiveIntake,analysis:input.analysis??null,inputParse:input.inputParse??null, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
   const cached = getRunByRecommendationKey(key);
   if (cached) return { kind: "report", status: cached.status, run: cached, report: publicReport(cached), idempotent: true };
   const requestJson = adapterResult.request_json;
@@ -229,15 +232,21 @@ async function runRecommendationCore(input, services = {}) {
   let validation = null;
   let repairCount = 0;
 
-  const retrievalEnabled = mode === "dify" && (services.retrievalEnabled ?? RETRIEVAL_CONFIG.provider === "dfrobot-public");
+  const retrievalEnabled = mode !== "mock" && (services.retrievalEnabled ?? RETRIEVAL_CONFIG.provider !== "unavailable");
   /* 库优先只在真实模式启用（mock 保持离线、快、可复现）。 */
   const libraryEnabled = mode !== "mock" && (services.libraryEnabled ?? true);
-  if(retrievalEnabled && !(effectiveIntake.interests?.includes('tech_digital') && effectiveIntake.interest_confidence?.tech_digital==='confirmed'))return {kind:'needs_input',status:'needs_input',mode,notices,errors:[{code:'RETRIEVAL_SCOPE_UNSUPPORTED',path:'retrieval',message:'当前公开来源仅覆盖已确认科技兴趣的创客方向，不将其推荐给兴趣未知或不符的用户。'}]};
-  const retrieval = retrievalEnabled ? await (services.retrievalWorker ?? retrievalWorker).submit({category:"maker",keywords:[],limit:3},{signal:input.signal}).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["未启用真实检索；价格为估算"]};
-  if (retrievalEnabled && new Set(retrieval.products.filter(p=>checkPrice(p,request.budget_amount)==='within_budget'&&p.stock_status!=='out_of_stock').map(p=>p.name)).size < 3) {
-    return {kind:"needs_input",status:"needs_input",mode,notices,errors:[{code:"RETRIEVAL_INSUFFICIENT",path:"retrieval",message:"公开来源不足三种不同且有据的礼物，请调整范围或稍后重试。"}],retrieval,media:mediaProvider.candidates()};
+  let searchPlan = normalizeRetrievalPlan({needs_retrieval:false,queries:[]});
+  // A caller may supply a previously model-decided plan; production LLM uses tool_calls below.
+  if(retrievalEnabled && services.planRetrieval){
+    try{searchPlan=await services.planRetrieval({intake:effectiveIntake,request,inputParse:nlParse},{signal:input.signal});}
+    catch{searchPlan={...searchPlan,audit:{decision_status:'planning_failed'}};}
   }
-  let productReferences = null;
+  let retrieval = retrievalEnabled && searchPlan.needs_retrieval
+    ? await (services.retrievalWorker ?? retrievalWorker).submit(searchPlan,{signal:input.signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}).catch(() => ({status:"unavailable",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]}))
+    : {status:"skipped",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]};
+  const agentTools = createOpencliToolSession({signal:input.signal,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}),details:(records,{signal})=>(services.retrieveProductDetails??runDomesticDetails)(records,{signal,dbPath:services.catalogDbPath??localDbPath()})});
+  const useAgentTools = mode==='llm' && retrievalEnabled;
+  let productReferences = null,referenceReferences=null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
@@ -255,6 +264,7 @@ async function runRecommendationCore(input, services = {}) {
     const raw = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     candidatesJson = raw;
     productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
+    referenceReferences = parseJsonOrNull(call.outputs?.reference_references_json || 'null');
   } else if (mode === "llm") {
     // 直连大模型：一次真实调用（含超时与重试上限）。
     // 失败一律如实上报为基础设施错误，绝不静默改用模拟候选。
@@ -263,20 +273,22 @@ async function runRecommendationCore(input, services = {}) {
       intakeJson: input.intake === undefined ? null : dump(input.intake),
       retrieval: retrievalEnabled ? retrieval : null,
       // 库优先：先把本地库（opencli 采集）里真实、预算内的商品给模型看，避免它凭空想买不到的东西。
-      library: libraryEnabled
+      library: libraryEnabled && searchPlan.needs_retrieval
         ? (services.libraryPreview ?? libraryPreview)({
             dbPath: services.catalogDbPath ?? localDbPath(),
             budgetAmount: request.budget_amount,
             limit: 8,
             forbiddenTerms: request.forbidden_terms,
             forbiddenTags: request.forbidden_tags,
-            keywords: [...(effectiveIntake.interests ?? []), ...(effectiveIntake.gift_styles ?? [])].filter((k) => typeof k === "string"),
+            searchPlan,
+            keywords: searchPlan.keywords,
           })
         : null,
       /* 第 1 步解析出来的用户硬约束（原文/带宽/城市）随请求一起给模型（裁定 2/3/4）。 */
       inputParse: nlParse,
+      ...(useAgentTools?{tools:agentTools.tools,executeTool:agentTools.executeTool,signal:input.signal}:{}),
     });
-    callCounts.recommend += 1;
+    callCounts.recommend += call.model_calls ?? 1;
     if (!call.ok) {
       return {
         kind: "infrastructure_error",
@@ -287,6 +299,9 @@ async function runRecommendationCore(input, services = {}) {
       };
     }
     candidatesJson = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
+    productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
+    referenceReferences = parseJsonOrNull(call.outputs?.reference_references_json || 'null');
+    if(agentTools.audit.length){retrieval=agentTools.retrieval;searchPlan=agentTools.plan;}
   } else if (demo === "model_error") {
     const broken = buildBrokenModelOutput();
     callCounts.recommend += 1;
@@ -362,7 +377,10 @@ async function runRecommendationCore(input, services = {}) {
   }
 
   let evidenceBindings = new Map();
-  if(retrievalEnabled){try {evidenceBindings = verifyCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates,productReferences,request.budget_amount);}catch {workflowErrors.push({code:"PRODUCT_EVIDENCE_MISMATCH",path:"retrieval",message:"商品规格、引用或价格与服务端证据不一致，候选不可选。"});}}
+  const optionalEvidence=bindOptionalCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates??[],productReferences,request.budget_amount);
+  evidenceBindings=optionalEvidence.bindings;
+  const optionalReferences=bindReferenceEvidence(retrieval.references??[],(parseJsonOrNull(candidatesJson)||{}).candidates??[],referenceReferences);
+  for(const id of optionalEvidence.knownOverBudget){const result=validation.candidate_results.find(r=>r.id===id);if(result){result.passed=false;pushError(result.errors,'OVER_BUDGET',id+'.estimated_total','所选商品的无附加条件观察价超过预算上限');}}
 
   /* ---- 追加规则 1：独特性启发式（warning 级，绝不硬错）------------------- */
   const candidateList = (parseJsonOrNull(candidatesJson) || {}).candidates || [];
@@ -393,8 +411,9 @@ async function runRecommendationCore(input, services = {}) {
     accounting: { candidates: candidateList.length, library_hits: 0, fallback_hits: 0, degraded: candidateList.length, scrape_calls: 0, scrape_total_elapsed_ms: 0, fallback_skipped_reason: catalogEnabled ? null : "SCRAPE_DISABLED", scrape_enabled: false },
   };
   if (catalogEnabled) {
-    const passable = candidateList.filter((candidate) => validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
-    const scrapeEnabled = services.catalogScrape !== undefined ? services.catalogScrape === true : process.env.GIFTWISE_CATALOG_SCRAPE !== "0";
+    const passable = candidateList.filter((candidate) => evidenceBindings.has(candidate.id) && evidenceBindings.get(candidate.id).reference_kind!=='public_reference' && validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
+    // External tool work already followed the model's pre-generation decision. Do not blind-scrape again.
+    const scrapeEnabled = false;
     const scrapeTimeoutMs = Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) > 0 ? Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) : 20000;
     try {
       const provided = await (services.provideRealProducts ?? provideRealProducts)({
@@ -405,6 +424,8 @@ async function runRecommendationCore(input, services = {}) {
         scrapeEnabled,
         scrapeTimeoutMs,
         spawnImpl: services.spawnCollect,
+        searchPlan,
+        signal:input.signal,
       });
       catalog = provided.catalog;
     } catch (error) {
@@ -553,13 +574,14 @@ async function runRecommendationCore(input, services = {}) {
     nl_parse: nlParse,
   });
   run.retrieval = retrieval;
+  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,reference_references:referenceReferences,rejected_references:[...optionalEvidence.rejected,...optionalReferences.rejected]};
   run.product_bindings = evidenceBindings;
+  run.reference_bindings=optionalReferences.bindings;
   /* 库内真实商品的绑定与媒体：候选图走「来源展示」通道（真实商品图 URL），
      包装图才走「生成」通道；两条通道不交叉（设计说明「两条通道不越界」）。 */
   run.catalog = catalog;
-  run.catalog_bindings = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched").map((entry) => [entry.candidate_id, entry]));
+  run.catalog_bindings = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched"&&evidenceBindings.get(entry.candidate_id)?.product_id===entry.product.product_id).map((entry) => [entry.candidate_id, entry]));
   const mediaBindings = [
-    ...[...evidenceBindings].map(([candidate_id, p]) => ({ candidate_id, product_id: p.product_id })),
     ...[...run.catalog_bindings.values()].map((entry) => ({
       candidate_id: entry.candidate_id,
       product_id: entry.product.product_id,
@@ -567,7 +589,7 @@ async function runRecommendationCore(input, services = {}) {
       match_detail: entry.match_detail,
       product_url: entry.product.page_url,
       product_title: entry.product.title,
-      image: entry.product.image_id
+      image: entry.product.image_id && entry.product.image_validation?.ok
         ? {
             id: entry.product.image_id,
             url: `/api/catalog/images/${entry.product.image_id}`,
@@ -581,8 +603,19 @@ async function runRecommendationCore(input, services = {}) {
           }
         : null,
     })),
+    ...[...evidenceBindings].map(([candidate_id,p])=>({candidate_id,product_id:p.product_id,
+      image:p.image_id&&p.image_validation?.ok?{id:p.image_id,url:`/api/catalog/images/${p.image_id}`,version:p.image_id,kind:'source_photo',alt:`真实商品来源图：${p.name}`,source_url:p.source_url??p.image_url,price_observed_at:p.observed_at}:null})),
+    ...[...optionalReferences.bindings].filter(([id])=>!evidenceBindings.has(id)).map(([candidate_id,r])=>({candidate_id,reference_id:r.reference_id,
+      image:r.image_id&&r.image_validation?.ok?{id:r.image_id,url:`/api/reference/images/${r.image_id}`,version:r.image_id,kind:'reference_image',alt:`公开资料参考图：${r.title}`,source_url:r.source_url,price_observed_at:r.observed_at}:null})),
   ];
-  run.media = mediaProvider.candidates(mediaBindings);
+  for(const entry of run.catalog_bindings.values()){
+    const p=entry.product;if(!p.image_validation?.ok)continue;
+    const existing=run.retrieval.products.find(x=>x.product_id===p.product_id);
+    const observed={product_id:p.product_id,name:p.title,title:p.title,variant:p.specifications??'',source_url:p.page_url,product_url:p.page_url,source_site:p.source_site,
+      price_amount:p.price_amount,currency:p.currency,price_conditions:p.price_conditions,image_id:p.image_id,image_url:p.image_urls[0]??null,observed_at:p.price_observed_at,image_validation:p.image_validation};
+    if(existing)Object.assign(existing,observed);else run.retrieval.products.push(observed);
+  }
+  run.media = mediaProvider.candidates([...new Map(mediaBindings.map(b=>[b.candidate_id,b])).values()]);
   run.delivery = delivery;
   run.uniqueness = { warnings: validation.warnings ?? [], note: "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。" };
   run.visual_direction = directionOutcome?.ok ? directionOutcome.direction : null;
@@ -742,9 +775,9 @@ async function runPresentationCore(input, services = {}) {
       ],
     };
   }
-  if(run.product_bindings?.size){
+  if(run.product_bindings?.has(selectedCandidateId)){
     try{const product=run.product_bindings.get(selectedCandidateId);verifyCandidateEvidence(run.retrieval,[candidate],[{candidate_id:selectedCandidateId,product_id:product?.product_id}],run.request.budget_amount);}
-    catch{return {kind:'rejected',status:'selection_rejected',errors:[{code:'PRODUCT_EVIDENCE_STALE',path:'selected_candidate_id',message:'商品证据已过期或不匹配，请重新检索生成。'}]};}
+    catch{run.product_bindings.delete(selectedCandidateId);run.retrieval_audit??={};run.retrieval_audit.expired_reference=selectedCandidateId;}
   }
   // 幂等：同一选择重复提交返回同一份呈现，不重复消耗修订额度，并显式告知调用方这是重放。
   if (run.selections.has(selectedCandidateId)) {
@@ -956,7 +989,7 @@ async function runPresentationCore(input, services = {}) {
   const waitInfo = { waited: false, timed_out: false, waited_ms: 0, timeout_ms: 0,
     ...(run.media?.selected?.task_id ? { task_id: run.media.selected.task_id } : {}) };
   run.status = "completed";
-  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media, media_wait: waitInfo, media_reference: referenceReport(run, selectedCandidateId), catalog: run.catalog, visual_direction: run.visual_direction, delivery: run.delivery, uniqueness: run.uniqueness };
+  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: retrievalView(run.retrieval), media: run.media, media_wait: waitInfo, media_reference: referenceReport(run, selectedCandidateId), catalog: publicReport(run).catalog, visual_direction: run.visual_direction, delivery: run.delivery, uniqueness: run.uniqueness };
   run.selections.set(selectedCandidateId, view);
   return { kind: "presentation", run, view };
 }

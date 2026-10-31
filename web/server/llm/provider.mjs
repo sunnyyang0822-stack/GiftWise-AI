@@ -105,6 +105,43 @@ export function parseModelJson(text, { requireKey = null, finishReason = null, u
   return { ok: true, value: parsed };
 }
 
+/** Bound model context without discarding every observation from a large result.
+ * Full collection persistence belongs to the executor; this only bounds the tool message.
+ */
+function boundToolResult(result, maxChars = 256000) {
+  const originalChars = JSON.stringify(result).length;
+  if (originalChars <= maxChars) return result;
+  let itemLimit = 40, textLimit = 2048;
+  const compact = (value,depth=0) => {
+    if (typeof value === 'string') return value.length > textLimit ? value.slice(0,textLimit) : value;
+    if (value === null || typeof value !== 'object') return value;
+    if (depth > 8) return Array.isArray(value) ? [] : {};
+    if (Array.isArray(value)) return value.slice(0,itemLimit).map(v=>compact(v,depth+1));
+    return Object.fromEntries(Object.entries(value).slice(0,80).map(([key,v])=>[key,compact(v,depth+1)]));
+  };
+  let bounded;
+  while (true) {
+    bounded = compact(result);
+    const collections = Object.fromEntries(Object.entries(result).filter(([,v])=>Array.isArray(v)).slice(0,80).map(([key,v])=>[key.slice(0,128),{total:v.length,returned:Array.isArray(bounded[key])?bounded[key].length:0}]));
+    bounded.tool_result_meta = {truncated:true,original_chars:originalChars,collections,item_limit:itemLimit,text_limit:textLimit};
+    if (JSON.stringify(bounded).length <= maxChars) return bounded;
+    itemLimit = Math.max(1,Math.floor(itemLimit/2));
+    textLimit = Math.max(64,Math.floor(textLimit/2));
+    // JSON object breadth/depth are bounded above; at the minimum preserve only
+    // the standard evidence collections and status instead of losing all results.
+    if (itemLimit === 1 && textLimit === 64) {
+      bounded = Object.fromEntries(['status','source_availability','products','contents','images','references','coverage','warnings','recommendations_available','tool_result_meta'].filter(k=>k in bounded).map(k=>[k,bounded[k]]));
+      if (JSON.stringify(bounded).length <= maxChars) return bounded;
+      const shallow = value => value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).slice(0,32).filter(([,v])=>v === null || ['string','number','boolean'].includes(typeof v)).map(([k,v])=>[k.slice(0,128),typeof v === 'string' ? v.slice(0,256) : v])) : typeof value === 'string' ? value.slice(0,256) : value;
+      const minimal = {status:typeof result.status === 'string' ? result.status.slice(0,64) : null,tool_result_meta:bounded.tool_result_meta};
+      for (const key of ['source_availability','products','contents','images','references','coverage','warnings']) if (Array.isArray(result[key])) {minimal[key]=result[key].slice(0,1).map(shallow); minimal.tool_result_meta.collections[key]={total:result[key].length,returned:minimal[key].length};}
+      if (result.source_availability && !Array.isArray(result.source_availability)) minimal.source_availability=shallow(result.source_availability);
+      minimal.tool_result_meta.nested_fields_omitted=true;
+      return minimal;
+    }
+  }
+}
+
 export class LlmProvider {
   /**
    * @param {{live?: object, config?: Function, hasConfig?: Function}} deps
@@ -130,7 +167,7 @@ export class LlmProvider {
    * 发一次真实调用，并记账。
    * @returns {Promise<object>} {ok:true, text, transport, …} | llmError
    */
-  async invoke({ kind, messages, maxTokens }) {
+  async invoke({ kind, messages, maxTokens, tools, tool_choice, signal }) {
     const cfg = this.config();
     if (!cfg.baseUrl || !cfg.apiKey || !cfg.model) {
       return llmError("LLM_NOT_CONFIGURED", { attempts: 0, transport: "live" });
@@ -149,6 +186,7 @@ export class LlmProvider {
       apiKey: cfg.apiKey,
       model: cfg.model,
       messages,
+      tools, tool_choice, signal,
       timeoutMs: cfg.timeoutMs,
       maxRetries: cfg.maxRetries,
       maxTokens: Number.isFinite(maxTokens) ? maxTokens : cfg.maxTokens,
@@ -184,54 +222,81 @@ export class LlmProvider {
    *   inputParse：第 1 步自然语言解析出的**用户硬约束**（原文/±带宽/城市），
    *   由 buildRecommendEnvelope 放进 input_constraints，不改变 request_json。
    */
-  async requestCandidates({ requestJson, intakeJson = null, retrieval = null, library = null, inputParse = null }) {
-    if (!this.available()) return llmError("LLM_NOT_CONFIGURED", { attempts: 0, transport: "live" });
+  async requestCandidates({ requestJson, intakeJson = null, retrieval = null, library = null, inputParse = null, tools = [], executeTool, signal, maxToolRounds = 4 }) {
+    if (!this.available()) return llmError('LLM_NOT_CONFIGURED', {attempts:0,transport:'live'});
     const guard = assertIntakeHasNoDerivedFields(intakeJson);
-    if (!guard.ok) {
-      return llmError("LLM_INTAKE_DERIVED_FIELD", { fields: guard.fields, attempts: 0 });
+    if (!guard.ok) return llmError('LLM_INTAKE_DERIVED_FIELD',{fields:guard.fields,attempts:0});
+    const registered = new Map();
+    for (const tool of tools) {
+      if (tool?.type !== 'function' || !/^[a-zA-Z0-9_-]{1,64}$/.test(tool.function?.name ?? '') || registered.has(tool.function.name)) return llmError('LLM_TOOL_CONFIG_INVALID');
+      registered.set(tool.function.name,tool);
     }
-    const envelope = buildRecommendEnvelope({
-      requestJson,
-      intakeJson,
-      // 检索不可用时不出现 retrieval_json 键（对齐可选语义；空值不用以掩盖缺失）。
-      retrieval: retrieval && retrieval.status !== "unavailable" ? retrieval : null,
-      // 库优先：库里真实存在的商品随信封一起给模型，避免它凭空想一个买不到的东西。
-      library,
-      inputParse,
-    });
-    const maxOutputRetries = this.outputRetries();
-    let reply = null;
-    let parsed = null;
-    let outputAttempts = 0;
-    for (let round = 0; round <= maxOutputRetries; round += 1) {
-      outputAttempts += 1;
-      reply = await this.invoke({ kind: "recommend", messages: buildRecommendMessages(envelope), maxTokens: this.config().maxTokens });
-      if (!reply.ok) return reply;
-      parsed = parseModelJson(reply.text, {
-        requireKey: "candidates",
-        finishReason: reply.finish_reason,
-        usage: reply.usage,
-        maxTokens: this.config().maxTokens,
-      });
-      if (parsed.ok) break;
-      // 被 max_tokens 截断（含被 reasoning 吃光额度）不是格式问题：重试同样会截断，只会白花一次额度。
-      if (parsed.code === "LLM_OUTPUT_TRUNCATED" || parsed.code === "LLM_OUTPUT_REASONING_EXHAUSTED") break;
-    }
-    if (!parsed.ok) {
-      return { ...parsed, transport: reply.transport, attempts: reply.attempts, output_attempts: outputAttempts };
-    }
-    return {
-      ok: true,
-      outputs: { candidates_json: dump(parsed.value) },
-      transport: reply.transport,
-      attempts: reply.attempts ?? 0,
-      output_attempts: outputAttempts,
-      usage: reply.usage ?? null,
-      model: reply.model ?? null,
-      http_status: reply.http_status ?? null,
-      finish_reason: reply.finish_reason ?? null,
-      elapsed_ms: reply.elapsed_ms ?? null,
+    const envelope = buildRecommendEnvelope({requestJson,intakeJson,retrieval:retrieval && retrieval.status !== 'unavailable' ? retrieval : null,library,inputParse});
+    const messages = buildRecommendMessages(envelope);
+    if (registered.size) messages[0].content += [
+      '\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部资料时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。',
+      '当前所有电商直抓均已停用，不调用或重试京东、淘宝及其他电商，也不要求用户登录这些电商。主要自主查公开图片、内容与灵感；可使用工具提供的duckduckgo/OpenCLI能力，bing作辅助，具体可用工具和来源以服务端schema及source_availability为准。工具不可用或无数据不阻止最终建议。',
+      '每次工具结果的source_availability及来源状态是真实执行反馈。对停用、风控、要求登录、受限或不可用的来源不反复循环重试；结合上下文改用允许的公开来源，或直接形成建议。不要求用户补非必要信息。',
+      '公开参考资料在references[]返回，每项以reference_id标识；参考图片标记为reference_image，内容与参考图不能叫商品SKU、source_photo、商品实拍、实时成交价或当前库存。不要求参考资料有价格，也不补造价格、规格、库存或来源。若有参考价，按其参考性质说明即可。',
+      '采用公开参考图时，可在最终JSON根对象附reference_references:[{candidate_id,reference_id}]，每个候选最多一条，选择最适合展示的那张；只引用本次工具references[]中的真实reference_id。其他灵感出处可在建议文字里说明，不增加同候选图片引用。不得把reference_id、图片ID、链接或内容source_id改造成product_id来满足商品照片门槛；没有SKU不影响模型建议，也不影响以参考图辅助理解。',
+      '历史真实商品结果若明确提供product_id，仍可单独用product_references:[{candidate_id,product_id}]引用；对应name写为商品name + " · " + variant，规格及数量一致，观察价及条件原样尊重。该历史支持不授权重新抓取电商，更不允许把公开参考当成商品。',
+      'product_references和reference_references是独立可选sidecar，由服务端剥离，不进入严格候选对象。无需图或没有资料时不必引用；先完成理解与比较，再给最终建议及可选引用。',
+    ].join('\n');
+    const toolAudit = [];
+    const cfg = this.config();
+    const redact = (value, depth = 0) => {
+      if (depth > 16) return '[omitted]';
+      if (typeof value === 'string') return cfg.apiKey ? value.split(cfg.apiKey).join('[redacted]') : value;
+      if (Array.isArray(value)) return value.map(v=>redact(v,depth+1));
+      if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).filter(([k])=>!/(?:password|cookie|authorization|token|secret|api.?key|prompt|messages)/i.test(k)).map(([k,v])=>[k,redact(v,depth+1)]));
+      return value;
     };
+    let reply, parsed;
+    let modelCalls = 0, toolRounds = 0, outputAttempts = 0;
+    const toolLimit = Number.isInteger(maxToolRounds) ? Math.max(0,Math.min(maxToolRounds,4)) : 4;
+    const meta = () => ({tool_audit:toolAudit,model_calls:modelCalls,synthetic:this.live?.synthetic === true});
+    while (true) {
+      const toolChoice = toolRounds >= toolLimit ? 'none' : 'auto';
+      reply = await this.invoke({kind:'recommend',messages,maxTokens:cfg.maxTokens,...(registered.size ? {tools:[...registered.values()],tool_choice:toolChoice} : {}),signal});
+      modelCalls += 1;
+      if (!reply.ok) return {...reply,...meta(),...(registered.size ? {tool_protocol_status:'http_or_transport_error',tool_protocol_support:'unverified'} : {})};
+      if (reply.tool_calls?.length) {
+        if (!registered.size || toolChoice === 'none') return {...llmError('LLM_TOOL_PROTOCOL_UNSUPPORTED'),...meta(),tool_protocol_status:'tool_choice_ignored'};
+        messages.push(reply.assistant_message ?? {role:'assistant',content:null,tool_calls:reply.tool_calls});
+        for (const call of reply.tool_calls) {
+          const name = call.function.name;
+          let args = null, result;
+          if (!registered.has(name)) result = {ok:false,error:{code:'TOOL_NOT_REGISTERED'}};
+          else {
+            try { strictParse(call.function.arguments); args = JSON.parse(call.function.arguments); if (!args || typeof args !== 'object' || Array.isArray(args)) throw new Error(); }
+            catch { result = {ok:false,error:{code:'TOOL_ARGUMENTS_INVALID'}}; }
+            if (!result) {
+              if (signal?.aborted) result = {ok:false,error:{code:'TOOL_CANCELLED'}};
+              else if (typeof executeTool !== 'function') result = {ok:false,error:{code:'TOOL_EXECUTOR_UNAVAILABLE'}};
+              else {
+                try {
+                  result = await executeTool({name,arguments:args,id:call.id});
+                  if (!result || typeof result !== 'object') result = {ok:false,error:{code:'TOOL_RESULT_INVALID'}};
+                  result = redact(result);
+                  result = boundToolResult(result);
+                } catch { result = {ok:false,error:{code:'TOOL_EXECUTION_FAILED'}}; }
+              }
+            }
+          }
+          const safeResult = redact(result);
+          toolAudit.push(redact({tool_call_id:call.id,name,arguments:registered.has(name) ? redact(args) : null,result:safeResult}));
+          messages.push({role:'tool',tool_call_id:call.id,content:JSON.stringify(safeResult)});
+        }
+        toolRounds += 1;
+        continue;
+      }
+      outputAttempts += 1;
+      parsed = parseModelJson(reply.text,{requireKey:'candidates',finishReason:reply.finish_reason,usage:reply.usage,maxTokens:cfg.maxTokens});
+      if (parsed.ok) break;
+      if (outputAttempts > this.outputRetries() || ['LLM_OUTPUT_TRUNCATED','LLM_OUTPUT_REASONING_EXHAUSTED'].includes(parsed.code)) return {...parsed,transport:reply.transport,attempts:reply.attempts,output_attempts:outputAttempts,...meta()};
+    }
+    const {product_references, reference_references, ...candidateOutput} = parsed.value;
+    return {ok:true,outputs:{candidates_json:dump(candidateOutput),...(product_references !== undefined ? {product_references_json:dump(product_references)} : {}),...(reference_references !== undefined ? {reference_references_json:dump(reference_references)} : {})},transport:reply.transport,attempts:reply.attempts ?? 0,output_attempts:outputAttempts,usage:reply.usage ?? null,model:reply.model ?? null,http_status:reply.http_status ?? null,finish_reason:reply.finish_reason ?? null,elapsed_ms:reply.elapsed_ms ?? null,...meta()};
   }
 
   /**
@@ -371,6 +436,11 @@ export async function requestCandidates(requestJson, retrieval = null, options =
     intakeJson: options.intakeJson ?? null,
     retrieval,
     library: options.library ?? null,
+    inputParse: options.inputParse ?? null,
+    tools: options.tools ?? [],
+    executeTool: options.executeTool,
+    signal: options.signal,
+    maxToolRounds: options.maxToolRounds,
   });
 }
 

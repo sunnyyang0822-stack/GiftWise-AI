@@ -1,14 +1,14 @@
 /**
  * 采集来源定义 + 归一化器。
  *
- * 只登记**实测能跑通**的、只读且免登录的 opencli 能力。每条来源都要说清楚：
+ * 国内只读来源定义；直接平台检索见 domestic-provider.mjs。
  *   - 用哪条 opencli 命令（capability）
  *   - 原始响应里有哪些字段
  *   - 哪些字段本来源拿不到（拿不到就 null，绝不编）
  *
  * 实测结论（2026-10-31，本机，CDP 直连模式）：
  *   smzdm search  ✅ 公开可读，价格是人民币「元」，带 mall（商城/卖家）
- *   amazon search ✅ 公开可读，价格币种随出口地区（本机得到 HKD），无卖家
+ *   海外来源不再登记，不参与新增采集或绑定。
  *   1688 search   ❌ AUTH_REQUIRED(77) —— 需要登录，按任务要求**不做**登录
  *   jd search     ❌ UNKNOWN "Inspected target navigated or closed"
  */
@@ -91,58 +91,6 @@ export const SOURCES = Object.freeze({
     },
   },
 
-  // ----------------------------------------------------------------- Amazon
-  amazon: {
-    id: 'amazon',
-    source_site: 'amazon.com',
-    capability: 'amazon search',
-    args: (q, limit) => ['amazon', 'search', q, '--limit', String(limit)],
-    /**
-     * @param {object} r 字段：rank,asin,title,product_url,source_url,fetched_at,strategy,price_text,price_value,currency,rating_text,review_count,badges
-     */
-    normalize(r, ctx) {
-      const priceText = typeof r.price_text === 'string' ? r.price_text.trim() : '';
-      // 形如 "HKD 39.23" / "US$12.99" / "￥88"
-      const m = priceText.match(new RegExp(`([A-Z]{3}|US\\$|HK\\$|[￥$€£])\\s*(${NUM})`));
-      let currency = null;
-      let price_amount = null;
-      if (m) {
-        price_amount = toAmount(m[2]);
-        currency = /^[A-Z]{3}$/.test(m[1]) ? m[1] : { 'US$': 'USD', 'HK$': 'HKD', '￥': 'CNY', $: 'USD', '€': 'EUR', '£': 'GBP' }[m[1]] ?? null;
-      }
-      // 来源给了明确 currency 字段就以它为准（实测为 null，故以上面解析为准）。
-      if (r.currency) currency = r.currency;
-      if (typeof r.price_value === 'number' && price_amount === null) price_amount = String(r.price_value);
-      if (!currency) price_amount = null; // 币种未知时不允许留下裸数值
-
-      const fetched = typeof r.fetched_at === 'string' && Number.isFinite(Date.parse(r.fetched_at)) ? r.fetched_at : null;
-      return {
-        record_kind: price_amount === null ? 'article' : 'product',
-        external_id: typeof r.asin === 'string' ? r.asin : null,
-        title: String(r.title ?? '').trim(),
-        price_text: priceText || null,
-        price_amount,
-        currency,
-        price_conditions: [],
-        seller: null, // amazon search 不返回卖家；卖家要用 amazon offer
-        product_url: typeof r.product_url === 'string' ? r.product_url : '',
-        image_url: null,
-        raw_excerpt: {
-          rank: r.rank ?? null,
-          asin: r.asin ?? null,
-          source_url: r.source_url ?? null,
-          strategy: r.strategy ?? null,
-          price_text: priceText || null,
-          rating_text: r.rating_text ?? null,
-          review_count: r.review_count ?? null,
-          badges: Array.isArray(r.badges) ? r.badges.slice(0, 6) : [],
-        },
-        query_params: { keyword: ctx.keyword, limit: ctx.limit, budget: ctx.budget ?? null },
-        price_observed_at: fetched, // 来源自带的抓取时间，来自 ISO8601（UTC）
-        scraped_at: fetched,
-      };
-    },
-  },
 });
 
 function safeHost(url) {
@@ -210,11 +158,7 @@ export function extractProductImages(markdown, title, { max = 6 } = {}) {
 }
 
 /** 默认采集计划：关键词 × 预算区间，全部是可公开检索的礼物方向。 */
-export const DEFAULT_PLAN = Object.freeze([
-  { source: 'smzdm', keyword: '礼物', budget: null, limit: 10 },
-  { source: 'smzdm', keyword: '生日礼物', budget: null, limit: 10 },
-  { source: 'smzdm', keyword: '送女友', budget: null, limit: 10 },
-]);
+export const DEFAULT_PLAN = Object.freeze([]); // 无需求时不静默采集泛词。
 
 export function planFromEnv(env = process.env) {
   if (!env.GW_COLLECT_PLAN) return DEFAULT_PLAN;

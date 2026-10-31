@@ -57,8 +57,8 @@ export class MediaProvider {
  candidates(bindings=[]){
   return {...emptyMedia(),candidates:bindings.map((b)=>{
    const {image,...rest}=b&&typeof b==='object'?b:{};
-   const valid=image&&typeof image==='object'&&image.kind==='source_photo'&&typeof image.url==='string'&&image.url.startsWith('/')&&typeof image.id==='string'&&image.id.length>0?{
-    id:image.id,url:image.url,version:typeof image.version==='string'?image.version:image.id,kind:'source_photo',
+   const valid=image&&typeof image==='object'&&['source_photo','reference_image'].includes(image.kind)&&typeof image.url==='string'&&image.url.startsWith('/')&&typeof image.id==='string'&&image.id.length>0?{
+    id:image.id,url:image.url,version:typeof image.version==='string'?image.version:image.id,kind:image.kind,
     alt:typeof image.alt==='string'?image.alt:null,source_url:typeof image.source_url==='string'?image.source_url:null,
     attribution:typeof image.attribution==='string'?image.attribution:null,
     price_basis:typeof image.price_basis==='string'?image.price_basis:null,

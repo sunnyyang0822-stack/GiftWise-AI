@@ -29,6 +29,7 @@ import { homedir } from 'node:os';
 import { openDb, startRun, finishRun, upsertProduct, addProductImages, getStats, REPO_ROOT } from '../localdb/db.mjs';
 import { ensureChrome } from './chrome.mjs';
 import { SOURCES, planFromEnv, webReadArgs, extractProductImages, PAGE_IMAGE_CAPABILITY } from './sources.mjs';
+import { taskDatabasePath, taskProcessEnv, taskDirectory } from './task-paths.mjs';
 
 const require = createRequire(import.meta.url);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -64,7 +65,7 @@ function runOpencli(mainPath, args, { endpoint, timeoutMs }) {
   return new Promise((resolvePromise) => {
     const started = Date.now();
     const env = {
-      ...process.env,
+      ...taskProcessEnv(),
       // 关键：让 opencli 走 CDPBridge，而不是需要扩展的 Browser Bridge。
       OPENCLI_CDP_ENDPOINT: endpoint,
       // 已知写操作才需要扩展；读取类命令不需要站点槽位。
@@ -73,7 +74,7 @@ function runOpencli(mainPath, args, { endpoint, timeoutMs }) {
     execFile(
       process.execPath,
       [mainPath, ...args],
-      { env, timeout: timeoutMs, maxBuffer: 8 * 1024 * 1024, windowsHide: true, shell: false },
+      { env, cwd: REPO_ROOT, timeout: timeoutMs, maxBuffer: 8 * 1024 * 1024, windowsHide: true, shell: false },
       (err, stdout, stderr) => {
         const duration_ms = Date.now() - started;
         const text = String(stdout ?? '').trim();
@@ -134,7 +135,8 @@ function runOpencliRaw(mainPath, args, { endpoint, timeoutMs }) {
       process.execPath,
       [mainPath, ...args],
       {
-        env: { ...process.env, OPENCLI_CDP_ENDPOINT: endpoint, OPENCLI_VERBOSE: '' },
+        env: { ...taskProcessEnv(), OPENCLI_CDP_ENDPOINT: endpoint, OPENCLI_VERBOSE: '' },
+        cwd: REPO_ROOT,
         timeout: timeoutMs,
         maxBuffer: 16 * 1024 * 1024,
         windowsHide: true,
@@ -173,7 +175,7 @@ function runOpencliRaw(mainPath, args, { endpoint, timeoutMs }) {
 }
 
 function opencliVersion(mainPath) {  try {
-    return execFileSync(process.execPath, [mainPath, '--version'], { encoding: 'utf8', timeout: 30000 }).trim();
+    return execFileSync(process.execPath, [mainPath, '--version'], { env: taskProcessEnv(), cwd: REPO_ROOT, encoding: 'utf8', timeout: 30000 }).trim();
   } catch {
     return null;
   }
@@ -181,6 +183,7 @@ function opencliVersion(mainPath) {  try {
 
 export async function collect({ plan, dbPath, delayMs, timeoutMs, port, keepBrowser = false } = {}) {
   const resolvedPlan = plan ?? planFromEnv();
+  if (!resolvedPlan.length) throw Object.assign(new Error('没有具体采集计划；不自动改搜泛词礼物'), { code: 'NO_SPECIFIC_QUERY' });
   const resolvedDelay = Number(delayMs ?? process.env.GW_COLLECT_DELAY_MS ?? 2500);
   const resolvedTimeout = Number(timeoutMs ?? process.env.GW_COLLECT_TIMEOUT_MS ?? 90000);
   const resolvedPort = Number(port ?? process.env.GW_CDP_PORT ?? 19360);
@@ -190,7 +193,7 @@ export async function collect({ plan, dbPath, delayMs, timeoutMs, port, keepBrow
   const version = opencliVersion(mainPath);
   log(`opencli 版本: ${version ?? '（无法读取）'}`);
 
-  const db = openDb(dbPath);
+  const db = openDb(taskDatabasePath(dbPath || process.env.GW_LOCAL_DB || join(REPO_ROOT, '.tmp/domestic-catalog.sqlite')));
   const browser = await ensureChrome({ port: resolvedPort, log });
 
   // 真实商品图：默认开启；每次搜索最多读这么多个商品页（限速用）。
@@ -259,7 +262,7 @@ export async function collect({ plan, dbPath, delayMs, timeoutMs, port, keepBrow
         let images = [];
         if (imagesEnabled && imageAttempts < imageBudget && normalized.record_kind === 'product') {
           imageAttempts += 1;
-          const read = await runOpencliRaw(mainPath, webReadArgs(normalized.product_url, join(REPO_ROOT, '.tmp', 'web-articles')), {
+          const read = await runOpencliRaw(mainPath, webReadArgs(normalized.product_url, taskDirectory(join(REPO_ROOT, '.tmp', 'web-articles'))), {
             endpoint: browser.endpoint,
             timeoutMs: resolvedTimeout,
           });

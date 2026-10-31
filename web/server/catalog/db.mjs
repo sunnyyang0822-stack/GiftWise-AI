@@ -1,7 +1,7 @@
 /**
  * 本地真实商品库的**只读**访问层（阶段二）。
  *
- * 库：`C:\Users\lenovo\Desktop\gw-opencli-db\.local-db\giftwise.sqlite`
+ * 库路径由当前项目配置注入。
  * 表：`collection_runs` / `products` / `product_images` / `price_observations` / `products_fts`
  *
  * ⛔ 本模块**不联网**、不写库、不建表、不改 schema：只读查询。
@@ -16,6 +16,28 @@
 import { DatabaseSync } from 'node:sqlite';
 import { existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+
+/** 来源与原始页面域名都必须属于国内白名单；聚合结果不冒充直连平台。 */
+export const DOMESTIC_SOURCE_HOSTS = Object.freeze({
+  taobao: ['taobao.com'], tmall: ['tmall.com'], jd: ['jd.com'],
+  pdd: ['pinduoduo.com', 'yangkeduo.com'], pinduoduo: ['pinduoduo.com', 'yangkeduo.com'],
+  douyin: ['douyin.com', 'jinritemai.com'], kuaishou: ['kuaishou.com', 'kwaixiaodian.com'],
+  '1688': ['1688.com'], vip: ['vip.com'], suning: ['suning.com'],
+  xiaomiyoupin: ['xiaomiyoupin.com', 'youpin.mi.com'], youpin: ['xiaomiyoupin.com', 'youpin.mi.com'],
+  dewu: ['dewu.com'], dianping: ['dianping.com'], smzdm: ['smzdm.com'],
+  xianyu: ['goofish.com', '2.taobao.com'], goofish: ['goofish.com', '2.taobao.com'], dangdang: ['dangdang.com'],
+  damai: ['damai.cn'], maoyan: ['maoyan.com'], bilibili: ['bilibili.com'],
+  yanxuan:['you.163.com'],xiaomi:['mi.com'],xiaohongshu_shop:['xiaohongshu.com'],
+});
+export function isDomesticProduct(product) {
+  const source = String(product?.source_site ?? '').toLowerCase();
+  const hosts = DOMESTIC_SOURCE_HOSTS[source] ?? Object.values(DOMESTIC_SOURCE_HOSTS).find(domains => domains.includes(source));
+  if (!hosts) return false;
+  try {
+    const url = new URL(product.page_url ?? product.product_url);
+    return url.protocol === 'https:' && hosts.some(h => url.hostname === h || url.hostname.endsWith('.' + h));
+  } catch { return false; }
+}
 
 /** 稳定的图片标识：由「来源 + 商品 + 图片原文 URL」推出，可用它反查真实 URL。 */
 export function imageIdOf(productId, url) {
@@ -53,6 +75,11 @@ function imagesOf(db, productId) {
     .map((row) => ({ ...row, image_id: imageIdOf(productId, row.url) }));
 }
 
+const OBSERVED_COLUMNS = ['raw_excerpt', 'price_unit', 'city', 'address', 'location', 'observed_at'];
+function observedColumns(db) {
+  const names = db.prepare('PRAGMA table_info(products)').all().map(row => row.name);
+  return OBSERVED_COLUMNS.filter(c => names.includes(c)).map(c => ', ' + c).join('');
+}
 const SELECT_COLUMNS = `product_id, external_id, source_site, capability, scraped_at, record_kind, title,
   price_text, price_amount, currency, price_status, price_kind, price_observed_at, price_conditions,
   seller, product_url, image_url, same_product_key, query_params`;
@@ -129,10 +156,10 @@ function shippingOf(row, optional) {
 /** 全部「可购买条目」（排除无价格的资讯帖）。 */
 export function listProducts(db, { limit = 200 } = {}) {
   const rows = db
-    .prepare(`select ${SELECT_COLUMNS} from products where record_kind = 'product' order by price_observed_at desc limit ?`)
-    .all(Math.max(1, Math.min(Number(limit) || 200, 500)));
+    .prepare(`select ${SELECT_COLUMNS}${observedColumns(db)} from products where record_kind in ('product', 'experience', 'ticket') order by price_observed_at desc limit ?`)
+    .all(limit === null ? -1 : Math.max(1, Number(limit) || 200));
   const optional = detectShippingColumns(db).products;
-  return rows.map((row) => hydrate(db, row, optional));
+  return rows.map((row) => hydrate(db, row, optional)).filter(isDomesticProduct);
 }
 
 function hydrate(db, row, optional = []) {
@@ -147,7 +174,18 @@ function hydrate(db, row, optional = []) {
   } catch {
     priceConditions = [];
   }
+  let metadata = {};
+  try { const raw = JSON.parse(row.raw_excerpt ?? '{}'); if (raw && typeof raw === 'object' && !Array.isArray(raw)) metadata = raw; } catch {}
   return {
+    record_kind: row.record_kind,
+    specifications:metadata.specifications??metadata.detail_specifications??null,
+    image_validation:metadata.image_validation??null,
+    image_provenance:metadata.image_provenance??null,
+    price_unit: row.price_unit ?? metadata.price_unit ?? null,
+    city: row.city ?? metadata.city ?? null,
+    address: row.address ?? metadata.address ?? null,
+    location: row.location ?? metadata.location ?? null,
+    observed_at: row.observed_at ?? metadata.observed_at ?? row.scraped_at ?? null,
     product_id: row.product_id,
     external_id: row.external_id,
     source_site: row.source_site,
@@ -158,7 +196,8 @@ function hydrate(db, row, optional = []) {
     price_amount: row.price_amount,
     currency: row.currency,
     price_status: row.price_status,
-    price_basis: 'page_observed',
+    price_basis: row.price_kind ?? null,
+    source_type: ['smzdm', 'smzdm.com'].includes(row.source_site) ? 'aggregator' : 'direct',
     price_observed_at: row.price_observed_at,
     price_conditions: priceConditions,
     seller: row.seller,
@@ -179,12 +218,8 @@ function hydrate(db, row, optional = []) {
  */
 export function searchProducts(db, { keywords = [], limit = 50 } = {}) {
   const terms = [...new Set((Array.isArray(keywords) ? keywords : []).map((item) => String(item).trim()).filter((item) => item.length >= 2))].slice(0, 12);
-  const rows = db
-    .prepare(`select ${SELECT_COLUMNS} from products where record_kind = 'product' order by price_observed_at desc limit ?`)
-    .all(Math.max(1, Math.min(Number(limit) || 50, 500)));
-  const optional = detectShippingColumns(db).products;
-  const hydrated = rows.map((row) => hydrate(db, row, optional));
-  if (terms.length === 0) return hydrated;
+  const hydrated = listProducts(db, {limit:null});
+  if (terms.length === 0) return hydrated.slice(0, limit);
   return hydrated
     .map((product) => {
       const haystack = `${product.title} ${product.seller ?? ''}`.toLowerCase();
@@ -193,7 +228,7 @@ export function searchProducts(db, { keywords = [], limit = 50 } = {}) {
     })
     .filter((entry) => entry.hits > 0)
     .sort((a, b) => b.hits - a.hits)
-    .map((entry) => ({ ...entry.product, matched_terms: entry.matched_terms }));
+    .map((entry) => ({ ...entry.product, matched_terms: entry.matched_terms })).slice(0, limit);
 }
 
 /**

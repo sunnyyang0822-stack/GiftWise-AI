@@ -445,7 +445,7 @@ export const REGION_PRICE_CONFIG = Object.freeze({
 });
 
 // 真实来源需显式启用；仅专用后台浏览器，默认不联网检索。
-export const RETRIEVAL_CONFIG = Object.freeze({provider:process.env.GIFTWISE_RETRIEVAL || 'unavailable',packageRoot:process.env.OPENCLI_PACKAGE_ROOT || '',queueLimit:4,timeoutMs:55000});
+export const RETRIEVAL_CONFIG = Object.freeze({provider:process.env.GIFTWISE_RETRIEVAL || 'domestic',packageRoot:process.env.OPENCLI_PACKAGE_ROOT || '',queueLimit:4,timeoutMs:90000});
 
 /**
  * 履约方式（产品负责人 2026-10-31 裁定，三轮增补）：

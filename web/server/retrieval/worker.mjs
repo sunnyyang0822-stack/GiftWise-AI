@@ -1,15 +1,19 @@
 import { randomUUID } from 'node:crypto';
 export function validatePlan(p) {
+ if(p?.category==='domestic') {
+  if(!Array.isArray(p.queries)||p.queries.some(q=>!q||typeof q.keyword!=='string'||!q.keyword.trim()||q.keyword.length>200||q.city!=null&&typeof q.city!=='string'||q.sources!=null&&(!Array.isArray(q.sources)||q.sources.some(s=>typeof s!=='string'))))throw new Error('INVALID_RETRIEVAL_PLAN');
+  return structuredClone(p);
+ }
  if (!p || Object.keys(p).some(k=>!['category','keywords','limit'].includes(k)) || !['books','stationery','home','maker'].includes(p.category) || !Array.isArray(p.keywords) || p.keywords.length>3 || p.keywords.some(s=>typeof s!=='string'||! /^[\p{L}\p{N} ]{1,30}$/u.test(s)) || !Number.isInteger(p.limit)||p.limit<1||p.limit>3) throw new Error('INVALID_RETRIEVAL_PLAN');
  return structuredClone(p);
 }
 export class RetrievalWorker {
  constructor(provider,{queueLimit=4,timeoutMs=15000}={}) { this.provider=provider;this.limit=queueLimit;this.timeout=timeoutMs;this.queue=[];this.active=false;this.poisoned=false; }
- submit(plan,{signal}={}) {
+ submit(plan,{signal,providerOptions}={}) {
   plan=validatePlan(plan);
   if(this.poisoned)return Promise.resolve({status:"unavailable",evidence_id:null,products:[],warnings:["检索器需维护者重启"]});
   if(this.queue.length>=this.limit) return Promise.reject(new Error('RETRIEVAL_QUEUE_FULL'));
-  return new Promise((resolve,reject)=>{this.queue.push({plan,signal,resolve,reject});this.drain();});
+  return new Promise((resolve,reject)=>{this.queue.push({plan,signal,providerOptions,resolve,reject});this.drain();});
  }
  async drain() {
   if(this.active)return;this.active=true;
@@ -18,10 +22,10 @@ export class RetrievalWorker {
     const cancel=()=>c.abort();j.signal?.addEventListener('abort',cancel,{once:true});
     try { const abort=new Promise((_,reject)=>c.signal.addEventListener('abort',()=>reject(new Error('RETRIEVAL_ABORTED')),{once:true}));
      timer=setTimeout(()=>c.abort(),this.timeout);
-     const result=await Promise.race([this.provider.search(j.plan,{signal:c.signal,taskId:randomUUID()}),abort]);
+     const result=await Promise.race([this.provider.search(j.plan,{...j.providerOptions,timeoutMs:Math.max(1,this.timeout-1000),signal:c.signal,taskId:randomUUID()}),abort]);
      j.resolve(structuredClone(result));
     } finally {j.signal?.removeEventListener('abort',cancel);}
-   }catch {if(c.signal.aborted)this.poisoned=true;j.resolve({status:'unavailable',evidence_id:null,products:[],warnings:['后台检索失败、取消或超时；价格未核实']});}
+   }catch {j.resolve({status:'unavailable',evidence_id:null,products:[],warnings:['补充检索暂不可用，仍可继续模型建议'],recommendations_available:true,enrichment_only:true});}
    finally {clearTimeout(timer);}
   }this.active=false;
  }
