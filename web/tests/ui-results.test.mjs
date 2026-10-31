@@ -180,50 +180,44 @@ function withImageOrigin(fn) {
   }
 }
 
-test("三卡参考图：每个可选候选仅显示各自一图及真实引用元数据，无SKU前置", () => withImageOrigin(() => {
+test("三卡无网图：已有真实引用也只交付文字卡，来源数据与三选择保留", () => withImageOrigin(() => {
   const data = threeReferences(), before = JSON.stringify(data), v = view(data);
   const cards = v.root.querySelectorAll(".gift-choice");
   assert.equal(cards.length, 3);
-  assert.equal(v.root.querySelectorAll("img").length, 3);
+  assert.equal(v.root.querySelectorAll("img").length, 0);
   cards.forEach((card, index) => {
-    const binding = data.media.candidates[index], reference = data.retrieval.references[index];
+    const binding = data.media.candidates[index];
     assert.equal(card.dataset.candidateId, binding.candidate_id);
-    assert.equal(card.querySelectorAll("img").length, 1);
-    assert.equal(card.querySelector("img").src, `${location.origin}${binding.image.url}`);
-    const figure = card.querySelector("figure");
-    assert.equal(figure.dataset.imageReferenceId, reference.reference_id);
-    assert.equal(figure.dataset.imageSourceUrl, reference.source_url);
-    assert.equal(figure.dataset.imageObservedAt, reference.observed_at);
-    assert.equal(figure.dataset.imageKind, "reference_image");
-    assert.equal(card.querySelector(".media-kind").textContent, "参考图片");
+    assert.equal(card.querySelector("figure"), null);
+    assert.equal(card.querySelector(".candidate-media-slot"), null);
+    assert.equal(card.querySelector(".card__title").textContent, data.candidates[index].name);
     card.querySelector(".suggest-row").querySelector("button").events.click();
   });
-  assert.equal(new Set(v.root.querySelectorAll("img").map(img => img.src)).size, 3);
   assert.deepEqual(v.selected, ["c1", "c2", "c3"]);
   assert.equal(JSON.stringify(data), before, "不改写原状态、推荐或创建商品记录");
 }));
 
-test("三卡参考图：图片尚在加载时文字和选择先可用，load仅更新原图片位", () => withImageOrigin(() => {
-  const v = view(threeReferences()), cards = v.root.querySelectorAll(".gift-choice");
+test("三卡无网图：图字段pending也不显示图片加载空态或禁选", () => withImageOrigin(() => {
+  const data = threeReferences(); data.media.candidates.forEach(slot => { slot.status = "pending"; slot.image = null; });
+  const v = view(data), cards = v.root.querySelectorAll(".gift-choice");
   const headings = cards.map(card => card.querySelector(".card__title"));
   cards.forEach((card, index) => {
     assert.equal(headings[index].textContent, `测试建议c${index + 1}`);
     const button = card.querySelector(".suggest-row").querySelector("button");
     assert.ok(!("disabled" in button.attrs));
-    const img = card.querySelector("img");
-    img.naturalWidth = 640; img.naturalHeight = 480; img.events.load();
-    assert.equal(card.querySelector("img"), img);
+    assert.equal(card.querySelector("img"), null);
     assert.equal(card.querySelector(".card__title"), headings[index]);
-    assert.equal(card.querySelector(".media-status").hidden, true);
+    assert.equal(card.querySelector(".media-status"), null);
+    assert.equal(card.querySelector(".candidate-media-slot"), null);
   });
 }));
 
-test("三卡参考图：单图加载失败不隐藏候选或禁选，也不影响其他两图", () => withImageOrigin(() => {
-  const v = view(threeReferences()), cards = v.root.querySelectorAll(".gift-choice");
-  cards[1].querySelector("img").events.error();
+test("三卡无网图：旧失败图片状态不隐藏任何文字候选或禁选", () => withImageOrigin(() => {
+  const data = threeReferences(); data.media.status = "failed"; data.media.candidates.forEach(slot => { slot.status = "unavailable"; slot.image = null; });
+  const v = view(data), cards = v.root.querySelectorAll(".gift-choice");
   assert.equal(v.root.querySelectorAll(".gift-choice").length, 3);
-  assert.equal(v.root.querySelectorAll("img").length, 2, "失败图片不能冒充三图完成");
-  assert.match(cards[1].querySelector(".media-status").textContent, /图片加载失败/);
+  assert.equal(v.root.querySelectorAll("img").length, 0);
+  assert.equal(cards[1].querySelector(".media-status"), null);
   cards.forEach(card => {
     const button = card.querySelector(".suggest-row").querySelector("button");
     assert.ok(!("disabled" in button.attrs)); button.events.click();
@@ -231,20 +225,20 @@ test("三卡参考图：单图加载失败不隐藏候选或禁选，也不影�
   assert.deepEqual(v.selected, ["c1", "c2", "c3"]);
 }));
 
-test("三卡参考图：缺失或无效引用只留下对应缺图，不用另一候选图片补齐", () => withImageOrigin(() => {
+test("三卡无网图：缺失无效或重复图片引用均不改变三条文字结果", () => withImageOrigin(() => {
   for (const alter of [data => { data.media.candidates.splice(1, 1); }, data => { data.retrieval.references[1].image_validation.ok = false; }, data => { data.media.candidates.push(structuredClone(data.media.candidates[1])); }]) {
     const data = threeReferences(); alter(data);
     const v = view(data), cards = v.root.querySelectorAll(".gift-choice");
     assert.equal(cards.length, 3);
     assert.equal(cards[1].querySelector("img"), null);
-    assert.equal(v.root.querySelectorAll("img").length, 2);
+    assert.equal(v.root.querySelectorAll("img").length, 0);
     assert.ok(cards.every(card => !("disabled" in card.querySelector(".suggest-row").querySelector("button").attrs)));
   }
 }));
 
-test("三卡参考图：新运行无来源时不会复用旧运行图片", () => withImageOrigin(() => {
+test("三卡无网图：新旧运行都不展示推荐图，不复用旧图", () => withImageOrigin(() => {
   const first = view(threeReferences());
-  assert.equal(first.root.querySelectorAll("img").length, 3);
+  assert.equal(first.root.querySelectorAll("img").length, 0);
   const next = report(); next.recommendation_run_id = "another-owner-run";
   const second = view(next);
   assert.equal(second.root.querySelectorAll(".gift-choice").length, 3);

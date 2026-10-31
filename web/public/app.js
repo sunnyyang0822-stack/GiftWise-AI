@@ -692,7 +692,6 @@ function currentViewKey() {
 }
 
 function render() {
-  if (!state.report || state.presentation || !state.inFlow || state.busy || state.encourage || state.timeout || state.error) resultViews?.stopRecommendationMediaPoll();
   if (!state.presentation || !state.inFlow || state.busy || state.encourage || state.timeout || state.error) resultViews?.stopMediaPoll();
   renderBadges();
   renderBanners();
