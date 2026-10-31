@@ -1,3 +1,4 @@
+import {randomBytes,createHmac,timingSafeEqual} from 'node:crypto';
 /**
  * GiftWise AI · web 接入层 HTTP 服务（零依赖，只用 node: 内置模块）。
  *
@@ -54,6 +55,13 @@ import { recognizeExclusions } from "./exclusion-provider.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
 import { createAnalysis, getAnalysis } from "./exclusion-store.mjs";
 
+const sessionSecret=randomBytes(32);
+function ownerScope(req,res){
+ const raw=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('gw_task_session='))?.slice(16);
+ if(raw&&/^[a-f0-9]{48}\.[a-f0-9]{64}$/.test(raw)){const [id,mac]=raw.split('.');const expected=createHmac('sha256',sessionSecret).update(id).digest();if(timingSafeEqual(Buffer.from(mac,'hex'),expected))return id;}
+ const id=randomBytes(24).toString('hex');const mac=createHmac('sha256',sessionSecret).update(id).digest('hex');
+ res.setHeader('Set-Cookie',`gw_task_session=${id}.${mac}; Path=/; HttpOnly; SameSite=Strict${req.socket.encrypted?'; Secure':''}`);return id;
+}
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(here, "..", "public");
 const MAX_BODY_BYTES = 262144;
@@ -182,6 +190,7 @@ function apiConfig() {
 
 async function handleApi(req, res, url) {
   const { pathname } = url;
+  const owner=ownerScope(req,res);
 
   if (req.method === "GET" && pathname === "/api/config") {
     sendJson(res, 200, apiConfig());
@@ -193,7 +202,7 @@ async function handleApi(req, res, url) {
   }
   if (req.method === "GET" && pathname.startsWith("/api/runs/")) {
     const run = getRun(pathname.slice("/api/runs/".length));
-    if (!run) {
+    if (!run || run.owner_scope !== owner) {
       sendJson(res, 404, {
         status: "error",
         errors: [{ code: "RECOMMENDATION_NOT_FOUND", path: "recommendation_run_id", message: "没有找到该推荐记录。" }],
@@ -268,6 +277,7 @@ async function handleApi(req, res, url) {
     }
     const checked = checkAiExclusions(recognized.ai_json, dislikes);
     const analysisId = createAnalysis({ intake: payload.intake, mode: recognized.mode, candidates: checked.candidates, status: checked.status, errors: checked.errors });
+    getAnalysis(analysisId).owner_scope=owner;
     sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, errors: checked.errors });
     return true;
   }
@@ -275,7 +285,9 @@ async function handleApi(req, res, url) {
   if (pathname === "/api/recommendations") {
     let analysis = null;
     if (payload.exclusion_confirmation?.analysis_id) analysis = getAnalysis(payload.exclusion_confirmation.analysis_id);
-    const outcome = await runRecommendation({ intake: payload.intake, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis });
+    if(analysis?.owner_scope!==owner)analysis=null;
+    const cancellation=new AbortController();res.once("close",()=>{if(!res.writableEnded)cancellation.abort();});
+    const outcome = await runRecommendation({ signal:cancellation.signal, ownerScope:owner, intake: payload.intake, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis });
     if (outcome.kind === "report") {
       sendJson(res, 200, outcome.report);
       return true;
@@ -293,6 +305,7 @@ async function handleApi(req, res, url) {
 
   if (pathname === "/api/presentations") {
     const outcome = await runPresentation({
+      ownerScope:owner,
       runId: payload.recommendation_run_id,
       selectedCandidateId: payload.selected_candidate_id,
       demo: payload.demo,

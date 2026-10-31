@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 export function validatePlan(p) {
- if (!p || Object.keys(p).some(k=>!['category','keywords','limit'].includes(k)) || !['books','stationery','home'].includes(p.category) || !Array.isArray(p.keywords) || p.keywords.length>3 || p.keywords.some(s=>typeof s!=='string'||! /^[\p{L}\p{N} ]{1,30}$/u.test(s)) || !Number.isInteger(p.limit)||p.limit<1||p.limit>3) throw new Error('INVALID_RETRIEVAL_PLAN');
+ if (!p || Object.keys(p).some(k=>!['category','keywords','limit'].includes(k)) || !['books','stationery','home','maker'].includes(p.category) || !Array.isArray(p.keywords) || p.keywords.length>3 || p.keywords.some(s=>typeof s!=='string'||! /^[\p{L}\p{N} ]{1,30}$/u.test(s)) || !Number.isInteger(p.limit)||p.limit<1||p.limit>3) throw new Error('INVALID_RETRIEVAL_PLAN');
  return structuredClone(p);
 }
 export class RetrievalWorker {

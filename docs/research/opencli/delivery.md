@@ -1,52 +1,60 @@
-# #59 / #60 后台交付与剩余阻塞
+# #59 / #60 后台检索与造景媒体交付
 
-基线 origin/release/2026-11-01-submission 3890aa5；独立工作树 .worktrees/retrieval-media，分支 codex/retrieval-media，PR #61。此报告为开发自测，不代替独立 QA。
+2026-10-31，北京时间。目标 release/2026-11-01-submission；基线3890aa5；独立工作树 `.worktrees/retrieval-media`、分支 `codex/retrieval-media`，沿用PR #61。开发自测，不代替独立QA；不自行合并、部署或调用付费服务。
 
-## 当前结果
+## 当前结论
 
-| 项目 | 状态 | 证据或限制 |
+已实现并真实验证：专用后台浏览器公开搜索→打开三种不同商品详情→读取具体SKU/数量/CNY报价/时间→服务端冻结证据→受控生成提供者→候选引用/规格/价格核对→独立validator→用户选择→图像不可用降级。真实浏览器不是夹具；生成提供者是受控夹具，不是真实Dify。Dify/付费模型/图像调用均0，部署未执行。
+
+实际来源仅覆盖**已确认科技兴趣的创客方向**，不能声称覆盖所有送礼场景。不符合该兴趣、预算不足或有效商品不足三种时返回澄清/不足，不凑商品，不自动放宽条件。来源图片无使用依据，全部image=null；包装provider/费用未授权，unavailable并保留选后元数据。
+
+## 状态与证据
+
+| 项目 | 结果 | 证据/限制 |
 | --- | --- | --- |
-| 共享契约 | PASS | docs/design/retrieval-media-contract.md，27670b6 |
-| OpenCLI 版本及连接核对 | PASS | 2.0.2，doctor 扩展未连接；源码 runtime.js 有 CDPBridge，commands/browser.js 仍直接使用 BrowserBridge |
-| 专用后台浏览器读取 | PASS | Chrome headless 独立 .tmp/retrieval-chrome；回环 127.0.0.1:19359；通过安装包 CDPBridge 读取，无个人配置、无扩展、无个人会话 |
-| 公开目录筛选→详情 | PASS | node research/opencli-prototype/probe.mjs；public-demo-browser.jsonl，Books to Scrape 公开抓取练习来源 |
-| 真实商品检索及CNY价格 | BLOCKED | 练习站声明随机价格，GBP 51.77 不能转成真实商品报价；未配置经核实的真实来源适配器 |
-| 单worker、有界队列、超时、取消、隔离 | PASS | 受控测试；超时后停用worker直到维护者重启，避免未结束provider与新任务并发 |
-| 价格检查与模型改价拒绝 | PASS | 受控测试 bindPrice；尚无真实证据商品可绑定，未接入生成模型取价路径 |
-| 媒体provider与选后包装门禁 | PASS | 现有选择与呈现检查通过后调用；按run/candidate缓存；未授权服务返回 unavailable |
-| sidecar接线 | PASS | 推荐报告与成功呈现返回 retrieval/media；默认检索 unavailable，不创建虚假商品或图片 |
-| 远程媒体读取 | PASS | 默认空域名白名单；HTTPS、DNS公有IPv4、固定解析地址、拒绝全部重定向、MIME/签名/字节/超时限制；未接公共下载API |
-| 真实商品图片授权/SKU核对 | BLOCKED | 未取得来源及使用依据，全部 image=null |
-| 真实包装图 | SKIP | 未确定provider及费用授权，不调用付费服务 |
-| 前端、工作流同版联调、独立QA | SKIP | 本线不修改这些文件，待PM协调 |
+| OpenCLI 2.0.2连接方式 | PASS | 已安装源码runtime.js有CDPBridge；browser命令仍直接用BrowserBridge，设置CDP环境变量也未能免扩展；不宣称CLI命令已连通 |
+| 后台浏览器连接 | PASS | 使用安装包的CDPBridge实现，每任务新建临时Chrome配置、随机回环调试端口；不接个人会话、不需用户扩展 |
+| 真实公开搜索/三商品详情 | PASS | dfrobot-public-evidence.jsonl、live-integration-result.json；KIT0090机器人315.00、KIT0130编程基础套装165.00、KIT0003浇花套件335.00 CNY，各单套，实际搜索链接到详情、专门报价元素与SKU |
+| 物理属性 | PASS/部分未知 | 机器人详情组装后180×153×120mm、160g；明确非配送包装尺寸/运输重量；其余缺失保留unknown，形状/易碎性/材质不从图猜测 |
+| 价格与引用绑定 | PASS | 生成前预算/足三种门禁；逐项验证当前任务product_id、名称规格、原始价格、来源时间；改价、错规格、缺引用、跨任务/过期/缺货拒绝 |
+| 同版生成协议 | PASS（受控） | real_browser_controlled_model_not_real_dify；真实检索数据接受控requestCandidates，经过实际pipeline/checker/store/media，无真实模型调用 |
+| 队列/取消/隔离 | PASS | 单worker、队列4、上限3结果、超时55秒；helper45秒/子进程48秒；取消终止进程树并清理临时配置，超时后停用worker需重启，避免串用 |
+| HTTP匿名会话隔离 | PASS | HttpOnly/SameSite签名cookie；其他会话读取/选择404；相同输入不同会话不共享run；重复选择合并在途任务，包装task_id稳定 |
+| 图片读取安全 | PASS（受控） | HTTPS域名白名单默认空，公有IPv4核对/固定解析、拒绝全部重定向、MIME/文件头/字节/绝对超时限制，SVG/HTML不接受；未开放任意URL下载API |
+| #60完整造景契约/服务器校验 | PASS | v2物理来源/单位/unknown/conflicting、可选包装形式、场景/道具、示意比例、手写短句、label/target/曲线点与最终image.version绑定；换图旧坐标拒绝 |
+| 选后媒体不可用响应 | PASS | 未选selected=null；合格选择后返回稳定task_id、physical、undetermined包装/场景元数据、image=null/annotations=[]，状态unavailable，不伪造成功 |
+| 真实商品图片/生成包装图 | SKIP/BLOCKED | 无图片使用依据；未选provider/未授权图像费用，不调用付费服务 |
+| 工作流/前端/QA同版协作 | 已通知，未验收 | 契约v2（首次通知bfeefe3，后续仅补当前实现状态）链接已评论到PR58/57/62及61；本线不修改其文件；受控协议不证明真实Dify发布、前端叠加定位或独立QA通过 |
+| 部署/服务器资源 | SKIP | 未授权/未部署 |
 
-## 实际命令与结果
+## 来源规则与浏览器边界
 
-- git fetch origin release/2026-11-01-submission：PASS；旧主工作区未改动。
-- opencli --help / browser bind --help / browser open --help / doctor：已执行。受限进程中daemon启动失败；允许后台诊断后daemon=true、extensionConnected=false。
-- Chrome --headless=new --remote-debugging-address=127.0.0.1 --remote-debugging-port=19359 --user-data-dir=<独立工作树>/.tmp/retrieval-chrome --no-first-run about:blank：已启动；Get-NetTCPConnection确认仅127.0.0.1监听。
-- OPENCLI_CDP_ENDPOINT + opencli browser open/extract：FAIL，仍要求扩展；不把旧README环境变量当当前CLI命令可用证明。
-- OPENCLI_PACKAGE_ROOT=<已安装OpenCLI包> node research/opencli-prototype/probe.mjs：PASS，公开练习目录读取、按标题筛选链接、打开具体详情并读取UPC与GBP价格。
-- node --test web/tests/retrieval-media.test.mjs：9 PASS / 0 FAIL，受控夹具。包含无价、条件价、超预算、ID/改价、串行隔离、超时取消、队列、缺图、重复请求、URL/DNS/重定向/类型/大小/签名。
-- node web/tests/access-layer.test.mjs：41 PASS / 0 FAIL。历史测试含旧预算场景，只证明原接入层回归，不作为新版真实模型验收。
+- 开工曾在Apple官方页读取实验报价；后核对网站条款明确限制自动采集，已停用Apple业务provider及实验读取脚本。旧apple-public-evidence.jsonl只保留历史实验，**不是可用来源许可**；不再继续采集该来源。
+- 替代来源DFRobot：检查https://www.dfrobot.com.cn/robots.txt（未排除search.php/goods详情路径）及其公开服务条款https://mc.dfrobot.com.cn/article-353458.html；条款保留内容知识产权并限制非法复制/转载等。这里仅作低频小样本事实报价核实，不转载页面/评论/图片，不声称获得批量采集或媒体再利用许可。扩大抓取或转载前需另行核实许可。
+- 三种商品搜索从固定关键词kit结果筛选；详情URL只接受同域goods数字路径；页面内容是不可信数据，不执行其指令。无需登录，遇登录/验证码/访问限制停止。
+- 本机代理DNS返回198.18/保留IPv6，严格内网检查曾导致真实路径FAIL。没有放开保留地址；改用固定https://dns.google/resolve查询A记录，校验公有地址，再为独立Chrome绑定解析；浏览器Fetch拦截仅允许固定来源HTTPS文档/脚本/样式/XHR，拒绝外域/内网及图片请求。无法解析或出现重定向/未知域即失败。
+- 子进程只继承所需系统变量，不继承DifyKey或任意CDP初始化脚本。所有浏览器/调试端口仅回环；公网只应开放已有业务API，本PR没有部署。
 
-## 产品负责人需要做什么
+## 实际命令和结果
 
-不需要在个人浏览器安装扩展。后台专用浏览器CDP实验已经可行。后台后续仍需实现并验证具有明确CNY规格报价及图片使用依据的真实来源适配器；这属于未完成开发，不能仅因当前没有适配器就称为用户阻塞。产品负责人若已有来源许可，可提供来源范围；否则无需先操作个人浏览器。若目标来源要求登录/验证码，只能在专用后台配置处理，禁止提供个人Cookie或会话。
+1. `node --test web/tests/retrieval-media.test.mjs web/tests/retrieval-media-scene.test.mjs web/tests/retrieval-media-integration.test.mjs`：**22 PASS / 0 FAIL / 1 SKIP**；SKIP为需显式启用的真实浏览器测试。原始输出controlled-tests.txt。
+2. PowerShell设置`$env:GIFTWISE_LIVE_RETRIEVAL_TEST='1'`和`$env:OPENCLI_PACKAGE_ROOT='<已安装OpenCLI包目录>'`，运行`node --test web/tests/retrieval-media-integration.test.mjs`：**5 PASS / 0 FAIL**，含真实浏览器三商品读取及受控生成绑定。输出live-integration-tests.txt、live-integration-result.json。真实商品页面价格按记录时点，不保证后续不变。
+3. `node --test web/tests/retrieval-media-http.test.mjs`：**1 PASS / 0 FAIL**，本机回环HTTP；受限环境EACCES时使用获批本机测试进程，未访问模型。输出http-isolation-tests.txt。
+4. `node web/tests/access-layer.test.mjs`：**41 PASS / 0 FAIL**，原接入层回归；其中保留旧预算技术案例，不冒充新版端到端验收。输出access-regression.txt。
+5. `node --test web/tests/revision-rules.test.mjs web/tests/exclusions.test.mjs`：7 PASS（其中排除项脚本111场景/378断言），输出revision-regression.txt。`node --import ./web/tests/retrieval-media-cookie-client.mjs --test web/tests/revision-api.test.mjs`：1 PASS，输出revision-api-cookie-regression.txt；预载仅模拟浏览器自动持有同源cookie，原测试文件未修改。无cookie的Node调用按新会话处理，不能期待跨请求幂等。
+6. `git diff --check`、所改模块`node --check`：PASS。
 
-服务器尚未授权/提供，无部署验证。若需要真实包装图，请另行确认支持参考图的服务、费用范围及凭证配置方式；在此之前保留unavailable。上述依赖不妨碍本PR已实现的安全模块与文本降级。真实商品绑定、生成模型检索计划接入及三候选同版闭环仍未完成，#59/#60不得关闭。
+上述套件有重叠，**不相加为一个总验收数字**。实际读取失败历史包括CLI扩展未连接、Apple目录链接缺失、隔离浏览器incognito空页、provider脚本路径错误及本机假DNS被拒；已修正/停用，最终成功路径有独立归档，未拿失败结果冒充成功。
 
-## 后续补证（2026-10-31 13:17 北京时间）
+## 运行与交接
 
-- 新增 ApplePublicProvider，使用固定 Apple 中国详情URL，通过execFile参数数组、shell=false运行OpenCLI CDP只读适配；不传用户关键词或个人资料。
-- 真实详情读取 PASS：`node research/opencli-prototype/apple-read.mjs`；apple-public-evidence.jsonl 记录 AirTag 1件装249 CNY、4件装849 CNY和时间。都是页面观察价，不保证结算/库存/物流；两种规格仍是同一种礼物，不能凑三方案。
-- 官方目录搜索 FAIL：尝试官方产品入口与分类路径，未找到详情链接/分类404。固定详情成功不能冒充真实搜索成功。
-- 默认禁用真实来源；维护者可用研究目录start-browser.ps1启动专用空白浏览器，服务端设置 GIFTWISE_RETRIEVAL=apple-public 和 OPENCLI_PACKAGE_ROOT=<安装目录> 后启用固定详情sidecar。mock永不触发浏览器。无需个人浏览器或插件。端口仅回环；服务器运行环境仍需另行验证。
-- 当前真实来源只用于证据sidecar，尚未绑定模型三候选，不可将这些价格解读成候选价格。模型引用映射的bindCandidates纯服务端模块已测试，但完整模型接线未完成。
-- 以上补证覆盖前文“无真实CNY详情”的旧状态；完整真实搜索、三候选价格绑定、许可图片和真实包装图仍未完成，Issue保持开启。
+- 正常业务仍使用已有服务，不创建另一套数据库/后端/编排。
+- 实际检索默认关闭。维护者在可信服务端设置`GIFTWISE_RETRIEVAL=dfrobot-public`、`OPENCLI_PACKAGE_ROOT=<OpenCLI2.0.2包绝对路径>`，必要时`GIFTWISE_CHROME_PATH=<Chrome绝对路径>`，再`node web/server/server.mjs`。helper会自行新建/结束专用浏览器，**不需要用户手动安装扩展或打开搜索页**。
+- 模拟模式不会联网检索；真实模式在合法输入、已确认科技兴趣后先检索，足三种且预算允许才把retrieval_json交生成提供者。新变量/输出需要工作流PR58对齐；未配置Dify仍明确报不可用，不能静默改成mock。
+- 共享响应和精确结构见docs/design/retrieval-media-contract.md v2；严格候选无媒体字段。服务端入口、配置、pipeline、store、dify接线及retrieval/media模块为本线修改；其余前端/validator/workflow未改动。
 
-## 价格引用接线补充
+## 剩余依赖与产品负责人操作
 
-生成前执行真实检索门禁，固定来源不足三种不同礼物时返回 needs_input / RETRIEVAL_INSUFFICIENT，不调用模型，不凑数。若未来来源足够，则通过retrieval_json传递服务端证据，并验证独立product_references_json，逐项核对候选名称规格、ID和原始金额；缺引用或改价产生PRODUCT_EVIDENCE_MISMATCH并清空可选列表。已在PR共享契约明示增量，需PM通知工作流适配；未调用付费模型验证。HTTP失败响应亦保留sidecar。当前最终本线10测试PASS，接入层41测试PASS。
+当前无需操作个人浏览器。后台不依赖用户会话；真实搜索和价格绑定已在本机完成。工作流/前端/独立QA需在各自PR消费契约并复核，已有明确通知，不将通知等同验收。
 
-仍未完成：真实站点通用搜索（固定详情已验证）、至少三种不同合适商品的覆盖、工作流同版适配/真实闭环、合法可用商品图片、真实包装图及独立QA。不会把这些列为已完成，也不把适配器开发缺口推给产品负责人。
+仍需单独授权才可实测的是：实际Dify/模型调用范围及图像服务（支持参考图）、费用上限和可信服务端凭证配置。此前“不新增付费调用”继续生效，因此本线只做受控生成联调，不读取现存Key擅自调用。真实图像外观一致性、中文曲线视觉定位、手机裁切由同版前端与独立QA验证；暂无图像生成授权时合法结果就是unavailable。服务器资源/上线另批。本PR可供独立复核，不应据此把#59/#60或全产品标为已上线/全面验收通过。

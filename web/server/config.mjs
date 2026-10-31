@@ -143,3 +143,6 @@ export const HOST = process.env.GW_HOST || "127.0.0.1";
 
 /** 前端请求超时（毫秒），用于展示中文「超时」状态。 */
 export const CLIENT_TIMEOUT_MS = 20000;
+
+// 真实来源需显式启用；仅专用后台浏览器，默认不联网检索。
+export const RETRIEVAL_CONFIG = Object.freeze({provider:process.env.GIFTWISE_RETRIEVAL || 'unavailable',packageRoot:process.env.OPENCLI_PACKAGE_ROOT || '',queueLimit:4,timeoutMs:55000});
