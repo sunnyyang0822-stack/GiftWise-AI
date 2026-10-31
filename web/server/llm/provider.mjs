@@ -238,7 +238,7 @@ export class LlmProvider {
       '当前所有电商直抓均已停用，不调用或重试京东、淘宝及其他电商，也不要求用户登录这些电商。主要自主查公开图片、内容与灵感；可使用工具提供的duckduckgo/OpenCLI能力，bing作辅助，具体可用工具和来源以服务端schema及source_availability为准。工具不可用或无数据不阻止最终建议。',
       '每次工具结果的source_availability及来源状态是真实执行反馈。对停用、风控、要求登录、受限或不可用的来源不反复循环重试；结合上下文改用允许的公开来源，或直接形成建议。不要求用户补非必要信息。',
       '公开参考资料在references[]返回，每项以reference_id标识；参考图片标记为reference_image，内容与参考图不能叫商品SKU、source_photo、商品实拍、实时成交价或当前库存。不要求参考资料有价格，也不补造价格、规格、库存或来源。若有参考价，按其参考性质说明即可。',
-      '采用公开参考图或资料时，可在最终JSON根对象附reference_references:[{candidate_id,reference_id}]，只引用本次工具references[]中的真实reference_id。不得把reference_id、图片ID、链接或内容source_id改造成product_id来满足商品照片门槛；没有SKU不影响模型建议，也不影响以参考图辅助理解。',
+      '采用公开参考图时，可在最终JSON根对象附reference_references:[{candidate_id,reference_id}]，每个候选最多一条，选择最适合展示的那张；只引用本次工具references[]中的真实reference_id。其他灵感出处可在建议文字里说明，不增加同候选图片引用。不得把reference_id、图片ID、链接或内容source_id改造成product_id来满足商品照片门槛；没有SKU不影响模型建议，也不影响以参考图辅助理解。',
       '历史真实商品结果若明确提供product_id，仍可单独用product_references:[{candidate_id,product_id}]引用；对应name写为商品name + " · " + variant，规格及数量一致，观察价及条件原样尊重。该历史支持不授权重新抓取电商，更不允许把公开参考当成商品。',
       'product_references和reference_references是独立可选sidecar，由服务端剥离，不进入严格候选对象。无需图或没有资料时不必引用；先完成理解与比较，再给最终建议及可选引用。',
     ].join('\n');
