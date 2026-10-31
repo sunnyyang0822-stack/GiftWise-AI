@@ -1057,7 +1057,9 @@ textarea {
 .range-dual input[type="range"]::-moz-range-track { height: 8px; background: transparent; }
 .range-dual input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; margin-top: -8px; border: 3px solid var(--surface); border-radius: 50%; background: var(--ribbon-blue); box-shadow: 0 1px 4px rgba(17,17,18,.22); appearance: none; pointer-events: auto; cursor: grab; }
 .range-dual input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border: 3px solid var(--surface); border-radius: 50%; background: var(--ribbon-blue); box-shadow: 0 1px 4px rgba(17,17,18,.22); pointer-events: auto; cursor: grab; }
-.range-dual input[type="range"]:focus-visible { outline: 3px solid rgba(31,58,147,.35); outline-offset: 4px; }
+.range-dual input[type="range"]:focus-visible { outline: none; }
+.range-dual input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(31,58,147,.24), 0 1px 4px rgba(17,17,18,.22); }
+.range-dual input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(31,58,147,.24), 0 1px 4px rgba(17,17,18,.22); }
 .range-dual input#budget-max { z-index: 2; }
 .range-dual__labels { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
 .range-dual__labels strong:last-child { text-align: right; }
