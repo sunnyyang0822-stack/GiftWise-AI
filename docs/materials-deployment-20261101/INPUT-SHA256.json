@@ -1,0 +1,101 @@
+{
+  "authoritative_source": "用户指定 GiftWise项目总目录/01-答辩与提交 中的对外目录",
+  "scope": "19 个当前主材料，不递归复制原始证据和旧代码ZIP；原始证据使用固定远端链接",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1569,
+      "sha256": "4c4c0b5120301347931d4150f19b469a971cd7a68a1cebbf98897ba324f932fc"
+    },
+    {
+      "path": "演讲稿-5分钟.md",
+      "bytes": 4303,
+      "sha256": "64d22e90714377819446b7f4d42cdb512248a06cd90f83ba5a10f27745cb32cf"
+    },
+    {
+      "path": "答辩问答-30题.md",
+      "bytes": 26033,
+      "sha256": "61090fa92d14ed27c66625c733cd863265a023bf1de81a5f424862aa52b87f1a"
+    },
+    {
+      "path": "01-答辩材料/Demo脚本-3分钟.md",
+      "bytes": 3487,
+      "sha256": "2e1718f9396f17a391c2c3c67ca64a140e8ade873af6ca2e3d8504171eb105c8"
+    },
+    {
+      "path": "01-答辩材料/GiftWise-AI-答辩.pdf",
+      "bytes": 1063971,
+      "sha256": "1739505311548fc90f843fb651825a2e8a40d912a16f7aeffcb97ca9d900224b"
+    },
+    {
+      "path": "01-答辩材料/GiftWise-AI-答辩.pptx",
+      "bytes": 1156358,
+      "sha256": "cd387e867bb4e71292745fdd653a60639ce601cc6b8d09a4a4b211903f856966"
+    },
+    {
+      "path": "02-提交材料/代码快照与材料变更声明.md",
+      "bytes": 3364,
+      "sha256": "663a0996c637b87dd05fc7c746aefbe9f0787fd58a1fb770e9e755f6e954316c"
+    },
+    {
+      "path": "02-提交材料/版本与文件清单.json",
+      "bytes": 331847,
+      "sha256": "b18d9a2f28771a8a9243c4235a795bbd0c6b313a1cdf6569f5cd229942b48a9f"
+    },
+    {
+      "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-10-31.drawio",
+      "bytes": 16781,
+      "sha256": "424ca75179fbed0c82f18e4a54ab491f5126b3febe96509fe555d06b5cf90f33"
+    },
+    {
+      "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-10-31.png",
+      "bytes": 373944,
+      "sha256": "ed30819978a30100c47c6ce10de5726b002e0d54e2399342068a2ea62857fe13"
+    },
+    {
+      "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-10-31.svg",
+      "bytes": 8235,
+      "sha256": "eb68c0c081deca3cc47c10b81d209fa6a7ecdf350d1aedbde822212682b77ede"
+    },
+    {
+      "path": "02-提交材料/专项材料/Agent执行流程-2026-11-01.md",
+      "bytes": 13137,
+      "sha256": "86ed6c503363f65320cb4e256e2ccd2364771e541c2f0926b5d665a8d3a7fb87"
+    },
+    {
+      "path": "02-提交材料/专项材料/Demo与代码仓库-2026-11-01.md",
+      "bytes": 23007,
+      "sha256": "c105fbc59b8b91a62154d2853454df8841350ab0c4f4412065de6fc529544965"
+    },
+    {
+      "path": "02-提交材料/专项材料/GiftWise-AI-系统架构设计.pdf",
+      "bytes": 14529870,
+      "sha256": "ee97175b863f54eb68ed6c258b4d4fa7717fb10abe766be2e288cf4e2f72e8e6"
+    },
+    {
+      "path": "02-提交材料/专项材料/可观测性证据-2026-11-01.md",
+      "bytes": 24857,
+      "sha256": "a45527aa155d2dfca2fc1dc688d1464b4ce64da860dff99695c58d76352d5975"
+    },
+    {
+      "path": "02-提交材料/专项材料/场景与价值分析-2026-11-01.md",
+      "bytes": 22167,
+      "sha256": "8f99e249c89db057c5099d513a87da5aa4c99cfd00f7933ec69e69802fd39b36"
+    },
+    {
+      "path": "02-提交材料/专项材料/异常处理说明-2026-11-01.md",
+      "bytes": 21760,
+      "sha256": "0663f1cebf0c86c4688213ceff63e932ef6b9dc2140f872b4a5e57ca1390a0cd"
+    },
+    {
+      "path": "02-提交材料/专项材料/成本与性能分析-2026-11-01.md",
+      "bytes": 30443,
+      "sha256": "3e9bf5affc84547e8e6dd7d6c6d77573268272c5e40c0a50e121186d147412c1"
+    },
+    {
+      "path": "02-提交材料/规则依据/AI比赛评分规则-v2.md",
+      "bytes": 8822,
+      "sha256": "3f823706f2ed62150cbff3a0f2d5e0252226fa1deb00fc7f15cac28bcd0c6180"
+    }
+  ]
+}

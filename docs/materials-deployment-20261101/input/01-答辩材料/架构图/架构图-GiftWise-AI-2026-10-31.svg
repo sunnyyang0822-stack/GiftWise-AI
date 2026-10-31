@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="620" viewBox="0 0 1440 620" font-family="Microsoft YaHei, Arial, sans-serif">
+<rect x="0" y="0" width="1440" height="620" fill="#F8FAFC"/>
+<rect x="12" y="48" width="1416" height="126" rx="14" fill="#EAF3F1"/>
+<rect x="12" y="234" width="1416" height="144" rx="14" fill="#EDF3F7"/>
+<defs>
+<marker id="main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#0F766E"/></marker>
+<marker id="async" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#4338CA"/></marker>
+<marker id="data" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0,0 8,4 0,8" fill="#526176"/></marker>
+</defs>
+<path d="M 153 156 L 153 252" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 278 306 L 316 306" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 546 306 L 584 306" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 699 252 L 699 156" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 814 112 L 852 112" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 967 156 L 967 252" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 1082 306 L 1120 306" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 1266 252 L 1266 156" fill="none" stroke="#0F766E" stroke-width="2.5" marker-end="url(#main)"/>
+<path d="M 1378 156 L 1378 252" fill="none" stroke="#4338CA" stroke-width="2.5" marker-end="url(#async)" stroke-dasharray="8,4"/>
+<path d="M 1322 360 L 1322 410 L 915 410 L 915 470" fill="none" stroke="#4338CA" stroke-width="2.5" marker-end="url(#async)"/>
+<path d="M 1082 524 L 1120 524" fill="none" stroke="#4338CA" stroke-width="2.5" marker-end="url(#async)"/>
+<path d="M 300 470 L 300 405 L 430 405 L 430 360" fill="none" stroke="#526176" stroke-width="2.5" marker-end="url(#data)" stroke-dasharray="8,4"/>
+<g id="input"><rect x="28" y="68" width="250" height="88" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="46" y="102" font-size="23" font-weight="bold" fill="#0F172A">需求输入</text>
+<text x="46" y="129" font-size="18" fill="#526176">自然描述 · 排除项确认</text>
+</g>
+<g id="compare"><rect x="584" y="68" width="230" height="88" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="602" y="102" font-size="23" font-weight="bold" fill="#0F172A">三方案比较</text>
+<text x="602" y="129" font-size="18" fill="#526176">依据 · 估价 · 校验结果</text>
+</g>
+<g id="select"><rect x="852" y="68" width="230" height="88" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="870" y="102" font-size="23" font-weight="bold" fill="#0F172A">用户明确选择</text>
+<text x="870" y="129" font-size="18" fill="#526176">只选通过检查的方案</text>
+</g>
+<g id="result"><rect x="1120" y="68" width="292" height="88" rx="10" fill="#E8F5F1" stroke="#0F766E" stroke-width="1.5"/>
+<text x="1138" y="102" font-size="23" font-weight="bold" fill="#0F172A">赠送指南与包装图</text>
+<text x="1138" y="129" font-size="18" fill="#526176">文字先展示 · 图片原位补齐</text>
+</g>
+<g id="context"><rect x="28" y="252" width="250" height="108" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="46" y="286" font-size="23" font-weight="bold" fill="#0F172A">解析与可信上下文</text>
+<text x="46" y="313" font-size="18" fill="#526176">自然澄清 · 续答保留原文</text>
+<text x="46" y="339" font-size="18" fill="#526176">服务端固定已确认约束</text>
+</g>
+<g id="recommend"><rect x="316" y="252" width="230" height="108" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="334" y="286" font-size="23" font-weight="bold" fill="#0F172A">候选生成</text>
+<text x="334" y="313" font-size="18" fill="#526176">直连文本模型 · 三方案</text>
+<text x="334" y="339" font-size="18" fill="#526176">本地商品数据增强</text>
+</g>
+<g id="check"><rect x="584" y="252" width="230" height="108" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="602" y="286" font-size="23" font-weight="bold" fill="#0F172A">独立代码校验</text>
+<text x="602" y="313" font-size="18" fill="#526176">预算 · 禁忌 · 结构</text>
+<text x="602" y="339" font-size="18" fill="#526176">合格后生成文字风格方向</text>
+</g>
+<g id="present"><rect x="852" y="252" width="230" height="108" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="870" y="286" font-size="23" font-weight="bold" fill="#0F172A">选择后生成与复核</text>
+<text x="870" y="313" font-size="18" fill="#526176">包装 · 配色 · 贺卡 · 赠送</text>
+<text x="870" y="339" font-size="18" fill="#526176">总流程最多一次业务修订</text>
+</g>
+<g id="api"><rect x="1120" y="252" width="292" height="108" rx="10" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="1138" y="286" font-size="21" font-weight="bold" fill="#0F172A">文字响应与媒体任务 API</text>
+<text x="1138" y="313" font-size="18" fill="#526176">立即返回文字 + task_id</text>
+<text x="1138" y="339" font-size="18" fill="#526176">GET 查询任务状态 / 图片</text>
+</g>
+<g id="catalog"><rect x="28" y="470" width="340" height="108" rx="10" fill="#FFFFFF" stroke="#526176" stroke-width="1.5"/>
+<text x="46" y="504" font-size="23" font-weight="bold" fill="#0F172A">商品数据增强</text>
+<text x="46" y="531" font-size="18" fill="#526176">本地 SQLite：库优先匹配</text>
+<text x="46" y="557" font-size="17" fill="#526176">OpenCLI：按需检索 / 页面读取</text>
+</g>
+<g id="state"><rect x="406" y="470" width="302" height="108" rx="10" fill="#FFFFFF" stroke="#526176" stroke-width="1.5"/>
+<text x="424" y="504" font-size="23" font-weight="bold" fill="#0F172A">可信运行状态</text>
+<text x="424" y="531" font-size="17" fill="#526176">任务快照 · 候选 · 选择 · 修订计数</text>
+<text x="424" y="557" font-size="18" fill="#526176">会话归属校验 · 选择幂等</text>
+</g>
+<g id="worker"><rect x="748" y="470" width="334" height="108" rx="10" fill="#F2F0FF" stroke="#4338CA" stroke-width="1.5"/>
+<text x="766" y="504" font-size="23" font-weight="bold" fill="#0F172A">后台包装图任务</text>
+<text x="766" y="531" font-size="17" fill="#526176">Seedream 4.5 · 仅生成所选方案</text>
+<text x="766" y="557" font-size="17" fill="#526176">pending → ready / failed</text>
+</g>
+<g id="storage"><rect x="1120" y="470" width="292" height="108" rx="10" fill="#F2F0FF" stroke="#4338CA" stroke-width="1.5"/>
+<text x="1138" y="504" font-size="23" font-weight="bold" fill="#0F172A">任务与产物落盘</text>
+<text x="1138" y="531" font-size="18" fill="#526176">媒体任务 JSON · 图片文件</text>
+<text x="1138" y="557" font-size="18" fill="#526176">模型调用记录</text>
+</g>
+<text x="28" y="35" font-size="22" fill="#0F766E" font-weight="bold">用户交互</text>
+<text x="316" y="220" font-size="22" fill="#0F766E" font-weight="bold">可信服务端 · Node.js</text>
+<text x="28" y="440" font-size="22" fill="#526176" font-weight="bold">数据与运行支撑</text>
+<text x="164" y="201" font-size="17" fill="#526176">补充信息后继续</text>
+<text x="710" y="201" font-size="17" fill="#526176">合格候选</text>
+<text x="978" y="201" font-size="17" fill="#526176">选择事件</text>
+<text x="1278" y="201" font-size="17" fill="#526176">文字 / 状态</text>
+<text x="1345" y="235" font-size="16" fill="#4338CA" font-weight="bold">GET</text>
+<text x="975" y="396" font-size="17" fill="#4338CA" font-weight="bold">异步启动</text>
+<text x="318" y="393" font-size="17" fill="#526176">可选增强</text>
+<text x="479" y="603" font-size="18" fill="#526176">风格方向：规则推导 + 文本模型润色（用户选择前）</text>
+<text x="1120" y="603" font-size="18" fill="#526176">密钥保留在服务端</text>
+</svg>
