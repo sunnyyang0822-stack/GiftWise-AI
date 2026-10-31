@@ -324,15 +324,27 @@ function renderBudget() {
       event.target.value = String(next);
       f.budget_confirmed = true; invalidateAnalysis();
       const output = $("budget-readout"); output.textContent = `预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`;
+      const dual = document.querySelector(".range-dual");
+      if (dual) { dual.style.setProperty("--range-min", `${Number(f.budget_min) / 10}%`); dual.style.setProperty("--range-max", `${Number(f.budget_max) / 10}%`); }
       document.querySelectorAll('[data-budget-value]').forEach(n=>{n.textContent=f[`budget_${n.dataset.budgetValue}`]+" 元"});
       const confirm = $("budget-confirm"); if(confirm) confirm.checked = true;
     };
-    body.push(el("p", {id:"budget-readout",class:"budget-readout",role:"status","aria-live":"polite",text:`预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`}),
-      el("div",{class:"budget-sliders"},["min","max"].map(which => el("label",{class:"budget-slider"},[
-        el("span",{text:which === "min" ? "下限" : "上限"}),
-        el("input",{type:"range",id:`budget-${which}`,min:"0",max:"1000",step:"50",value:f[`budget_${which}`],"aria-label":which === "min" ? "礼物预算下限" : "礼物预算上限","data-field":`budget-${which}`,oninput:e=>update(which,e)}),
-        el("strong",{"data-budget-value":which,text:f[`budget_${which}`]+" 元"}),
-      ]))), el("p",{class:"field__hint",text:"0–1000 元，每次 50 元；可用方向键调整，下限不会超过上限。"}));
+    body.push(
+      el("p", {id:"budget-readout",class:"budget-readout",role:"status","aria-live":"polite",text:`预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`}),
+      el("div",{class:"budget-sliders"},[
+        el("div",{class:"range-dual","style":`--range-min:${Number(f.budget_min) / 10}%;--range-max:${Number(f.budget_max) / 10}%`},[
+          el("div",{class:"range-dual__track","aria-hidden":"true"}),
+          el("div",{class:"range-dual__fill","aria-hidden":"true"}),
+          ...["min","max"].map(which => el("input",{type:"range",id:`budget-${which}`,min:"0",max:"1000",step:"50",value:f[`budget_${which}`],"aria-label":which === "min" ? "礼物预算下限" : "礼物预算上限","data-field":`budget-${which}`,oninput:e=>update(which,e)})),
+        ]),
+        el("div",{class:"range-dual__labels"},[
+          el("strong",{"data-budget-value":"min",text:`${f.budget_min} 元`} ),
+          el("span",{text:"0–1000 元"}),
+          el("strong",{"data-budget-value":"max",text:`${f.budget_max} 元`} ),
+        ]),
+      ]),
+      el("p",{class:"field__hint",text:"同一条轨道的两端都可拖动；左端是下限，右端是上限。也可用方向键调整，每次 50 元。"})
+    );
   } else if (f.budget_mode === "other") {
     body.push(el("div",{class:"budget-custom"},["min","max"].map(which=>el("label",{},[
       el("span",{text:which === "min" ? "预算下限（元）" : "预算上限（元）"}),
