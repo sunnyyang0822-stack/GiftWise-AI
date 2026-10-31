@@ -7,7 +7,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 from fixtures import rule_cases
-from validator import validate
+from validator.rules import validate
 
 
 class RevisionRules(unittest.TestCase):

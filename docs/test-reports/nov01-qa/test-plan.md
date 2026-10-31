@@ -12,7 +12,7 @@
 
 1. 先执行夹具自检，确认案例数量、独立零元/区间/旧标量期望、虚构数据和 Python 语法。
 2. 集成后分别执行旧基线：tests 329、stage_b 275、stage_c 39、boundary 45；这些数字只作实际运行结果，不能用 discover 通过替代断言。
-3. 执行新增规则套件并记录每组 `status/all_passed/error code/path/warnings`。特别检查 0 元+366 天仍拒绝，低于区间下限只产生 warning，三个候选不加总。
+3. 从仓库根目录执行 `python tests/acceptance/nov01_revision/run_nov01.py`，使用 `validator.rules.validate` 实际规则入口，记录每组 `status/all_passed/error code/path/warnings`。特别检查 0 元礼物通过、0 元+366 天仍拒绝，低于区间下限只产生 warning，三个候选不加总。
 4. 更新 parity 生成器后，在临时目录生成 fixture；独立断言零元、区间、金额格式和六档天数期望，再比较 Python/JS 的结构、错误码、路径、中文文案和 warnings。两侧一致不视为正确性证明；`days=10**20` 残差照实登记。
 5. 接入服务在本线专用端口先 `GET /healthz`，核实服务身份与 `mode`，显式设置 `GW_BASE` 后再跑 HTTP 冒烟。浏览器仅使用项目专用配置；若没有浏览器依赖，结果为阻塞而不是安装依赖或推断通过。
 6. 真实模型、Dify、新版线上能力和镜像一致性分别写 `未测`，不从旧报告继承新版结论。`tools/verify_all.py` 仅在临时副本执行，原始输出单独归档。
