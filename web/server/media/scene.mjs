@@ -2,6 +2,13 @@ const fields=['dimensions','shape','weight','fragility','materials'];
 export const unknownPhysical=()=>Object.fromEntries(fields.map(k=>[k,{status:'unknown',value:null,unit:null,sources:[]}]));
 const point=p=>p&&Object.keys(p).length===2&&['x','y'].every(k=>typeof p[k]==='number'&&Number.isFinite(p[k])&&p[k]>=0&&p[k]<=1);
 function fail(){throw new Error('MEDIA_SCENE_INVALID');}
+export function validateMediaImageUrl(raw,{allowedHosts=[]}={}){
+ if(typeof raw!=='string'||raw.length>2048||/[\u0000-\u0020]/.test(raw)||/^(javascript|data|file|blob):/i.test(raw))fail();
+ if(raw.startsWith('/')){if(!/^\/api\/media\/assets\/[a-f0-9]{64}$/.test(raw))fail();return raw;}
+ let u;try{u=new URL(raw);}catch{fail();}
+ if(u.protocol!=='https:'||u.username||u.password||u.port&&u.port!=='443'||!allowedHosts.includes(u.hostname)||/\.(svg|html?)$/i.test(u.pathname))fail();
+ return raw;
+}
 export function validatePhysical(physical){
  if(!physical||Object.keys(physical).length!==5)fail();
  for(const key of fields){const p=physical[key];if(!p||!['known','unknown','conflicting','suggested'].includes(p.status)||!Array.isArray(p.sources)||p.sources.length>5)fail();
@@ -23,7 +30,7 @@ export function validateScene(s){
  if(['unknown','conflicting','suggested'].includes(s.physical.dimensions.status)&&s.packaging.scale.status==='evidence_based')fail();
  if(!s.scene||s.scene.props_are_included!==false||s.scene.text_baked_in!==false||!Array.isArray(s.scene.props)||s.scene.props.length>10||s.scene.props.some(t=>typeof t!=='string')||!Array.isArray(s.unknowns)||s.unknowns.some(t=>typeof t!=='string')||!Array.isArray(s.annotations)||s.annotations.length>5)fail();
  if(s.image===null){if(s.annotations.length||s.status==='ready')fail();return s;}
- if(!s.image||typeof s.image.version!=='string'||!s.image.version||s.image.kind!=='ai_illustration'||!s.image.alt?.includes('AI包装效果示意'))fail();
+ if(!s.image||typeof s.image.version!=='string'||!s.image.version||typeof s.image.url!=='string'||!s.image.url||!(()=>{try{validateMediaImageUrl(s.image.url);return true;}catch{return false;}})()||s.image.kind!=='ai_illustration'||!s.image.alt?.includes('AI包装效果示意'))fail();
  const ids=new Set();for(const a of s.annotations){if(!a||typeof a.id!=='string'||ids.has(a.id)||a.image_version!==s.image.version||typeof a.text!=='string'||![...a.text].length||[...a.text].length>30||/[<>\n\r]/.test(a.text)||a.text_style!=='handwritten'||!point(a.target)||!point(a.label))fail();ids.add(a.id);if(a.curve!==null&&(!Array.isArray(a.curve?.control_points)||![1,2].includes(a.curve.control_points.length)||a.curve.control_points.some(p=>!point(p))))fail();}
  return s;
 }

@@ -81,3 +81,10 @@ Seedream测试：`node --test web/tests/retrieval-media-seedream.test.mjs` **7 P
 工作流PR58仍按旧v1提示，尚未消费Seedream任务字段；后台不改workflow文件。需要工作流负责人确认其呈现输出不会写入图片说明/坐标或改动可信价格。真实Dify调用未获本轮授权，不能宣称同版端到端。
 
 QA可固定提交运行以上命令，另运行`node --test web/tests/retrieval-media-history.test.mjs`（3 PASS）和`node --test web/tests/retrieval-media-http.test.mjs`（需回环权限，1 PASS）。
+
+
+## RM-001 ready图片URL安全修复
+
+提交后续：待提交。`validateMediaImageUrl`成为ready图片信封统一入口：内部图片只接受`/api/media/assets/<64位SHA256>`；外部仅可配置HTTPS主机，拒绝javascript/data/file/blob、非HTTPS、凭据、非443端口、内网/保留地址、SVG/HTML和非任务路径。`validateScene`在ready信封生成/保存前强制调用；媒体资产GET仍由服务端任务归属和ready状态控制，响应不跟随重定向。RM-001专项测试2 PASS。
+
+previous_gifts状态保持：3 PASS；Seedream状态/幂等/指纹/用量测试7 PASS。全量`retrieval-media*.mjs`在普通受限执行中HTTP测试会因回环EACCES失败；按用户授权的回环测试权限重跑后HTTP 1 PASS，其余35 PASS、1 SKIP（真实浏览器测试需显式开关）。所有`web/server/media/*.mjs` node --check PASS；access-layer 41 PASS。
