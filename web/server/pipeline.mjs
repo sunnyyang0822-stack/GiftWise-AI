@@ -15,7 +15,7 @@ const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrob
 
 import { strictParse, dump } from "./jsonstrict.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
-import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents } from "./checker.mjs";
+import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents, withTimeAdvisories } from "./checker.mjs";
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
 import { GIFT_STYLE_TABLE, CLOSENESS_TABLE } from "./labels.mjs";
 // Dify 客户端保留（历史与对照），但**不再是默认路径**：默认走 llm（无凭证则 mock）。
@@ -80,29 +80,7 @@ function literalTokens(text) {
   return [...tokens];
 }
 
-/**
- * 用户明确给出的确定金额/天数、以及喜好原文的**候选侧 gate**。
- *
- * 为什么放在这里而不是 checker.mjs：
- *   - checker.mjs 是与 Python `validator/rules.py` 逐项对账的共享校验器（parity-check.mjs），
- *     动它会破坏两端一致性；而 pipeline 里本来就有"在共享校验之上追加工作流 gate"的既有做法
- *     （fulfillmentOf / relationAssumptionErrors 同样在共享校验之后收紧）。
- *   - 本 gate 只在**第 1 步解析确实拿到用户确定值/原文**时生效；没有自然语言输入的老路径完全不受影响。
- *
- * 口径（产品负责人 2026-10-31 裁定 2/3）：
- *   - 金额：候选估算总价必须落在 [值−50, 值+50]。上界同时被既有 OVER_BUDGET（≤ 用户所给值）兜住，
- *     因此**实际生效区间是 [值−50, 值]**；这是"更严"而不是"更松"，不会有绕过。
- *   - 天数：用户给的「N 天」是**期限**，不是"准备时间必须接近 N 天"。
- *     ⛔ 曾经把 ±1 天当成候选准备时间的下界，实测把 30 天期限下的 2/7/3 天准备时间全部判失败，
- *     用户一个方案都选不了 —— 已按下面的口径改正。
- *     正确口径：N 天是期限，允许 ±1 天容差只可能体现在**到达时间**上界（total ≤ N+1）。
- *     既有到达规则（prep + 预售/发货 + 运输 ≤ available_days = N）比 N+1 **更严**，
- *     所以"放宽到 N+1"必须改 checker.mjs（与 Python 校验器逐项对账，动它要产品负责人确认）⇒
- *     本 gate 只做**警示**：总时长超过 N+1 时明确标注，硬门槛仍由既有到达规则执行。
- *     天数带宽（N−1, N+1）仍然完整返回给前端用于**展示与追问**（例如提示用户期限取哪一档）。
- *   - 原文：候选文案里必须能找到原文的落点，否则记为警示（默认 warning，可用
- *     GIFTWISE_LITERAL_PREFERENCE_GATE=1 升为硬 gate）。
- */
+/** 用户输入约束：预算继续按现有契约检查，时间仅提示，喜好保留原文。 */
 export function applyInputParseGates({ inputParse, validation, candidates, delivery = null, notices }) {
   if (!inputParse || typeof inputParse !== "object") return null;
   const budgetBand = inputParse.constraints?.budget_band ?? null;
@@ -117,7 +95,7 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
           ...daysBand,
           enforced: "tolerance_warning",
           enforced_note:
-            "N 天是期限：±1 天容差只体现在到达时间上界（total ≤ N+1）。既有到达规则（total ≤ N）更严，放宽它需要改与 Python 校验器对账的 checker.mjs，因此这里只做警示，硬门槛仍是既有到达规则。",
+            "时间仅作参考，是否赶得上由你判断。",
         }
       : null,
     literal_preferences: literals,
@@ -154,12 +132,12 @@ export function applyInputParseGates({ inputParse, validation, candidates, deliv
           code: "DELIVERY_BEYOND_DAYS_TOLERANCE",
           total_days: lead,
           tolerance_days: tolerance,
-          message: `估算总时长 ${lead} 天已超过用户所给 ${daysBand.user_days} 天的 ±${daysBand.band_days} 天容差（${tolerance} 天）——即便按最宽松的解释也赶不上。`,
+          message: `估算总时长上界为${lead}天，你的计划为${daysBand.user_days}天，是否赶得上由你判断。`,
           level: "warning",
         };
         audit.findings.push(finding);
         result.warnings = [...(result.warnings ?? []), finding];
-        notices.push(`⚠ 候选 ${result.id} 的估算总时长 ${lead} 天超过用户期限 ${daysBand.user_days} 天 + ${daysBand.band_days} 天容差。`);
+        notices.push(finding.message);
       }
     }
     if (literals.length > 0) {
@@ -351,8 +329,8 @@ async function runRecommendationCore(input, services = {}) {
   }
 
   initialCandidatesJson = candidatesJson;
-  validation = validate(requestJson, candidatesJson, strictParse);
-  initialValidation = validation;
+  initialValidation = validate(requestJson, candidatesJson, strictParse);
+  validation = withTimeAdvisories(initialValidation);
 
   const internal = validation.errors.some((e) => e.code === "INTERNAL_ERROR");
   let repairable = mode === "mock" && !internal && !validation.all_passed && repairCount === 0;
@@ -368,7 +346,7 @@ async function runRecommendationCore(input, services = {}) {
         : buildMockRevision(request, items, validation);
     callCounts.recommend_revision += 1;
     repairCount = 1;
-    const revisedValidation = validate(requestJson, revised.candidates_json, strictParse);
+    const revisedValidation = withTimeAdvisories(validate(requestJson, revised.candidates_json, strictParse));
     // N6 状态保护：已通过候选必须逐字节不变，否则整次修订不得用于选择。
     const previousPassed = new Map(
       items
@@ -397,7 +375,7 @@ async function runRecommendationCore(input, services = {}) {
     workflowErrors.push({
       code: "REPAIR_NOT_ALLOWED",
       path: "repair_count",
-      message: "当前状态不允许自动修订，未采用新候选",
+      message: "当前无法自动调整候选，请重新生成。",
     });
   }
 
@@ -422,9 +400,7 @@ async function runRecommendationCore(input, services = {}) {
     }
   });
 
-  /* ---- 阶段二：真实商品数据线（库优先；缺失才补抓 1 次 opencli）-----------
-     必须在时间判定**之前**跑：运输/预售时长来自真实商品页字段，
-     没有绑定商品时这两段只能按保守默认参与判定。 */
+  /* 先匹配真实商品，以页面物流字段补充时间提示。 */
   const catalogEnabled = mode !== "mock" || services.catalogEnabled === true;
   let catalog = {
     status: "unavailable",
@@ -455,26 +431,23 @@ async function runRecommendationCore(input, services = {}) {
   }
   const catalogByCandidate = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched").map((entry) => [entry.candidate_id, entry]));
 
-  /* ---- 追加规则 2：时间对齐 = 准备 + 预售/发货 + 运输 <= 可用天数 ----------
-     ⚠ mock 模式下**不适用**：那里没有任何真实商品页，也就没有任何运输/预售信息；
-     给虚构商品套一个"保守物流时长"等于凭空编造物流约束。因此 mock 模式如实标注
-     「不适用」，只有真实数据线（llm/dify）才执行这条判定。 */
+  /* 时间提示：真实模式参考商品页时长，未知快递按3~5天估算；模拟模式不编造物流。 */
   const deliveryApplicable = mode !== "mock";
   const delivery = {
     applicable: deliveryApplicable,
-    reason: deliveryApplicable ? null : "MOCK_MODE_NO_REAL_PRODUCT：模拟模式没有真实商品页与物流信息，运输/预售时长判定不适用（不编造物流约束）",
+    reason: deliveryApplicable ? null : "模拟数据没有真实物流信息",
     policy: {
-      rule: "preparation_days + presale/shipping_within_days + shipping_days <= available_days 才算通过",
+      rule: "时间估算仅作提示，不影响候选选择；是否赶得上由用户判断",
       shipping: { ...SHIPPING_CONFIG },
       presale: { ...PRESALE_CONFIG },
-      presale_note: "预售不是排除条件：平台给出的预售/发货时长直接计入判定，并如实显著标注。",
+      presale_note: "预售发货时间请向商家确认。",
       purchase_window: { ...PURCHASE_WINDOW_CONFIG },
-      tier_rule: "用户选「3–5 天」档且网购时长未知时，默认快递视为已含在该档内：准备 <= 5-3 = 2 天",
+      tier_rule: "未知快递统一按3~5天估算，与用户选择的时间档位无关",
       not_a_guarantee: PURCHASE_WINDOW_CONFIG.not_a_guarantee,
     },
     per_candidate: {},
   };
-  if (!deliveryApplicable) notices.push("⚠ 模拟模式：没有真实商品页，运输/预售时长判定不适用；已如实标注，不编造物流时长。");
+  if (!deliveryApplicable) notices.push("模拟数据没有真实物流信息。");
   validation.candidate_results.forEach((result, index) => {
     const candidate = candidateList[index];
     const bound = catalogByCandidate.get(result.id) ?? null;
@@ -541,16 +514,15 @@ async function runRecommendationCore(input, services = {}) {
     }
     result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
   });
-  /* ---- 追加规则 3：第 1 步解析出来的用户硬约束（确定金额 ±50、确定天数 ±1、喜好原文）----
-     与上面的到达时间/履约 gate 同一位置、同一手法：在共享校验之上**收紧**，绝不放松任何既有规则。 */
+  /* 第 1 步解析约束：预算与喜好沿用原契约，时间仅作提示。 */
   const inputParseAudit = applyInputParseGates({ inputParse: nlParse, validation, candidates: candidateList, delivery, notices });
   if (inputParseAudit) {
     validation.input_parse_gates = inputParseAudit;
     if (inputParseAudit.findings.length > 0) {
-      notices.push(`第 1 步的硬约束检查共产生 ${inputParseAudit.findings.length} 条候选级结论（见响应 validation.input_parse_gates.findings）。`);
+      notices.push(`有${inputParseAudit.findings.length}条与你的需求相关的提示，请结合方案查看。`);
     }
   }
-  validation.all_passed = validation.candidate_results.length === LIMITS.candidatesPerBatch && validation.candidate_results.every((item) => item.passed);
+  validation.all_passed = validation.errors.length === 0 && validation.candidate_results.length === LIMITS.candidatesPerBatch && validation.candidate_results.every((item) => item.passed);
   if (!validation.all_passed && ["passed"].includes(validation.status)) validation.status = "failed";
 
   /* ---- 追加规则 3：第 3–4 步的包装风格与色彩视觉方向（与 intake 一致、可追溯）----
@@ -875,7 +847,19 @@ async function runPresentationCore(input, services = {}) {
     presentation = run.demo === "stress" || demo === "stress" ? stressifyPresentation(built.presentation) : built.presentation;
   }
 
-  let recheck = checkPresentation(run.request, candidate, presentation);
+  const rawPresentationCheck = checkPresentation(run.request, candidate, presentation);
+  let recheck = withTimeAdvisories(rawPresentationCheck);
+  // 先检查模型原值，避免覆盖非法/缺失字段；合法估算统一引用冻结候选。
+  if (typeof presentation?.revised_estimated_preparation_days === "number" && Number.isInteger(presentation.revised_estimated_preparation_days) && presentation.revised_estimated_preparation_days >= 0 &&
+      !recheck.errors.some((e) => e.path === "presentation.revised_estimated_preparation_days")) {
+    const reportedDays = presentation.revised_estimated_preparation_days;
+    presentation = { ...presentation, revised_estimated_preparation_days: candidate.estimated_preparation_days };
+    recheck = withTimeAdvisories(checkPresentation(run.request, candidate, presentation));
+    recheck.raw_validation = structuredClone(rawPresentationCheck);
+    if (reportedDays !== candidate.estimated_preparation_days) {
+      recheck.warnings.push({ code: "PREPARATION_ESTIMATE_ALIGNED", path: "presentation.revised_estimated_preparation_days", message: `准备时间沿用所选礼物的${candidate.estimated_preparation_days}天估算；呈现模型原估算为${reportedDays}天。` });
+    }
+  }
   /* 呈现文字与第 3–4 步方向的对齐：被禁颜色 → 硬错（「不喜欢的东西」绝对禁止）；
      明示偏好未被体现 → warning（文案措辞自由度高于生图 prompt）。 */
   const alignment = presentationAlignmentErrors(run.visual_direction, presentation);
@@ -892,7 +876,7 @@ async function runPresentationCore(input, services = {}) {
   if (alignment.warnings.length) {
     recheck.warnings = [...(recheck.warnings ?? []), ...alignment.warnings];
   }
-  // 呈现阶段的交付时间复核（准备 + 预售/发货 + 运输 <= 可用天数），与候选阶段同一判据。
+  // 呈现阶段复用候选准备天数，物流信息仅作提示。
   const boundProduct = run.catalog_bindings?.get(selectedCandidateId)?.product ?? null;
   const boundShipping = boundProduct?.shipping ?? null;
   const presentationDeliveryApplicable = run.mode !== "mock";
@@ -934,14 +918,14 @@ async function runPresentationCore(input, services = {}) {
     // 直连模式绝不用模拟数据"修复"模型输出：复核没过就如实失败。
     if (run.mode === "llm") {
       extras.repair_note =
-        "直连大模型模式不对输出做模拟修订；呈现复核未通过即如实报告失败，未生成替代内容。";
+        "赠送指南未通过检查，请查看具体问题。";
       pushError(recheck.errors, "REPAIR_NOT_ALLOWED", "repair_count", "该模式不允许用模拟数据修订呈现内容");
       const view = presentationView(run, candidate, presentation, recheck, extras);
       return { kind: "presentation_failed", run, view };
     }
     if (run.repair_count >= GLOBAL_REPAIR_LIMIT) {
       extras.repair_note =
-        "全局自动修订额度已用完（推荐阶段已使用 1 次），不再开启第二次自动修订；以下为真实验收失败结果。";
+        "本次已自动调整过一次，请查看仍需解决的问题。";
       pushError(recheck.errors, "REPAIR_LIMIT_REACHED", "repair_count", "全局自动修订额度已用完，未继续自动修改");
       const view = presentationView(run, candidate, presentation, recheck, extras);
       return { kind: "presentation_failed", run, view };
@@ -950,7 +934,7 @@ async function runPresentationCore(input, services = {}) {
     const firstErrors = recheck.errors.map((e) => ({ ...e }));
     const revised = buildMockPresentation(run.request, candidate, { attempt: 2 });
     run.call_counts.presentation_revision += 1;
-    const revisedCheck = checkPresentation(run.request, candidate, revised.presentation);
+    const revisedCheck = withTimeAdvisories(checkPresentation(run.request, candidate, revised.presentation));
     run.repair_count += 1;
     presentation = revised.presentation;
     recheck = revisedCheck;
