@@ -74,7 +74,7 @@ const CONTRACT_VERSION = "giftwise-20261031-v2";
 const STEP_TITLES = ["关系场合预算时间", "兴趣风格", "不喜欢和补充"];
 const LOCAL_UI_FIXTURE = new URLSearchParams(location.search).get("ui_fixture") === "nov01";
 const LOCAL_DEADLINES = [
-  ["明天", 1], ["3–5 天", 5], ["一周以内", 7], ["一月以内", 30], ["一季度以内", 90], ["一年以内", 365],
+  ["一天", 1], ["3–5天", 5], ["一周以内", 7], ["一月以内", 30], ["一季度以内", 90], ["一年以内", 365],
 ].map(([label, days]) => ({ id: `fixture-${days}`, label, days }));
 const codePoints = value => [...value].length;
 const moneyCents = value => AMOUNT_RE.test(value) ? Number(value.split(".")[0]) * 100 + Number((value.split(".")[1] || "").padEnd(2, "0")) : null;
@@ -367,9 +367,9 @@ function renderBudget() {
 function renderDeadline() {
   const options = deadlineOptions();
   return el("section",{class:"card"},[
-    el("h2",{class:"card__title",text:"能留出多久准备？"}),
-    el("p",{class:"field__hint",text:"按选择的天数上限检查完整准备时间，不承诺实际送达日期。"}),
-    options ? el("div",{class:"chips deadline-options",role:"group","aria-label":"准备时间"},options.map(r=>chip(`${r.label} · 按 ${r.days} 天上限检查`,state.form.deadline_days===String(r.days),()=>{
+    el("h2",{class:"card__title",text:"你有多少时间准备？"}),
+    el("p",{class:"field__hint",text:"选一个最接近的时间，不代表承诺送达日期。"}),
+    options ? el("div",{class:"chips deadline-options",role:"group","aria-label":"准备时间"},options.map(r=>chip(r.label,state.form.deadline_days===String(r.days),()=>{
       state.form.deadline_days=state.form.deadline_days===String(r.days)?"":String(r.days);invalidateAnalysis();render();
     }))) : el("p",{class:"field__error",role:"alert",text:"准备时间配置尚未更新为六档，请稍后刷新；暂不能提交。"}),
   ]);
