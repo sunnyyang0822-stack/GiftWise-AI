@@ -26,7 +26,7 @@ const media = (status = "pending", candidateId = "c1", id = taskId) => ({ contra
 const presentation = () => ({ status: "completed", recommendation_run_id: "run-1", selected_candidate_id: "c1", candidate: { id: "c1", name: "一本摄影集" }, sections: [{ title: "贺卡", items: ["生日快乐，愿你继续发现生活里的好风景。"] }, { title: "包装", items: ["用素色纸搭配细带。"] }, { title: "赠送", items: ["见面时轻松地送给对方。"] }], recheck_summary: { passed: true, gift_estimated_total: "80.00", currency: "CNY" }, media: media() });
 const flush = async () => { for (let i = 0; i < 8; i++) await Promise.resolve(); };
 function setup(fetcher = async () => ({ ok: true, data: media("ready") })) {
-  let seq = 0, fullRenders = 0;
+  let seq = 0, fullRenders = 0, elapsed = 0;
   const timers = new Map(), calls = [];
   const state = { inFlow: true, requestVersion: 1, presentation: presentation() };
   const ctx = { el, state, render() { fullRenders++; }, apiFetch: async (...args) => { calls.push(args); return fetcher(...args); }, errorBox: () => null, setTimeout: (fn, delay) => { const id = ++seq; timers.set(id, { fn, delay }); return id; }, clearTimeout: id => timers.delete(id) };
@@ -34,7 +34,7 @@ function setup(fetcher = async () => ({ ok: true, data: media("ready") })) {
   let root;
   const mount = () => { const result = views.renderPresentation(); root = el("main", {}, [...result.body, ...result.actions]); return root; };
   mount();
-  return { state, views, calls, timers, mount, get root() { return root; }, get fullRenders() { return fullRenders; }, async next() { const next = timers.entries().next().value; if (!next) return; timers.delete(next[0]); next[1].fn(); await flush(); } };
+  return { state, views, calls, timers, mount, get root() { return root; }, get elapsed() { return elapsed; }, get fullRenders() { return fullRenders; }, async next() { const next = timers.entries().next().value; if (!next) return; timers.delete(next[0]); elapsed += next[1].delay; next[1].fn(); await flush(); } };
 }
 
 test("文字立即可见，只有真实pending+合法任务显示生成中，初次渲染不等待GET", () => {
@@ -132,8 +132,11 @@ test("错绑task或候选的状态响应不能覆盖当前图片区", async () =
 
 test("持续pending保留有上限的读取，重绘不能重置计数或付费重生", async () => {
   const h = setup(async () => ({ ok: true, data: media() }));
-  for (let i = 0; i < 8; i++) await h.next();
-  assert.equal(h.calls.length, 8); assert.equal(h.timers.size, 0);
+  for (let i = 0; i < 20 && h.timers.size; i++) await h.next();
+  assert.ok(h.elapsed >= 60000, "自动读取窗口不能短于后端60秒供应商超时");
+  assert.ok(h.elapsed < 120000 && h.calls.length < 20, "自动读取仍有上限");
+  assert.equal(h.timers.size, 0);
+  assert.equal(h.state.presentation.media.status, "pending", "前端读取用尽不改成供应商failed");
   h.mount(); assert.equal(h.timers.size, 0);
   assert.match(h.root.textContent, /效果图还在生成|刷新图片状态/);
   assert.doesNotMatch(h.root.textContent, /查询 8|退避|自动刷新/);

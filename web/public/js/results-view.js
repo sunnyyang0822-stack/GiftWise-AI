@@ -13,7 +13,8 @@ export function createResultViews(ctx) {
   /* ------------------------------------------ 图片任务轮询（/api/media/tasks/<id>） */
   // 只读取既有任务；轮询与手动刷新均不创建/重试生图。离开时令在途响应失效。
   const MEDIA_TASK_ID_RE = /^[a-f0-9]{64}$/;
-  const MEDIA_POLL_DELAYS_MS = [1000, 2000, 4000, 8000, 8000, 8000, 8000, 8000];
+  // 总等待覆盖后端 60 秒供应商边界；用尽后仍保留真实 pending，允许手动读状态。
+  const MEDIA_POLL_DELAYS_MS = [1000, 2000, 4000, 8000, 8000, 8000, 8000, 8000, 8000, 8000];
   const MEDIA_POLL_TIMEOUT_MS = 10000;
   const MEDIA_TERMINAL = new Set(["ready", "failed", "unavailable"]);
   const schedule = ctx.setTimeout || setTimeout;
