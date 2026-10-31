@@ -1,0 +1,11 @@
+FAIL frontend-ai-vs-demo-label TypeError: stage.replaceChildren is not a function
+    at load (file:///C:/Users/lenovo/Desktop/giftwise/qa-rm-frontend-dd50/web/public/js/media-view.js:58:32)
+    at mediaFigure (file:///C:/Users/lenovo/Desktop/giftwise/qa-rm-frontend-dd50/web/public/js/media-view.js:75:88)
+    at packagingMedia (file:///C:/Users/lenovo/Desktop/giftwise/qa-rm-frontend-dd50/web/public/js/media-view.js:46:18)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:28:124
+    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:28:1
+FAIL workflow-v2-prompt-alignment AssertionError [ERR_ASSERTION]: 仍声明无物理字段并禁止curve，尚未对齐后台v2
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:34:195
+    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:34:1

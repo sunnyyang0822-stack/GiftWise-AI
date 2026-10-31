@@ -1,0 +1,15 @@
+✔ 平台请求字段、images为安全读取后的data URL，不使用image参数 (22.8451ms)
+✔ 无参考图许可、错SKU、危险URL不调用供应商 (0.67ms)
+✔ 超时为执行未知且无自动重试、返回错误不泄露原文 (18.8979ms)
+✔ 供应商异常、多图、错误base64及尺寸不符均拒绝 (1.5366ms)
+✔ 未选/不合格/模拟运行/呈现未通过均不能计费 (5.1402ms)
+✔ pending→ready持久化、并发/新provider复用、资产指纹及归属 (24.7075ms)
+✔ 超时/失败重复请求不计费；重启的pending转执行未知 (19.4941ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98.1013

@@ -1,0 +1,11 @@
+✔ 历史字段缺省/空白归一、保留非空原文、不变成兴趣或禁忌 (7.1222ms)
+✔ 类型与Unicode码点边界，旧版未提供时不补新字段 (3.5164ms)
+✔ 已冻结历史传入生成provider及快照、改变历史不复用旧run (7.2717ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23.6783

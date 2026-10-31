@@ -1,0 +1,337 @@
+{
+  "sha": "e034aa53a38ea1f41af64a779a18a3e66f310ee8",
+  "mode": "offline-controlled-no-network",
+  "results": [
+    {
+      "id": "plan-valid",
+      "input": {
+        "category": "maker",
+        "keywords": [
+          "kit"
+        ],
+        "limit": 3
+      },
+      "expected": "仅接受固定结构",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "plan-injection",
+      "input": {
+        "commands": [
+          "; echo QA",
+          "$(echo QA)",
+          "javascript:QA"
+        ],
+        "extra": [
+          "shell",
+          "url",
+          "script"
+        ]
+      },
+      "expected": "拒绝危险内容和额外键",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "money-strict",
+      "input": {
+        "values": [
+          true,
+          -1,
+          "NaN",
+          "Infinity",
+          "01",
+          "1.001"
+        ]
+      },
+      "expected": "拒绝布尔/负数/非有限与非法金额",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "budget-boundaries",
+      "input": {
+        "equal": "200.00",
+        "over": "200.01"
+      },
+      "expected": "等上限通过，超一分拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "price-unknown-conditional-range",
+      "input": {
+        "null_price": null,
+        "conditions": [
+          "会员",
+          "券",
+          "两件价"
+        ],
+        "range": {
+          "min": "180",
+          "max": "220"
+        }
+      },
+      "expected": "缺价未知/条件未知/范围按上端",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "evidence-currency-quantity",
+      "input": {
+        "currency": "GBP",
+        "quantity": true
+      },
+      "expected": "冻结层拒绝不符币种和数量",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "detail-evidence-required",
+      "input": {
+        "source": "browser_observed",
+        "page_kind": "search"
+      },
+      "expected": "摘要不能充当详情证据",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "evidence-freeze",
+      "input": {},
+      "expected": "冻结价格/规格和嵌套物理证据不可改",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-valid",
+      "input": {},
+      "expected": "同候选规格和金额绑定成功",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-model-lowered",
+      "input": {
+        "model": "0.00"
+      },
+      "expected": "服务端价格不能改低",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-wrong-variant",
+      "input": {},
+      "expected": "同名不同规格拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-cross-task",
+      "input": {},
+      "expected": "其他任务product_id不可用",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-expired",
+      "input": {
+        "age_ms": 600001
+      },
+      "expected": "过期观察证据拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "binding-duplicate-product",
+      "input": {},
+      "expected": "不同候选不得重复一个商品",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "worker-isolation",
+      "input": {},
+      "expected": "串行任务、不同taskId、结果深拷贝",
+      "status": "PASS",
+      "actual": {
+        "max": 1,
+        "task_ids": [
+          "004f8be6-91df-4a99-829d-f80db3c73c01",
+          "05e87979-29e0-4a2e-ad49-f8c62bb000ad"
+        ]
+      }
+    },
+    {
+      "id": "worker-queue-boundary",
+      "input": {
+        "queueLimit": 1
+      },
+      "expected": "active+1等待，额外请求队满",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "worker-timeout",
+      "input": {},
+      "expected": "超时unavailable并停用直到维护",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "worker-cancel-queued",
+      "input": {},
+      "expected": "等待任务取消不执行provider",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "worker-provider-failure",
+      "input": {},
+      "expected": "断连/验证码/拒绝访问失败无商品成功",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "media-selection-gate",
+      "input": {
+        "before_selection": true,
+        "forged": true
+      },
+      "expected": "未选择或失败候选不可包装",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "media-idempotency",
+      "input": {},
+      "expected": "并发/重放稳定任务，跨run不复用",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "physical-unknown",
+      "input": {},
+      "expected": "未知不补精确尺寸",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "scene-valid",
+      "input": {},
+      "expected": "合法版本与0/1坐标、异形示意通过",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "scene-old-image-version",
+      "input": {},
+      "expected": "换图后旧坐标拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "scene-coordinate-invalid",
+      "input": {},
+      "expected": "非有限、布尔、字符串、越界均拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "scene-unknown-scale-props",
+      "input": {},
+      "expected": "未知不称实测，道具不作赠品、禁止烧字",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "scene-no-image-no-annotations",
+      "input": {},
+      "expected": "无图不能ready或带旧标注",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "url-private-denial",
+      "input": {},
+      "expected": "回环/内网/保留地址拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "url-protocol-host",
+      "input": {},
+      "expected": "协议、身份、端口和域名拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "url-dns-rebinding",
+      "input": {},
+      "expected": "公私混合解析拒绝，不触发transport",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "url-redirect-denied",
+      "input": {},
+      "expected": "拒绝重定向不访问内网",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "url-mime-signature-size",
+      "input": {},
+      "expected": "SVG/伪PNG/超限均拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "pipeline-owner-idempotency",
+      "input": {
+        "mode": "mock"
+      },
+      "expected": "同owner重放一个run，跨owner隔离",
+      "status": "PASS",
+      "actual": {
+        "same_owner_same_run": true,
+        "cross_owner_separate": true,
+        "selection_response": {
+          "kind": "not_found",
+          "status": "error",
+          "errors": [
+            {
+              "code": "RECOMMENDATION_NOT_FOUND",
+              "path": "recommendation_run_id",
+              "message": "没有找到该推荐记录（可能进程已重启或记录已过期）；请重新填写需求。"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "scene-ready-image-url-validation",
+      "input": {
+        "url": "javascript:QA"
+      },
+      "expected": "provider输出的非法图片URL须在服务端校验拒绝",
+      "status": "FAIL",
+      "actual": "AssertionError [ERR_ASSERTION]: Missing expected exception.\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:61:155\n    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:18:66)\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:61:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+    },
+    {
+      "id": "scene-failed-status-preserved",
+      "input": {
+        "status": "failed",
+        "image": "present"
+      },
+      "expected": "失败元数据保持failed，不能转换ready",
+      "status": "PASS",
+      "actual": "断言通过"
+    }
+  ],
+  "counts": {
+    "PASS": 34,
+    "FAIL": 1
+  }
+}

@@ -1,0 +1,767 @@
+{
+  "sha": "a4d639bb757cc99315ca9acc633d45192d20c15a",
+  "scope": "offline_record_audit_not_live_source_or_image_permission",
+  "counts": {
+    "PASS": 20,
+    "FAIL": 0
+  },
+  "records": 20,
+  "known_prices": 14,
+  "unknown_prices": 6,
+  "authorized_images": 0,
+  "rows": [
+    {
+      "id": "ikea-cn-40583741",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "59.99",
+      "date": "2026-10-31T05:16:45Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面同时出现每满2000减200宣传，主金额未减去满减；活动门槛及叠加规则未核实。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-40583741",
+        "source_url": "https://www.ikea.cn/cn/zh/p/upphetta-wu-pu-ta-ka-pei-hu-cha-hu-bo-li-bu-xiu-gang-hui-bai-40583741/",
+        "view_requested_at": "2026-10-31T05:16:45Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "2 weeks ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L40: 货号405.837.41",
+          "L132: 咖啡壶/茶壶，玻璃/不锈钢 灰白，1 公升",
+          "L134: ¥59.99¥ 59.99"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-40096374",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "99.99",
+      "date": "2026-10-31T05:16:45Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-40096374",
+        "source_url": "https://www.ikea.cn/cn/zh/p/fado-table-lamp-white-40096374/",
+        "view_requested_at": "2026-10-31T05:16:45Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "today",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L40: 货号400.963.74",
+          "L144: 台灯, 白色, 25 厘米",
+          "L146: ¥99.99¥ 99.99",
+          "L53: 灯泡须另购。宜家建议使用LED球形灯泡E27，乳白色。"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-10373589",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "129.00",
+      "date": "2026-10-31T05:16:45Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-10373589",
+        "source_url": "https://www.ikea.cn/cn/zh/p/blahaj-bu-luo-ai-mao-rong-wan-ju-sha-yu-10373589/",
+        "view_requested_at": "2026-10-31T05:16:45Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "3 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L44: 货号103.735.89",
+          "L139: 毛绒玩具，鲨鱼，100 厘米",
+          "L141: ¥129.00¥ 129.00"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-10477619",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "29.99",
+      "date": "2026-10-31T05:16:45Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-10477619",
+        "source_url": "https://www.ikea.cn/cn/zh/p/mala-mo-la-bai-ban-bi-dai-bi-he-bai-ban-ca-duo-se-10477619/",
+        "view_requested_at": "2026-10-31T05:16:45Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "2 months ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L40: 货号104.776.19",
+          "L151: 白板笔带笔盒/白板擦，多色",
+          "L153: ¥29.99/4 支¥ 29.99/4 支"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-70458000",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "9.99",
+      "date": "2026-10-31T05:17:11Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-70458000",
+        "source_url": "https://www.ikea.cn/cn/zh/p/bergenes-holder-for-mobile-phone-tablet-bamboo-70458000/",
+        "view_requested_at": "2026-10-31T05:17:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "3 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L42: 货号704.580.00",
+          "L125: 手机/平板支架，竹",
+          "L127: ¥9.99¥ 9.99"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-90412860",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "79.99",
+      "date": "2026-10-31T05:17:11Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-90412860",
+        "source_url": "https://www.ikea.cn/cn/zh/p/vivalla-wei-wa-la-ping-ban-zhi-jia-zhu-90412860/",
+        "view_requested_at": "2026-10-31T05:17:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "3 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L49: 货号904.128.60",
+          "L133: 平板支架，竹，26x15.5 厘米",
+          "L135: ¥79.99¥ 79.99"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-90597024",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "19.99",
+      "date": "2026-10-31T05:17:11Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面同时出现每满2000减200宣传，主金额未减去满减；活动门槛及叠加规则未核实。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-90597024",
+        "source_url": "https://www.ikea.cn/cn/zh/p/gladelig-mug-dark-grey-90597024/",
+        "view_requested_at": "2026-10-31T05:17:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "2 weeks ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L42: 货号905.970.24",
+          "L119: 杯，深灰色，37 厘升",
+          "L121: ¥19.99¥ 19.99"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "apple-cn-mwty3fe-a",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "149.00",
+      "date": "2026-10-31T05:17:11Z",
+      "conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-apple-cn-mwty3fe-a",
+        "source_url": "https://www.apple.com.cn/shop/product/mwty3fe/a",
+        "view_requested_at": "2026-10-31T05:17:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "yesterday",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L32: # EarPods (闪电接头)",
+          "L34: RMB 149",
+          "L74: 采用闪电接头的 EarPods"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-70612110",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "69.99",
+      "date": "2026-10-31T05:17:35Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "主金额为页面明确列出的非会员2只装69.99元；会员39.99元仅作独立条件报价，禁止自动替换主金额。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-70612110",
+        "source_url": "https://www.ikea.cn/cn/zh/p/smoerfisk-si-mo-fei-si-bei-qian-lu-fen-hong-se-70612110/",
+        "view_requested_at": "2026-10-31T05:17:35Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "yesterday",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L44: 货号706.121.10",
+          "L130: 杯, 浅绿/粉红色, 34 厘升",
+          "L132: 非会员价 ¥69.99/2 只装¥ 69.99/2 只装",
+          "L134: ¥39.99/2 只装¥ 39.99/2 只装",
+          "L136: 优惠有效期 2026.10.14 至 2026.11.11"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "apple-cn-homepod-mini-2-white",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "1099.00",
+      "date": "2026-10-31T05:17:35Z",
+      "conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。",
+        "每位顾客限购6部；采用单台全额1099元，未使用24期月供金额。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-apple-cn-homepod-mini-2-white",
+        "source_url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+        "view_requested_at": "2026-10-31T05:17:35Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "today",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L34: # 购买 HomePod mini 2",
+          "L36: 每位顾客限购 6 部 HomePod mini 2。",
+          "L38: 【16†白色 RMB 1,099】",
+          "L61:     * HomePod mini 2",
+          "L62:     * 20W USB-C 电源适配器"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "apple-cn-muwa3ch-a",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "649.00",
+      "date": "2026-10-31T05:17:35Z",
+      "conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-apple-cn-muwa3ch-a",
+        "source_url": "https://www.apple.com.cn/shop/product/muwa3ch/a",
+        "view_requested_at": "2026-10-31T05:17:35Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "today",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L32: # Apple Pencil (USB-C)",
+          "L34: RMB 649",
+          "L68: 直径：8.9 毫米 (0.35 英寸)",
+          "L70: 长度：155 毫米 (6.10 英寸)",
+          "L72: 重量：20.5 克 (0.72 盎司)"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-10561991",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "79.99",
+      "date": "2026-10-31T05:18:02Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-10561991",
+        "source_url": "https://www.ikea.cn/cn/zh/p/vattenkrasse-wa-te-qia-si-jiao-shui-hu-ru-bai-se-jin-huang-se-10561991/",
+        "view_requested_at": "2026-10-31T05:18:02Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "4 months ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L46: 货号 105.619.91",
+          "L123: 浇水壶，乳白色/金黄色，35 厘升",
+          "L125: ¥79.99¥ 79.99"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "ikea-cn-90592597",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "99.99",
+      "date": "2026-10-31T05:18:02Z",
+      "conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-ikea-cn-90592597",
+        "source_url": "https://www.ikea.cn/cn/zh/p/vappeby-portable-bluetooth-speaker-waterproof-blue-90592597/",
+        "view_requested_at": "2026-10-31T05:18:02Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "2 months ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L42: 货号905.925.97",
+          "L169: 便携蓝牙音箱，防水/蓝色",
+          "L171: ¥99.99¥ 99.99",
+          "L73: USB-C电线和USB电源适配器须单独另购。"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-31147",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:21Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-31147",
+        "source_url": "https://www.lego.com/zh-cn/product/retro-camera-31147",
+        "view_requested_at": "2026-10-31T05:18:21Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "3 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L484: 261",
+          "L493: 【73†Creator 3 合 1】#31147",
+          "L494: # 复古相机"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-72046",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:21Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-72046",
+        "source_url": "https://www.lego.com/zh-cn/product/game-boy-72046",
+        "view_requested_at": "2026-10-31T05:18:21Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "4 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L482: 421",
+          "L491: 【41†乐高®超级马力欧】#72046",
+          "L492: # Game Boy™ 积木游戏机"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-40725",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:11Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-40725",
+        "source_url": "https://www.lego.com/zh-cn/product/cherry-blossoms-40725",
+        "view_requested_at": "2026-10-31T05:18:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "2 days ago",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L486: 430",
+          "L497: 【184†其他】#40725",
+          "L499: # 樱花",
+          "L521:   * 尺寸——本套装包含 438 块组件，每根樱花枝条长 35 厘米（14 英寸）"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-31213",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:11Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-31213",
+        "source_url": "https://www.lego.com/zh-cn/product/mona-lisa-31213",
+        "view_requested_at": "2026-10-31T05:18:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "last week",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L486: 1503",
+          "L497: 【57†艺术】#31213",
+          "L498: # 蒙娜丽莎"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-10328",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:11Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-10328",
+        "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-roses-10328",
+        "view_requested_at": "2026-10-31T05:18:11Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "today",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L486: 822",
+          "L495: 【23†Botanicals】#10328",
+          "L497: # 玫瑰花束"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "lego-cn-10374",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": null,
+      "date": "2026-10-31T05:18:21Z",
+      "conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-lego-cn-10374",
+        "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-pink-roses-10374",
+        "view_requested_at": "2026-10-31T05:18:21Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "yesterday",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L486: 789",
+          "L495: 【23†Botanicals】#10374",
+          "L496: # 粉玫瑰花束"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    },
+    {
+      "id": "apple-cn-airtag-single-unengraved",
+      "checks": {
+        "identity": true,
+        "price": true,
+        "conditions": true,
+        "date": true,
+        "evidence_link": true,
+        "non_realtime": true,
+        "image_rights_not_assumed": true,
+        "unknowns_preserved": true
+      },
+      "status": "PASS",
+      "price": "249.00",
+      "date": "2026-10-31T05:18:21Z",
+      "conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。",
+        "249元只对应1件装；4件装849元不折算为本条价格；页面有免费镌刻宣传，本条不含镌刻要求。"
+      ],
+      "raw_evidence": {
+        "evidence_id": "evidence-apple-cn-airtag-single-unengraved",
+        "source_url": "https://www.apple.com.cn/shop/buy-airtag/airtag",
+        "view_requested_at": "2026-10-31T05:18:21Z",
+        "view_completed_before": "2026-10-31T05:21:03Z",
+        "reader": "web.run open（公开网页文本提取）",
+        "source_kind": "official_product_detail",
+        "cache_notice": "today",
+        "upstream_fetched_at": null,
+        "raw_excerpt_format": "工具返回的必要短片段，L为工具提取文本行号；非原始HTML、非全页副本",
+        "raw_excerpt": [
+          "L35: # 购买 AirTag",
+          "L39: 【16†1 件装 RMB 249】",
+          "L41: 【17†4 件装 RMB 849】"
+        ],
+        "coverage_note": "身份和报价必要片段；其余规格/标签为同页人工整理事实摘要，未保存整段商品文案。详情可能来自工具缓存，不证明商家此时仍有效。"
+      }
+    }
+  ],
+  "limitation": "仅核对资料内部结构和证据片段/引用；未实时读取页面，不确认售价、权利授权、视觉、库存和送达。"
+}

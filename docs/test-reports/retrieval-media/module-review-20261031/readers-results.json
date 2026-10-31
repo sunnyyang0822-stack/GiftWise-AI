@@ -1,0 +1,93 @@
+{
+  "scope": "exported-functions-with-minimal-DOM-and-static-workflow-not-browser",
+  "frontend_sha": "dd50fefc6ab9cf86a11e23a93a43e9fd7b3c6b53",
+  "workflow_sha": "277b71d0042163a808a39b513edac684fb694747",
+  "results": [
+    {
+      "id": "frontend-coordinate-version",
+      "input": {},
+      "expected": "合法端点保留，旧版本/越界丢弃",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-url-boundary",
+      "input": {},
+      "expected": "仅本站相对媒体，远程/脚本/协议相对拒绝",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-candidate-binding",
+      "input": {},
+      "expected": "candidate→product→image三引用匹配且保留价格来源",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-mismatched-image",
+      "input": {},
+      "expected": "产品image_id不符不展示",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-duplicate-binding",
+      "input": {},
+      "expected": "同候选重复媒体引用降级",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-selected-null",
+      "input": {},
+      "expected": "v2无图selected不崩溃且保留文字",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "frontend-ai-vs-demo-label",
+      "input": {
+        "kind": "ai_illustration",
+        "status": "ready"
+      },
+      "expected": "真实provider AI信封不得无条件标为摄影开发夹具、非AI生成",
+      "status": "FAIL",
+      "actual": "AssertionError [ERR_ASSERTION]: 把心意，好好包起来。AI包装效果示意 · 当前为授权摄影开发夹具，非AI生成结果。尺寸与适配性未知，不代表已制作实物或保证外观。场景道具不包含在赠送清单内。包装、道具未报价，不代表免费。图片加载中…AI效果示意，非商品实拍重试加载图片\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:29:355\n    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:29:1"
+    },
+    {
+      "id": "workflow-sidecar-status",
+      "input": {},
+      "expected": "夹具状态属于共享枚举",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "workflow-reference-binding",
+      "input": {},
+      "expected": "三个候选引用独立商品并与媒体绑定一致",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "workflow-source-no-fake-live",
+      "input": {},
+      "expected": "虚构夹具保持seed/null图片/无实时成功",
+      "status": "PASS",
+      "actual": "断言通过"
+    },
+    {
+      "id": "workflow-v2-prompt-alignment",
+      "input": {
+        "contract": "retrieval-media-v2"
+      },
+      "expected": "包装提示词不能禁止v2已定义的physical/version/curve字段",
+      "status": "FAIL",
+      "actual": "AssertionError [ERR_ASSERTION]: 仍声明无物理字段并禁止curve，尚未对齐后台v2\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:35:195\n    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)\n    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:35:1"
+    }
+  ],
+  "counts": {
+    "PASS": 9,
+    "FAIL": 2
+  }
+}

@@ -1,0 +1,8 @@
+FAIL frontend-ai-vs-demo-label AssertionError [ERR_ASSERTION]: 把心意，好好包起来。AI包装效果示意 · 当前为授权摄影开发夹具，非AI生成结果。尺寸与适配性未知，不代表已制作实物或保证外观。场景道具不包含在赠送清单内。包装、道具未报价，不代表免费。图片加载中…AI效果示意，非商品实拍重试加载图片
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:29:355
+    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:29:1
+FAIL workflow-v2-prompt-alignment AssertionError [ERR_ASSERTION]: 仍声明无物理字段并禁止curve，尚未对齐后台v2
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:35:195
+    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:7:54)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_readers.mjs:35:1
