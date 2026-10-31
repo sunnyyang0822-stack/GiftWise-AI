@@ -1,11 +1,14 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [html, app, css] = await Promise.all([
+// 需求收集已改为对话式：字段与校验逻辑分布在 app.js（提交契约）与 js/chat.js（逐题收集）。
+const [html, appMain, chatJs, css] = await Promise.all([
   readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
-  readFile(new URL("../public/styles.css", import.meta.url), "utf8"),
+  readFile(new URL("../public/js/chat.js", import.meta.url), "utf8"),
+  Promise.all(["styles.css", "chat.css"].map(n => readFile(new URL(`../public/${n}`, import.meta.url), "utf8"))).then(x => x.join("\n")),
 ]);
+const app = `${appMain}\n${chatJs}`;
 
 for (const id of ["badges", "banner-slot", "mode-flag", "hero-flag", "footer-meta", "view", "cta-start", "cta-start-2", "hero", "how", "steps", "live"]) {
   assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id}`);

@@ -36,9 +36,9 @@ export async function previewRequest(path, payload) {
     const intake = payload.intake;
     const source = intake.dislikes;
     // 固定的虚构夹具只覆盖这句示例，其余表达要求澄清，不能冒充语义识别。
-    if (source.trim() !== "不要香水") return reply({ status: "needs_input", mode: "mock", analysis_id: null, candidates: [], errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", message: "预览示例暂不能理解这段限制，请使用“不要香水”或修改后重试。" }] });
+    if (source.trim() !== "不要香水") return reply({ status: "needs_input", mode: "mock", analysis_id: null, candidates: [], errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", message: "这句我还没完全理解，能换个更直接的说法吗？比如“不要香水”。" }] });
     const id = `preview-analysis-${++sequence}`;
-    const candidates = [{ id: "xc1", kind: "tag", tag: "fragrance", term: null, source_span: "不要香水", confidence: "high", why: "示例原文明确排除香水。", evidence: "user_text" }];
+    const candidates = [{ id: "xc1", kind: "tag", tag: "fragrance", term: null, source_span: "不要香水", confidence: "high", why: "你写了“不要香水”。", evidence: "user_text" }];
     analyses.set(id, JSON.stringify(intake));
     return reply({ status: "needs_confirmation", mode: "mock", analysis_id: id, candidates, errors: [] });
   }
@@ -63,15 +63,15 @@ export async function previewRequest(path, payload) {
       ["一份定制主题画作", "围绕一段共同记忆，留下一份纪念", "个人纪念", "对方的审美与制作条件"],
     ];
     const candidates = directions.map(([name, description, direction, unknown], i) => ({ id: `preview-c${i + 1}`, name, description,
-      reason: `${direction}的示例方向，供你比较表达方式。`, fact_refs: ["f1"], inferences: ["这类表达可能适合当前场合，仍需你判断。"],
-      unknowns: [unknown, "价格、库存、实际准备条件未核实。"], estimated_total: noSpend ? "0.00" : ["80.00", "150.00", "220.00"][i],
+      reason: `走「${direction}」的路子：${description}。`, fact_refs: ["f1"], inferences: ["这类表达和当前场合比较相配。"],
+      unknowns: [unknown, "具体价格与库存以购买时为准"], estimated_total: noSpend ? "0.00" : ["80.00", "150.00", "220.00"][i],
       currency: "CNY", estimated_preparation_days: [1, 3, 5][i] }));
     const results = candidates.map(c => {
       const errors = [];
-      if (cents(c.estimated_total) > cents(f.budget_range.max)) errors.push({ code: "OVER_BUDGET", message: "示例估价高于预算上限。" });
-      if (c.estimated_preparation_days > f.deadline_days) errors.push({ code: "PREPARATION_TOO_LONG", message: "示例准备时间超过可用天数。" });
-      if (scenario === "blocked") errors.push({ code: "PREVIEW_BLOCKED", message: "预览：该方案未通过检查。" });
-      return { id: c.id, passed: errors.length === 0, errors, warnings: cents(c.estimated_total) < cents(f.budget_range.min) ? [{ code: "BELOW_BUDGET_RANGE", message: "示例估价低于预算下限，仍可选择。" }] : [] };
+      if (cents(c.estimated_total) > cents(f.budget_range.max)) errors.push({ code: "OVER_BUDGET", message: "估价高于你的预算上限。" });
+      if (c.estimated_preparation_days > f.deadline_days) errors.push({ code: "PREPARATION_TOO_LONG", message: "准备时间超过了你能留出的天数。" });
+      if (scenario === "blocked") errors.push({ code: "PREVIEW_BLOCKED", message: "这个方案和你的要求有冲突。" });
+      return { id: c.id, passed: errors.length === 0, errors, warnings: cents(c.estimated_total) < cents(f.budget_range.min) ? [{ code: "BELOW_BUDGET_RANGE", message: "估价低于预算下限，仍可选择。" }] : [] };
     });
     const id = `preview-run-${++sequence}`;
     const report = { contract_version: config.contract_version, recommendation_run_id: id, mode: "mock", status: results.every(r => r.passed) ? "passed" : "failed",

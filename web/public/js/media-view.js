@@ -7,7 +7,7 @@ const node = (tag, attrs = {}, children = []) => {
   }
   n.append(...children.filter(Boolean)); return n;
 };
-const kinds = { source_photo: "商品来源图", ai_illustration: "AI效果示意，非商品实拍", demo: "开发样例，非商品实拍" };
+const kinds = { source_photo: "商品来源图", ai_illustration: "AI 效果示意", demo: "" };
 // 媒体必须经本站托管；拒绝远程直连、data、脚本URL、调试端口。外部SVG绝不内联。
 export function localMediaUrl(value) {
   if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || /[\\\u0000-\u0020]/.test(value)) return null;
@@ -27,27 +27,29 @@ export function candidateMedia(report, candidate) {
   const product = products.length === 1 ? products[0] : null;
   const boundImage = product && product.image_id === binding.image?.id ? binding.image : null;
   const figure = mediaFigure(boundImage, [], report.media?.status);
-  const source = { browser_observed: "页面观察价，非结算保证", user_provided: "用户提供，未核实", seed: "开发样例估算，非实时价格", unknown: "来源未知" };
-  const provenance = figure.querySelector(".media-source") || figure;
-  provenance.append(node("p", { class: "media-price", text: `价格来源：${source[product?.price_source] || "来源未知"}。读取日期：${product?.observed_at || "未检索"}。` }));
-  if (Array.isArray(product?.price_conditions)) provenance.append(node("p", { class: "media-caption", text: product.price_conditions.join("；") }));
+  // 只有真实来源的价格才标注出处；参考估价本身已在卡片上以“参考”呈现。
+  const source = { browser_observed: "页面价格", user_provided: "你提供的价格" };
+  if (source[product?.price_source]) {
+    const provenance = figure.querySelector(".media-source") || figure;
+    provenance.append(node("p", { class: "media-price", text: `${source[product.price_source]}${product.observed_at ? ` · ${product.observed_at}` : ""}` }));
+    if (product.price_conditions?.length) provenance.append(node("p", { class: "media-caption", text: product.price_conditions.join("；") }));
+  }
   return figure;
 }
 export function packagingMedia(view) {
   const selected = view.media?.selected;
   const section = node("section", { class: "packaging-media", "aria-label": "所选礼物包装效果示意" });
-  section.append(node("h2", { text: "把心意，好好包起来。" }));
-  section.append(node("p", { class: "media-caption", text: "AI包装效果示意 · 当前为授权摄影开发夹具，非AI生成结果。尺寸与适配性未知，不代表已制作实物或保证外观。" }));
-  section.append(node("p", { class: "media-caption", text: "场景道具不包含在赠送清单内。包装、道具未报价，不代表免费。" }));
+  section.append(node("div", { class: "packaging-media__head" }, [
+    node("h2", { text: "把心意，好好包起来。" }),
+    node("span", { class: "media-kind", text: "包装效果示意" }),
+  ]));
   if (!selected || selected.candidate_id !== view.selected_candidate_id) { section.append(mediaFigure(null)); return section; }
-  if (selected.packaging?.scale?.note) section.append(node("p", { class: "media-caption", text: selected.packaging.scale.note }));
-  if (selected.scene?.description) section.append(node("p", { class: "media-caption", text: selected.scene.description }));
   const annotations = view.media?.contract_version === "retrieval-media-v2" && !selected.image?.version ? [] : selected.annotations;
   section.append(mediaFigure(selected.image, annotations, view.media?.status)); return section;
 }
 function mediaFigure(image, annotations = [], status = "ready") {
   const figure = node("figure", { class: "gift-media", "data-image-id": image?.id || "missing" });
-  const safe = image && kinds[image.kind] && localMediaUrl(image.url);
+  const safe = image && Object.hasOwn(kinds, image.kind) && localMediaUrl(image.url);
   const notes = validAnnotations(annotations, image?.version);
   const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}` });
   const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: safe ? status === "pending" ? "图片正在准备，文字结果可先查看。" : "图片加载中…" : "暂无图片，文字结果仍可查看。" });
@@ -66,11 +68,12 @@ function mediaFigure(image, annotations = [], status = "ready") {
     stage.append(img); img.src = safe;
   };
   retry.addEventListener("click", load);
-  figure.append(stage, notice, node("figcaption", { class: "media-caption", text: image ? kinds[image.kind] || "图片类型未知，未展示" : "图片缺失" }), retry);
-  if (image?.attribution) figure.append(node("details", { class: "media-source" }, [node("summary", { text: "图片来源与说明" }), node("p", { class: "media-attribution", text: image.attribution })]));
+  const caption = image ? kinds[image.kind] : "";
+  figure.append(...[stage, notice, caption ? node("figcaption", { class: "media-caption", text: caption }) : null, retry].filter(Boolean));
+  if (image?.attribution) figure.append(node("details", { class: "media-source" }, [node("summary", { text: "图片来源" }), node("p", { class: "media-attribution", text: image.attribution })]));
   if (notes.length) {
     const list = node("ol", {}, notes.map(a => node("li", { text: a.text })));
-    figure.append(node("details", { class: "media-notes" }, [node("summary", { text: "查看说明" }), list]));
+    figure.append(node("details", { class: "media-notes" }, [node("summary", { text: "文字版说明" }), list]));
   }
   if (safe && status !== "pending" && status !== "failed" && status !== "unavailable") load();
   else if (safe) { retry.hidden = false; retry.textContent = "重新查看图片"; if (status !== "pending") notice.textContent = "图片暂不可用，文字结果可先查看。"; }

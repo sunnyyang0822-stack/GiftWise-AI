@@ -1,42 +1,68 @@
-/* GiftWise 全站令牌 · 系统字体，无外部资源。维护权归 WEB-002。 */
+/* GiftWise 全站令牌 · 2026-10-31 视觉重构：保留原白底与黑/红/蓝配色，叠加极淡缎带色流体光晕 + 玻璃卡片 + 手写字体。
+   字体均为 OFL 开源授权、本站自托管（见 /fonts.css 与 /fonts/OFL-*.txt），无 CDN。 */
 :root {
+  /* 色板：纸面、墨色与缎带色 */
   --gw-color-bg: #fbf9f7;
+  --gw-color-bg-deep: #f3f0ec;
   --gw-color-surface: #ffffff;
   --gw-color-text: #101011;
   --gw-color-text-secondary: #5b5a5a;
   --gw-color-primary: #0f0f10;
   --gw-color-primary-hover: #303032;
   --gw-color-primary-active: #000000;
-  --gw-color-accent: #a01c23;
-  --gw-color-accent-blue: #21437a;
-  --gw-color-border: #dfdad5;
-  --gw-color-success: #245d3c;
-  --gw-color-success-bg: #edf5ef;
-  --gw-color-warning: #784b14;
-  --gw-color-warning-bg: #fff4df;
-  --gw-color-danger: #a01c23;
-  --gw-color-danger-bg: #fceeee;
+  --gw-color-accent: #a01c23;          /* 缎带红（原品牌色） */
+  --gw-color-accent-coral: #e0584a;    /* 珊瑚缎带 */
+  --gw-color-accent-blue: #21437a;     /* 缎带蓝（原品牌色） */
+  --gw-color-accent-gold: #c9a15a;     /* 点缀金，仅小面积 */
+  --gw-color-accent-pink: #f6d9d7;     /* 极淡红，光晕用 */
+  --gw-color-accent-lilac: #d6deef;    /* 极淡蓝，光晕用 */
+  --gw-color-border: #e4e0db;
+  --gw-color-success: #23744b;
+  --gw-color-success-bg: rgb(35 116 75 / 10%);
+  --gw-color-warning: #8a5a12;
+  --gw-color-warning-bg: rgb(243 180 67 / 18%);
+  --gw-color-danger: #c22f3a;
+  --gw-color-danger-bg: rgb(217 58 68 / 9%);
   --gw-color-disabled: #e5e1dc;
-  --gw-font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --gw-font-family-brand: Arial, "Helvetica Neue", sans-serif;
+
+  /* 渐变：品牌主渐变与流体光晕 */
+  --gw-gradient-brand: linear-gradient(120deg, #a01c23 0%, #e0584a 100%);
+  --gw-gradient-cool: linear-gradient(120deg, #21437a 0%, #4a6fb0 100%);
+  --gw-gradient-ink: linear-gradient(135deg, #1d1d1f 0%, #0b0b0c 100%);
+
+  /* 玻璃质感 */
+  --gw-glass-bg: rgb(255 255 255 / 62%);
+  --gw-glass-bg-strong: rgb(255 255 255 / 78%);
+  --gw-glass-border: rgb(255 255 255 / 75%);
+  --gw-glass-blur: 20px;
+  --gw-glass-shadow: 0 1px 0 rgb(255 255 255 / 90%) inset, 0 18px 50px -20px rgb(16 16 17 / 18%), 0 2px 8px rgb(16 16 17 / 4%);
+  --gw-glass-shadow-hover: 0 1px 0 rgb(255 255 255 / 95%) inset, 0 26px 60px -20px rgb(16 16 17 / 26%), 0 4px 14px rgb(16 16 17 / 6%);
+
+  /* 字体：标题与正文为手写楷体（霞鹜文楷），少量手写批注为钢笔字（龙藏体） */
+  --gw-font-display: "GW WenKai", "PingFang SC", "Microsoft YaHei", serif;   /* 霞鹜文楷：手写笔意 + 雅致，配合黑盒缎带的高级感 */
+  --gw-font-family: "GW WenKai", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  --gw-font-hand: "GW LongCang", "GW WenKai", cursive;
+  --gw-font-family-brand: "GW WenKai", serif;
   --gw-font-family-mono: ui-monospace, Consolas, monospace;
-  --gw-font-size-xs: 12px;
-  --gw-font-size-sm: 14px;
-  --gw-font-size-base: 16px;
+
+  --gw-font-size-xs: 13px;
+  --gw-font-size-sm: 15px;
+  --gw-font-size-base: 17px;
   --gw-font-size-lg: 20px;
   --gw-font-size-xl: 24px;
-  --gw-font-size-h3: 32px;
+  --gw-font-size-h3: 30px;
   --gw-font-size-h2: 56px;
   --gw-font-size-h1: 96px;
   --gw-font-weight-regular: 400;
   --gw-font-weight-medium: 500;
-  --gw-font-weight-semibold: 600;
-  --gw-font-weight-bold: 700;
-  --gw-font-weight-display: 800;
-  --gw-font-line-height-tight: 1.12;
-  --gw-font-line-height-heading: 1.25;
-  --gw-font-line-height-body: 1.6;
-  --gw-font-line-height-caption: 1.5;
+  --gw-font-weight-semibold: 500;
+  --gw-font-weight-bold: 500;
+  --gw-font-weight-display: 500;
+  --gw-font-line-height-tight: 1.15;
+  --gw-font-line-height-heading: 1.3;
+  --gw-font-line-height-body: 1.7;
+  --gw-font-line-height-caption: 1.55;
+
   --gw-space-0: 0;
   --gw-space-1: 8px;
   --gw-space-2: 16px;
@@ -48,53 +74,61 @@
   --gw-space-10: 80px;
   --gw-space-12: 96px;
   --gw-space-16: 128px;
-  --gw-radius-sm: 8px;
-  --gw-radius-md: 16px;
-  --gw-radius-lg: 24px;
+
+  --gw-radius-sm: 12px;
+  --gw-radius-md: 20px;
+  --gw-radius-lg: 28px;
+  --gw-radius-xl: 36px;
   --gw-radius-pill: 999px;
+
   --gw-shadow-none: none;
-  --gw-shadow-sm: 0 2px 8px rgb(15 15 16 / 5%);
-  --gw-shadow-md: 0 12px 32px rgb(15 15 16 / 9%);
+  --gw-shadow-sm: 0 4px 14px rgb(16 16 17 / 6%);
+  --gw-shadow-md: 0 18px 44px -14px rgb(16 16 17 / 18%);
+  --gw-shadow-glow: 0 14px 30px -12px rgb(16 16 17 / 45%);
+
   --gw-z-base: 0;
   --gw-z-content: 1;
   --gw-z-sticky: 20;
   --gw-z-overlay: 40;
   --gw-z-skip: 60;
-  --gw-layout-max: 1512px;
-  --gw-layout-gutter: 64px;
+  --gw-layout-max: 1240px;
+  --gw-layout-gutter: 48px;
+
   --gw-button-bg: var(--gw-color-primary);
-  --gw-button-text: var(--gw-color-surface);
-  --gw-button-radius: var(--gw-radius-md);
-  --gw-button-height: 64px;
-  --gw-button-padding-x: var(--gw-space-5);
-  --gw-button-secondary-bg: transparent;
+  --gw-button-text: #ffffff;
+  --gw-button-radius: var(--gw-radius-pill);
+  --gw-button-height: 56px;
+  --gw-button-padding-x: 28px;
+  --gw-button-secondary-bg: var(--gw-glass-bg);
   --gw-button-secondary-text: var(--gw-color-text);
-  --gw-button-secondary-border: var(--gw-color-border);
-  --gw-card-bg: var(--gw-color-surface);
-  --gw-card-radius: var(--gw-radius-md);
-  --gw-card-border: var(--gw-color-border);
-  --gw-card-padding: var(--gw-space-4);
-  --gw-card-shadow: var(--gw-shadow-none);
-  --gw-tag-bg: #f0ece7;
+  --gw-button-secondary-border: var(--gw-glass-border);
+  --gw-card-bg: var(--gw-glass-bg);
+  --gw-card-radius: var(--gw-radius-lg);
+  --gw-card-border: var(--gw-glass-border);
+  --gw-card-padding: 28px;
+  --gw-card-shadow: var(--gw-glass-shadow);
+  --gw-tag-bg: rgb(255 255 255 / 70%);
   --gw-tag-text: var(--gw-color-text-secondary);
   --gw-tag-radius: var(--gw-radius-pill);
-  --gw-input-bg: var(--gw-color-surface);
+  --gw-input-bg: rgb(255 255 255 / 82%);
   --gw-input-text: var(--gw-color-text);
   --gw-input-border: var(--gw-color-border);
-  --gw-input-radius: var(--gw-radius-sm);
-  --gw-input-height: 48px;
-  --gw-input-padding: var(--gw-space-2);
+  --gw-input-radius: var(--gw-radius-md);
+  --gw-input-height: 52px;
+  --gw-input-padding: 16px;
   --gw-focus-color: var(--gw-color-accent-blue);
   --gw-focus-width: 3px;
-  --gw-focus-offset: 4px;
-  --gw-motion-duration: 240ms;
+  --gw-focus-offset: 3px;
+
+  --gw-motion-duration: 280ms;
   --gw-motion-ease: cubic-bezier(.16, 1, .3, 1);
+  --gw-motion-spring: cubic-bezier(.34, 1.56, .64, 1);
 }
 @media (max-width: 1023px) {
-  :root { --gw-layout-gutter: 32px; --gw-font-size-h1: 72px; --gw-font-size-h2: 40px; }
+  :root { --gw-layout-gutter: 32px; --gw-font-size-h1: 72px; --gw-font-size-h2: 44px; }
 }
 @media (max-width: 599px) {
-  :root { --gw-layout-gutter: 24px; --gw-font-size-h1: 52px; --gw-font-size-h2: 32px; --gw-font-size-h3: 24px; }
+  :root { --gw-layout-gutter: 16px; --gw-font-size-h1: 50px; --gw-font-size-h2: 34px; --gw-font-size-h3: 24px; --gw-card-padding: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
   :root { --gw-motion-duration: 0ms; }

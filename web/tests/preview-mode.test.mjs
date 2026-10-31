@@ -7,7 +7,7 @@ const intake = {contract_version:"giftwise-20261031-v2",recipient_relation:"purs
 test("本地配置、六档与预算不需要重复确认",async()=>{
   assert.equal(PREVIEW_MODE,true);
   assert.deepEqual(previewConfig.ranges.deadline.map(r=>r.days),[1,5,7,30,90,365]);
-  const app=await readFile(new URL('../public/app.js',import.meta.url),'utf8');
+  const app=(await Promise.all(['../public/app.js','../public/js/chat.js'].map(n=>readFile(new URL(n,import.meta.url),'utf8')))).join('\n');
   assert.doesNotMatch(app,/budget_confirmed|fetch\(/);
   assert.match(app,/previous_gifts: f\.previous_gifts/);
   assert.match(app,/placeholder:"讨厌的东西，过敏，衣服尺码未知"/);
