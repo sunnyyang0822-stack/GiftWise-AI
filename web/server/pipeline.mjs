@@ -14,6 +14,7 @@ const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrob
  */
 
 import { strictParse, dump } from "./jsonstrict.mjs";
+import { packagingSectionItems } from "./presentation-packaging.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
 import { validate, validateForDecision, validateRequestOnly, requestIsValid, checkPresentation, checkPresentationForDecision, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents } from "./checker.mjs";
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
@@ -623,10 +624,7 @@ function buildSections(presentation, candidate, request) {
     {
       key: "packaging",
       title: "② 包装材料与步骤",
-      items: [
-        ...(presentation.packaging.materials || []).map((m) => `材料：${m}`),
-        ...(presentation.packaging.steps || []).map((s, i) => `步骤 ${i + 1}：${s}`),
-      ],
+      items: packagingSectionItems(presentation.packaging),
     },
     {
       key: "card",

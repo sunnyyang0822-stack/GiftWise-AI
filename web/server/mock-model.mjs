@@ -340,7 +340,7 @@ export function buildMockPresentation(request, candidate, options = {}) {
     const presentation = {
       contract_version: "giftwise-20261031-v2",
       style: isPursuit ? "低压力、简洁" : "简洁实用",
-      packaging: { color_palette: attempt === 2 ? ["原色", "米白"] : ["米白", "浅木色", "雾霾蓝"] },
+      packaging: { color_palette: attempt === 2 ? ["原色", "米白"] : ["米白", "浅木色", "雾霾蓝"], description: `模拟呈现示例：可把${candidate.name}自然交给对方，并附上下面的贺卡说明；本示例不要求采购包装材料。` },
       card_text: flavor.card_text,
       giving_advice: { timing: flavor.timing, wording: flavor.wording, relationship_cautions: flavor.cautions },
       unknowns: ["实际价格、库存、配送时效均未核实"],

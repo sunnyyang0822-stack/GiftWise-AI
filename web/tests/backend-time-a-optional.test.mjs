@@ -9,7 +9,7 @@ import { buildMockCandidates } from '../server/mock-model.mjs';
 const req = () => ({contract_version:'giftwise-20261031-v2',recipient_relation:'恋人',occasion:'生日',budget_amount:'800',currency:'CNY',available_days:null,facts:[],forbidden_tags:[],forbidden_terms:[],notes:''});
 const gift = (id, extra={}) => ({id,name:`方案${id}`,description:`不同方向${id}`,estimated_total:'780.00',currency:'CNY',estimated_preparation_days:8,tags:['other'],reason:'生日心意',fact_refs:[],inferences:[],unknowns:[],...extra});
 const batch = (first=gift('c1')) => ({candidates:[first,gift('c2'),gift('c3')]});
-const p = () => ({contract_version:'giftwise-20261031-v2',style:'简洁',packaging:{color_palette:['米白']},card_text:'生日快乐',giving_advice:{timing:'方便时送出',wording:'一点心意',relationship_cautions:[]},unknowns:[],currency:'CNY',revised_estimated_preparation_days:8});
+const p = () => ({contract_version:'giftwise-20261031-v2',style:'简洁',packaging: { color_palette: ['米白'], description: "受控呈现说明：无需新增包装，可直接交付所选礼物并附上贺卡。" },card_text:'生日快乐',giving_advice:{timing:'方便时送出',wording:'一点心意',relationship_cautions:[]},unknowns:[],currency:'CNY',revised_estimated_preparation_days:8});
 const check = (r,b) => validateForDecision(JSON.stringify(r),JSON.stringify(b),strictParse);
 
 for (const absent of [true,false]) test(`optional time ${absent?'missing':'null'} runs full validation and retains strict raw failure`,()=>{

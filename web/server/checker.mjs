@@ -15,6 +15,7 @@
 
 import { JsonFloat, codePointLength } from "./jsonstrict.mjs";
 import { TAGS } from "./labels.mjs";
+import { packagingTextItems } from "./presentation-packaging.mjs";
 import { LIMITS, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG } from "./config.mjs";
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?(?![\s\S])/;
@@ -809,7 +810,7 @@ function checkLegacyPresentation(request, candidate, presentation) {
   return { passed: errors.length === 0, errors };
 }
 
-/** 新版只复核冻结礼物价；呈现不得携带任何报价或旧包装教程。 */
+/** 新版复核冻结礼物价和模型包装内容，不接收包装报价。 */
 export function checkPresentation(requestData, selectedCandidate, presentation) {
   return checkPresentationCore(requestData, selectedCandidate, presentation);
 }
@@ -853,7 +854,7 @@ function checkPresentationCore(requestData, selectedCandidate, presentation, opt
       if (!Object.hasOwn(value, key)) invalid(`${path}.${key}`, "缺少新版呈现必填字段");
     }
     for (const key of Object.keys(value)) {
-      if (![...keys, ...optional].includes(key)) invalid(`${path}.${key}`, "新版呈现不接收此字段或任何报价、旧包装教程");
+      if (![...keys, ...optional].includes(key)) invalid(`${path}.${key}`, "新版呈现不接收此字段或任何包装报价");
     }
     return true;
   };
@@ -872,8 +873,21 @@ function checkPresentationCore(requestData, selectedCandidate, presentation, opt
   string(presentation.style, "presentation.style");
   string(presentation.card_text, "presentation.card_text");
   string(presentation.currency, "presentation.currency");
-  if (shape(presentation.packaging, "presentation.packaging", ["color_palette"])) {
+  if (shape(presentation.packaging, "presentation.packaging", ["color_palette"], ["materials", "steps", "description"])) {
     list(presentation.packaging.color_palette, "presentation.packaging.color_palette", true);
+    for (const field of ["materials", "steps"]) {
+      if (!Object.hasOwn(presentation.packaging, field)) continue;
+      const value = presentation.packaging[field];
+      if (typeof value === "string") string(value, `presentation.packaging.${field}`);
+      else list(value, `presentation.packaging.${field}`);
+    }
+    if (Object.hasOwn(presentation.packaging, "description")) string(presentation.packaging.description, "presentation.packaging.description");
+    const materials = packagingTextItems(presentation.packaging.materials);
+    const steps = packagingTextItems(presentation.packaging.steps);
+    const description = packagingTextItems(presentation.packaging.description);
+    if (!description.length && !(materials.length && steps.length)) {
+      invalid("presentation.packaging", "请提供包装材料与步骤；无需实体包装时，请说明适合这份礼物的呈现方式");
+    }
   }
   if (shape(presentation.giving_advice, "presentation.giving_advice", ["timing", "wording", "relationship_cautions"])) {
     string(presentation.giving_advice.timing, "presentation.giving_advice.timing");
