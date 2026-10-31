@@ -1,0 +1,407 @@
+diff --git a/tests/acceptance/boundary/test_boundary_ranges.py b/tests/acceptance/boundary/test_boundary_ranges.py
+index 358f332..c552674 100644
+--- a/tests/acceptance/boundary/test_boundary_ranges.py
++++ b/tests/acceptance/boundary/test_boundary_ranges.py
+@@ -1,6 +1,7 @@
+-"""QA-001 独立边界套件：请求侧数值范围 [1,10000] / [0,365] 及其"不下沉到候选侧"。
++"""QA-001 独立边界套件：请求侧数值范围 [0,10000] / [0,365] 及其"不下沉到候选侧"。
+ 
+-依据：`docs/validator-contract-decisions.md` §5（2026-10-30 修订：请求预算 [1,10000] 含端点）、
++依据：2026-10-31 交付变更契约与本轮 PM 决定：请求预算 [0,10000] 含端点；旧依据
++`docs/validator-contract-decisions.md` §5 的禁止零预算规则已被覆盖。
+ §6（可用天数 [0,365] 含端点，保留 0）。两者均复用 `LIMIT_EXCEEDED`、请求侧 `needs_input`。
+ 
+ **本文件不复用规则线的 `tests/test_cases.json`**：夹具全部在此自建（虚构人物、虚构礼物），
+@@ -124,14 +125,39 @@ class BoundaryAssertMixin:
+ # ================================================================= 预算：范围
+ 
+ class RequestBudgetRange(BoundaryAssertMixin, unittest.TestCase):
+-    """请求预算 [1, 10000] 含端点（§5 2026-10-30 修订）。"""
++    """请求预算 [0, 10000]；合法预算仍须独立检查候选费用。"""
+ 
+     def test_zero_and_zero_decimals_are_rejected(self):
++        """保留历史测试 ID；现在拒绝的是有价候选，不是零预算请求。"""
+         for value in ("0", "0.0", "0.00"):
+             with self.subTest(budget=value):
+                 result = self.run_validate(my_request(budget_amount=value), my_batch())
+-                self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
+-                self.assert_status(result, "needs_input", f"budget={value}")
++                self.assert_no_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
++                self.assert_status(result, "failed", f"budget={value}")
++                for index, candidate in enumerate(result["candidate_results"]):
++                    self.assertFalse(candidate["passed"])
++                    self.assert_code_at(result, "OVER_BUDGET", f"candidates[{index}].estimated_total")
++
++    def test_zero_and_fractional_budget_with_affordable_candidates_pass(self):
++        for value in ("0", "0.0", "0.00", "0.99"):
++            with self.subTest(budget=value):
++                batch = my_batch()
++                for candidate in batch["candidates"]:
++                    candidate["estimated_total"] = value
++                result = self.run_validate(my_request(budget_amount=value), batch)
++                self.assert_status(result, "passed")
++                self.assertEqual([], all_errors(result))
++                self.assertTrue(all(c["passed"] for c in result["candidate_results"]))
++
++    def test_zero_budget_does_not_bypass_invalid_days(self):
++        batch = my_batch()
++        for candidate in batch["candidates"]:
++            candidate["estimated_total"] = "0"
++        result = self.run_validate(my_request(budget_amount="0", available_days=366), batch)
++        self.assert_status(result, "needs_input")
++        self.assert_no_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount")
++        self.assert_code_at(result, "LIMIT_EXCEEDED", "request.available_days")
++        self.assertFalse(any(c["passed"] for c in result["candidate_results"]))
+ 
+     def test_lower_bound_is_inclusive(self):
+         for value in ("1", "1.00"):
+@@ -308,7 +334,7 @@ class RequestErrorDominates(BoundaryAssertMixin, unittest.TestCase):
+     def test_request_range_error_and_candidate_error_together(self):
+         batch = my_batch()
+         batch["candidates"][0]["estimated_total"] = "99999"
+-        result = self.run_validate(my_request(budget_amount="0"), batch)
++        result = self.run_validate(my_request(budget_amount="10000.01"), batch)
+         self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount")
+         self.assert_status(result, "needs_input", "请求侧错误优先级更高")
+         self.assertFalse(result["all_passed"], "有错误时 all_passed 必须为 false")
+diff --git a/tests/acceptance/boundary/test_error_composition.py b/tests/acceptance/boundary/test_error_composition.py
+index 6ba7f4b..1d51de0 100644
+--- a/tests/acceptance/boundary/test_error_composition.py
++++ b/tests/acceptance/boundary/test_error_composition.py
+@@ -92,7 +92,7 @@ class ErrorComposition(DeepEdgeMixin, unittest.TestCase):
+     """多个错误并存时是否都上报（不去重、不互相吞掉）。"""
+ 
+     def test_two_range_errors_are_both_reported(self):
+-        result = run(raw('"0"', "366"))
++        result = run(raw('"10000.01"', "366"))
+         self.assert_status(result, "needs_input", "预算与天数同时越界")
+         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.available_days"))
+@@ -101,19 +101,19 @@ class ErrorComposition(DeepEdgeMixin, unittest.TestCase):
+         self.assertFalse(result["all_passed"])
+ 
+     def test_range_and_type_errors_coexist(self):
+-        result = run(raw('"0"', "-1"))
++        result = run(raw('"10000.01"', "-1"))
+         self.assertEqual(["INVALID_TYPE"], codes_at(result, "request.available_days"))
+         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+         self.assert_status(result, "needs_input", "范围 + 类型")
+ 
+     def test_range_and_currency_errors_coexist(self):
+-        result = run(raw('"0"', "3", '"USD"'))
++        result = run(raw('"10000.01"', "3", '"USD"'))
+         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+         self.assertEqual(["UNSUPPORTED_CURRENCY"], codes_at(result, "request.currency"))
+         self.assert_status(result, "needs_input", "范围 + 币种")
+ 
+     def test_three_distinct_errors_all_reported(self):
+-        result = run(raw('"0"', "-1", '"USD"'))
++        result = run(raw('"10000.01"', "-1", '"USD"'))
+         found = {c for c, _ in pairs(result)}
+         self.assertEqual({"INVALID_TYPE", "LIMIT_EXCEEDED", "UNSUPPORTED_CURRENCY"}, found,
+                          f"三类错误应全部上报，实际={pairs(result)}")
+diff --git a/tests/acceptance/nov01_revision/fixtures.py b/tests/acceptance/nov01_revision/fixtures.py
+index 3bd04ac..e508457 100644
+--- a/tests/acceptance/nov01_revision/fixtures.py
++++ b/tests/acceptance/nov01_revision/fixtures.py
+@@ -42,15 +42,15 @@ def rule_cases():
+     add("R10-over-max", price="150.01", status="failed", code="OVER_BUDGET", path="candidates[0].estimated_total")
+     invalid = [
+         ("null", None, "INVALID_BUDGET_RANGE", "request.budget_range"),
+-        ("missing-min", {"max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
+-        ("missing-max", {"min": "100"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
++        ("missing-min", {"max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range.min"),
++        ("missing-max", {"min": "100"}, "INVALID_BUDGET_RANGE", "request.budget_range.max"),
+         ("reversed", {"min": "151", "max": "150"}, "INVALID_BUDGET_RANGE", "request.budget_range"),
+         ("null-min", {"min": None, "max": "150"}, "INVALID_TYPE", "request.budget_range.min"),
+         ("leading-zero", {"min": "00", "max": "150"}, "INVALID_AMOUNT", "request.budget_range.min"),
+         ("exponent", {"min": "1e2", "max": "150"}, "INVALID_AMOUNT", "request.budget_range.min"),
+         ("bool", {"min": False, "max": "150"}, "INVALID_TYPE", "request.budget_range.min"),
+         ("over-limit", {"min": "0", "max": "10000.01"}, "LIMIT_EXCEEDED", "request.budget_range.max"),
+-        ("mismatch", {"min": "100", "max": "149"}, "BUDGET_RANGE_MISMATCH", "request.budget_range"),
++        ("mismatch", {"min": "100", "max": "149"}, "BUDGET_RANGE_MISMATCH", "request.budget_amount"),
+     ]
+     for suffix, value, code, path in invalid:
+         add("R-invalid-" + suffix, {"budget_range": value}, status="needs_input", code=code, path=path)
+diff --git a/tests/acceptance/nov01_revision/rules.json b/tests/acceptance/nov01_revision/rules.json
+index 5426a83..49a37e5 100644
+--- a/tests/acceptance/nov01_revision/rules.json
++++ b/tests/acceptance/nov01_revision/rules.json
+@@ -976,7 +976,7 @@
+     },
+     "status": "needs_input",
+     "code": "INVALID_BUDGET_RANGE",
+-    "path": "request.budget_range",
++    "path": "request.budget_range.min",
+     "warning": false
+   },
+   {
+@@ -1057,7 +1057,7 @@
+     },
+     "status": "needs_input",
+     "code": "INVALID_BUDGET_RANGE",
+-    "path": "request.budget_range",
++    "path": "request.budget_range.max",
+     "warning": false
+   },
+   {
+@@ -1631,7 +1631,7 @@
+     },
+     "status": "needs_input",
+     "code": "BUDGET_RANGE_MISMATCH",
+-    "path": "request.budget_range",
++    "path": "request.budget_amount",
+     "warning": false
+   },
+   {
+diff --git a/tests/acceptance/nov01_revision/test_revision_rules.py b/tests/acceptance/nov01_revision/test_revision_rules.py
+index cae9570..2d3e4fb 100644
+--- a/tests/acceptance/nov01_revision/test_revision_rules.py
++++ b/tests/acceptance/nov01_revision/test_revision_rules.py
+@@ -24,6 +24,8 @@ def build_test(case):
+         errors = actual["errors"] + [e for c in actual["candidate_results"] for e in c["errors"]]
+         if case["code"]:
+             self.assertIn((case["code"], case["path"]), [(e["code"], e["path"]) for e in errors], actual)
++        if case["status"] == "needs_input":
++            self.assertFalse(any(c["passed"] for c in actual["candidate_results"]), actual)
+         if case["status"] == "passed":
+             self.assertEqual(len(actual["candidate_results"]), 3)
+             for candidate in actual["candidate_results"]:
+diff --git a/tests/acceptance/stage_b/build_cases.py b/tests/acceptance/stage_b/build_cases.py
+index 248c5f8..b05bc90 100644
+--- a/tests/acceptance/stage_b/build_cases.py
++++ b/tests/acceptance/stage_b/build_cases.py
+@@ -62,7 +62,7 @@ def build():
+         return change
+ 
+     add("B001_base", "T01", passed=[True, True, True])
+-    # 请求预算范围 [1, 10000]；候选估算不受范围约束，零估算与越界分别由语义码处理。
++    # 当前发布契约 [0,10000]；保持旧 case ID，逐项迁移记录见本轮 QA 报告。
+     allowed_money = {"request": ("1", "12", "12.3", "12.30", "9999.99", "10000", "10000.00"),
+                      "candidate": ("0", "0.0", "0.00", "12", "12.3", "12.30")}
+     for side, name in (("request", "budget_amount"), ("candidate", "estimated_total")):
+@@ -80,9 +80,14 @@ def build():
+                     field("request", name, value)(r, b)
+                     for candidate in b["candidates"]:
+                         candidate["estimated_total"] = "0"
+-                add(f"money_range_reject_request_{i}", "T02_T11", out_of_range, "needs_input",
+-                    "LIMIT_EXCEEDED", "request.budget_amount", "top",
+-                    message="预算须在 1 至 10000 之间")
++                # 历史 ID 包含 reject，不更换/移除用例；前四项现在验证低值预算合法。
++                if i < 4:
++                    add(f"money_range_reject_request_{i}", "T02_T11", out_of_range,
++                        passed=[True, True, True], absent=["LIMIT_EXCEEDED", "OVER_BUDGET"])
++                else:
++                    add(f"money_range_reject_request_{i}", "T02_T11", out_of_range, "needs_input",
++                        "LIMIT_EXCEEDED", "request.budget_amount", "top",
++                        message="预算须在 0 至 10000 之间")
+         bad_values = ("-0", "-1.00", "00", "01.00", "+1", "1e1", "1,000", "¥1",
+                       "１.００", " 1", "1 ", ".5", "1.", "1.001", "NaN", "Infinity", "", "1\n")
+         for i, value in enumerate(bad_values + (1, True, None, [], {})):
+diff --git a/tests/acceptance/stage_b/cases.json b/tests/acceptance/stage_b/cases.json
+index 2769cff..ce780e9 100644
+--- a/tests/acceptance/stage_b/cases.json
++++ b/tests/acceptance/stage_b/cases.json
+@@ -108,15 +108,17 @@
+       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
+       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "errors": [
+-          {
+-            "code": "LIMIT_EXCEEDED",
+-            "path": "request.budget_amount",
+-            "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+-          }
++        "status": "passed",
++        "all_passed": true,
++        "errors": [],
++        "candidate_passed": [
++          true,
++          true,
++          true
++        ],
++        "absent_codes": [
++          "LIMIT_EXCEEDED",
++          "OVER_BUDGET"
+         ]
+       },
+       "mode": "normal"
+@@ -127,15 +129,17 @@
+       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.0\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
+       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "errors": [
+-          {
+-            "code": "LIMIT_EXCEEDED",
+-            "path": "request.budget_amount",
+-            "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+-          }
++        "status": "passed",
++        "all_passed": true,
++        "errors": [],
++        "candidate_passed": [
++          true,
++          true,
++          true
++        ],
++        "absent_codes": [
++          "LIMIT_EXCEEDED",
++          "OVER_BUDGET"
+         ]
+       },
+       "mode": "normal"
+@@ -146,15 +150,17 @@
+       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.00\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
+       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "errors": [
+-          {
+-            "code": "LIMIT_EXCEEDED",
+-            "path": "request.budget_amount",
+-            "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+-          }
++        "status": "passed",
++        "all_passed": true,
++        "errors": [],
++        "candidate_passed": [
++          true,
++          true,
++          true
++        ],
++        "absent_codes": [
++          "LIMIT_EXCEEDED",
++          "OVER_BUDGET"
+         ]
+       },
+       "mode": "normal"
+@@ -165,15 +171,17 @@
+       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.99\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
+       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "errors": [
+-          {
+-            "code": "LIMIT_EXCEEDED",
+-            "path": "request.budget_amount",
+-            "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+-          }
++        "status": "passed",
++        "all_passed": true,
++        "errors": [],
++        "candidate_passed": [
++          true,
++          true,
++          true
++        ],
++        "absent_codes": [
++          "LIMIT_EXCEEDED",
++          "OVER_BUDGET"
+         ]
+       },
+       "mode": "normal"
+@@ -191,7 +199,7 @@
+             "code": "LIMIT_EXCEEDED",
+             "path": "request.budget_amount",
+             "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
++            "message": "\u9884\u7b97\u987b\u5728 0 \u81f3 10000 \u4e4b\u95f4"
+           }
+         ]
+       },
+@@ -210,7 +218,7 @@
+             "code": "LIMIT_EXCEEDED",
+             "path": "request.budget_amount",
+             "location": "top",
+-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
++            "message": "\u9884\u7b97\u987b\u5728 0 \u81f3 10000 \u4e4b\u95f4"
+           }
+         ]
+       },
+diff --git a/tests/acceptance/stage_b/pinned_hashes.json b/tests/acceptance/stage_b/pinned_hashes.json
+index b8232d5..8c503d7 100644
+--- a/tests/acceptance/stage_b/pinned_hashes.json
++++ b/tests/acceptance/stage_b/pinned_hashes.json
+@@ -1,10 +1,10 @@
+ {
+   "notice": "Stage B 独立验收的现行文件基线（SHA256）。测试运行以本文件为准。",
+   "baseline_date": "2026-10-31（Asia/Shanghai +08:00）",
+-  "pinned_at": "2026-10-31T01:20:45+08:00",
++  "pinned_at": "2026-10-31T11:32:13.934393+08:00",
+   "baseline_owner": "GiftWise｜测试验收 Agent（Issue #8）",
+-  "approved_by": "PM（Issue #8 夜间指令明确授权\"重钉基线\"，并指明可落在 manifest 或测试文件中）",
+-  "reason": "规则侧请求侧数值范围校验落地（validator/rules.py 新增：预算 ∈ [1,10000]、可用天数 ≤ 365）后，规则源码、单元测试与用例集发生经 PM 确认的合法变更，导致 2026-10-29 评审钉住值过时。",
++  "approved_by": "本轮 PM 明确授权：工作流重建正式合入并检查实际内容后，核验发布测试指纹；不得只改哈希修绿",
++  "reason": "PR #54 已正式合入 3dfb186；先审阅真实规则/开发夹具语义变化，5份生成物重建内容一致，31组生成规则语义与新契约一致，随后记录发布基线哈希。",
+   "why_not_edit_review": "docs/pm-reviews/** 是 B 类历史记录，不得改写数字。故本基线另立于此，并在 superseded_sha256 中逐条保留旧值以保持可追溯；测试会断言这些旧值与评审文件逐条一致。",
+   "superseded_review": "docs/pm-reviews/val-001-rereview-2026-10-29.md",
+   "superseded_sha256": {
+@@ -21,8 +21,38 @@
+   },
+   "files": {
+     "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+-    "validator/rules.py": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
++    "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+     "tests/test_validator.py": "9c83a4c6c6341ed54c724498ca4d1bab6c196071c7809c6d144696d2339c601e",
+-    "tests/test_cases.json": "07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db"
+-  }
++    "tests/test_cases.json": "546e9b43ca9766885634d05f94d2729f8e827203e878c943c56aa6a93fc18669"
++  },
++  "previous_release_baseline": {
++    "notice": "Stage B 独立验收的现行文件基线（SHA256）。测试运行以本文件为准。",
++    "baseline_date": "2026-10-31（Asia/Shanghai +08:00）",
++    "pinned_at": "2026-10-31T01:20:45+08:00",
++    "baseline_owner": "GiftWise｜测试验收 Agent（Issue #8）",
++    "approved_by": "PM（Issue #8 夜间指令明确授权\"重钉基线\"，并指明可落在 manifest 或测试文件中）",
++    "reason": "规则侧请求侧数值范围校验落地（validator/rules.py 新增：预算 ∈ [1,10000]、可用天数 ≤ 365）后，规则源码、单元测试与用例集发生经 PM 确认的合法变更，导致 2026-10-29 评审钉住值过时。",
++    "why_not_edit_review": "docs/pm-reviews/** 是 B 类历史记录，不得改写数字。故本基线另立于此，并在 superseded_sha256 中逐条保留旧值以保持可追溯；测试会断言这些旧值与评审文件逐条一致。",
++    "superseded_review": "docs/pm-reviews/val-001-rereview-2026-10-29.md",
++    "superseded_sha256": {
++      "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
++      "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
++      "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
++      "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
++    },
++    "changed_since_review": {
++      "validator/__init__.py": "未变（范围校验加在 rules.py 的调用点，未进入共用函数所在模块）",
++      "validator/rules.py": "+5 行：请求侧范围校验（含注释\"范围约束不得进入 _amount/_days 共用函数\"）",
++      "tests/test_validator.py": "+6/-2：test_decimal_boundary_ignores_context_rounding 改用 10000 / 10000.00 / 10000.01（超上界会先被 LIMIT_EXCEEDED 拦下，测不到候选侧）",
++      "tests/test_cases.json": "313 → 320 条（+7/-0）：新增 T02_budget_below_min、T02_budget_min_1、T02_budget_max_10000、T02_budget_above_max、T04_days_max_365、T04_days_above_max、T02_T04_zero_estimates_candidate_allowed"
++    },
++    "files": {
++      "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
++      "validator/rules.py": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
++      "tests/test_validator.py": "9c83a4c6c6341ed54c724498ca4d1bab6c196071c7809c6d144696d2339c601e",
++      "tests/test_cases.json": "07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db"
++    }
++  },
++  "content_review_evidence": "docs/test-reports/rev-qa-001/migration-20261031/rebuilt-content/review.json",
++  "integration_sha": "3dfb186b74a4afabfef82c7213401fb60587f946"
+ }
+diff --git a/web/tools/browser-check.mjs b/web/tools/browser-check.mjs
+index 790e7d5..87e796d 100644
+--- a/web/tools/browser-check.mjs
++++ b/web/tools/browser-check.mjs
+@@ -413,6 +413,12 @@ async function close(client, targetId) {
+ /* ------------------------------------------------------------------ 主流程 */
+ 
+ async function main() {
++  if (process.env.GW_REVISION_QA === "1") {
++    const { runRevision } = await import("../../tests/acceptance/nov01_revision/browser-revision.mjs");
++    await runRevision({ Client, open, close, ensureLocalServer, stopOwnServer,
++      base: BASE, cdp: CDP, out: OUT_DIR, viewports: VIEWPORTS });
++    return;
++  }
+   // 开工前服务身份自检（共用模块 web/tools/server-identity.mjs）：
+   // 绝不在不知情的情况下测别的工作区的服务；必要时自起独占端口。
+   BASE = await ensureLocalServer(BASE, { explicit: (process.env.GW_BASE || "").trim().length > 0 });

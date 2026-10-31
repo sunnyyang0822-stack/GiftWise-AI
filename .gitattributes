@@ -3,3 +3,6 @@ validator/__init__.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 validator/rules.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 tests/test_validator.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
 tests/test_cases.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+
+# 独立 QA 原始输出按采集字节保存。
+docs/test-reports/final-qa-1031/evidence/** -text

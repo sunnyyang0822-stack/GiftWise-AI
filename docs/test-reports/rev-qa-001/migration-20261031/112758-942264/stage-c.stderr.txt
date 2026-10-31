@@ -1,0 +1,14 @@
+======================================================================
+FAIL: test_c5_02_manifest_matches_generated_artifacts (test_stage_c_workflow.C5GeneratedNodes.test_c5_02_manifest_matches_generated_artifacts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-qa-migration\tests\acceptance\stage_c\test_stage_c_workflow.py", line 655, in test_c5_02_manifest_matches_generated_artifacts
+    self.observe("C5-02", "生成物与 manifest 哈希一致（无 STALE）", {}, expected, actual, ok)
+  File "C:\Users\lenovo\Desktop\giftwise-qa-migration\tests\acceptance\stage_c\test_stage_c_workflow.py", line 141, in observe
+    self.assertTrue(ok, f"{case_id} {title}: expected={expected!r} actual={actual!r}")
+AssertionError: False is not true : C5-02 生成物与 manifest 哈希一致（无 STALE）: expected='manifest.format=python-source-not-dsl；5 个生成物摘要与 manifest 记录一致，且与生成器按同一源码字节形态重算的内容在 LF 归一化后逐字节相同' actual={'format': 'python-source-not-dsl', 'entries': {}, 'mismatches': ['manifest:sources_sha256']}
+
+----------------------------------------------------------------------
+Ran 39 tests in 0.106s
+
+FAILED (failures=1)

@@ -1,0 +1,662 @@
+[
+  {
+    "layer": "js",
+    "id": "friend",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "friend",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"朋友\",\"recipient_relation_id\":\"friend\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "js",
+    "id": "occasion_custom_illegal_combination",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "occasion_custom": "虚构补充说明"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.occasion_custom",
+          "message": "只有选择其他场合时才能填写自定义场合"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "js",
+    "id": "occasion_custom_missing",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "other",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.occasion_custom",
+          "message": "选择其他场合时请填写自定义场合"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.occasion",
+          "message": "必须为非空字符串"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "js",
+    "id": "occasion_custom_valid",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "other",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "occasion_custom": "虚构补充说明"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"虚构补充说明\",\"occasion_custom\":\"虚构补充说明\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "js",
+    "id": "partner",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "partner",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"恋人\",\"recipient_relation_id\":\"partner\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "js",
+    "id": "pursuit",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "js",
+    "id": "recipient_relation_custom_illegal_combination",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "recipient_relation_custom": "虚构补充说明"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.recipient_relation_custom",
+          "message": "只有选择其他关系时才能填写自定义关系"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "js",
+    "id": "recipient_relation_custom_missing",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "other",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.recipient_relation_custom",
+          "message": "选择其他关系时请填写自定义关系"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.recipient_relation",
+          "message": "必须为非空字符串"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "js",
+    "id": "recipient_relation_custom_valid",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "other",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "recipient_relation_custom": "虚构补充说明"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"虚构补充说明\",\"recipient_relation_id\":\"other\",\"recipient_relation_custom\":\"虚构补充说明\",\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "friend",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "friend",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"朋友\",\"recipient_relation_id\":\"friend\",\"occasion\":\"生日\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "occasion_custom_illegal_combination",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "occasion_custom": "虚构补充说明"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.occasion_custom",
+          "message": "未声明的输入字段，请确认契约版本"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "python",
+    "id": "occasion_custom_missing",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "other",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"其他\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "occasion_custom_valid",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "other",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "occasion_custom": "虚构补充说明"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.occasion_custom",
+          "message": "未声明的输入字段，请确认契约版本"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "python",
+    "id": "partner",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "partner",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"恋人\",\"recipient_relation_id\":\"partner\",\"occasion\":\"生日\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "pursuit",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"追求对象\",\"recipient_relation_id\":\"pursuit\",\"occasion\":\"生日\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "recipient_relation_custom_illegal_combination",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "pursuit",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "recipient_relation_custom": "虚构补充说明"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.recipient_relation_custom",
+          "message": "未声明的输入字段，请确认契约版本"
+        }
+      ],
+      "request_json": null
+    }
+  },
+  {
+    "layer": "python",
+    "id": "recipient_relation_custom_missing",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "other",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例"
+    },
+    "expected_status": "needs_input",
+    "actual": {
+      "status": "ready",
+      "errors": [],
+      "request_json": "{\"recipient_relation\":\"其他\",\"recipient_relation_id\":\"other\",\"occasion\":\"生日\",\"budget_amount\":\"300\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构案例\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"0\",\"max\":\"300\"},\"dislikes\":\"\"}"
+    }
+  },
+  {
+    "layer": "python",
+    "id": "recipient_relation_custom_valid",
+    "input": {
+      "contract_version": "giftwise-20261031-v2",
+      "recipient_relation": "other",
+      "occasion": "birthday",
+      "budget_mode": "other",
+      "budget_range": {
+        "min": "0",
+        "max": "300"
+      },
+      "currency": "CNY",
+      "deadline_days": 5,
+      "closeness": "unknown",
+      "interests": [],
+      "interest_confidence": {},
+      "gift_styles": [],
+      "dislikes": "",
+      "hard_exclusions": {
+        "tags": [],
+        "terms": [],
+        "unresolved": []
+      },
+      "additional_context": "QA虚构案例",
+      "recipient_relation_custom": "虚构补充说明"
+    },
+    "expected_status": "ready",
+    "actual": {
+      "status": "needs_input",
+      "errors": [
+        {
+          "code": "INTAKE_UNKNOWN_FIELD",
+          "path": "intake.recipient_relation_custom",
+          "message": "未声明的输入字段，请确认契约版本"
+        }
+      ],
+      "request_json": null
+    }
+  }
+]

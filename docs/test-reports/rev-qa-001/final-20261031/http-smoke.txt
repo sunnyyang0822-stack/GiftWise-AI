@@ -1,0 +1,4 @@
+✅ 服务一致性自检通过：/landing.css=24981B / /=20862B
+冒烟脚本异常：TypeError: Cannot read properties of undefined (reading 'replace')
+    at main (file:///C:/Users/lenovo/Desktop/giftwise-final-qa/web/tools/smoke-http.mjs:131:64)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

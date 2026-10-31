@@ -1,0 +1,20 @@
+[
+  {
+    "name": "intake-parity",
+    "command": [
+      "C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe",
+      "tests/acceptance/final_qa_1031/test_intake_parity.py"
+    ],
+    "started": "2026-10-31T12:29:22.974596+08:00",
+    "exit_code": 1
+  },
+  {
+    "name": "content-review",
+    "command": [
+      "C:/Users/lenovo/AppData/Local/Programs/Python/Python312/python.exe",
+      "tests/acceptance/nov01_revision/review_rebuilt_content.py"
+    ],
+    "started": "2026-10-31T12:29:24.393035+08:00",
+    "exit_code": 0
+  }
+]

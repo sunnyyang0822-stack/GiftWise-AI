@@ -1,0 +1,98 @@
+======================================================================
+FAIL: test_zero_and_zero_decimals_are_rejected (test_boundary_ranges.RequestBudgetRange.test_zero_and_zero_decimals_are_rejected) (budget='0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 133, in test_zero_and_zero_decimals_are_rejected
+    self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 107, in assert_code_at
+    self.assertIn(code, found, f"{msg} 期望 {path} 报 {code}，实际该路径的码为 {found}；"
+AssertionError: 'LIMIT_EXCEEDED' not found in [] : budget=0 期望 request.budget_amount 报 LIMIT_EXCEEDED，实际该路径的码为 []；全部错误=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('OVER_BUDGET', 'candidates[1].estimated_total'), ('OVER_BUDGET', 'candidates[2].estimated_total')]
+
+======================================================================
+FAIL: test_zero_and_zero_decimals_are_rejected (test_boundary_ranges.RequestBudgetRange.test_zero_and_zero_decimals_are_rejected) (budget='0.0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 133, in test_zero_and_zero_decimals_are_rejected
+    self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 107, in assert_code_at
+    self.assertIn(code, found, f"{msg} 期望 {path} 报 {code}，实际该路径的码为 {found}；"
+AssertionError: 'LIMIT_EXCEEDED' not found in [] : budget=0.0 期望 request.budget_amount 报 LIMIT_EXCEEDED，实际该路径的码为 []；全部错误=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('OVER_BUDGET', 'candidates[1].estimated_total'), ('OVER_BUDGET', 'candidates[2].estimated_total')]
+
+======================================================================
+FAIL: test_zero_and_zero_decimals_are_rejected (test_boundary_ranges.RequestBudgetRange.test_zero_and_zero_decimals_are_rejected) (budget='0.00')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 133, in test_zero_and_zero_decimals_are_rejected
+    self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount", f"budget={value}")
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 107, in assert_code_at
+    self.assertIn(code, found, f"{msg} 期望 {path} 报 {code}，实际该路径的码为 {found}；"
+AssertionError: 'LIMIT_EXCEEDED' not found in [] : budget=0.00 期望 request.budget_amount 报 LIMIT_EXCEEDED，实际该路径的码为 []；全部错误=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('OVER_BUDGET', 'candidates[1].estimated_total'), ('OVER_BUDGET', 'candidates[2].estimated_total')]
+
+======================================================================
+FAIL: test_request_range_error_and_candidate_error_together (test_boundary_ranges.RequestErrorDominates.test_request_range_error_and_candidate_error_together)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 312, in test_request_range_error_and_candidate_error_together
+    self.assert_code_at(result, "LIMIT_EXCEEDED", "request.budget_amount")
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_boundary_ranges.py", line 107, in assert_code_at
+    self.assertIn(code, found, f"{msg} 期望 {path} 报 {code}，实际该路径的码为 {found}；"
+AssertionError: 'LIMIT_EXCEEDED' not found in [] :  期望 request.budget_amount 报 LIMIT_EXCEEDED，实际该路径的码为 []；全部错误=[('OVER_BUDGET', 'candidates[0].estimated_total'), ('OVER_BUDGET', 'candidates[1].estimated_total'), ('OVER_BUDGET', 'candidates[2].estimated_total')]
+
+======================================================================
+FAIL: test_range_and_currency_errors_coexist (test_error_composition.ErrorComposition.test_range_and_currency_errors_coexist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_error_composition.py", line 111, in test_range_and_currency_errors_coexist
+    self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+AssertionError: Lists differ: ['LIMIT_EXCEEDED'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'LIMIT_EXCEEDED'
+
+- ['LIMIT_EXCEEDED']
++ []
+
+======================================================================
+FAIL: test_range_and_type_errors_coexist (test_error_composition.ErrorComposition.test_range_and_type_errors_coexist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_error_composition.py", line 106, in test_range_and_type_errors_coexist
+    self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+AssertionError: Lists differ: ['LIMIT_EXCEEDED'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'LIMIT_EXCEEDED'
+
+- ['LIMIT_EXCEEDED']
++ []
+
+======================================================================
+FAIL: test_three_distinct_errors_all_reported (test_error_composition.ErrorComposition.test_three_distinct_errors_all_reported)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_error_composition.py", line 118, in test_three_distinct_errors_all_reported
+    self.assertEqual({"INVALID_TYPE", "LIMIT_EXCEEDED", "UNSUPPORTED_CURRENCY"}, found,
+AssertionError: Items in the first set but not the second:
+'LIMIT_EXCEEDED' : 三类错误应全部上报，实际=[('INVALID_TYPE', 'request.available_days'), ('UNSUPPORTED_CURRENCY', 'request.currency')]
+
+======================================================================
+FAIL: test_two_range_errors_are_both_reported (test_error_composition.ErrorComposition.test_two_range_errors_are_both_reported)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise\qa-pinned-1031\tests\acceptance\boundary\test_error_composition.py", line 97, in test_two_range_errors_are_both_reported
+    self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
+AssertionError: Lists differ: ['LIMIT_EXCEEDED'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'LIMIT_EXCEEDED'
+
+- ['LIMIT_EXCEEDED']
++ []
+
+----------------------------------------------------------------------
+Ran 45 tests in 0.023s
+
+FAILED (failures=8)

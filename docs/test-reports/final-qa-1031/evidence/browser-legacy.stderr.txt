@@ -1,0 +1,4 @@
+浏览器自查异常：Error: 找不到 chip「100–200 元」；可选：恋人 / 追求对象 / 朋友 / 家人 / 同学 / 老师/导师 / 客户/合作伙伴 / 其他 / 非常熟悉 / 比较熟悉 / 了解不多 / 几乎不了解 / 不确定 / 生日 / 节日 / 感谢 / 纪念日 / 毕业/升职祝贺 / 其他 / 选择预算区间 / 不花钱的心意 / 其他金额 / 不确定
+    at Page.click (file:///C:/Users/lenovo/Desktop/giftwise/qa-pinned-1031/web/tools/browser-check.mjs:245:27)
+    at async fillStep1 (file:///C:/Users/lenovo/Desktop/giftwise/qa-pinned-1031/web/tools/browser-check.mjs:353:3)
+    at async main (file:///C:/Users/lenovo/Desktop/giftwise/qa-pinned-1031/web/tools/browser-check.mjs:464:5)

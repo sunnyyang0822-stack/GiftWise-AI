@@ -1,0 +1,669 @@
+{
+  "base": "http://127.0.0.1:19437",
+  "browser": "Chrome/156.0.8078.79",
+  "mode": "mock",
+  "server_config": {
+    "mode": "mock",
+    "dify_configured": false,
+    "dify_published_verified": false,
+    "pursuit_contract_ready": true,
+    "pursuit_notice": "「追求对象」在本地仓库的契约中已经落地（工作区未提交改动 + 生成物已重建），模拟模式下可以正常生成低压力方案；接入层未接真实模型（无凭证），真实调用仍以服务端返回为准。",
+    "notices": {
+      "mock_mode": "⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。",
+      "mock_candidates": "以下三个方案为模拟数据，用于演示校验与选择流程。",
+      "mock_presentation": "以下呈现内容为模拟数据，用于演示「选择后」的四段呈现与复核流程。"
+    },
+    "unknown_interests_hint": "「暂时不知道」是界面上的互斥状态，不是机器值：选择它时提交 interests: [] 与 interest_confidence: {}，不会生成任何用户事实。",
+    "labels": {
+      "relations": [
+        {
+          "id": "partner",
+          "zh": "恋人",
+          "scene": "恋人之间，可以表达亲密与纪念，但不能承诺对方反应。"
+        },
+        {
+          "id": "pursuit",
+          "zh": "追求对象",
+          "scene": "追求关系，不代表对方已接受或存在双向好感；默认低压力表达，不暗示关系已确定。"
+        },
+        {
+          "id": "friend",
+          "zh": "朋友",
+          "scene": "朋友之间，按熟悉程度和使用场合选择，避免过度亲密。"
+        },
+        {
+          "id": "family",
+          "zh": "家人",
+          "scene": "家人之间，重实用与陪伴感。"
+        },
+        {
+          "id": "classmate",
+          "zh": "同学",
+          "scene": "同学之间，重共同经历与实用。"
+        },
+        {
+          "id": "mentor",
+          "zh": "老师/导师",
+          "scene": "师生或指导关系，分寸优先，避免私人化过强。"
+        },
+        {
+          "id": "client_partner",
+          "zh": "客户/合作伙伴",
+          "scene": "商务往来，得体、通用、不私人化。"
+        },
+        {
+          "id": "other",
+          "zh": "其他",
+          "scene": "其他关系；如不确定可如实选择，不做关系推断。"
+        }
+      ],
+      "closeness": [
+        {
+          "id": "very_familiar",
+          "zh": "非常熟悉"
+        },
+        {
+          "id": "familiar",
+          "zh": "比较熟悉"
+        },
+        {
+          "id": "limited",
+          "zh": "了解不多"
+        },
+        {
+          "id": "unfamiliar",
+          "zh": "几乎不了解"
+        },
+        {
+          "id": "unknown",
+          "zh": "不确定"
+        }
+      ],
+      "occasions": [
+        {
+          "id": "birthday",
+          "zh": "生日"
+        },
+        {
+          "id": "festival",
+          "zh": "节日"
+        },
+        {
+          "id": "thanks",
+          "zh": "感谢"
+        },
+        {
+          "id": "anniversary",
+          "zh": "纪念日"
+        },
+        {
+          "id": "graduation_promotion",
+          "zh": "毕业/升职祝贺"
+        },
+        {
+          "id": "other",
+          "zh": "其他"
+        }
+      ],
+      "interests": [
+        {
+          "id": "design_art",
+          "zh": "设计与艺术"
+        },
+        {
+          "id": "coffee_food",
+          "zh": "咖啡与美食"
+        },
+        {
+          "id": "reading_learning",
+          "zh": "阅读与学习"
+        },
+        {
+          "id": "tech_digital",
+          "zh": "科技与数码"
+        },
+        {
+          "id": "sports_outdoors",
+          "zh": "运动与户外"
+        },
+        {
+          "id": "music_movies",
+          "zh": "音乐与电影"
+        },
+        {
+          "id": "games_anime",
+          "zh": "游戏与动漫"
+        },
+        {
+          "id": "travel_exploration",
+          "zh": "旅行与探索"
+        },
+        {
+          "id": "home_living",
+          "zh": "家居与生活"
+        },
+        {
+          "id": "plants_nature",
+          "zh": "植物与自然"
+        },
+        {
+          "id": "fashion_accessories",
+          "zh": "时尚与配饰"
+        },
+        {
+          "id": "experiences_activities",
+          "zh": "体验与活动"
+        }
+      ],
+      "gift_styles": [
+        {
+          "id": "design",
+          "zh": "有设计感"
+        },
+        {
+          "id": "practical",
+          "zh": "实用型"
+        },
+        {
+          "id": "personalized",
+          "zh": "个性化定制"
+        },
+        {
+          "id": "surprising",
+          "zh": "有趣且能带来惊喜"
+        },
+        {
+          "id": "memorable",
+          "zh": "有纪念意义"
+        },
+        {
+          "id": "experiential",
+          "zh": "体验型"
+        },
+        {
+          "id": "understated",
+          "zh": "精致但不张扬"
+        }
+      ],
+      "exclusions": [
+        {
+          "id": "alcohol",
+          "zh": "酒类"
+        },
+        {
+          "id": "food",
+          "zh": "食品"
+        },
+        {
+          "id": "fragrance",
+          "zh": "香氛"
+        },
+        {
+          "id": "jewelry",
+          "zh": "珠宝首饰"
+        },
+        {
+          "id": "plant",
+          "zh": "植物"
+        },
+        {
+          "id": "other",
+          "zh": "其他类别"
+        }
+      ]
+    },
+    "ranges": {
+      "budget": [
+        {
+          "id": "r1",
+          "label": "100 元以内",
+          "min": "0",
+          "max": "100"
+        },
+        {
+          "id": "r2",
+          "label": "100–200 元",
+          "min": "100",
+          "max": "200"
+        },
+        {
+          "id": "r3",
+          "label": "200–500 元",
+          "min": "200",
+          "max": "500"
+        },
+        {
+          "id": "r4",
+          "label": "500–1000 元",
+          "min": "500",
+          "max": "1000"
+        },
+        {
+          "id": "r5",
+          "label": "1000 元以上",
+          "min": "1000",
+          "max": null
+        }
+      ],
+      "deadline": [
+        {
+          "id": "d0",
+          "label": "明天",
+          "value": 1,
+          "hint": "按 1 天上限检查",
+          "minDays": 0,
+          "maxDays": 1
+        },
+        {
+          "id": "d1",
+          "label": "3–5 天",
+          "value": 5,
+          "hint": "按 5 天上限检查",
+          "minDays": 3,
+          "maxDays": 5
+        },
+        {
+          "id": "d2",
+          "label": "一周以内",
+          "value": 7,
+          "hint": "按 7 天上限检查",
+          "minDays": 0,
+          "maxDays": 7
+        },
+        {
+          "id": "d3",
+          "label": "一月以内",
+          "value": 30,
+          "hint": "按 30 天上限检查",
+          "minDays": 0,
+          "maxDays": 30
+        },
+        {
+          "id": "d4",
+          "label": "一季度以内",
+          "value": 90,
+          "hint": "按 90 天上限检查",
+          "minDays": 0,
+          "maxDays": 90
+        },
+        {
+          "id": "d5",
+          "label": "一年以内",
+          "value": 365,
+          "hint": "按 365 天上限检查",
+          "minDays": 0,
+          "maxDays": 365
+        }
+      ]
+    },
+    "budget_slider": {
+      "min": 0,
+      "max": 1000,
+      "step": 50
+    },
+    "budget_modes": [
+      "slider",
+      "zero",
+      "other"
+    ],
+    "limits": {
+      "currency": "CNY",
+      "intake_bytes": 32768,
+      "max_array_items": 20,
+      "max_string_code_points": 1000,
+      "candidates": 3,
+      "global_repair_limit": 1
+    },
+    "client_timeout_ms": 20000
+  },
+  "counts": {
+    "PASS": 27,
+    "FAIL": 9,
+    "SKIP": 0,
+    "BLOCKED": 27
+  },
+  "results": [
+    {
+      "id": "desktop:three-steps",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:mock-visible",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:no-horizontal-overflow",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:two-sliders",
+      "status": "PASS",
+      "actual": [
+        {
+          "id": "budget-min",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算下限"
+        },
+        {
+          "id": "budget-max",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算上限"
+        }
+      ]
+    },
+    {
+      "id": "desktop:slider-keyboard",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:slider-no-cross",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:six-time-options",
+      "status": "FAIL",
+      "actual": {
+        "labels": [],
+        "error": true
+      }
+    },
+    {
+      "id": "desktop:other-relation-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "desktop:other-occasion-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "desktop:other-money-inputs",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:empty-money-blocked",
+      "status": "PASS"
+    },
+    {
+      "id": "desktop:back-preserves-input",
+      "status": "BLOCKED",
+      "actual": "六档时间配置不兼容，无法从正常界面进入第二步"
+    },
+    {
+      "id": "desktop:ai-confirmation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:recommendation-three-candidates",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:selection-before-presentation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:bill-one-gift-no-packaging-price",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:recognition-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:recommendation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:presentation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:timeout-recovery",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "desktop:console-errors",
+      "status": "PASS",
+      "actual": []
+    },
+    {
+      "id": "narrow390:three-steps",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:mock-visible",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:no-horizontal-overflow",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:two-sliders",
+      "status": "PASS",
+      "actual": [
+        {
+          "id": "budget-min",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算下限"
+        },
+        {
+          "id": "budget-max",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算上限"
+        }
+      ]
+    },
+    {
+      "id": "narrow390:slider-keyboard",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:slider-no-cross",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:six-time-options",
+      "status": "FAIL",
+      "actual": {
+        "labels": [],
+        "error": true
+      }
+    },
+    {
+      "id": "narrow390:other-relation-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "narrow390:other-occasion-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "narrow390:other-money-inputs",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:empty-money-blocked",
+      "status": "PASS"
+    },
+    {
+      "id": "narrow390:back-preserves-input",
+      "status": "BLOCKED",
+      "actual": "六档时间配置不兼容，无法从正常界面进入第二步"
+    },
+    {
+      "id": "narrow390:ai-confirmation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:recommendation-three-candidates",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:selection-before-presentation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:bill-one-gift-no-packaging-price",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:recognition-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:recommendation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:presentation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:timeout-recovery",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "narrow390:console-errors",
+      "status": "PASS",
+      "actual": []
+    },
+    {
+      "id": "tiny320:three-steps",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:mock-visible",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:no-horizontal-overflow",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:two-sliders",
+      "status": "PASS",
+      "actual": [
+        {
+          "id": "budget-min",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算下限"
+        },
+        {
+          "id": "budget-max",
+          "min": "0",
+          "max": "1000",
+          "step": "50",
+          "label": "礼物预算上限"
+        }
+      ]
+    },
+    {
+      "id": "tiny320:slider-keyboard",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:slider-no-cross",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:six-time-options",
+      "status": "FAIL",
+      "actual": {
+        "labels": [],
+        "error": true
+      }
+    },
+    {
+      "id": "tiny320:other-relation-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "tiny320:other-occasion-input",
+      "status": "FAIL"
+    },
+    {
+      "id": "tiny320:other-money-inputs",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:empty-money-blocked",
+      "status": "PASS"
+    },
+    {
+      "id": "tiny320:back-preserves-input",
+      "status": "BLOCKED",
+      "actual": "六档时间配置不兼容，无法从正常界面进入第二步"
+    },
+    {
+      "id": "tiny320:ai-confirmation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:recommendation-three-candidates",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:selection-before-presentation",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:bill-one-gift-no-packaging-price",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:recognition-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:recommendation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:presentation-loading",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:timeout-recovery",
+      "status": "BLOCKED",
+      "actual": "正常表单被六档时间缺陷阻断；未注入配置或模拟响应绕过"
+    },
+    {
+      "id": "tiny320:console-errors",
+      "status": "PASS",
+      "actual": []
+    }
+  ]
+}

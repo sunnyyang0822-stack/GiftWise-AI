@@ -108,15 +108,17 @@
       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "errors": [
-          {
-            "code": "LIMIT_EXCEEDED",
-            "path": "request.budget_amount",
-            "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
-          }
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ],
+        "absent_codes": [
+          "LIMIT_EXCEEDED",
+          "OVER_BUDGET"
         ]
       },
       "mode": "normal"
@@ -127,15 +129,17 @@
       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.0\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "errors": [
-          {
-            "code": "LIMIT_EXCEEDED",
-            "path": "request.budget_amount",
-            "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
-          }
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ],
+        "absent_codes": [
+          "LIMIT_EXCEEDED",
+          "OVER_BUDGET"
         ]
       },
       "mode": "normal"
@@ -146,15 +150,17 @@
       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.00\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "errors": [
-          {
-            "code": "LIMIT_EXCEEDED",
-            "path": "request.budget_amount",
-            "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
-          }
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ],
+        "absent_codes": [
+          "LIMIT_EXCEEDED",
+          "OVER_BUDGET"
         ]
       },
       "mode": "normal"
@@ -165,15 +171,17 @@
       "request_arg": "{\"recipient_relation\":\"\u865a\u6784\u7528\u6237\u7684\u670b\u53cb\",\"occasion\":\"\u6bd5\u4e1a\u795d\u798f\",\"budget_amount\":\"0.99\",\"currency\":\"CNY\",\"available_days\":3,\"facts\":[{\"id\":\"coffee\",\"text\":\"\u559c\u6b22\u624b\u51b2\u5496\u5561\"},{\"id\":\"simple\",\"text\":\"\u559c\u6b22\u7b80\u6d01\u7684\u65e5\u5e38\u7528\u54c1\"}],\"forbidden_tags\":[\"alcohol\"],\"forbidden_terms\":[\"\u70c8\u9152\"],\"notes\":\"\u4e0d\u9700\u8981\u56de\u5e94\u538b\u529b\"}",
       "candidates_arg": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"\u624b\u51b2\u5206\u4eab\u676f\",\"description\":\"\u4e00\u53ea\u5206\u4eab\u676f\uff0c\u542b\u57fa\u7840\u5305\u88c5\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":3,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u5df2\u77e5\u5496\u5561\u5174\u8da3\",\"fact_refs\":[\"coffee\"],\"inferences\":[\"\u5206\u4eab\u676f\u53ef\u80fd\u9002\u5408\u65e5\u5e38\u4f7f\u7528\"],\"unknowns\":[\"\u5b9e\u9645\u4f9b\u5e94\u672a\u6838\u5b9e\"],\"presentation\":\"\u7eb8\u76d2\u57fa\u7840\u5305\u88c5\uff0c\u8be6\u7ec6\u5448\u73b0\u7b49\u5f85\u9009\u62e9\"},{\"id\":\"c2\",\"name\":\"\u7eb8\u8d28\u9605\u8bfb\u624b\u8d26\",\"description\":\"\u4e00\u672c\u624b\u8d26\uff0c\u542b\u8d3a\u5361\u4e0e\u914d\u9001\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"\u63d0\u4f9b\u4e66\u5199\u65b9\u5411\uff0c\u4e0d\u5047\u5b9a\u9605\u8bfb\u4e60\u60ef\",\"fact_refs\":[],\"inferences\":[],\"unknowns\":[\"\u662f\u5426\u4f7f\u7528\u7eb8\u672c\"]},{\"id\":\"c3\",\"name\":\"\u6298\u53e0\u5e03\u888b\",\"description\":\"\u4e00\u53ea\u968f\u8eab\u5e03\u888b\uff0c\u542b\u57fa\u672c\u5448\u73b0\u8d39\u7528\u4f30\u7b97\",\"estimated_total\":\"0\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"\u547c\u5e94\u7b80\u6d01\u7528\u54c1\u504f\u597d\",\"fact_refs\":[\"simple\"],\"inferences\":[\"\u968f\u8eab\u7528\u54c1\u53ef\u80fd\u5b9e\u7528\"],\"unknowns\":[\"\u989c\u8272\u504f\u597d\u672a\u63d0\u4f9b\"]}]}",
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "errors": [
-          {
-            "code": "LIMIT_EXCEEDED",
-            "path": "request.budget_amount",
-            "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
-          }
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_passed": [
+          true,
+          true,
+          true
+        ],
+        "absent_codes": [
+          "LIMIT_EXCEEDED",
+          "OVER_BUDGET"
         ]
       },
       "mode": "normal"
@@ -191,7 +199,7 @@
             "code": "LIMIT_EXCEEDED",
             "path": "request.budget_amount",
             "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+            "message": "\u9884\u7b97\u987b\u5728 0 \u81f3 10000 \u4e4b\u95f4"
           }
         ]
       },
@@ -210,7 +218,7 @@
             "code": "LIMIT_EXCEEDED",
             "path": "request.budget_amount",
             "location": "top",
-            "message": "\u9884\u7b97\u987b\u5728 1 \u81f3 10000 \u4e4b\u95f4"
+            "message": "\u9884\u7b97\u987b\u5728 0 \u81f3 10000 \u4e4b\u95f4"
           }
         ]
       },

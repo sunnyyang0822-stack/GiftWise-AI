@@ -1,0 +1,748 @@
+{
+  "base": "http://127.0.0.1:19437",
+  "mode": "mock",
+  "counts": {
+    "PASS": 46,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0
+  },
+  "results": [
+    {
+      "id": "service-mock-config",
+      "status": "PASS",
+      "actual": {
+        "health": {
+          "status": "ok",
+          "mode": "mock",
+          "runs": 1
+        },
+        "mode": "mock"
+      }
+    },
+    {
+      "id": "six-numeric-times",
+      "status": "PASS",
+      "actual": [
+        {
+          "id": "d0",
+          "label": "明天",
+          "value": 1,
+          "hint": "按 1 天上限检查",
+          "minDays": 0,
+          "maxDays": 1
+        },
+        {
+          "id": "d1",
+          "label": "3–5 天",
+          "value": 5,
+          "hint": "按 5 天上限检查",
+          "minDays": 3,
+          "maxDays": 5
+        },
+        {
+          "id": "d2",
+          "label": "一周以内",
+          "value": 7,
+          "hint": "按 7 天上限检查",
+          "minDays": 0,
+          "maxDays": 7
+        },
+        {
+          "id": "d3",
+          "label": "一月以内",
+          "value": 30,
+          "hint": "按 30 天上限检查",
+          "minDays": 0,
+          "maxDays": 30
+        },
+        {
+          "id": "d4",
+          "label": "一季度以内",
+          "value": 90,
+          "hint": "按 90 天上限检查",
+          "minDays": 0,
+          "maxDays": 90
+        },
+        {
+          "id": "d5",
+          "label": "一年以内",
+          "value": 365,
+          "hint": "按 365 天上限检查",
+          "minDays": 0,
+          "maxDays": 365
+        }
+      ]
+    },
+    {
+      "id": "config-no-credentials",
+      "status": "PASS"
+    },
+    {
+      "id": "recipient_relation:invalid-custom-",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.recipient_relation_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.recipient_relation_custom",
+          "message": "选择其他关系时请填写自定义关系"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.recipient_relation",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "recipient_relation:invalid-custom- ",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.recipient_relation_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.recipient_relation_custom",
+          "message": "选择其他关系时请填写自定义关系"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.recipient_relation",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "recipient_relation:invalid-custom-字字字字字字字字字字",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "intake.recipient_relation_custom",
+          "message": "自定义文本最多 1000 个 Unicode 码点"
+        },
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "request.recipient_relation",
+          "message": "字段字符串超过 1000 个 Unicode 码点"
+        },
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "request.recipient_relation_custom",
+          "message": "字段字符串超过 1000 个 Unicode 码点"
+        }
+      ]
+    },
+    {
+      "id": "recipient_relation:invalid-custom-null",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.recipient_relation_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.recipient_relation_custom",
+          "message": "选择其他关系时请填写自定义关系"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.recipient_relation",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "recipient_relation:invalid-custom-3",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.recipient_relation_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.recipient_relation_custom",
+          "message": "选择其他关系时请填写自定义关系"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.recipient_relation",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "recipient_relation:missing-custom",
+      "status": "PASS"
+    },
+    {
+      "id": "recipient_relation:valid-frozen",
+      "status": "PASS",
+      "actual": {
+        "recipient_relation": "社团指导老师",
+        "recipient_relation_id": "other",
+        "recipient_relation_custom": "社团指导老师",
+        "occasion": "生日",
+        "occasion_custom": null,
+        "budget_amount": "300",
+        "currency": "CNY",
+        "available_days": 5,
+        "facts": [],
+        "forbidden_tags": [],
+        "forbidden_terms": [],
+        "notes": "QA 虚构请求，不假定双向好感",
+        "closeness": "limited",
+        "preference_inferences": [],
+        "gift_styles": [],
+        "hard_exclusions_original": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "contract_version": "giftwise-20261031-v2",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "dislikes": ""
+      }
+    },
+    {
+      "id": "recipient_relation:illegal-combination",
+      "status": "PASS"
+    },
+    {
+      "id": "occasion:invalid-custom-",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.occasion_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.occasion_custom",
+          "message": "选择其他场合时请填写自定义场合"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.occasion",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "occasion:invalid-custom- ",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.occasion_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.occasion_custom",
+          "message": "选择其他场合时请填写自定义场合"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.occasion",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "occasion:invalid-custom-字字字字字字字字字字",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "intake.occasion_custom",
+          "message": "自定义文本最多 1000 个 Unicode 码点"
+        },
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "request.occasion",
+          "message": "字段字符串超过 1000 个 Unicode 码点"
+        },
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "request.occasion_custom",
+          "message": "字段字符串超过 1000 个 Unicode 码点"
+        }
+      ]
+    },
+    {
+      "id": "occasion:invalid-custom-null",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.occasion_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.occasion_custom",
+          "message": "选择其他场合时请填写自定义场合"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.occasion",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "occasion:invalid-custom-3",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "intake.occasion_custom",
+          "message": "自定义文本必须为非空字符串"
+        },
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "intake.occasion_custom",
+          "message": "选择其他场合时请填写自定义场合"
+        },
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.occasion",
+          "message": "必须为非空字符串"
+        }
+      ]
+    },
+    {
+      "id": "occasion:missing-custom",
+      "status": "PASS"
+    },
+    {
+      "id": "occasion:valid-frozen",
+      "status": "PASS",
+      "actual": {
+        "recipient_relation": "追求对象",
+        "recipient_relation_id": "pursuit",
+        "recipient_relation_custom": null,
+        "occasion": "搬家答谢",
+        "occasion_custom": "搬家答谢",
+        "budget_amount": "300",
+        "currency": "CNY",
+        "available_days": 5,
+        "facts": [],
+        "forbidden_tags": [],
+        "forbidden_terms": [],
+        "notes": "QA 虚构请求，不假定双向好感",
+        "closeness": "limited",
+        "preference_inferences": [],
+        "gift_styles": [],
+        "hard_exclusions_original": {
+          "tags": [],
+          "terms": [],
+          "unresolved": []
+        },
+        "contract_version": "giftwise-20261031-v2",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "dislikes": ""
+      }
+    },
+    {
+      "id": "occasion:illegal-combination",
+      "status": "PASS"
+    },
+    {
+      "id": "budget:missing-min",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_BUDGET_RANGE",
+          "path": "intake.budget_range.min",
+          "message": "预算区间两端均须填写"
+        }
+      ]
+    },
+    {
+      "id": "budget:missing-max",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_BUDGET_RANGE",
+          "path": "intake.budget_range.max",
+          "message": "预算区间两端均须填写"
+        }
+      ]
+    },
+    {
+      "id": "budget:blank-min",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_AMOUNT",
+          "path": "intake.budget_range.min",
+          "message": "金额必须为有限非负、至多两位小数的 ASCII 十进制字符串"
+        }
+      ]
+    },
+    {
+      "id": "budget:reversed",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_BUDGET_RANGE",
+          "path": "intake.budget_range",
+          "message": "预算区间下限不能超过上限"
+        }
+      ]
+    },
+    {
+      "id": "budget:over-limit",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "LIMIT_EXCEEDED",
+          "path": "intake.budget_range.max",
+          "message": "预算区间端点须在 0 至 10000 之间"
+        }
+      ]
+    },
+    {
+      "id": "budget:slider-custom",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INVALID_BUDGET_RANGE",
+          "path": "intake.budget_range",
+          "message": "滑条两端须在 0 至 1000 之间，步长为 50 元"
+        }
+      ]
+    },
+    {
+      "id": "zero-legal",
+      "status": "PASS",
+      "actual": "passed"
+    },
+    {
+      "id": "below-min-warning-selectable",
+      "status": "PASS",
+      "actual": {
+        "status": "passed",
+        "all_passed": true,
+        "errors": [],
+        "candidate_results": [
+          {
+            "id": "c1",
+            "passed": true,
+            "errors": [],
+            "warnings": [
+              {
+                "code": "BELOW_BUDGET_RANGE",
+                "path": "candidates[0].estimated_total",
+                "message": "礼物估价低于预算区间下限，仍可选择"
+              }
+            ]
+          },
+          {
+            "id": "c2",
+            "passed": true,
+            "errors": [],
+            "warnings": [
+              {
+                "code": "BELOW_BUDGET_RANGE",
+                "path": "candidates[1].estimated_total",
+                "message": "礼物估价低于预算区间下限，仍可选择"
+              }
+            ]
+          },
+          {
+            "id": "c3",
+            "passed": true,
+            "errors": [],
+            "warnings": [
+              {
+                "code": "BELOW_BUDGET_RANGE",
+                "path": "candidates[2].estimated_total",
+                "message": "礼物估价低于预算区间下限，仍可选择"
+              }
+            ]
+          }
+        ],
+        "business_data_verification": "not_verified"
+      }
+    },
+    {
+      "id": "unconfirmed-blocked",
+      "status": "PASS",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_CLARIFICATION_REQUIRED",
+            "path": "exclusion_confirmation",
+            "message": "请先完成不喜欢内容的识别与逐项确认。"
+          }
+        ],
+        "mode": "mock",
+        "notices": [
+          "⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。"
+        ]
+      }
+    },
+    {
+      "id": "empty-dislikes-no-analysis",
+      "status": "PASS",
+      "actual": {
+        "status": "needs_input",
+        "mode": "mock",
+        "analysis_id": null,
+        "candidates": [],
+        "errors": []
+      }
+    },
+    {
+      "id": "analysis-anchored",
+      "status": "PASS",
+      "actual": {
+        "status": "needs_confirmation",
+        "mode": "mock",
+        "analysis_id": "xa-cd029dab-c0cd-4b24-8794-ae3e30d36b3f",
+        "candidates": [
+          {
+            "id": "xc1",
+            "kind": "tag",
+            "tag": "fragrance",
+            "term": null,
+            "source_span": "不要香水",
+            "confidence": "high",
+            "why": "虚构模拟夹具：原文提到香水，仍需用户确认",
+            "evidence": "user_text"
+          }
+        ],
+        "errors": []
+      }
+    },
+    {
+      "id": "confirmation:forged-id",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "EXCLUSION_ANALYSIS_STALE",
+          "path": "exclusion_confirmation.analysis_id",
+          "message": "排除项识别已过期或不存在，请重新识别。"
+        }
+      ]
+    },
+    {
+      "id": "confirmation:wrong-candidate",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "exclusion_confirmation.confirmed_ids",
+          "message": "请确认全部识别到的排除项，且每项只能确认一次。"
+        }
+      ]
+    },
+    {
+      "id": "confirmation:duplicate-id",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "exclusion_confirmation.confirmed_ids",
+          "message": "请确认全部识别到的排除项，且每项只能确认一次。"
+        }
+      ]
+    },
+    {
+      "id": "confirmation:partial",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "INTAKE_CLARIFICATION_REQUIRED",
+          "path": "exclusion_confirmation.confirmed_ids",
+          "message": "请确认全部识别到的排除项，且每项只能确认一次。"
+        }
+      ]
+    },
+    {
+      "id": "confirmation:changed-intake",
+      "status": "PASS",
+      "actual": [
+        {
+          "code": "EXCLUSION_ANALYSIS_STALE",
+          "path": "exclusion_confirmation.analysis_id",
+          "message": "排除项识别与当前输入不一致，请重新识别。"
+        }
+      ]
+    },
+    {
+      "id": "confirmed-three-candidates",
+      "status": "PASS",
+      "actual": "failed"
+    },
+    {
+      "id": "confirmation-idempotent",
+      "status": "PASS",
+      "actual": {
+        "recommend": 1,
+        "recommend_revision": 1,
+        "presentation": 0,
+        "presentation_revision": 0
+      }
+    },
+    {
+      "id": "before-choice-zero-presentation",
+      "status": "PASS",
+      "actual": {
+        "recommend": 1,
+        "recommend_revision": 1,
+        "presentation": 0,
+        "presentation_revision": 0
+      }
+    },
+    {
+      "id": "forged-selection-rejected",
+      "status": "PASS",
+      "actual": {
+        "status": "selection_rejected",
+        "errors": [
+          {
+            "code": "INVALID_SELECTION",
+            "path": "selected_candidate_id",
+            "message": "该候选 ID 不属于本次推荐记录，已拒绝；请从当前三个方案中重新选择。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "failed-candidate-rejected",
+      "status": "PASS",
+      "actual": {
+        "status": "selection_rejected",
+        "errors": [
+          {
+            "code": "CANDIDATE_NOT_PASSED",
+            "path": "selected_candidate_id",
+            "message": "该方案未通过独立规则检查，不能选择；失败项需要你调整需求后重新生成。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "bill-one-gift",
+      "status": "PASS",
+      "actual": {
+        "contract_version": "giftwise-20261031-v2",
+        "gift_estimated_total": "118.00",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "budget_amount": "300",
+        "currency": "CNY",
+        "revised_estimated_preparation_days": 1,
+        "available_days": 5,
+        "passed": true,
+        "business_data_verification": "not_verified"
+      }
+    },
+    {
+      "id": "packaging-no-quote",
+      "status": "PASS",
+      "actual": {
+        "contract_version": "giftwise-20261031-v2",
+        "style": "低压力、简洁",
+        "packaging": {
+          "color_palette": [
+            "米白",
+            "浅木色",
+            "雾霾蓝"
+          ]
+        },
+        "card_text": "生日快乐！看到合适的小东西就顺手带了一份，希望新的一岁顺顺利利，做想做的事。",
+        "giving_advice": {
+          "timing": "挑对方方便、环境轻松的时候单独送出，简单聊几句就结束，不安排需要回应的话题。",
+          "wording": "这是顺手准备的一点生日心意，祝你生日快乐，别有负担。",
+          "relationship_cautions": [
+            "不暗示双方已确定关系",
+            "不默认告白或要求回应",
+            "避免在公开场合制造回应压力"
+          ]
+        },
+        "unknowns": [
+          "实际价格、库存、配送时效均未核实"
+        ],
+        "currency": "CNY",
+        "revised_estimated_preparation_days": 1
+      }
+    },
+    {
+      "id": "bill-not-verified",
+      "status": "PASS",
+      "actual": {
+        "contract_version": "giftwise-20261031-v2",
+        "gift_estimated_total": "118.00",
+        "budget_range": {
+          "min": "100",
+          "max": "300"
+        },
+        "budget_amount": "300",
+        "currency": "CNY",
+        "revised_estimated_preparation_days": 1,
+        "available_days": 5,
+        "passed": true,
+        "business_data_verification": "not_verified"
+      }
+    },
+    {
+      "id": "presentation-idempotent",
+      "status": "PASS",
+      "actual": {
+        "recommend": 1,
+        "recommend_revision": 1,
+        "presentation": 1,
+        "presentation_revision": 0
+      }
+    },
+    {
+      "id": "repairs-at-most-one",
+      "status": "PASS",
+      "actual": 1
+    },
+    {
+      "id": "unmapped-blocked",
+      "status": "PASS",
+      "actual": {
+        "status": "needs_input",
+        "mode": "mock",
+        "analysis_id": null,
+        "candidates": [],
+        "errors": [
+          {
+            "code": "INTAKE_CLARIFICATION_REQUIRED",
+            "path": "dislikes",
+            "message": "模拟模式仅支持标注的虚构固定夹具，请修改输入或配置真实提供者"
+          }
+        ]
+      }
+    }
+  ]
+}

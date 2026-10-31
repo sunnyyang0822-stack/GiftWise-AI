@@ -976,7 +976,7 @@
     },
     "status": "needs_input",
     "code": "INVALID_BUDGET_RANGE",
-    "path": "request.budget_range",
+    "path": "request.budget_range.min",
     "warning": false
   },
   {
@@ -1057,7 +1057,7 @@
     },
     "status": "needs_input",
     "code": "INVALID_BUDGET_RANGE",
-    "path": "request.budget_range",
+    "path": "request.budget_range.max",
     "warning": false
   },
   {
@@ -1631,7 +1631,7 @@
     },
     "status": "needs_input",
     "code": "BUDGET_RANGE_MISMATCH",
-    "path": "request.budget_range",
+    "path": "request.budget_amount",
     "warning": false
   },
   {

@@ -1,0 +1,106 @@
+{
+  "release_sha": "3dfb186b74a4afabfef82c7213401fb60587f946",
+  "mode": "mock",
+  "base": "http://127.0.0.1:19437",
+  "cdp": "http://127.0.0.1:9439",
+  "runs": [
+    {
+      "name": "http-legacy",
+      "command": [
+        "node",
+        "web/tools/smoke-http.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:37.804156+08:00",
+      "finished": "2026-10-31T12:27:38.012546+08:00",
+      "exit_code": 2
+    },
+    {
+      "name": "http-revision",
+      "command": [
+        "node",
+        "tests/acceptance/nov01_revision/http-revision.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:38.014547+08:00",
+      "finished": "2026-10-31T12:27:38.229395+08:00",
+      "exit_code": 0
+    },
+    {
+      "name": "browser-legacy",
+      "command": [
+        "node",
+        "web/tools/browser-check.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": null,
+      "started": "2026-10-31T12:27:39.406552+08:00",
+      "finished": "2026-10-31T12:27:41.490911+08:00",
+      "exit_code": 2
+    },
+    {
+      "name": "browser-revision",
+      "command": [
+        "node",
+        "web/tools/browser-check.mjs"
+      ],
+      "env": {
+        "GW_MODE": "mock",
+        "GW_HOST": "127.0.0.1",
+        "GW_PORT": "19437",
+        "GW_BASE": "http://127.0.0.1:19437",
+        "GW_CDP": "http://127.0.0.1:9439",
+        "GW_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\browser",
+        "GW_QA_OUT": "C:\\Users\\lenovo\\Desktop\\giftwise\\qa-pinned-1031\\docs\\test-reports\\final-qa-1031\\evidence\\http"
+      },
+      "extras": {
+        "GW_REVISION_QA": "1"
+      },
+      "started": "2026-10-31T12:27:41.491921+08:00",
+      "finished": "2026-10-31T12:27:47.037925+08:00",
+      "exit_code": 1
+    }
+  ],
+  "server_pid": 35984,
+  "health": {
+    "status": "ok",
+    "mode": "mock",
+    "runs": 0
+  },
+  "browser_pid": 43336,
+  "browser_version": {
+    "Browser": "Chrome/156.0.8078.79",
+    "File-Path-Style": "windows",
+    "Protocol-Version": "1.3",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "V8-Version": "15.6.75.27",
+    "WebKit-Version": "537.36 (@a21ce95c24ce3964416f09ae1862f53f319eb4d0)",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9439/devtools/browser/7ffe154c-768d-4200-bcd9-b4896826069d"
+  }
+}

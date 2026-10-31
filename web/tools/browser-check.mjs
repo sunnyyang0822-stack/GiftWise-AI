@@ -413,6 +413,12 @@ async function close(client, targetId) {
 /* ------------------------------------------------------------------ 主流程 */
 
 async function main() {
+  if (process.env.GW_REVISION_QA === "1") {
+    const { runRevision } = await import("../../tests/acceptance/nov01_revision/browser-revision.mjs");
+    await runRevision({ Client, open, close, ensureLocalServer, stopOwnServer,
+      base: BASE, cdp: CDP, out: OUT_DIR, viewports: VIEWPORTS });
+    return;
+  }
   // 开工前服务身份自检（共用模块 web/tools/server-identity.mjs）：
   // 绝不在不知情的情况下测别的工作区的服务；必要时自起独占端口。
   BASE = await ensureLocalServer(BASE, { explicit: (process.env.GW_BASE || "").trim().length > 0 });
