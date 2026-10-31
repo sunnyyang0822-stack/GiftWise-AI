@@ -1,0 +1,1807 @@
+{
+  "schema_version": "giftwise-seed-catalog-research-v1",
+  "status": "research_only_not_integrated",
+  "created_at": "2026-10-31T05:21:03Z",
+  "related_issues": [
+    59,
+    60
+  ],
+  "contract_baseline": "PR #61 docs/design/retrieval-media-contract.md（2026-10-31读取；待PM/后台单一写者确认映射）",
+  "disclaimer": "人工整理的非实时参考数据；不是后台真实浏览器检索结果，不保证售价、库存、送达或可购买性；不得降价凑预算。",
+  "products": [
+    {
+      "product_id": "ikea-cn-40583741",
+      "name": "UPPHETTA 乌普塔 咖啡壶/茶壶",
+      "brand": "IKEA",
+      "model": "405.837.41",
+      "source_product_id": "40583741",
+      "source_sku_id": null,
+      "variant": "玻璃/不锈钢灰白；1 L；高22 cm、直径10 cm",
+      "quantity": 1,
+      "quantity_unit": "个",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "59.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面同时出现每满2000减200宣传，主金额未减去满减；活动门槛及叠加规则未核实。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/upphetta-wu-pu-ta-ka-pei-hu-cha-hu-bo-li-bu-xiu-gang-hui-bai-40583741/",
+      "observed_at": "2026-10-31T05:16:45Z",
+      "fetched_at": "2026-10-31T05:16:45Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "耐热玻璃",
+          "聚丙烯塑料",
+          "不锈钢"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "玻璃/不锈钢灰白；1 L；高22 cm、直径10 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "咖啡与美食",
+          "家居与生活"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情为冲泡咖啡或茶的压滤壶。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/upphetta-wu-pu-ta-ka-pei-hu-cha-hu-bo-li-bu-xiu-gang-hui-bai-40583741/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-40583741",
+      "unverified_items": [
+        "易碎；需阅读压滤操作说明；未评估个人过敏适用性。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-40096374",
+      "name": "FADO 法多 台灯",
+      "brand": "IKEA",
+      "model": "400.963.74",
+      "source_product_id": "40096374",
+      "source_sku_id": null,
+      "variant": "白色；直径25 cm；高24 cm；不含灯泡",
+      "quantity": 1,
+      "quantity_unit": "盏",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "99.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/fado-table-lamp-white-40096374/",
+      "observed_at": "2026-10-31T05:16:45Z",
+      "fetched_at": "2026-10-31T05:16:45Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "玻璃灯罩",
+          "聚丙烯底座"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "白色；直径25 cm；高24 cm；不含灯泡",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "设计与艺术",
+          "家居与生活"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为球形玻璃装饰台灯。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/fado-table-lamp-white-40096374/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-40096374",
+      "unverified_items": [
+        "灯泡另购且未核价，不能把99.99元视为可直接使用的完整配置费用。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-10373589",
+      "name": "BLÅHAJ 布罗艾 毛绒玩具",
+      "brand": "IKEA",
+      "model": "103.735.89",
+      "source_product_id": "10373589",
+      "source_sku_id": null,
+      "variant": "鲨鱼；蓝色；长100 cm",
+      "quantity": 1,
+      "quantity_unit": "只",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "129.00",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/blahaj-bu-luo-ai-mao-rong-wan-ju-sha-yu-10373589/",
+      "observed_at": "2026-10-31T05:16:45Z",
+      "fetched_at": "2026-10-31T05:16:45Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "聚酯面料",
+          "再生聚酯中空填充"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "鲨鱼；蓝色；长100 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "植物与自然",
+          "家居与生活"
+        ],
+        "styles": [
+          "有趣能带来惊喜"
+        ],
+        "basis": "详情为鲨鱼外形毛绒玩具；自然标签仅指海洋动物题材。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/blahaj-bu-luo-ai-mao-rong-wan-ju-sha-yu-10373589/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-10373589",
+      "unverified_items": [
+        "需确认收礼人是否喜欢毛绒和海洋动物题材；不由年龄或身份推断。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-10477619",
+      "name": "MÅLA 莫拉 白板笔带笔盒/白板擦",
+      "brand": "IKEA",
+      "model": "104.776.19",
+      "source_product_id": "10477619",
+      "source_sku_id": null,
+      "variant": "多色；4支白板笔及配套笔盒/板擦；非纸用绘画笔",
+      "quantity": 1,
+      "quantity_unit": "套",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "29.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/mala-mo-la-bai-ban-bi-dai-bi-he-bai-ban-ca-duo-se-10477619/",
+      "observed_at": "2026-10-31T05:16:45Z",
+      "fetched_at": "2026-10-31T05:16:45Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "聚丙烯部件",
+          "聚酯笔尖等部件"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "多色；4支白板笔及配套笔盒/板擦；非纸用绘画笔",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "设计与艺术",
+          "阅读与学习"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情说明用于白板书写，带收纳和板擦；非专业美术工具。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/mala-mo-la-bai-ban-bi-dai-bi-he-bai-ban-ca-duo-se-10477619/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-10477619",
+      "unverified_items": [
+        "油墨完整配方未知；不能用于人体绘画；小部件警告；需确认已有白板及握持适用性。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-70458000",
+      "name": "BERGENES 伯格尼斯 手机/平板支架",
+      "brand": "IKEA",
+      "model": "704.580.00",
+      "source_product_id": "70458000",
+      "source_sku_id": null,
+      "variant": "竹；13×8 cm；两种插槽",
+      "quantity": 1,
+      "quantity_unit": "个",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "9.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/bergenes-holder-for-mobile-phone-tablet-bamboo-70458000/",
+      "observed_at": "2026-10-31T05:17:11Z",
+      "fetched_at": "2026-10-31T05:17:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "竹",
+          "丙烯酸清漆"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "竹；13×8 cm；两种插槽",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "科技与数码",
+          "家居与生活"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情为手机和平板设备支撑用品。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/bergenes-holder-for-mobile-phone-tablet-bamboo-70458000/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-70458000",
+      "unverified_items": [
+        "详情提及最高11英寸平板；实际设备厚度及保护壳适配未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-90412860",
+      "name": "VIVALLA 维瓦拉 平板支架",
+      "brand": "IKEA",
+      "model": "904.128.60",
+      "source_product_id": "90412860",
+      "source_sku_id": null,
+      "variant": "竹；宽26×深16×高15.5 cm；不含壁装杆",
+      "quantity": 1,
+      "quantity_unit": "个",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "79.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面有11.11活动标记；未取得完整活动规则，不声明为无条件普通售价。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/vivalla-wei-wa-la-ping-ban-zhi-jia-zhu-90412860/",
+      "observed_at": "2026-10-31T05:17:11Z",
+      "fetched_at": "2026-10-31T05:17:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "竹贴面",
+          "丙烯酸清漆"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "竹；宽26×深16×高15.5 cm；不含壁装杆",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "阅读与学习",
+          "科技与数码"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情支持放置书或平板；阅读标签来自承托书本用途。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/vivalla-wei-wa-la-ping-ban-zhi-jia-zhu-90412860/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-90412860",
+      "unverified_items": [
+        "此前摘要含桦木贴面，实际打开详情只列竹贴面；不合并摘要材质。壁装杆另购未核价。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-90597024",
+      "name": "GLADELIG 格拉德里 杯",
+      "brand": "IKEA",
+      "model": "905.970.24",
+      "source_product_id": "90597024",
+      "source_sku_id": null,
+      "variant": "深灰色；370 mL；单只",
+      "quantity": 1,
+      "quantity_unit": "只",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "19.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "页面同时出现每满2000减200宣传，主金额未减去满减；活动门槛及叠加规则未核实。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/gladelig-mug-dark-grey-90597024/",
+      "observed_at": "2026-10-31T05:17:11Z",
+      "fetched_at": "2026-10-31T05:17:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "石瓷",
+          "彩釉"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "深灰色；370 mL；单只",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "咖啡与美食",
+          "家居与生活"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为反应釉饮用杯，标签依据杯具用途及釉面设计。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/gladelig-mug-dark-grey-90597024/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-90597024",
+      "unverified_items": [
+        "不根据外观推断食品接触或个人过敏安全；未取得检测报告。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "apple-cn-mwty3fe-a",
+      "name": "EarPods（闪电接头）",
+      "brand": "Apple",
+      "model": "MWTY3FE/A",
+      "source_product_id": "MWTY3FE/A",
+      "source_sku_id": null,
+      "variant": "闪电接头；有线；含线控",
+      "quantity": 1,
+      "quantity_unit": "副",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "149.00",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.apple.com.cn/shop/product/mwty3fe/a",
+      "observed_at": "2026-10-31T05:17:11Z",
+      "fetched_at": "2026-10-31T05:17:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "闪电接头；有线；含线控",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "音乐与电影",
+          "科技与数码"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情为有线音频耳机。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.apple.com.cn/shop/product/mwty3fe/a",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-apple-cn-mwty3fe-a",
+      "unverified_items": [
+        "需闪电接口及兼容系统；耳形适配、接触材质及过敏原未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-70612110",
+      "name": "SMÖRFISK 斯莫菲斯 杯",
+      "brand": "IKEA",
+      "model": "706.121.10",
+      "source_product_id": "70612110",
+      "source_sku_id": null,
+      "variant": "浅绿/粉红色；每只340 mL；2只装",
+      "quantity": 1,
+      "quantity_unit": "套",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "69.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "non_member_list",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。",
+        "主金额为页面明确列出的非会员2只装69.99元；会员39.99元仅作独立条件报价，禁止自动替换主金额。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [
+        {
+          "quote_id": "quote-ikea-cn-70612110-member-20261031",
+          "price_amount": "39.99",
+          "currency": "CNY",
+          "quantity": 1,
+          "quantity_unit": "套",
+          "variant": "浅绿/粉红色；每只340 mL；2只装",
+          "price_type": "member",
+          "conditions": [
+            "宜家会员",
+            "页面标示有效期2026-10-14至2026-11-11",
+            "购买者会员资格及结算适用性未核实"
+          ],
+          "source_url": "https://www.ikea.cn/cn/zh/p/smoerfisk-si-mo-fei-si-bei-qian-lu-fen-hong-se-70612110/",
+          "observed_at": "2026-10-31T05:17:35Z",
+          "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-70612110"
+        }
+      ],
+      "source_url": "https://www.ikea.cn/cn/zh/p/smoerfisk-si-mo-fei-si-bei-qian-lu-fen-hong-se-70612110/",
+      "observed_at": "2026-10-31T05:17:35Z",
+      "fetched_at": "2026-10-31T05:17:35Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "长石瓷",
+          "彩釉"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "浅绿/粉红色；每只340 mL；2只装",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "咖啡与美食",
+          "家居与生活"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为双色两只装杯具；不把双杯擅自解释为情侣专用。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/smoerfisk-si-mo-fei-si-bei-qian-lu-fen-hong-se-70612110/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-70612110",
+      "unverified_items": [
+        "会员价须满足会员及有效期条件，主参考价采用非会员两只装金额。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "apple-cn-homepod-mini-2-white",
+      "name": "HomePod mini 2",
+      "brand": "Apple",
+      "model": "HomePod mini 2",
+      "source_product_id": null,
+      "source_sku_id": null,
+      "variant": "白色；附20W USB-C电源适配器",
+      "quantity": 1,
+      "quantity_unit": "台",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "1099.00",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。",
+        "每位顾客限购6部；采用单台全额1099元，未使用24期月供金额。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+      "observed_at": "2026-10-31T05:17:35Z",
+      "fetched_at": "2026-10-31T05:17:35Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "白色；附20W USB-C电源适配器",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "音乐与电影",
+          "科技与数码",
+          "家居与生活"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "实际打开详情为第二代智能音箱，包含音频和家居功能。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.apple.com.cn/shop/buy-homepod/homepod-mini",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-apple-cn-homepod-mini-2-white",
+      "unverified_items": [
+        "摘要为旧HomePod mini 999元，打开详情为mini 2 1099元；不混代、不采用摘要旧价。兼容设备、联网条件与订阅费用待核实。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "apple-cn-muwa3ch-a",
+      "name": "Apple Pencil（USB-C）",
+      "brand": "Apple",
+      "model": "MUWA3CH/A",
+      "source_product_id": "MUWA3CH/A",
+      "source_sku_id": null,
+      "variant": "USB-C；长155 mm、直径8.9 mm；20.5 g",
+      "quantity": 1,
+      "quantity_unit": "支",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "649.00",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.apple.com.cn/shop/product/muwa3ch/a",
+      "observed_at": "2026-10-31T05:17:35Z",
+      "fetched_at": "2026-10-31T05:17:35Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "USB-C；长155 mm、直径8.9 mm；20.5 g",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "设计与艺术",
+          "阅读与学习",
+          "科技与数码"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情包含画图、笔记和文档标注用途。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.apple.com.cn/shop/product/muwa3ch/a",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-apple-cn-muwa3ch-a",
+      "unverified_items": [
+        "仅适配指定设备和系统；用户具体机型未知；线缆配置及完整材质未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-10561991",
+      "name": "VATTENKRASSE 瓦特卡斯 浇水壶",
+      "brand": "IKEA",
+      "model": "105.619.91",
+      "source_product_id": "10561991",
+      "source_sku_id": null,
+      "variant": "乳白色/金黄色；350 mL；高13 cm；喷雾款",
+      "quantity": 1,
+      "quantity_unit": "个",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "79.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/vattenkrasse-wa-te-qia-si-jiao-shui-hu-ru-bai-se-jin-huang-se-10561991/",
+      "observed_at": "2026-10-31T05:18:02Z",
+      "fetched_at": "2026-10-31T05:18:02Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "镀锌钢瓶体",
+          "粉末涂层",
+          "不锈钢及塑料等泵件"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "乳白色/金黄色；350 mL；高13 cm；喷雾款",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "植物与自然",
+          "家居与生活"
+        ],
+        "styles": [
+          "有设计感",
+          "实用型"
+        ],
+        "basis": "详情为植物喷水护理用品；不与0.9 L洒水壶混价。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/vattenkrasse-wa-te-qia-si-jiao-shui-hu-ru-bai-se-jin-huang-se-10561991/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-10561991",
+      "unverified_items": [
+        "同系列0.9 L价格不用于本350 mL型号；植物适用的喷水频次未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "ikea-cn-90592597",
+      "name": "VAPPEBY 瓦波比 便携蓝牙音箱",
+      "brand": "IKEA",
+      "model": "905.925.97",
+      "source_product_id": "90592597",
+      "source_sku_id": null,
+      "variant": "防水/蓝色；高8×长6×宽8 cm；单台",
+      "quantity": 1,
+      "quantity_unit": "台",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "99.99",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，未折算成单只/单块。",
+        "未登录、未加购、未使用优惠券；结算适用性未核实。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.ikea.cn/cn/zh/p/vappeby-portable-bluetooth-speaker-waterproof-blue-90592597/",
+      "observed_at": "2026-10-31T05:18:02Z",
+      "fetched_at": "2026-10-31T05:18:02Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": "商品暂时缺货，逛逛相似商品吧",
+        "region": null,
+        "known_scope": "工具提取的未选地区页面",
+        "interpretation": "保留缺货提示；未核实地区库存，不推断全国库存或可购买性"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "partial",
+        "items": [
+          "ABS外壳",
+          "聚酯把手",
+          "硅橡胶按钮"
+        ],
+        "ingredients": null,
+        "allergens": null,
+        "size": "防水/蓝色；高8×长6×宽8 cm；单台",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "音乐与电影",
+          "科技与数码"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情为蓝牙音频设备；立体声需要两台，不按双台宣传配单台价格。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.ikea.cn/cn/zh/p/vappeby-portable-bluetooth-speaker-waterproof-blue-90592597/",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-ikea-cn-90592597",
+      "unverified_items": [
+        "USB-C线和电源适配器另购未核价；不推断涉水使用安全；电池不可更换。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-31147",
+      "name": "复古相机",
+      "brand": "LEGO",
+      "model": "31147",
+      "source_product_id": "31147",
+      "source_sku_id": null,
+      "variant": "261块；3合1；相机模型约高7×宽13×深8 cm",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/retro-camera-31147",
+      "observed_at": "2026-10-31T05:18:21Z",
+      "fetched_at": "2026-10-31T05:18:21Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "261块；3合1；相机模型约高7×宽13×深8 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "设计与艺术"
+        ],
+        "styles": [
+          "有趣能带来惊喜"
+        ],
+        "basis": "详情为复古摄影题材拼搭模型；不具备相机拍照功能。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/retro-camera-31147",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-31147",
+      "unverified_items": [
+        "相机/摄影机/电视由同一套积木重搭，非三套同时交付；完整材质、价格未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-72046",
+      "name": "Game Boy™ 积木游戏机",
+      "brand": "LEGO",
+      "model": "72046",
+      "source_product_id": "72046",
+      "source_sku_id": null,
+      "variant": "421块；模型约高14×宽9×深3 cm",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/game-boy-72046",
+      "observed_at": "2026-10-31T05:18:21Z",
+      "fetched_at": "2026-10-31T05:18:21Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "421块；模型约高14×宽9×深3 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "游戏与动漫"
+        ],
+        "styles": [
+          "有纪念意义"
+        ],
+        "basis": "详情为任天堂掌机造型展示模型；标签仅指游戏题材，不代表可运行游戏。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/game-boy-72046",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-72046",
+      "unverified_items": [
+        "无灯光、声音或数字播放功能；需确认对复古游戏题材的偏好；价格未知。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-40725",
+      "name": "樱花",
+      "brand": "LEGO",
+      "model": "40725",
+      "source_product_id": "40725",
+      "source_sku_id": null,
+      "variant": "两枝拼搭樱花；每枝约35 cm；组件数存在430/438冲突",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/cherry-blossoms-40725",
+      "observed_at": "2026-10-31T05:18:11Z",
+      "fetched_at": "2026-10-31T05:18:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "两枝拼搭樱花；每枝约35 cm；组件数存在430/438冲突",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "植物与自然",
+          "设计与艺术"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为花枝造型积木装饰，非活体植物。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/cherry-blossoms-40725",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-40725",
+      "unverified_items": [
+        "详情页头430块、正文438块不一致，组件数量不强定，须查包装/官方更正；即将停产提示不等于无库存。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-31213",
+      "name": "蒙娜丽莎",
+      "brand": "LEGO",
+      "model": "31213",
+      "source_product_id": "31213",
+      "source_sku_id": null,
+      "variant": "1503块；拼搭壁画约高43×宽30×深4 cm",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/mona-lisa-31213",
+      "observed_at": "2026-10-31T05:18:11Z",
+      "fetched_at": "2026-10-31T05:18:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "1503块；拼搭壁画约高43×宽30×深4 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "设计与艺术"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为画作题材的积木壁挂作品。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/mona-lisa-31213",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-31213",
+      "unverified_items": [
+        "壁面安装条件未知；有即将停产提示；价格未知；不把原作版权状态当作商品照片授权。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-10328",
+      "name": "玫瑰花束",
+      "brand": "LEGO",
+      "model": "10328",
+      "source_product_id": "10328",
+      "source_sku_id": null,
+      "variant": "822块；12朵红玫瑰及4枝满天星；最高玫瑰约31 cm",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-roses-10328",
+      "observed_at": "2026-10-31T05:18:11Z",
+      "fetched_at": "2026-10-31T05:18:11Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "822块；12朵红玫瑰及4枝满天星；最高玫瑰约31 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "植物与自然",
+          "设计与艺术"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为红玫瑰拼搭装饰；不是天然鲜花。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-roses-10328",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-10328",
+      "unverified_items": [
+        "需另行确认花瓶、拼搭时间、表达强度是否适合；追求关系不默认已获接受。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "lego-cn-10374",
+      "name": "粉玫瑰花束",
+      "brand": "LEGO",
+      "model": "10374",
+      "source_product_id": "10374",
+      "source_sku_id": null,
+      "variant": "789块；12朵粉玫瑰及4枝满天星；最高玫瑰约32 cm",
+      "quantity": 1,
+      "quantity_unit": "盒",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": null,
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "unknown",
+      "price_conditions": [
+        "中国大陆详情提取未返回人民币报价；会员、优惠券、多件及结算条件未知。"
+      ],
+      "price_conditions_status": "unknown",
+      "conditional_quotes": [],
+      "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-pink-roses-10374",
+      "observed_at": "2026-10-31T05:18:21Z",
+      "fetched_at": "2026-10-31T05:18:21Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "789块；12朵粉玫瑰及4枝满天星；最高玫瑰约32 cm",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "植物与自然",
+          "设计与艺术"
+        ],
+        "styles": [
+          "有设计感"
+        ],
+        "basis": "详情为粉色玫瑰拼搭装饰，型号和组件数与10328不同。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.lego.com/zh-cn/product/bouquet-of-pink-roses-10374",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-lego-cn-10374",
+      "unverified_items": [
+        "与红玫瑰10328分开记录；花瓶、拼搭时间及关系表达是否合适待确认。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    },
+    {
+      "product_id": "apple-cn-airtag-single-unengraved",
+      "name": "AirTag",
+      "brand": "Apple",
+      "model": "AirTag（当前页面新一代；零件号未取得）",
+      "source_product_id": null,
+      "source_sku_id": null,
+      "variant": "1件装；未选择镌刻；按页面1件装展示价",
+      "quantity": 1,
+      "quantity_unit": "件",
+      "quantity_semantics": "quantity为销售单位数量；套装内件数见variant，主金额为该数量合计",
+      "currency": "CNY",
+      "price_amount": "249.00",
+      "price_range": null,
+      "price_source": "seed",
+      "price_type": "page_display",
+      "price_conditions": [
+        "主金额按1个销售单位，非月供、非以旧换新/教育/补贴价格。",
+        "未登录、未加购、未核实结算优惠条件。",
+        "249元只对应1件装；4件装849元不折算为本条价格；页面有免费镌刻宣传，本条不含镌刻要求。"
+      ],
+      "price_conditions_status": "not_checked_at_checkout",
+      "conditional_quotes": [],
+      "source_url": "https://www.apple.com.cn/shop/buy-airtag/airtag",
+      "observed_at": "2026-10-31T05:18:21Z",
+      "fetched_at": "2026-10-31T05:18:21Z",
+      "upstream_fetched_at": null,
+      "observation_method": "manual_review_of_web_tool_extract",
+      "non_realtime": true,
+      "price_label": "估算·非实时价格",
+      "business_data_verification": "not_verified",
+      "shipping_status": "unknown",
+      "shipping_amount": null,
+      "stock_status": "unknown",
+      "stock_observation": {
+        "page_text": null,
+        "region": null,
+        "known_scope": "未核实",
+        "interpretation": "购物袋按钮或展示价格不证明库存"
+      },
+      "preparation_status": "unknown",
+      "preparation_days": null,
+      "delivery_status": "unknown",
+      "materials": {
+        "status": "unknown",
+        "items": null,
+        "ingredients": null,
+        "allergens": null,
+        "size": "1件装；默认不添加个性化镌刻",
+        "safety_status": "not_assessed",
+        "note": "公开详情中的部分材料不等于完整成分或个人适用性证明；不从图片、品类或品牌推断安全。"
+      },
+      "tags": {
+        "interests": [
+          "科技与数码",
+          "旅行与探索"
+        ],
+        "styles": [
+          "实用型"
+        ],
+        "basis": "详情提到用于钥匙串、背包物品查找；旅行标签为整理者按物品寻回用途的归类。",
+        "basis_type": "organizer_classification_from_product_facts",
+        "recipient_preference": "unknown"
+      },
+      "image_id": null,
+      "image": {
+        "source_url": "https://www.apple.com.cn/shop/buy-airtag/airtag",
+        "source_url_kind": "official_product_page",
+        "asset_url": null,
+        "rights_status": "unverified",
+        "use_basis": "未取得适用于GiftWise展示、下载、改图或包装生成参考的具体授权；公开可见不是授权。",
+        "download_permission": "unknown",
+        "display_permission": "unknown",
+        "project_download_allowed": false,
+        "project_display_allowed": false,
+        "downloaded": false,
+        "white_background_status": "not_visually_verified",
+        "resolution_status": "unknown",
+        "sku_match_status": "not_visually_verified",
+        "rights_evidence_ref": "docs/research/seed-catalog/README.md#图片依据"
+      },
+      "evidence_ref": "docs/research/seed-catalog/evidence.json#evidence-apple-cn-airtag-single-unengraved",
+      "unverified_items": [
+        "未取得零件号，后续必须核对代际，换代后停用本ID或新建ID；仅作物品查找方向，不用于跟踪他人；兼容系统和配件待核实。",
+        "实际售价、适用优惠、配送地址运费、地区库存、准备时间及送达时间",
+        "图片文件地址、精度、白底外观、规格一致性和使用授权"
+      ]
+    }
+  ]
+}
