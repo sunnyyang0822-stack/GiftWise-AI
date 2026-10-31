@@ -29,6 +29,8 @@ export function createRun(init) {
   const runId = `gw-${new Date().getTime().toString(36)}-${randomUUID().slice(0, 8)}`;
   const run = {
     run_id: runId,
+    owner_scope: init.owner_scope || "internal",
+    media_generation_authorized: init.media_generation_authorized === true,
     created_at: nowIso(),
     mode: init.mode,
     request_json: init.request_json,
@@ -67,15 +69,17 @@ export function getRun(runId) {
   if (!run) return null;
   if (Date.now() - new Date(run.created_at).getTime() > RUN_TTL_MS) {
     runs.delete(runId);
+    for(const [key,id] of recommendationKeys)if(id===runId)recommendationKeys.delete(key);
     return null;
   }
   return run;
 }
 
 function prune() {
+  for(const [key,id] of recommendationKeys)if(!getRun(id))recommendationKeys.delete(key);
   if (runs.size <= RUN_LIMIT) return;
   const ordered = [...runs.values()].sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
-  for (const run of ordered.slice(0, runs.size - RUN_LIMIT)) runs.delete(run.run_id);
+  for (const run of ordered.slice(0, runs.size - RUN_LIMIT)){runs.delete(run.run_id);for(const [key,id] of recommendationKeys)if(id===run.run_id)recommendationKeys.delete(key);}
 }
 
 export function runCount() {
@@ -90,6 +94,8 @@ export function reset() {
 /** 面向浏览器的最小脱敏视图：不含密钥、不含内部提示。 */
 export function publicReport(run) {
   return {
+    retrieval: run.retrieval || { status: "unavailable", evidence_id: null, products: [], warnings: ["未获取实时价格"] },
+    media: run.media || { status: "unavailable", candidates: [], selected: null },
     recommendation_run_id: run.run_id,
     created_at: run.created_at,
     mode: run.mode,

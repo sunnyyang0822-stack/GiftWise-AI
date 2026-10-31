@@ -1,0 +1,63 @@
+✔ C:\Users\lenovo\Desktop\giftwise\.worktrees\retrieval-media\web\tests\retrieval-media-cookie-client.mjs (292.25ms)
+✔ 历史字段缺省/空白归一、保留非空原文、不变成兴趣或禁忌 (10.1178ms)
+✔ 类型与Unicode码点边界，旧版未提供时不补新字段 (5.481ms)
+✔ 已冻结历史传入生成provider及快照、改变历史不复用旧run (13.1297ms)
+GiftWise web 接入层已启动：http://127.0.0.1:0
+模式：mock（模拟数据；Dify 未配置或未确认发布）
+追求对象契约已落地：是（工作区未提交改动）
+✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (21.141ms)
+✔ 同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型 (15.4158ms)
+✔ 受控改价/错规格/跨任务引用均清空可选项 (4.9086ms)
+✔ 证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行 (4.3361ms)
+﹣ 真实独立浏览器搜索三种商品→受控模型协议同版接线（无付费模型） (0.1417ms) # SKIP
+✔ 并发重复推荐共享同一任务，不重复检索或生成 (14.7215ms)
+✔ RM-001 ready图片URL统一拒绝危险协议、内网、非HTTPS、SVG/HTML及重定向形态 (2.0483ms)
+✔ RM-001 ready信封在scene校验中执行统一URL检查 (1.0437ms)
+✔ 完整造景与异形形式保持独立元数据 (1.8536ms)
+✔ 换图旧坐标、越界与无图标注拒绝 (0.5932ms)
+✔ 未知尺寸不能宣称比例基于证据 (0.1342ms)
+✔ 小/大/细长/圆形/不规则/易碎证据和单位冲突 (3.4431ms)
+✔ 不将模型建议当实测、拒绝非法单位和精确假数字 (0.3409ms)
+✔ 不同运行独立，重复包装稳定任务ID，未知属性不编造 (0.5923ms)
+✔ 平台请求字段、images为安全读取后的data URL，不使用image参数 (19.4664ms)
+✔ 无参考图许可、错SKU、危险URL不调用供应商 (0.6443ms)
+✔ 超时为执行未知且无自动重试、返回错误不泄露原文 (20.8989ms)
+✔ 供应商异常、多图、错误base64及尺寸不符均拒绝 (1.5991ms)
+✔ 未选/不合格/模拟运行/呈现未通过均不能计费 (5.5588ms)
+✔ pending→ready持久化、并发/新provider复用、资产指纹及归属 (27.4231ms)
+✔ 超时/失败重复请求不计费；重启的pending转执行未知 (23.191ms)
+✔ 受限参数拒绝执行字段及注入 (1.6197ms)
+✔ 未知、条件、超预算及价格绑定 (0.3927ms)
+✔ 串行与任务隔离 (35.0862ms)
+✔ 超时及取消返回明确不可用 (14.4831ms)
+✔ 媒体缺失、选后门禁与幂等 (1.0226ms)
+✔ URL风险默认拒绝及内网地址 (5.3959ms)
+✔ 受控媒体读取：重定向、类型、大小、伪装内容和合法PNG (3.3647ms)
+✔ 有界队列拒绝溢出 (36.7674ms)
+✔ 详情证据与冻结价格绑定，不接受摘要、错ID或模型低价 (3.7114ms)
+✔ 模型提供者引用一一对应规格与金额 (0.6426ms)
+✔ 证据过期、缺货与区间跨预算拒绝 (0.377ms)
+✔ 媒体DNS和响应绝对超时 (25.9818ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 35
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 593.1314
+
+✖ failing tests:
+
+test at web\tests\retrieval-media-http.test.mjs:11:1
+✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (21.141ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect EACCES 127.0.0.1:63353
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:2021:16) {
+      errno: -4092,
+      code: 'EACCES',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 63353
+    }
+  }
