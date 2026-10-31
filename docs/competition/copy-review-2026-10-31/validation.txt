@@ -1,0 +1,63 @@
+PASS Tracked changes limited to the declared material files
+PASS No tracked PPTX, product code or historical evidence changed
+PASS Original text retained as prefix (Git CRLF/LF normalized): docs/competition/材料清单与自查.md
+PASS Original text retained as prefix (Git CRLF/LF normalized): docs/speech/README.md
+PASS Original text retained as prefix (Git CRLF/LF normalized): docs/demo/README.md
+PASS Original text retained as prefix (Git CRLF/LF normalized): docs/qa-prep/README.md
+PASS QA questions numbered 1 through 30 exactly
+PASS Speech plan continuous from 0 to 300 seconds (not measured)
+PASS Main speech avoids old engineering result totals
+PASS Relative links in rewritten/new drafts resolve
+PASS Primary-workspace historical audit reports unchanged
+PASS Issue snapshot includes latest product focus and revision boundary
+PASS git diff --check
+Scope: document-only consistency checks. No product tests or model calls executed.
+
+Reproduce from this worktree root in PowerShell with Python 3:
+@'
+from pathlib import Path
+import subprocess,re,json,hashlib
+base='3dc36d570fcdd843840e5d4e500708b2231defe1'
+checks=[]
+def check(label,value):
+ checks.append((label,bool(value)))
+ print(('PASS' if value else 'FAIL')+' '+label)
+changed=subprocess.check_output(['git','diff','--name-only','-z',base]).decode('utf8').split('\0')
+changed=[x for x in changed if x]
+allowed={'docs/competition/答辩PPT骨架.md','docs/competition/材料清单与自查.md','docs/speech/讲稿-5分钟-2026-10-31.md','docs/speech/README.md','docs/demo-script.md','docs/demo/分镜计时表-3min.md','docs/demo/README.md','docs/qa-prep/30题问答.md','docs/qa-prep/红线话术与兜底动作.md','docs/qa-prep/README.md'}
+check('Tracked changes limited to the declared material files',set(changed)<=allowed)
+check('No tracked PPTX, product code or historical evidence changed',not any(x.endswith('.pptx') or x.startswith(('web/','workflow/','validator/','tests/','deploy/','docs/test-reports/','docs/verification/')) for x in changed))
+append=['docs/competition/材料清单与自查.md','docs/speech/README.md','docs/demo/README.md','docs/qa-prep/README.md']
+for f in append:
+ old=subprocess.check_output(['git','show',base+':'+f]);new=Path(f).read_bytes()
+ check('Original text retained as prefix (Git CRLF/LF normalized): '+f,new.replace(b'\r\n',b'\n').startswith(old.replace(b'\r\n',b'\n')))
+q=Path('docs/qa-prep/30题问答.md').read_text(encoding='utf8')
+check('QA questions numbered 1 through 30 exactly',list(map(int,re.findall(r'^### (\d+)\.',q,re.M)))==list(range(1,31)))
+speech=Path('docs/speech/讲稿-5分钟-2026-10-31.md').read_text(encoding='utf8')
+slots=re.findall(r'^## S\d+.*?｜(\d+):(\d+)–(\d+):(\d+)（计划）',speech,re.M)
+ranges=[(int(a)*60+int(b),int(c)*60+int(d)) for a,b,c,d in slots]
+check('Speech plan continuous from 0 to 300 seconds (not measured)',len(ranges)==8 and ranges[0][0]==0 and ranges[-1][1]==300 and all(ranges[i][1]==ranges[i+1][0] for i in range(7)))
+check('Main speech avoids old engineering result totals',not re.search(r'329|688|38,326|169\.676|11 节点|19 个错误码',speech))
+links=[]
+paths=list(allowed)+['docs/competition/虚构场景与三方案示例-2026-10-31.md','docs/competition/文案修订与待核实清单-2026-10-31.md']
+# Check rewritten drafts and new documents, not pre-existing links in historical prefixes.
+for f in paths:
+ if f in append:continue
+ text=Path(f).read_text(encoding='utf8')
+ for target in re.findall(r'\]\(([^)]+)\)',text):
+  if '://' in target or target.startswith('#'):continue
+  path=(Path(f).parent/target.split('#')[0])
+  if not path.exists():links.append((f,target))
+check('Relative links in rewritten/new drafts resolve',not links)
+if links:print(links)
+record=json.loads(Path('docs/competition/copy-review-2026-10-31/reviewed-sources.json').read_text(encoding='utf8'))
+reports=[x for x in record['primary_workspace_materials_read_only'] if '事实审查' in x['path']]
+check('Primary-workspace historical audit reports unchanged',all(hashlib.sha256(Path(x['reviewed_location']).read_bytes()).hexdigest()==x['sha256'] for x in reports))
+issue=json.loads(Path('docs/competition/copy-review-2026-10-31/issue-1-source.json').read_text(encoding='utf8'))
+check('Issue snapshot includes latest product focus and revision boundary','帮助用户挑选礼物' in issue['body'] and '异常兜底' in issue['body'])
+r=subprocess.run(['git','diff','--check'],capture_output=True)
+check('git diff --check',r.returncode==0)
+print('Scope: document-only consistency checks. No product tests or model calls executed.')
+raise SystemExit(0 if all(ok for _,ok in checks) else 1)
+
+'@ | py -

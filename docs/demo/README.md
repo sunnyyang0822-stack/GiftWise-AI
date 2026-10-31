@@ -181,3 +181,8 @@ $ curl -sS -o /dev/null -w '%{http_code}' http://www.baidu.com/
 已于 00:56 删除并复查目录恢复原状。详见 [`demo-rehearsal-record.md`](demo-rehearsal-record.md) §10。
 
 > ⚠️ **2026-10-31 注**：`shots/D10-1-live-ui-top-1440x900.png` 与 `shots/INPUT-20-input-step1.png` **字节完全相同**（均 421,249 B，sha256 `06e7a6af2bb72b5d…`）——是**同一张图挂了两个 ID**，**不要当成两条独立证据**计数。
+
+
+## 2026-10-31 新版联调期间的材料入口
+
+本 README 上文的运行、截图和模式记录是旧版历史；不能作为新版真实模型端到端或最终三分钟 Demo 的完成证据。当前文案以 [主脚本](../demo-script.md) 和 [新版分镜计划](分镜计时表-3min.md) 为 PM 审查入口；旧脚本修订建议、预演清单、故障卡和离线回放仍属旧版参考，不自动升级。最终数字、步骤条/按钮、服务入口、等待阈值、截图和录屏均等 QA 锁版再核对。见 [待核实清单](../competition/文案修订与待核实清单-2026-10-31.md)。
