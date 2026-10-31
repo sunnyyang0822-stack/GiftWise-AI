@@ -1,0 +1,125 @@
+{
+  "local_verified": true,
+  "cloud_not_verified": true,
+  "online_model_calls": 0,
+  "cost": "未测",
+  "results": [
+    {
+      "name": "区间保留100至300及标量max",
+      "passed": true
+    },
+    {
+      "name": "3至5天按5天上限",
+      "passed": true
+    },
+    {
+      "name": "零元夹具不新增支出",
+      "passed": true
+    },
+    {
+      "name": "零元三方向不同",
+      "passed": true
+    },
+    {
+      "name": "明确香水建议锚定与白名单",
+      "passed": true
+    },
+    {
+      "name": "未知与注入夹具均待澄清",
+      "passed": true
+    },
+    {
+      "name": "排除项非法顶层字段待拒绝",
+      "passed": true
+    },
+    {
+      "name": "term 反向锚定失败夹具",
+      "passed": true
+    },
+    {
+      "name": "other 标签不进入识别白名单",
+      "passed": true
+    },
+    {
+      "name": "新版呈现严格根字段",
+      "passed": true
+    },
+    {
+      "name": "新版呈现没有报价材料步骤",
+      "passed": true
+    },
+    {
+      "name": "呈现报价字段负例明确拒绝",
+      "passed": true
+    },
+    {
+      "name": "呈现材料步骤字段负例明确拒绝",
+      "passed": true
+    },
+    {
+      "name": "一次修订持续超预算停止",
+      "passed": true
+    },
+    {
+      "name": "原始约束与事实未改",
+      "passed": true
+    },
+    {
+      "name": "新版报告仅礼物口径",
+      "passed": true
+    },
+    {
+      "name": "等待选择且不替选",
+      "passed": true
+    },
+    {
+      "name": "自定义关系原样传递",
+      "passed": true
+    },
+    {
+      "name": "自定义场合原样传递",
+      "passed": true
+    },
+    {
+      "name": "自定义预算区间和标量一致",
+      "passed": true
+    },
+    {
+      "name": "自定义字段非法值拒绝:recipient_relation_custom",
+      "passed": true
+    },
+    {
+      "name": "自定义字段非法值拒绝:occasion_custom",
+      "passed": true
+    },
+    {
+      "name": "自定义字段非法值拒绝:recipient_relation_custom",
+      "passed": true
+    },
+    {
+      "name": "非其他关系拒绝自定义字段",
+      "passed": true
+    },
+    {
+      "name": "旧版报告保留原口径",
+      "passed": true
+    },
+    {
+      "name": "提示词版本 generate.md",
+      "passed": true
+    },
+    {
+      "name": "提示词版本 repair.md",
+      "passed": true
+    },
+    {
+      "name": "提示词版本 exclusions.md",
+      "passed": true
+    },
+    {
+      "name": "提示词版本 presentation.md",
+      "passed": true
+    }
+  ],
+  "scope": "离线固定夹具/提示词结构与报告逻辑；不证明真实识别或新版适配通过"
+}
