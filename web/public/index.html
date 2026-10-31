@@ -4,288 +4,234 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
-    <meta name="description" content="GiftWise AI · 面向青年的送礼决策助手：三页中文输入、三个有依据的思路、独立规则校验，选择后才生成包装、配色、贺卡与赠送方式。当前为模拟数据演示。" />
+    <meta name="description" content="GiftWise AI · 陪你挑礼物：聊几句，得到三个有依据的礼物思路，选定后再一起想包装、贺卡与送出的方式。" />
+    <meta name="theme-color" content="#fbf9f7" />
     <title>GiftWise AI · 找到那份刚好的心意</title>
+    <link rel="stylesheet" href="/fonts.css" />
     <link rel="stylesheet" href="/tokens.css" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/landing.css" />
+    <link rel="stylesheet" href="/chat.css" />
   </head>
   <body>
+    <div class="gw-aura" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <a class="skip-link" href="#view">跳到主要内容</a>
 
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="brand" href="/">
-          <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z" />
-            <path fill="var(--gw-color-bg)" d="m23 16 2 6-2 7-3-7Z" />
-            <path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z" />
-          </svg>
-          <span>GiftWise AI</span>
+    <header class="site-header lp-header">
+      <div class="lp-header__inner">
+        <a class="lp-brand" href="/" aria-label="GiftWise AI 首页">
+          <svg class="lp-brand__logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z" /><path fill="var(--gw-color-bg)" d="m23 16 2 6-2 7-3-7Z" /><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z" /></svg>
+          <span class="lp-brand__name">GiftWise AI</span>
         </a>
-        <!-- 模拟数据标识：放在常驻吸顶头部，任何滚动位置和窄屏都看得见 -->
-        <span class="mode-flag" id="mode-flag">模拟数据 · 未接真实模型</span>
-        <nav class="site-nav" aria-label="主导航">
-          <a href="#how">怎么运行</a>
-          <a href="#after">选完之后</a>
-          <a href="#faq">常见问题</a>
-          <a href="#privacy">隐私</a>
+        <span class="mode-flag" id="mode-flag" hidden></span>
+        <nav class="lp-nav" aria-label="主导航">
+          <a href="#how" data-anchor-link>怎么运行</a>
+          <a href="#after" data-anchor-link>选完之后</a>
         </nav>
-        <button class="btn btn--primary btn--sm" type="button" id="cta-start">
-          开始挑选礼物
+        <button class="lp-btn lp-btn--dark lp-btn--sm" type="button" id="cta-start">
+          <i data-icon="chat" data-size="18"></i>开始挑礼物
         </button>
       </div>
     </header>
 
-    <!-- 第一屏 · 品牌：这是什么、给谁用、一句话价值 -->
-    <section class="hero gw-hero" id="hero" data-landing aria-labelledby="hero-title">
-      <div class="gw-hero__art" role="img" aria-label="哑光黑色礼盒层层叠放，系着红色、珊瑚色和深蓝色缎带；品牌概念图，并非商品展示。"></div>
-      <div class="gw-hero__content">
-        <h1 id="hero-title">让心意，<br />送得刚刚好。</h1>
-        <p class="hero__sub">准备礼物的人，<br />先感到幸福。</p>
-        <p class="gw-hero__description">送给恋人、追求对象或朋友的礼物决策助手：<br />从你们的关系出发，给你三个有依据的礼物思路。<br />把心意想清楚，把选择留给你。</p>
-        <div class="hero__cta">
-          <button class="btn btn--primary gw-button" type="button" id="cta-start-2">
+    <!-- 第一屏 · 品牌：一句话价值 + 礼盒主视觉 -->
+    <section class="lp-hero" id="hero" data-landing aria-labelledby="hero-title">
+      <div class="lp-hero__copy">
+        <span class="lp-hero__rule" aria-hidden="true"></span>
+        <p class="lp-hand-chip lp-rise"><i data-icon="sparkles" data-size="18"></i>聊几句，就知道送什么</p>
+        <h1 id="hero-title" class="lp-hero__title lp-rise">
+          <span class="lp-line">让心意，</span>
+          <span class="lp-line">送得<span class="lp-mark">刚刚好<svg class="lp-underline" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 20 C 60 6, 130 26, 190 14 S 275 8, 296 18" /></svg></span>。</span>
+        </h1>
+        <p class="lp-hero__sub lp-rise">准备礼物的人，先感到幸福。</p>
+        <div class="lp-hero__cta lp-rise">
+          <button class="lp-btn lp-btn--dark lp-btn--lg" type="button" id="cta-start-2">
             开始挑选礼物
-            <svg width="28" height="24" viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 12h23m-8-8 8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="lp-btn__arrow" aria-hidden="true"><i data-icon="arrow-right" data-size="20"></i></span>
           </button>
+          <a class="lp-link" href="#how" data-anchor-link><i data-icon="arrow-down" data-size="18"></i>看看怎么运行</a>
         </div>
-        <p class="hero__flag" id="hero-flag">当前为模拟数据演示：接入层还没有接入真实模型（未配置模型凭证），方案与呈现内容不是模型真实输出；价格、库存及送达未核实。</p>
+        <p class="lp-sign lp-rise" aria-hidden="true">—— 给正在挑礼物的你</p>
+        <p class="hero__flag" id="hero-flag" hidden></p>
       </div>
-      <div class="gw-hero__bottom">
-        <a class="gw-scroll-link" href="#how" aria-label="下滑了解怎么运行"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" aria-hidden="true" focusable="false"><path d="M9 2v15m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
+
+      <div class="lp-hero__art" aria-hidden="true">
+        <div class="lp-hero__glow"></div>
+        <img class="lp-hero__img" src="/img/image-1.webp" width="1672" height="941" alt="" decoding="async" fetchpriority="high" />
+        <div class="lp-sticker lp-sticker--a"><i data-icon="heart" data-size="18"></i>送给恋人 · 纪念日</div>
+        <div class="lp-sticker lp-sticker--b"><i data-icon="wallet" data-size="18"></i>预算 100–300</div>
+        <div class="lp-sticker lp-sticker--c"><i data-icon="shield" data-size="18"></i>不超预算 · 避开雷区</div>
+        <p class="lp-note lp-note--hero">
+          三个思路，挑一个就好
+          <svg viewBox="0 0 120 70" aria-hidden="true"><path d="M8 10 C 40 4, 86 18, 100 54" /><path d="M88 46 L 100 56 L 106 42" /></svg>
+        </p>
       </div>
     </section>
 
-    <!-- 第二屏 · 如何运行：三步叙事，与真实输入页一致 -->
-    <section class="how gw-how" id="how" data-landing aria-labelledby="how-title">
-      <div class="gw-how__heading">
-        <h2 id="how-title">好礼物，<span>从了解开始。</span></h2>
-        <p>不用一开始就有答案。<br />我们陪你，把心意一步步想清楚。</p>
+    <!-- 跑马灯：常见的关系与场合 -->
+    <section class="lp-marquee" data-landing aria-label="适合的关系与场合">
+      <div class="lp-marquee__track">
+        <ul class="lp-marquee__list">
+          <li><i data-icon="heart" data-size="20"></i>恋人</li>
+          <li><i data-icon="heart-spark" data-size="20"></i>追求对象</li>
+          <li><i data-icon="smile" data-size="20"></i>朋友</li>
+          <li><i data-icon="cake" data-size="20"></i>生日</li>
+          <li><i data-icon="calendar" data-size="20"></i>纪念日</li>
+          <li><i data-icon="lantern" data-size="20"></i>节日</li>
+          <li><i data-icon="flower" data-size="20"></i>感谢</li>
+          <li><i data-icon="trophy" data-size="20"></i>毕业升职</li>
+          <li><i data-icon="home" data-size="20"></i>家人</li>
+        </ul>
+        <ul class="lp-marquee__list" aria-hidden="true">
+          <li><i data-icon="heart" data-size="20"></i>恋人</li>
+          <li><i data-icon="heart-spark" data-size="20"></i>追求对象</li>
+          <li><i data-icon="smile" data-size="20"></i>朋友</li>
+          <li><i data-icon="cake" data-size="20"></i>生日</li>
+          <li><i data-icon="calendar" data-size="20"></i>纪念日</li>
+          <li><i data-icon="lantern" data-size="20"></i>节日</li>
+          <li><i data-icon="flower" data-size="20"></i>感谢</li>
+          <li><i data-icon="trophy" data-size="20"></i>毕业升职</li>
+          <li><i data-icon="home" data-size="20"></i>家人</li>
+        </ul>
       </div>
-      <ol class="gw-how__steps">
-        <li class="gw-how__step">
-          <div class="gw-how__copy">
-            <span class="gw-how__number" aria-label="第一步">01 <span>关于 TA</span></span>
-            <h3>说说你们的故事。</h3>
-            <p>确认关系、场合、预算和准备时间。<br />兴趣不了解，也可以留空。</p>
-            <p class="gw-how__detail">未知就留作未知，不替你猜。</p>
-          </div>
-          <div class="gw-how__gift gw-how__gift--red" aria-hidden="true"></div>
-        </li>
-        <li class="gw-how__step">
-          <div class="gw-how__copy">
-            <span class="gw-how__number" aria-label="第二步">02 <span>思考与校验</span></span>
-            <h3>三个思路，都有依据。</h3>
-            <p>AI 提出不同方向，独立规则再检查<br />预算、准备时间和禁忌。</p>
-            <p class="gw-how__detail">事实、推断与未知，分别说清。</p>
-          </div>
-          <div class="gw-how__gift gw-how__gift--blue" aria-hidden="true"></div>
-        </li>
-        <li class="gw-how__step">
-          <div class="gw-how__copy">
-            <span class="gw-how__number" aria-label="第三步">03 <span>由你决定</span></span>
-            <h3>选定后，再好好表达。</h3>
-            <p>你选中通过检查的方案后，再设计<br />配色、包装、贺卡与赠送方式。</p>
-            <p class="gw-how__detail"><span class="gw-how__target">目标设计</span> 尚未接入真实模型。</p>
-          </div>
-          <div class="gw-how__gift gw-how__gift--card" aria-hidden="true"></div>
-        </li>
-      </ol>
+    </section>
 
-      <!-- 讲人话的「怎么跑起来」：三页输入，顺序与真实表单一致 -->
-      <div class="gw-how__run">
-        <h3 class="gw-how__run-title">真要用起来，是这样三页。</h3>
-        <ol class="gw-how__run-list">
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">01</span>
-            <p class="gw-how__run-name">关系</p>
-            <p class="gw-how__run-text">先说是谁：恋人、追求对象、朋友、家人或同学。恋人与追求对象是两个独立选项，不会互相替代。</p>
+    <!-- 第二屏 · 怎么运行：对话式体验 -->
+    <section class="lp-section lp-how" id="how" data-landing aria-labelledby="how-title">
+      <div class="lp-section__head lp-reveal">
+        <h2 id="how-title">好礼物，<br class="lp-br-m" />从聊几句开始。</h2>
+        <p class="lp-hand">不用一开始就有答案～</p>
+      </div>
+
+      <div class="lp-how__grid">
+        <div class="lp-demo gw-chat-panel lp-reveal" role="img" aria-label="对话演示：小礼一次问一个问题，点选项卡就能回答。">
+          <div class="gw-chat-head" aria-hidden="true">
+            <span class="gw-bot-avatar gw-bot-avatar--lg" aria-hidden="true"><svg class="gw-star" viewBox="0 0 48 48" width="24" height="24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z"/><path fill="#0f0f10" d="m23 16 2 6-2 7-3-7Z"/><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z"/></svg></span>
+            <div class="gw-chat-head__id">
+              <p class="gw-chat-head__name">小礼</p>
+              <p class="gw-chat-head__sub"><span class="gw-chat-head__brand">GiftWise 礼物助手 ·</span><span class="gw-chat-head__status"><span class="gw-online" aria-hidden="true"></span>在线</span></p>
+            </div>
+            <div class="gw-chat-head__progress"><span class="gw-chat-head__count">2 / 10</span><span class="gw-chat-head__bar"><span style="--p:20%"></span></span></div>
+          </div>
+          <div class="lp-demo__log" aria-hidden="true">
+            <div class="gw-group gw-group--bot lp-demo__item">
+              <span class="gw-bot-avatar" aria-hidden="true"><svg class="gw-star" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z"/><path fill="#0f0f10" d="m23 16 2 6-2 7-3-7Z"/><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z"/></svg></span>
+              <div class="gw-group__col">
+                <p class="gw-group__name">小礼</p>
+                <p class="gw-bubble gw-bubble--bot lp-demo__intro">嗨，我是小礼～陪你一起挑礼物。</p>
+                <p class="gw-bubble gw-bubble--bot">这份礼物，想送给谁？</p>
+                <div class="gw-attach gw-attach--done"><div class="gw-opts"><span class="gw-opt gw-opt--was"><span class="gw-opt__icon"><i data-icon="heart-spark" data-size="18"></i></span><span class="gw-opt__label">追求对象</span></span></div></div>
+              </div>
+            </div>
+            <div class="gw-group gw-group--me lp-demo__item">
+              <div class="gw-group__col">
+                <p class="gw-bubble gw-bubble--me">追求对象</p>
+                <span class="gw-edit"><i data-icon="edit" data-size="12"></i>改一下</span>
+              </div>
+            </div>
+            <div class="gw-group gw-group--bot lp-demo__item">
+              <span class="gw-bot-avatar" aria-hidden="true"><svg class="gw-star" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z"/><path fill="#0f0f10" d="m23 16 2 6-2 7-3-7Z"/><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z"/></svg></span>
+              <div class="gw-group__col">
+                <p class="gw-bubble gw-bubble--bot">收到～那我们选得低调又用心一点。</p>
+                <p class="gw-bubble gw-bubble--bot">是什么场合呢？</p>
+                <div class="gw-attach"><div class="gw-opts"><span class="gw-opt"><span class="gw-opt__icon"><i data-icon="cake" data-size="18"></i></span><span class="gw-opt__label">生日</span></span><span class="gw-opt"><span class="gw-opt__icon"><i data-icon="lantern" data-size="18"></i></span><span class="gw-opt__label">节日</span></span><span class="gw-opt"><span class="gw-opt__icon"><i data-icon="flower" data-size="18"></i></span><span class="gw-opt__label">感谢</span></span><span class="gw-opt"><span class="gw-opt__icon"><i data-icon="calendar" data-size="18"></i></span><span class="gw-opt__label">纪念日</span></span><span class="gw-opt gw-opt--quiet"><span class="gw-opt__icon"><i data-icon="more" data-size="18"></i></span><span class="gw-opt__label">其他</span></span></div></div>
+              </div>
+            </div>
+            <div class="gw-group gw-group--bot lp-demo__item lp-demo__typing">
+              <span class="gw-bot-avatar" aria-hidden="true"><svg class="gw-star" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z"/><path fill="#0f0f10" d="m23 16 2 6-2 7-3-7Z"/><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z"/></svg></span>
+              <div class="gw-group__col"><p class="gw-bubble gw-bubble--bot gw-bubble--typing"><span class="gw-dots"><i></i><i></i><i></i></span></p></div>
+            </div>
+          </div>
+          <div class="lp-demo__foot" aria-hidden="true">
+            <div class="gw-composer"><span class="lp-demo__ph">比如：她生日在下周，喜欢拍照</span><span class="gw-composer__send"><i data-icon="send" data-size="18"></i></span></div>
+          </div>
+        </div>
+
+        <ol class="lp-steps">
+          <li class="lp-step lp-glass lp-reveal">
+            <div class="lp-step__art lp-step__art--1" aria-hidden="true"></div>
+            <div class="lp-step__body">
+              <span class="lp-step__no">01</span>
+              <h3><i data-icon="chat" data-size="22"></i>一次只问一件事</h3>
+              <p>点选项卡就能答，不知道就跳过。</p>
+            </div>
           </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">02</span>
-            <p class="gw-how__run-name">场合</p>
-            <p class="gw-how__run-text">生日、节日、感谢、纪念日、毕业／升职祝贺，或者其他；选最接近的那个就好，不必替自己找标准答案。</p>
+          <li class="lp-step lp-glass lp-reveal">
+            <div class="lp-step__art lp-step__art--2" aria-hidden="true"></div>
+            <div class="lp-step__body">
+              <span class="lp-step__no">02</span>
+              <h3><i data-icon="scale" data-size="22"></i>三个思路，都有依据</h3>
+              <p>预算、时间和不想要的，都帮你逐条核对。</p>
+            </div>
           </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">03</span>
-            <p class="gw-how__run-name">预算与时间</p>
-            <p class="gw-how__run-text">先选区间，再确认明确的金额上限和可用准备天数。系统不会替你补默认值；“不着急”也会被问成具体天数。</p>
-          </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">04</span>
-            <p class="gw-how__run-name">兴趣与禁忌</p>
-            <p class="gw-how__run-text">知道多少说多少，不了解就留空。明确不要的类型按类别拦截，你确认过的字面词按原文拦截，含糊的会先要求澄清。</p>
+          <li class="lp-step lp-glass lp-reveal">
+            <div class="lp-step__art lp-step__art--3" aria-hidden="true"></div>
+            <div class="lp-step__body">
+              <span class="lp-step__no">03</span>
+              <h3><i data-icon="hand" data-size="22"></i>由你决定</h3>
+              <p>选定之后，再想怎么包、怎么送。</p>
+            </div>
           </li>
         </ol>
-        <p class="gw-how__run-foot">不需要注册，也不需要真实姓名；每一步都能返回上一步，已填内容不会丢。大约 60 秒可完成（待测目标，暂无真实用户计时数据）。</p>
-      </div>
-
-      <p class="gw-how__closing">把依据交代清楚，把选择留给你。<span>全局最多一次自动修订；费用与准备时间仅为估算。</span></p>
-    </section>
-
-    <!-- 第三屏 · 选完方案之后还有四段附加流程 -->
-    <section class="gw-band gw-after" id="after" data-landing aria-labelledby="after-title">
-      <div class="gw-band__head">
-        <div>
-          <p class="gw-band__kicker">第三屏 · 选完方案之后</p>
-          <h2 id="after-title">选完方案，<br />还有四段要一起做完。</h2>
-        </div>
-        <p>三条思路只是开始。只有你选定其中一个之后，才会按固定顺序生成下面四段——不会提前生成，也不会自动替你选。</p>
-      </div>
-      <ol class="gw-after__list">
-        <li class="gw-after__item">
-          <span class="gw-after__no" aria-hidden="true">①</span>
-          <h3>风格与配色</h3>
-          <p>定下整体气质：干净克制、温柔，还是有一点仪式感。颜色会给出具体色号，不只是一句形容词。</p>
-        </li>
-        <li class="gw-after__item">
-          <span class="gw-after__no" aria-hidden="true">②</span>
-          <h3>包装材料与步骤</h3>
-          <p>用什么纸、什么缎带、怎么折、先放什么后放什么；按步骤做就能完成，不靠手感。</p>
-        </li>
-        <li class="gw-after__item">
-          <span class="gw-after__no" aria-hidden="true">③</span>
-          <h3>贺卡正文与装饰</h3>
-          <p>一段可以直接抄下来的话，加上花等小装饰的建议。恋人、追求对象与朋友的话术各自不同。</p>
-        </li>
-        <li class="gw-after__item">
-          <span class="gw-after__no" aria-hidden="true">④</span>
-          <h3>赠送时机、方式与话术</h3>
-          <p>什么时候给、怎么递出去、开口第一句说什么。追求对象默认低压力表达，不制造回应压力。</p>
-        </li>
-      </ol>
-      <p class="gw-band__note">
-        <span class="gw-target">目标设计</span>
-        这四段属于「选择之后」的呈现阶段：生成后还会复核所选礼物的估价、准备时间与禁忌；包装与贺卡只描述风格，不报价，也不代表免费。
-        当前接入层没有接入真实模型（未配置模型凭证），所以这四段现在展示的是内置模拟结构，不是模型真实输出。
-      </p>
-    </section>
-
-    <!-- 第四屏 · Q&A -->
-    <section class="gw-band gw-faq" id="faq" data-landing aria-labelledby="faq-title">
-      <div class="gw-band__head">
-        <div>
-          <p class="gw-band__kicker">第四屏 · 常见问题</p>
-          <h2 id="faq-title">你可能想问的。</h2>
-        </div>
-        <p>答不上来的问题，我们不会写得像答得上。下面是当前实现里确定的部分，以及还没有做的部分。</p>
-      </div>
-      <div class="gw-faq__list">
-        <details class="gw-faq__item">
-          <summary>这是什么？能帮我做什么？</summary>
-          <div class="gw-faq__body"><p>它是一个送礼决策助手：你说清关系、场合、预算和准备时间，它给出三个方向不同的礼物思路，每个思路都带理由、依据和「仍未知」的部分，再由独立规则检查预算、时间与禁忌。它不是商品搜索，也不替你下单。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>要花钱吗？要注册吗？</summary>
-          <div class="gw-faq__body"><p>不用注册，也不用填真实姓名。当前是演示版本：页面上出现的所有价格都是估算（含礼物、包装、贺卡、装饰与配送），没有真实商品价格、库存或物流数据；一切都只是估算，不是承诺。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>为什么只给三个方案？</summary>
-          <div class="gw-faq__body"><p>三个方向不同的方案比较好比较，也不容易变成一屏挑花眼的清单。就三个，不再追加——避免把「想清楚」变成「再刷一刷」。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>我不知道 TA 喜欢什么，还能用吗？</summary>
-          <div class="gw-faq__body"><p>能。兴趣可以整组跳过，跳过就等于未知；系统不会按性别、年龄或职业替你猜。只有你选「明确知道」的才算事实，「只是猜测」会单独标成推断，和事实分开写。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>选完之后会发生什么？</summary>
-          <div class="gw-faq__body"><p>只有你明确选定某个通过检查的方案之后，才会按固定顺序生成风格配色、包装材料与步骤、贺卡正文与装饰、赠送时机与话术，并复核所选礼物的估价、准备时间和禁忌。这部分当前是目标设计，展示的是模拟结构。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>页面上为什么写着「模拟数据」？</summary>
-          <div class="gw-faq__body"><p>因为接入层还没有接入真实模型（未配置模型凭证）：三个方案与四段呈现都来自内置的固定模拟数据，不是模型真实输出。而独立规则校验、选择门槛和修订计数是真实实现，可以真实拦住不合格的方案。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>我的输入会被怎么处理？</summary>
-          <div class="gw-faq__body"><p>只在本次会话内使用：运行记录留在接入层进程的内存里，服务重启即失效，不写入数据库；记录里不含密钥、令牌或用户原文。页面不加载任何第三方脚本、字体或 CDN。完整说明见第六屏的隐私条款。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>对方一定会喜欢吗？</summary>
-          <div class="gw-faq__body"><p>不会承诺。我们能做的是让礼物更贴合你们的关系、场合和边界；最后是否合适，仍然由你和对方真实的相处决定。这也是为什么页面上一直写着「未核实」。</p></div>
-        </details>
       </div>
     </section>
 
-    <!-- 第五屏 · 重申主题 -->
-    <section class="gw-band gw-theme" id="theme" data-landing aria-labelledby="theme-title">
-      <p class="gw-band__kicker">第五屏 · 说到底</p>
-      <h2 id="theme-title">我们不做替你决定的推荐。<br /><span>我们陪你把心意想清楚。</span></h2>
-      <ul class="gw-theme__list">
-        <li>
-          <strong>依据说清楚</strong>
-          <p>哪一句是你说过的，哪一句是模型猜的，哪一句我们其实不知道——分开写，不混成一句漂亮话。</p>
-        </li>
-        <li>
-          <strong>边界守得住</strong>
-          <p>预算上限、可用天数、明确禁忌是硬约束：模型不能覆盖，也不会被悄悄放宽，更不会替你做主。</p>
-        </li>
-        <li>
-          <strong>选择留给你</strong>
-          <p>三个方向不同的思路，各自经过独立规则检查；选不选、选哪个、要不要改需求，都由你决定。</p>
-        </li>
-      </ul>
-      <p class="gw-theme__closing">让心意，送得刚刚好。</p>
-    </section>
-
-    <!-- 第六屏 · 工作原理 + 隐私条款 -->
-    <section class="gw-band gw-privacy" id="privacy" data-landing aria-labelledby="privacy-title">
-      <div class="gw-band__head">
-        <div>
-          <p class="gw-band__kicker">第六屏 · 工作原理与隐私</p>
-          <h2 id="privacy-title">它是怎么算出来的，<br />你的话去了哪里。</h2>
+    <!-- 第三屏 · 选完之后：四件小事 -->
+    <section class="lp-section lp-after" id="after" data-landing aria-labelledby="after-title">
+      <div class="lp-after__grid">
+        <div class="lp-after__visual lp-reveal" aria-hidden="true">
+          <div class="lp-after__halo"></div>
+          <img src="/img/after-gift-wrapped.png" width="1254" height="1254" alt="" loading="lazy" decoding="async" />
+          <p class="lp-note lp-note--after">
+            选定之后，才开始包装哦
+            <svg viewBox="0 0 120 70" aria-hidden="true"><path d="M112 8 C 80 4, 30 14, 18 52" /><path d="M10 40 L 17 54 L 30 46" /></svg>
+          </p>
         </div>
-        <p>两栏都是可以自己核对的：左边是流程与判定顺序，右边是数据边界。没有写在这里的能力，就是还没有做。</p>
-      </div>
-      <div class="gw-privacy__cols">
-        <div class="gw-privacy__col">
-          <h3>工作原理</h3>
-          <ol class="gw-privacy__steps">
-            <li>
-              <strong>先把需求整理成确定的结构</strong>
-              <p>关系、场合、预算上限、可用天数与硬约束先变成机器能校验的字段；不合法的输入会在提交前就被中文说明拦住，不静默补默认值。</p>
+        <div class="lp-after__copy">
+          <div class="lp-section__head lp-reveal">
+            <h2 id="after-title">从选礼物，<br />到好好送出去。</h2>
+          </div>
+          <ul class="lp-bento">
+            <li class="lp-tile lp-paper lp-reveal">
+              <span class="lp-tile__icon lp-tile__icon--red"><i data-icon="palette" data-size="26"></i></span>
+              <h3>风格与配色</h3>
+              <p>贴合你们的关系和场合。</p>
             </li>
-            <li>
-              <strong>再生成三个不同的思路</strong>
-              <p>三个方案方向不同，各自带理由、事实引用、模型推断与「仍未知」，并且明确标出哪些只是估算。</p>
+            <li class="lp-tile lp-paper lp-reveal">
+              <span class="lp-tile__icon lp-tile__icon--blue"><i data-icon="gift" data-size="26"></i></span>
+              <h3>包装方式</h3>
+              <p>跟着礼物的形状来，不硬套方盒。</p>
             </li>
-            <li>
-              <strong>然后用独立规则检查</strong>
-              <p>预算、准备时间与禁忌由独立代码校验，不是模型自述「我通过了」；没通过的方案会被标成不可选择，也不会被自动替换成别的方案。</p>
+            <li class="lp-tile lp-paper lp-reveal">
+              <span class="lp-tile__icon lp-tile__icon--coral"><i data-icon="card" data-size="26"></i></span>
+              <h3>一张贺卡</h3>
+              <p>用你的语气，写一段自然的话。</p>
             </li>
-            <li>
-              <strong>需要时只自动修订一次</strong>
-              <p>推荐与呈现两个阶段合计最多一次自动业务修订；额度由服务端持有，浏览器不能提交或篡改，用完后如实报失败。</p>
+            <li class="lp-tile lp-paper lp-reveal">
+              <span class="lp-tile__icon lp-tile__icon--ink"><i data-icon="hand" data-size="26"></i></span>
+              <h3>怎么送出</h3>
+              <p>挑个时机，轻松递出，不给压力。</p>
             </li>
-            <li>
-              <strong>你选择之后才生成呈现</strong>
-              <p>选定之后才按顺序生成风格配色、包装、贺卡装饰与赠送方式，并复核所选礼物的估价、准备时间与禁忌。</p>
-            </li>
-          </ol>
-        </div>
-        <div class="gw-privacy__col">
-          <h3>隐私条款（当前实现）</h3>
-          <ul class="gw-privacy__points">
-            <li>不收集真实姓名、手机号或邮箱，也不要求注册。唯一的自由文本是「补充说明」，可以不填；页面也不要求上传任何照片或文件。</li>
-            <li>你的输入只在本次会话里、在这个接入层进程内使用。运行记录保存在内存中，服务重启即失效，不写入数据库，也不做长期留存。</li>
-            <li>运行记录里不含密钥、令牌或用户原文；页面与仓库都不保存任何真实凭证，密钥只可能放在可信服务端。</li>
-            <li>页面不加载任何第三方脚本、字体或 CDN：全部资源来自本站，可在浏览器网络面板核对（当前为 0 个外部请求、0 个远程字体）。</li>
-            <li>当前接入层未接入真实模型（没有配置模型凭证），你的输入不会被发送给任何模型服务；页面常驻的「模拟数据」标识说明的就是这件事。</li>
-            <li>价格、库存与送达一律未核实（not_verified）：所有费用与准备时间只能读作估算。准备天数表示可用准备时间，不是送达承诺。</li>
-            <li>公开内容只使用虚构人物与脱敏数据；演示里出现的请求都是构造出来的，不对应任何真实收礼人。</li>
           </ul>
-          <p class="gw-privacy__caveat">这份说明只描述当前可核对的实现，不构成对未来版本的承诺；未来若接入真实模型，数据边界会随之更新并在此处说明。</p>
         </div>
       </div>
-      <div class="gw-final">
-        <div>
-          <h3>准备好了吗？</h3>
-          <p>三页，大约 60 秒（待测目标）。填完会看到三个方向不同的思路，各自带依据、礼物估价与独立检查结果。</p>
-        </div>
-        <button class="gw-button" type="button" id="cta-start-3">
-          开始挑选礼物 · 填写三步需求
-          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 12h23m-8-8 8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </section>
+
+    <!-- 收束屏：深色，上下渐变融入白底 -->
+    <section class="lp-closing" id="welcome" data-landing aria-labelledby="welcome-title">
+      <div class="lp-closing__glow" aria-hidden="true"><span></span><span></span></div>
+      <div class="lp-closing__inner lp-reveal">
+        <p class="lp-closing__hand">你已经很用心了</p>
+        <h2 id="welcome-title">心意不必昂贵，<br />但值得认真。</h2>
+        <ul class="lp-closing__points" aria-label="我们会陪你做的事">
+          <li><i data-icon="heart" data-size="18"></i>你决定想表达什么</li>
+          <li><i data-icon="search" data-size="18"></i>我们讲清每个依据</li>
+        </ul>
+        <button class="lp-btn lp-btn--light lp-btn--lg" type="button" id="cta-welcome">
+          开始选礼物
+          <span class="lp-btn__arrow" aria-hidden="true"><i data-icon="arrow-right" data-size="20"></i></span>
         </button>
+        <p class="lp-sign lp-sign--light" aria-hidden="true">—— GiftWise</p>
       </div>
     </section>
 
@@ -298,12 +244,15 @@
 
     <main id="view" class="view" tabindex="-1"></main>
 
-    <footer class="app-footer">
-      <p>
-        费用与准备时间仅为估算；未核实真实价格、库存或实际送达；不承诺对方一定喜欢。
-        全局自动业务修订总额度为 <strong>1 次</strong>，由服务端可信状态持有，浏览器不能提交或篡改。
-        「约 60 秒完成输入」是待测目标，当前没有真实用户测量数据。
-      </p>
+    <footer class="app-footer lp-footer" aria-label="网站信息">
+      <div class="lp-footer__inner">
+        <a class="lp-brand lp-brand--footer" href="/" aria-label="回到 GiftWise AI 首页">
+          <svg class="lp-brand__logo" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z" /><path fill="var(--gw-color-bg)" d="m23 16 2 6-2 7-3-7Z" /><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z" /></svg>
+          <span class="lp-brand__name">GiftWise AI</span>
+        </a>
+        <p class="lp-footer__hand">准备礼物的人，先感到幸福。</p>
+        <p class="lp-footer__copy">© 2026 GiftWise AI</p>
+      </div>
       <p id="footer-meta" class="app-footer__meta"></p>
     </footer>
 

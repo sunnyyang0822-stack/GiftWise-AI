@@ -1,0 +1,5 @@
+/* 自托管手写字体（SIL OFL 1.1，许可见 /fonts/OFL-*.txt）。子集脚本按站内文字 + GB2312 汉字生成，
+   缺字时回退系统中文字体。font-display: swap 保证首帧可读。 */
+@font-face { font-family: "GW WenKai"; src: url("/fonts/wenkai-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "GW WenKai"; src: url("/fonts/wenkai-medium.woff2") format("woff2"); font-weight: 500 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "GW LongCang"; src: url("/fonts/longcang.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }
