@@ -158,7 +158,7 @@ body {
   margin: 0 0 14px;
   padding: 8px 12px;
   border: 1px solid var(--warn-line);
-  border-left: 3px solid var(--warn-line);
+  border-left: 1px solid var(--warn-line);
   border-radius: var(--radius-sm);
   background: var(--warn-bg);
   color: var(--warn-ink);
@@ -319,7 +319,7 @@ body {
 }
 .banner {
   border: 1px solid var(--line);
-  border-left: 3px solid var(--warn-line);
+  border-left: 1px solid var(--warn-line);
   background: var(--warn-bg);
   color: var(--warn-ink);
   border-radius: var(--radius-sm);
@@ -420,10 +420,10 @@ body {
   letter-spacing: 0.04em;
 }
 .card--ok {
-  border-left: 3px solid var(--ok-line);
+  border-left: 1px solid var(--ok-line);
 }
 .card--fail {
-  border-left: 3px solid var(--err-line);
+  border-left: 1px solid var(--err-line);
   background: var(--surface);
 }
 .card--selected {
@@ -820,7 +820,7 @@ textarea {
 
 .error-box {
   border: 1px solid var(--line);
-  border-left: 3px solid var(--err-line);
+  border-left: 1px solid var(--err-line);
   background: var(--err-bg);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
@@ -1039,3 +1039,44 @@ textarea {
     padding-bottom: 220px;
   }
 }
+
+/* 11 月交付：预算区间与排除项识别 */
+.budget-readout {
+  margin: 18px 0 10px;
+  font-size: 1.25rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.budget-sliders {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+.budget-slider {
+  display: grid;
+  grid-template-columns: 4em minmax(0, 1fr) 5em;
+  gap: 12px;
+  align-items: center;
+  min-height: 44px;
+}
+.budget-slider input[type="range"] { width: 100%; accent-color: var(--black); min-height: 44px; }
+.budget-slider strong { text-align: right; white-space: nowrap; }
+.budget-custom { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.budget-custom label, .text-field { display: grid; gap: 6px; font-weight: 650; }
+.budget-custom input, .text-field textarea { width: 100%; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; background: var(--surface); color: var(--ink); font: inherit; }
+.text-field { margin-top: 18px; }
+.text-field textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
+.analysis-item { padding: 14px 0; border-top: 1px solid var(--line); }
+.analysis-item blockquote { margin: 0 0 8px; color: var(--ink-2); font-weight: 650; }
+.analysis-item p { margin: 6px 0; }
+.revision-step-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 12px 0 0; list-style: none; }
+.revision-step-list .step-pill { width: 100%; min-height: 44px; }
+@media (max-width: 599px) {
+  .budget-custom { grid-template-columns: 1fr; }
+  .budget-slider { grid-template-columns: 3.5em minmax(0, 1fr) 4.5em; gap: 8px; font-size: .9rem; }
+  .revision-step-list { gap: 5px; }
+  .revision-step-list .step-pill { padding-inline: 6px; font-size: .78rem; }
+}\n

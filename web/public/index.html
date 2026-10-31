@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
-    <meta name="description" content="GiftWise AI · 面向青年的送礼决策助手：四步中文输入、三个有依据的思路、独立规则校验，选择后才生成包装、配色、贺卡与赠送方式。当前为模拟数据演示。" />
+    <meta name="description" content="GiftWise AI · 面向青年的送礼决策助手：三页中文输入、三个有依据的思路、独立规则校验，选择后才生成包装、配色、贺卡与赠送方式。当前为模拟数据演示。" />
     <title>GiftWise AI · 找到那份刚好的心意</title>
     <link rel="stylesheet" href="/tokens.css" />
     <link rel="stylesheet" href="/styles.css" />
@@ -57,7 +57,7 @@
       </div>
     </section>
 
-    <!-- 第二屏 · 如何运行：三步叙事 + 真正用起来的四步走 -->
+    <!-- 第二屏 · 如何运行：三步叙事，与真实输入页一致 -->
     <section class="how gw-how" id="how" data-landing aria-labelledby="how-title">
       <div class="gw-how__heading">
         <h2 id="how-title">好礼物，<span>从了解开始。</span></h2>
@@ -93,9 +93,9 @@
         </li>
       </ol>
 
-      <!-- 讲人话的「怎么跑起来」：四步走，顺序与真实表单一致 -->
+      <!-- 讲人话的「怎么跑起来」：三页输入，顺序与真实表单一致 -->
       <div class="gw-how__run">
-        <h3 class="gw-how__run-title">真要用起来，是这样四步。</h3>
+        <h3 class="gw-how__run-title">真要用起来，是这样三页。</h3>
         <ol class="gw-how__run-list">
           <li>
             <span class="gw-how__run-no" aria-hidden="true">01</span>
@@ -157,7 +157,7 @@
       </ol>
       <p class="gw-band__note">
         <span class="gw-target">目标设计</span>
-        这四段属于「选择之后」的呈现阶段：生成后还会做一次增量复核，核对礼物＋包装＋贺卡＋装饰＋配送的总费用、准备时间与禁忌；全局两个阶段合计最多一次自动修订，额度由服务端持有，浏览器改不了。
+        这四段属于「选择之后」的呈现阶段：生成后还会复核所选礼物的估价、准备时间与禁忌；包装与贺卡只描述风格，不报价，也不代表免费。
         当前接入层没有接入真实模型（未配置模型凭证），所以这四段现在展示的是内置模拟结构，不是模型真实输出。
       </p>
     </section>
@@ -190,7 +190,7 @@
         </details>
         <details class="gw-faq__item">
           <summary>选完之后会发生什么？</summary>
-          <div class="gw-faq__body"><p>只有你明确选定某个通过检查的方案之后，才会按固定顺序生成风格配色、包装材料与步骤、贺卡正文与装饰、赠送时机与话术，并做一次增量复核（总费用、准备时间、禁忌）。这部分当前是目标设计，展示的是模拟结构。</p></div>
+          <div class="gw-faq__body"><p>只有你明确选定某个通过检查的方案之后，才会按固定顺序生成风格配色、包装材料与步骤、贺卡正文与装饰、赠送时机与话术，并复核所选礼物的估价、准备时间和禁忌。这部分当前是目标设计，展示的是模拟结构。</p></div>
         </details>
         <details class="gw-faq__item">
           <summary>页面上为什么写着「模拟数据」？</summary>
@@ -259,7 +259,7 @@
             </li>
             <li>
               <strong>你选择之后才生成呈现</strong>
-              <p>选定之后才按顺序生成风格配色、包装、贺卡装饰与赠送方式，并做增量复核：总费用不超过预算、准备时间不超过可用天数、禁忌仍然不出现。</p>
+              <p>选定之后才按顺序生成风格配色、包装、贺卡装饰与赠送方式，并复核所选礼物的估价、准备时间与禁忌。</p>
             </li>
           </ol>
         </div>
@@ -280,7 +280,7 @@
       <div class="gw-final">
         <div>
           <h3>准备好了吗？</h3>
-          <p>四步，大约 60 秒（待测目标）。填完会看到三个方向不同的思路，各自带依据、费用估算与独立检查结果。</p>
+          <p>三页，大约 60 秒（待测目标）。填完会看到三个方向不同的思路，各自带依据、礼物估价与独立检查结果。</p>
         </div>
         <button class="gw-button" type="button" id="cta-start-3">
           开始挑选礼物 · 填写三步需求
@@ -291,10 +291,10 @@
 
     <div class="badges" id="badges" role="status" aria-live="polite"></div>
 
-    <!-- 模拟数据与关系契约的显著标识：常驻页面顶部，避免误以为已接入真实模型 -->
+    <!-- 模拟数据标识常驻页面顶部，避免误以为已接入真实模型 -->
     <div id="banner-slot" class="banner-slot" role="status" aria-live="polite"></div>
 
-    <nav class="steps" id="steps" aria-label="填写进度：四步"></nav>
+    <nav class="steps" id="steps" aria-label="填写进度：三步"></nav>
 
     <main id="view" class="view" tabindex="-1"></main>
 
