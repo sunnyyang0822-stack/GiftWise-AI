@@ -14,9 +14,10 @@
  *   - 不执行任何登录动作。
  */
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { join, basename } from 'node:path';
 import { REPO_ROOT } from '../localdb/db.mjs';
+import { taskPath, taskDirectory, taskProcessEnv } from './task-paths.mjs';
 
 const CANDIDATE_CHROME = [
   process.env.GW_CHROME_PATH,
@@ -24,12 +25,15 @@ const CANDIDATE_CHROME = [
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   process.env.LOCALAPPDATA && join(process.env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe'),
   '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
 ].filter(Boolean);
 
 export function findChrome() {
-  for (const p of CANDIDATE_CHROME) if (existsSync(p)) return p;
+  for (const p of CANDIDATE_CHROME) if (existsSync(p) && /^(chrome\.exe|google-chrome|chrome)$/i.test(basename(p))) return p;
   return null;
+}
+
+export function projectPath(path) {
+  return taskPath(path);
 }
 
 async function cdpAlive(port, timeoutMs = 1500) {
@@ -48,48 +52,61 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
  * 确保 127.0.0.1:<port> 上有一个可用的 CDP 浏览器。
- * 端口已有 CDP 时**复用**（不杀别人的进程）；否则用专用 profile 拉起一个，
+ * 端口已有 CDP 时拒绝连接；否则用专用 profile 拉起一个，
  * 并在返回的 stop() 里只结束自己拉起的那个进程。
  */
-export async function ensureChrome({ port = 19360, profileDir, startupTimeoutMs = 30000, log = () => {} } = {}) {
+export async function ensureChrome({ port = 19360, profileDir, headless = true, startupTimeoutMs = 30000, log = () => {} } = {}) {
+  if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('INVALID_CDP_PORT');
+  const profile = projectPath(profileDir || join(REPO_ROOT, '.tmp', 'opencli-cdp-profile'));
   const endpoint = `http://127.0.0.1:${port}`;
   if (await cdpAlive(port)) {
-    log(`复用已存在的 CDP 浏览器：${endpoint}（不结束该进程）`);
-    return { endpoint, started: false, stop: async () => {} };
+    throw Object.assign(new Error(`端口 ${port} 已占用；不会连接其他浏览器，请为当前任务选择空闲端口`), { code: 'CDP_PORT_IN_USE' });
   }
 
   const exe = findChrome();
   if (!exe) {
-    throw Object.assign(new Error('找不到 Chrome/Chromium 可执行文件；请设置 GW_CHROME_PATH'), {
+    throw Object.assign(new Error('找不到 Google Chrome 可执行文件；请设置 GW_CHROME_PATH（不自动改用其他浏览器）'), {
       code: 'CHROME_NOT_FOUND',
     });
   }
 
-  const profile = profileDir || join(REPO_ROOT, '.tmp', 'opencli-cdp-profile');
-  mkdirSync(profile, { recursive: true });
+  taskDirectory(profile);
+  const runtimeDir = taskDirectory(join(REPO_ROOT, '.tmp/domestic-runtime'));
+  const childEnv = taskProcessEnv(process.env, runtimeDir);
 
   const args = [
-    '--headless=new',
+    ...(headless ? ['--headless=new'] : []),
     '--remote-debugging-address=127.0.0.1',
     `--remote-debugging-port=${port}`,
     `--user-data-dir=${profile}`,
+    `--disk-cache-dir=${taskDirectory(join(runtimeDir, 'chrome-cache'))}`,
+    `--crash-dumps-dir=${taskDirectory(join(runtimeDir, 'crash-dumps'))}`,
+    '--disable-breakpad',
+    '--disable-component-update',
     '--no-first-run',
     '--no-default-browser-check',
     '--disable-gpu',
     '--disable-extensions',
     'about:blank',
   ];
-  log(`启动专用无头浏览器：${exe}（profile=${profile}，端口 ${port}，仅本机）`);
-  const child = spawn(exe, args, { stdio: 'ignore', windowsHide: true, detached: false });
+  log(`启动项目专用浏览器：${exe}（profile=${profile}，端口 ${port}，仅本机，${headless ? '后台' : '可见登录窗口'}）`);
+  const child = spawn(exe, args, { env: childEnv, cwd: REPO_ROOT, stdio: 'ignore', windowsHide: headless, detached: false, shell: false });
+  let spawnError;
+  child.on('error', error => { spawnError = error; });
   child.unref?.();
 
   const deadline = Date.now() + startupTimeoutMs;
   while (Date.now() < deadline) {
+    if (spawnError) throw Object.assign(new Error('Google Chrome 启动失败'), { code: 'CHROME_START_FAILED' });
     if (await cdpAlive(port)) {
       log(`CDP 就绪：${endpoint}`);
       return {
         endpoint,
         started: true,
+        pid: child.pid,
+        profileDir: profile,
+        executable: exe,
+        runtimeDir,
         stop: async () => stopChrome(child),
       };
     }

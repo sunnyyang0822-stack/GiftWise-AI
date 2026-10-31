@@ -133,14 +133,14 @@ function bindingSection(envelope) {
     "- request_json：服务端已经冻结的请求（字符串形式）。它是**唯一**的可信输入。",
   ];
   if (Object.hasOwn(envelope, "retrieval_json")) {
-    lines.push("- retrieval_json：服务端检索到的公开来源证据（对象）。检索状态可能与 evidence 字段一致也可能不可用，如实处理，不要补造商品。");
+    lines.push("- retrieval_json：可选补充资料。products 是国内交易来源的商品/商户观察；contents 和 images 是灵感资料及参考图，不能冒充SKU、报价或商品实拍。结合完整需求自主决定推荐，不要求使用资料、不要求凑齐真实商品。无来源或未知价格仍可给出模型建议，不编造商户、价格、场次、库存或来源。明确区分估算与观察。");
   }
   if (Object.hasOwn(envelope, "library_json")) {
     lines.push(
       "- library_json：服务端从**本地商品库**（opencli 采集的真实商品页）里筛出的真实商品：`products[]` 每项含 product_id / title / price_amount / currency / price_basis / page_url / source_site。",
       "  这是**真实存在、可追溯**的商品（价格是页面观察价，不是结算价，也未核实库存与配送）。",
-      "  要求：优先围绕其中的商品写候选（name/description 要写得能明确对应到某一项），并在 unknowns 里如实说明未核实项；",
-      "  ⛔ 不得编造库里没有的商品、价格或链接；也不必强行使用库内商品——库里没有合适的就照常给方案，但要说明取舍。",
+      "  这些观察仅用于增强建议；由你结合完整上下文判断是否适合，无合适条目仍直接给出礼物建议。",
+      "  不编造具体购买事实或链接。模型建议可采用清楚标注的估价，未知报价不能视为预算违规，也不能用0冒充已核实免费。",
     );
   }
   if (Object.hasOwn(envelope, "input_constraints")) {
@@ -149,7 +149,7 @@ function bindingSection(envelope) {
       "  * `literal_preferences`：用户的**原话**。⛔ 不许用预设类目替代它：候选的名称与说明必须能在字面上与这些原话对得上；",
       "    只把「喜欢黑白」写成「设计感礼物」而不体现黑白，视为没有满足用户要求。",
       "  * `budget_band` / `days_band`：用户给出确定金额/天数后服务端算出的**允许带宽**（含上下界），只能落在带宽内。",
-      "  * `city` / `region_price`：体验类必须按该城市的价格水平估价（一线城市普遍更高）；没有城市就按最保守的中位城市估。",
+      "  * `city`：已知时供相关本地查询使用；只有确实影响具体商户/套餐检索时才自然追问，不要求所有体验补城市，不编造城市报价。",
       "  * 这些约束与 request_json 里的硬约束同等有效；⛔ 任何一条都不许用「已尽量考虑」之类的话糊过去。",
     );
   }

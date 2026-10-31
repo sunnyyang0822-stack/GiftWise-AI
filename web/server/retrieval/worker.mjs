@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
 export function validatePlan(p) {
+ if(p?.category==='domestic') {
+  if(!Array.isArray(p.queries)||p.queries.some(q=>!q||typeof q.keyword!=='string'||!q.keyword.trim()||q.keyword.length>200||q.city!=null&&typeof q.city!=='string'||q.sources!=null&&(!Array.isArray(q.sources)||q.sources.some(s=>typeof s!=='string'))))throw new Error('INVALID_RETRIEVAL_PLAN');
+  return structuredClone(p);
+ }
  if (!p || Object.keys(p).some(k=>!['category','keywords','limit'].includes(k)) || !['books','stationery','home','maker'].includes(p.category) || !Array.isArray(p.keywords) || p.keywords.length>3 || p.keywords.some(s=>typeof s!=='string'||! /^[\p{L}\p{N} ]{1,30}$/u.test(s)) || !Number.isInteger(p.limit)||p.limit<1||p.limit>3) throw new Error('INVALID_RETRIEVAL_PLAN');
  return structuredClone(p);
 }
@@ -21,7 +25,7 @@ export class RetrievalWorker {
      const result=await Promise.race([this.provider.search(j.plan,{signal:c.signal,taskId:randomUUID()}),abort]);
      j.resolve(structuredClone(result));
     } finally {j.signal?.removeEventListener('abort',cancel);}
-   }catch {if(c.signal.aborted)this.poisoned=true;j.resolve({status:'unavailable',evidence_id:null,products:[],warnings:['后台检索失败、取消或超时；价格未核实']});}
+   }catch {j.resolve({status:'unavailable',evidence_id:null,products:[],warnings:['补充检索暂不可用，仍可继续模型建议'],recommendations_available:true,enrichment_only:true});}
    finally {clearTimeout(timer);}
   }this.active=false;
  }

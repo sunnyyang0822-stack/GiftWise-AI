@@ -107,13 +107,15 @@ function readDomesticDom(config) {
 }
 
 /** 有界查询覆盖报告。失败为增强信息，不应被上层当作阻止模型建议的业务条件。 */
-export async function runDomesticSearch(page, { platform: id, keyword, city, pages = 1, maxPages = 12, waitMs = 2500 } = {}) {
+export async function runDomesticSearch(page, { platform: id, keyword, city, pages, maxPages = 50, waitMs = 2500, signal, onProgress = () => {} } = {}) {
   const platform = DOMESTIC_PLATFORMS[id];
   if (!platform) throw new TypeError('不支持的国内来源');
-  const requested = Math.min(pageNumber(pages), pageNumber(maxPages), 12);
-  const report = { platform: id, capability: platform.capability, status: 'empty_or_selector_changed', records: [], pages_requested: requested, pages_completed: 0, pages: [], limitations: [], observed_at: new Date().toISOString(), complete: false };
+  const requested = Math.min(pages == null ? pageNumber(maxPages) : pageNumber(pages), pageNumber(maxPages));
+  const report = { platform: id, capability: platform.capability, status: 'empty_or_selector_changed', records: [], pages_requested: pages ?? null, safety_page_limit: requested, pages_completed: 0, pages: [], limitations: [], observed_at: new Date().toISOString(), complete: false, reported_total: null };
   const seen = new Set();
+  let exhausted = false;
   for (let n = 1; n <= requested; n++) {
+    if (signal?.aborted) { report.status = 'cancelled'; report.limitations.push('本次检索已取消'); break; }
     if (n > 1 && platform.pagination === 'first_page_only') { report.limitations.push('该Web入口尚未核实分页，仅访问首屏'); break; }
     const url = platform.searchUrl(keyword, city, n);
     try {
@@ -124,12 +126,18 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
       delete entry.records;
       report.pages.push(entry);
       report.status = result.status;
+      report.reported_total = result.total_text ?? report.reported_total;
       if (result.status !== 'ok') { report.limitations.push(result.status); break; }
       report.pages_completed++;
+      const previousCount = report.records.length;
       for (const raw of result.records || []) {
         const record = platform.normalize(raw, { keyword, city, page: n, scrapedAt: entry.observed_at });
         if (record && !seen.has(record.product_url)) { seen.add(record.product_url); report.records.push(record); }
       }
+      onProgress({ ...report, records: undefined });
+      if (platform.pagination === 'first_page_only') { report.limitations.push('仅已加载首屏，尚未核实滚动/分页覆盖，不声明查询全量'); break; }
+      if (n > 1 && report.records.length === previousCount) { report.limitations.push('分页返回重复条目，已停止且不声明全量'); break; }
+      if (result.next_available === false) { exhausted = true; break; }
     } catch (error) {
       report.status = 'failed';
       report.pages.push({ page: n, requested_url: url, status: 'failed', error_code: error.code || 'PAGE_READ_FAILED' });
@@ -138,7 +146,8 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
     }
   }
   if (platform.capability === 'homepage_probe_only') report.limitations.push('仅官网可达性/商品链接探测，未接通关键词检索');
-  report.complete = report.pages_completed === requested && platform.capability === 'dom_search';
-  report.coverage = report.complete ? 'requested_pages_only' : 'partial_or_unavailable';
+  if (!exhausted && report.pages_completed === requested && platform.pagination !== 'first_page_only') report.limitations.push('达到本次页数上限，仍可能存在后续页');
+  report.complete = exhausted && platform.capability === 'dom_search';
+  report.coverage = report.complete ? 'accessible_page_chain_exhausted' : 'partial_or_unavailable';
   return report;
 }
