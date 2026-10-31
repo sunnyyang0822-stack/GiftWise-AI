@@ -21,7 +21,7 @@ export function createOpencliToolSession({ search, signal, auditStore=null } = {
   }
   async function executeTool(call) {
     let persistedResult;
-    const entry={tool_call_id:call.id??null,name:call.name,at:new Date().toISOString(),status:'requested'};
+    const entry={tool_call_id:call.id??null,name:call.name,at:new Date().toISOString(),model_round:call.model_round??null,status:'requested'};
     audit.push(entry);
     try{
       const args=typeof call.arguments==='string'?JSON.parse(call.arguments):call.arguments;

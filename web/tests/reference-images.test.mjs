@@ -65,3 +65,14 @@ test('补图遇明确受限后不再访问同源，其他非电商来源仍可�
   await input.executeTool(searchCall);return{ok:true,reference_references:[]};
  }});await job.promise;assert.equal(restrictedRequests,1);assert.equal(otherRequests,1);assert.ok(run.reference_image_slots.every(s=>s.status==='unavailable'));assert.deepEqual(run.selectable_candidate_ids,['c1','c2','c3']);
 });
+
+test('仅格式修复一次不再调用工具，只映射已有已验证ID，且按行保留合法引用',async()=>{
+ const cfg={baseUrl:'https://fixture.test/v1',apiKey:'fixture-only',model:'fixture',timeoutMs:1000,maxRetries:0,maxTokens:4000};let calls=0,toolsCalled=0;
+ const responses=['not json',JSON.stringify({reference_references:[citations()[0],null,{candidate_id:'c2',reference_id:'ref_c2'},{candidate_id:'c3',reference_id:'missing'}]})];
+ const live=new OpenAiCompatibleTransport({fetchImpl:async(_url,options)=>{const body=JSON.parse(options.body);if(calls>0)assert.equal(body.tool_choice,'none');return{ok:true,status:200,json:async()=>({choices:[{finish_reason:'stop',message:{role:'assistant',content:responses[calls++]}}]})};}});
+ const provider=new LlmProvider({live,config:()=>cfg,hasConfig:()=>true});
+ const session=createOpencliToolSession({search:async()=>({status:'partial',references:refs()})});await session.executeTool(searchCall);
+ const run=makeRun();run.retrieval=session.retrieval;
+ const job=startReferenceImages(run,{session,requestJson:'{}',requestImages:input=>provider.requestReferenceImages({...input,executeTool:async()=>{toolsCalled++;throw Error('format cannot search');}})});await job.promise;
+ assert.equal(calls,2);assert.equal(toolsCalled,0);assert.deepEqual(run.reference_image_slots.map(s=>s.status),['ready','ready','unavailable']);assert.equal(run.call_counts.reference_images,2);
+});

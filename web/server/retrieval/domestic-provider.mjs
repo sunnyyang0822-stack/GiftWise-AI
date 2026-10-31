@@ -10,6 +10,7 @@ import { unknownPhysical } from '../media/scene.mjs';
 import { enrichDomesticDetail,validateSourceImage } from '../collect/domestic-detail.mjs';
 import { cacheSourceImage } from '../catalog/source-image-cache.mjs';
 import{createSourceAvailabilityTracker}from'./source-availability.mjs';
+import{publicReferenceUrl}from'../collect/public-reference.mjs';
 const sourceAvailability=createSourceAvailabilityTracker();
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,32);
 
@@ -17,8 +18,9 @@ async function referenceRecords(page,records,{source,signal,imageValidationLimit
  const result=[];let attempted=0;
  for(const record of records){
   if(signal?.aborted)break;
+  const sourceUrl=publicReferenceUrl(record.source_url,'bing');if(!sourceUrl)continue;
   const reference_id='ref_'+digest(`${source}|${record.source_url}`);
-  const r={...record,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null};
+  const r={...record,source_url:sourceUrl,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null};
   if(record.image_url&&attempted<imageValidationLimit){
    attempted++;
    const validation=await validateSourceImage(record.image_url,{role:'reference',fetchImpl:page.fetchImage,signal,includeBytes:true});

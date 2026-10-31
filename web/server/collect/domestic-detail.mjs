@@ -21,7 +21,8 @@ const inDomain = (host, domains) => domains.some(d => host === d || host.endsWit
 function validImageUrl(value, role) {
   try {
     const url = new URL(value);
-    if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443') || !inDomain(url.hostname, role==='reference'?REFERENCE_CDN:CDN)) return null;
+    const regionalBing=role==='reference'&&/^tse[1-4]-mm\.cn\.bing\.net$/.test(url.hostname)&&/^\/th(?:\/|$)/.test(url.pathname);
+    if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443') || (!regionalBing&&!inDomain(url.hostname, role==='reference'?REFERENCE_CDN:CDN))) return null;
     url.hash = '';
     return url;
   } catch { return null; }
@@ -202,7 +203,8 @@ export async function validateSourceImage(value, { fetchImpl, signal, maxBytes =
   let reader;
   try {
     for (let redirects = 0; redirects <= 4; redirects++) {
-      const response = await (fetchImpl || pinnedGet)(url, { method: 'GET', redirect: 'manual', credentials: 'omit', signal, headers: { Accept: 'image/png,image/jpeg,image/webp,image/gif' } });
+      const response = await (fetchImpl || pinnedGet)(url, { method: 'GET', redirect: 'manual', credentials: 'omit', imageRole:role, signal, headers: { Accept: 'image/png,image/jpeg,image/webp,image/gif' } });
+      if(['IMAGE_CORS_OR_NETWORK_FAILED','IMAGE_REDIRECT_NOT_ALLOWED','IMAGE_TOO_LARGE'].includes(response.image_transport_error))return fail(response.image_transport_error);
       if ([301, 302, 303, 307, 308].includes(response.status)) {
         await response.body?.cancel?.();
         const target = response.headers.get('location');

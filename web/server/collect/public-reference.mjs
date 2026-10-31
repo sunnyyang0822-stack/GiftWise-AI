@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const DOMESTIC_DOMAINS = ['mi.com', 'huawei.com', 'honor.com', 'midea.com', 'haier.com', 'smzdm.com', 'zdmimg.com', 'sspai.com', 'ithome.com', 'zhihu.com', 'bilibili.com', 'douban.com', 'weibo.com', 'xiaohongshu.com', 'douyin.com', '163.com', 'sohu.com', 'qq.com', 'people.com.cn', 'xinhuanet.com', 'sina.com.cn', 'zol.com.cn', 'pconline.com.cn', 'dianping.com'];
-const GLOBAL_CONTENT_DOMAINS=['pinterest.com','pixiv.net','wikipedia.org','wikimedia.org','unsplash.com','pexels.com','behance.net','dribbble.com','instructables.com','designboom.com','dezeen.com','archdaily.com','flickr.com','imgur.com','reddit.com','youtube.com'];
+const GLOBAL_CONTENT_DOMAINS=['pinterest.com','pixiv.net','wikipedia.org','wikimedia.org','unsplash.com','pexels.com','behance.net','dribbble.com','instructables.com','designboom.com','dezeen.com','archdaily.com','flickr.com','imgur.com','reddit.com','youtube.com','huodongxing.com'];
 const COMMERCE_DOMAINS = ['jd.com', 'jd.hk', 'taobao.com', 'tmall.com', '1688.com', 'pinduoduo.com', 'yangkeduo.com', 'jinritemai.com', 'kwaixiaodian.com', 'vip.com', 'suning.com', 'suning.cn', 'xiaomiyoupin.com', 'dewu.com', 'poizon.com', 'dangdang.com', 'amazon.cn', 'gome.com.cn', 'kaola.com', 'you.163.com'];
 const clean = (value, max = 300) => typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max) : '';
 export const PUBLIC_REFERENCE_SOURCES = Object.freeze({
@@ -23,8 +23,9 @@ function searchUrl(source, keyword, page) {
 }
 
 /** 解开公开跳转目标后检查非电商资料来源，跳转链接本身不作为证据。 */
-export function publicReferenceUrl(value, source) {
+export function publicReferenceUrl(value, source, depth=0) {
   try {
+    if(depth>2)return null;
     let url = new URL(value, source === 'bing' ? 'https://cn.bing.com' : 'https://html.duckduckgo.com');
     if (source === 'bing' && (url.hostname === 'bing.com' || url.hostname.endsWith('.bing.com')) && url.pathname === '/ck/a') {
       const target = url.searchParams.get('u');
@@ -39,12 +40,16 @@ export function publicReferenceUrl(value, source) {
     if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password || url.port) return null;
     if (COMMERCE_DOMAINS.some(d => url.hostname === d || url.hostname.endsWith('.' + d))) return null;
     if (/^(?:shop|store|mall|buy|item|detail)\./i.test(url.hostname)) return null;
-    if (/\/(?:goods-detail|goods|shop|mall|cart|checkout|buy)(?:\/|$)/i.test(url.pathname)) return null;
+    const canonicalPath=decodeURIComponent(url.pathname).replace(/\/+/g,'/');
+    if (/^\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?(?:goods-detail|goods|products?|shop|mall|cart|checkout|buy)(?:\/|$)/i.test(canonicalPath)) return null;
     // 参考/灵感允许已盘点的国内外内容站，不开放海外电商采购。
     if (!(url.hostname.endsWith('.cn') || [...DOMESTIC_DOMAINS,...GLOBAL_CONTENT_DOMAINS].some(d => url.hostname === d || url.hostname.endsWith('.' + d)))) return null;
     if (/login|passport|signin|oauth|authorize/i.test(url.hostname + url.pathname)) return null;
+    for(const key of ['url','u','target','redirect','redirect_uri','redirect_url','next','dest','destination','return_url']){
+      const next=url.searchParams.get(key);if(next&&/^https?:\/\//i.test(next))return publicReferenceUrl(next,source,depth+1);
+    }
     url.hash = '';
-    for (const key of [...url.searchParams.keys()]) if (/^(?:utm_.+|spm|scm|fbclid|msclkid|access_token|token|session|cookie|authorization)$/i.test(key)) url.searchParams.delete(key);
+    for (const key of [...url.searchParams.keys()]) if (/^(?:utm_.+|spm|scm|fbclid|msclkid|session|sessionid|auth|key|api_key|sign|sig|expires|uid|user_id|openid|x-amz-.+)$|token|cookie|authorization|signature/i.test(key)) url.searchParams.delete(key);
     return url.href;
   } catch { return null; }
 }

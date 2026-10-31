@@ -1,4 +1,5 @@
 /** 灵感资料通道：公开卡片内容不是商品报价、购买绑定或商品实拍证据。 */
+import{publicReferenceUrl}from'./public-reference.mjs';
 const clean = (value, limit = 300) => typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, limit) : '';
 const configs = [
   { id: 'xiaohongshu', name: '小红书', domain: 'xiaohongshu.com', kind: 'content', base: 'https://www.xiaohongshu.com/search_result', query: 'keyword', cards: 'section.note-item, section:has(a[href*="/explore/"]), section:has(a[href*="/search_result/"])', links: 'a[href*="/explore/"], a[href*="/search_result/"]', title: '.title, [class*="title"]', author: '.author .name, .author-wrapper .name', summary: '.desc, .description', paths: '^/(explore|search_result|note)/[a-zA-Z0-9]+', cliArgs: ['query', '--limit', '--sort', '--note-type', '--publish-time', '--scope', '--location'] },
@@ -35,7 +36,7 @@ function sourceUrl(value, config) {
     if (!(url.hostname === config.domain || url.hostname.endsWith(`.${config.domain}`))) return null;
     if (!new RegExp(config.paths).test(url.pathname)) return null;
     url.hash = '';
-    return url.href;
+    return publicReferenceUrl(url.href,'bing');
   } catch { return null; }
 }
 

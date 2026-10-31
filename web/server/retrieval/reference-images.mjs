@@ -1,4 +1,5 @@
 import{bindReferenceEvidence}from'./reference-evidence.mjs';
+import{publicReferenceUrl}from'../collect/public-reference.mjs';
 
 export function referenceImageSlots(candidates,retrieval,bindings=[],pending=false){
  const used=new Set();
@@ -7,12 +8,12 @@ export function referenceImageSlots(candidates,retrieval,bindings=[],pending=fal
   const b=matches.length===1?matches[0]:null;
   const records=(retrieval.references??[]).filter(r=>r.reference_id===b?.reference_id);
   const r=records.length===1?records[0]:null,key=r?.image_validation?.sha256??r?.image_id;
-  if(b&&r?.reference_kind==='public_reference'&&r.image_kind==='reference_image'&&r.image_validation?.ok===true&&r.image_validation.width>0&&r.image_validation.height>0&&/^[a-f0-9]{32,64}$/.test(r.image_id??'')&&r.image_id===b.image.id&&b.image.url===`/api/reference/images/${r.image_id}`&&!used.has(key)){used.add(key);return{...b,status:'ready'};}
+  if(b&&r?.reference_kind==='public_reference'&&publicReferenceUrl(r.source_url,'bing')&&r.image_kind==='reference_image'&&r.image_validation?.ok===true&&r.image_validation.width>0&&r.image_validation.height>0&&/^[a-f0-9]{32,64}$/.test(r.image_id??'')&&r.image_id===b.image.id&&b.image.url===`/api/reference/images/${r.image_id}`&&!used.has(key)){used.add(key);return{...b,status:'ready'};}
   return{candidate_id:c.id,reference_id:null,image:null,status:pending?'pending':'unavailable'};
  });
 }
 function bindingsFromReferences(records,candidates,citations){
- const bound=bindReferenceEvidence(records,candidates,citations);
+ const bound=bindReferenceEvidence(records.filter(r=>publicReferenceUrl(r.source_url,'bing')),candidates,citations);
  return{rejected:bound.rejected,bindings:[...bound.bindings].map(([candidate_id,r])=>({candidate_id,reference_id:r.reference_id,image:r.image_id&&r.image_validation?.ok?{id:r.image_id,url:`/api/reference/images/${r.image_id}`,version:r.image_id,kind:'reference_image',alt:`公开资料参考图：${r.title}`,source_url:r.source_url,price_observed_at:r.observed_at}:null}))};
 }
 /** One idempotent, bounded job after the final batch has passed. GET never calls this. */
@@ -49,13 +50,13 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
    run.call_counts.reference_images=(run.call_counts.reference_images??0)+(result.model_calls??0);
    if(!current()||controller.signal.aborted)throw Error('REFERENCE_CANCELLED');
    run.retrieval=session.retrieval;
-   const citations=(result.reference_references??[]).filter(r=>missing.includes(r.candidate_id));
+   const citations=(Array.isArray(result.reference_references)?result.reference_references:[]).filter(r=>r&&typeof r==='object'&&missing.includes(r.candidate_id));
    const selected=bindingsFromReferences(run.retrieval.references??[],run.candidates,citations);
    job.rejected_references=selected.rejected;
    const slots=referenceImageSlots(run.candidates,run.retrieval,[...initial.filter(s=>s.status==='ready'),...selected.bindings]);
    run.reference_image_slots=slots;run.media={...run.media,candidates:slots};
    job.missing_candidate_ids=slots.filter(s=>s.status!=='ready').map(s=>s.candidate_id);
-   job.status=job.missing_candidate_ids.length?'unavailable':'ready';job.error_code=result.ok?null:(result.code??'REFERENCE_MODEL_FAILED');
+   job.status=job.missing_candidate_ids.length?'unavailable':'ready';job.error_code=result.ok?null:(result.code??'REFERENCE_MODEL_FAILED');job.error_detail=result.reason??null;
   }catch{job.status=controller.signal.aborted?'cancelled':'unavailable';job.error_code=controller.signal.aborted?'REFERENCE_TIMEOUT_OR_CANCELLED':'REFERENCE_IMAGE_FAILED';}
   finally{
    clearTimeout(timer);signal?.removeEventListener('abort',abort);
@@ -64,7 +65,7 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
     run.media={...run.media,candidates:run.reference_image_slots};job.missing_candidate_ids=run.reference_image_slots.filter(s=>s.status!=='ready').map(s=>s.candidate_id);
    }
    job.completed_at=new Date().toISOString();
-   session.finalize({runId:run.run_id,status:job.status==='ready'?'completed':job.status,errorCode:job.error_code,bindings:run.reference_image_slots,rejected:job.rejected_references??[],candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
+   session.finalize({runId:run.run_id,status:job.status==='ready'?'completed':job.status,errorCode:job.error_code,errorDetail:job.error_detail,bindings:run.reference_image_slots,rejected:job.rejected_references??[],candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
   }
  });
  job.cancel=abort;

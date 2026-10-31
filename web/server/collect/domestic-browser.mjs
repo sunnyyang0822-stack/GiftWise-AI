@@ -16,6 +16,22 @@ export function opencliPackageRoot(explicit) {
 export function opencliVersion(root) { return JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version; }
 export async function importOpencli(root, file) { return import(pathToFileURL(join(root, file)).href); }
 
+/** Public-reference GET: browser CORS applies; redirects are never followed invisibly. */
+export async function fetchBrowserReferenceImage(evaluate,url){
+  const value=await evaluate(`(${(async function(value){
+    try{
+      const response=await fetch(value,{method:'GET',credentials:'omit',mode:'cors',redirect:'manual'});
+      if(response.type==='opaqueredirect'||response.status===0)return{error:'IMAGE_REDIRECT_NOT_ALLOWED'};
+      const reader=response.body?.getReader();if(!reader)return{status:response.status,headers:{'content-type':response.headers.get('content-type')||''},data:''};
+      const chunks=[];let length=0;while(true){const part=await reader.read();if(part.done)break;length+=part.value.length;if(length>8*1024*1024){await reader.cancel();return{error:'IMAGE_TOO_LARGE'};}chunks.push(part.value);}
+      let binary='';for(const bytes of chunks)for(let i=0;i<bytes.length;i+=4096)binary+=String.fromCharCode(...bytes.subarray(i,i+4096));
+      return{status:response.status,headers:{'content-type':response.headers.get('content-type')||''},data:btoa(binary)};
+    }catch{return{error:'IMAGE_CORS_OR_NETWORK_FAILED'};}
+  }).toString()})(${JSON.stringify(String(url))})`);
+  const response=new Response(value?.data?Buffer.from(value.data,'base64'):null,{status:value?.status||502,headers:value?.headers??{}});
+  if(value?.error)response.image_transport_error=value.error;return response;
+}
+
 export async function createDomesticPage({ port = 19366, profileDir = join(REPO_ROOT, '.tmp/domestic-profile'), headless = true, signal, timeoutMs = 20000 } = {}) {
   profileDir = projectPath(profileDir);
   mkdirSync(profileDir, { recursive: true });
@@ -83,7 +99,8 @@ export async function createDomesticPage({ port = 19366, profileDir = join(REPO_
           await new Promise(r => setTimeout(r, delayMs));
         }
       },
-      async fetchImage(url) {
+      async fetchImage(url,options={}) {
+        if(options.imageRole==='reference')return fetchBrowserReferenceImage(evaluate,url);
         // Only the fixed image validator calls this; credentials are explicitly omitted.
         const tree=await send('Page.getFrameTree');
         const {resource}=await send('Network.loadNetworkResource',{frameId:tree.frameTree.frame.id,url:String(url),options:{disableCache:false,includeCredentials:false}});
