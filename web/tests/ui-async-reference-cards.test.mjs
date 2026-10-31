@@ -41,7 +41,7 @@ function setup(fetcher = async () => snapshot()) {
   let seq = 0, elapsed = 0, fullRenders = 0;
   const timers = new Map(), calls = [], selected = [];
   const state = { inFlow: true, requestVersion: 1, report: report(), busy: false };
-  const ctx = { el, state, selectCandidate: id => selected.push(id), resetToForm() {}, stateView: () => ({ body: [], actions: [] }), render() { fullRenders++; }, apiFetch: async (...args) => { calls.push(args); return fetcher(...args); }, setTimeout: (fn, delay) => { const id = ++seq; timers.set(id, { fn, delay }); return id; }, clearTimeout: id => timers.delete(id) };
+  const ctx = { el, state, selectCandidate: id => selected.push(id), resetToForm() {}, stateView: () => ({ body: [], actions: [] }), render() { fullRenders++; }, apiFetch: async (...args) => { calls.push(args); return fetcher(...args); }, now: () => elapsed, setTimeout: (fn, delay) => { const id = ++seq; timers.set(id, { fn, delay }); return id; }, clearTimeout: id => timers.delete(id) };
   const views = createResultViews(ctx);
   let root;
   const mount = () => { const result = views.renderRecommendation(); root = el("main", {}, [...result.body, ...result.actions]); return root; };
@@ -117,8 +117,8 @@ test("owner404或TTL失效停止等待，不显示错图也不再次请求", asy
 test("覆盖180秒后最后只读一次并停，仍pending保持真实等待且可手动读终态", async () => {
   let ready = false;
   const h = setup(async () => snapshot(ready ? undefined : ["pending", "pending", "pending"]));
-  let iterations = 0; while (h.timers.size && iterations++ < 50) await h.next();
-  assert.equal(h.elapsed, 180000); assert.equal(h.calls.length, 25); assert.equal(h.timers.size, 0);
+  let iterations = 0; while (h.timers.size && iterations++ < 100) await h.next();
+  assert.equal(h.elapsed, 180000); assert.equal(h.calls.length, 60); assert.equal(h.timers.size, 0);
   assert.match(h.root.textContent, /配图还在准备/); assert.equal(h.root.querySelectorAll("img").length, 0);
   assert.ok(h.state.report.media.candidates.every(c => c.status === "pending"));
   h.mount(); assert.equal(h.timers.size, 0); ready = true;
@@ -152,9 +152,9 @@ test("新run没有候选时也立即清理旧等待，不等旧timer到期", asy
 
 test("最后一读在途离开再返回也不突破已耗尽窗口或产生零延迟查询", async () => {
   let resolve;
-  const h = setup(async () => h.calls.length < 25 ? snapshot(["pending", "pending", "pending"]) : new Promise(done => { resolve = done; }));
-  for (let i = 0; i < 25; i++) await h.next();
-  assert.equal(h.elapsed, 180000); assert.equal(h.calls.length, 25);
+  const h = setup(async () => h.calls.length < 60 ? snapshot(["pending", "pending", "pending"]) : new Promise(done => { resolve = done; }));
+  for (let i = 0; i < 60; i++) await h.next();
+  assert.equal(h.elapsed, 180000); assert.equal(h.calls.length, 60);
   h.views.stopRecommendationMediaPoll(); h.mount();
   assert.equal(h.timers.size, 0); assert.match(h.root.textContent, /配图还在准备/);
   resolve(snapshot()); await flush();
