@@ -246,6 +246,7 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
 /* =========================================================== 媒体图 */
 .gift-media { margin: 20px 0 28px; min-width: 0; }
 .media-stage { position: relative; isolation: isolate; min-height: 120px; background: #fff; }
+.media-stage--pending { display: grid; place-items: center; min-height: 220px; }
 .media-stage > img { display: block; width: 100%; height: auto; object-fit: contain; }
 .gift-media > .media-stage { max-width: 900px; margin-inline: auto; }
 .media-caption, .media-attribution, .media-price { overflow-wrap: anywhere; line-height: 1.6; }

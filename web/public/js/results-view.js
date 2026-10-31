@@ -11,90 +11,92 @@ export function createResultViews(ctx) {
   const money = (v, cur = "CNY") => (cur === "CNY" ? `¥${v}` : `${v} ${cur}`);
 
   /* ------------------------------------------ 图片任务轮询（/api/media/tasks/<id>） */
-  /**
-   * 后端在「选定瞬间」返回的 media.status 是 pending：真实生图是异步的，
-   * 响应里给的是 task_id，图片稍后才可用。所以前端必须自己轮询
-   * GET /api/media/tasks/<task_id> 直到 ready / failed / unavailable —— 原来全仓
-   * 没有任何轮询，图片就永远停在「图片正在准备」。
-   * 契约：task_id 为 64 位小写十六进制；响应体就是 media 对象本身
-   * （{contract_version,status,candidates,selected}），与 view.media 同形，可直接替换。
-   * 退避与上限：间隔依次 1s、2s、4s，之后封顶 8s；最多 8 次查询（累计等待约 47 秒，
-   * 单次请求另有 10 秒超时）。这比后端「单张图约 8 秒」留了足够余量，又不会无限转圈。
-   * 失败不自动重试：终态、HTTP 错误、超时、次数用尽都**停止**，只留一句中文说明，
-   * 文字结果照常可看。后端若改成「等图就绪再返回」，这里的 pending 分支自然不再触发，
-   * 两条路径可以共存、互不冲突。
-   */
+  // 只读取既有任务；轮询与手动刷新均不创建/重试生图。离开时令在途响应失效。
   const MEDIA_TASK_ID_RE = /^[a-f0-9]{64}$/;
   const MEDIA_POLL_DELAYS_MS = [1000, 2000, 4000, 8000, 8000, 8000, 8000, 8000];
   const MEDIA_POLL_TIMEOUT_MS = 10000;
   const MEDIA_TERMINAL = new Set(["ready", "failed", "unavailable"]);
-  const mediaPoll = { taskId: null, timer: null, attempt: 0, notes: new Map() };
+  const schedule = ctx.setTimeout || setTimeout;
+  const cancel = ctx.clearTimeout || clearTimeout;
+  const polls = new WeakMap();
+  let activePoll = null;
+  const visible = view => state.presentation === view && state.inFlow !== false && !state.busy && !state.encourage && !state.error && !state.timeout;
+  const pending = view => view.media?.status === "pending" && view.media?.selected?.status === "pending";
+  const current = (poll, epoch) => activePoll === poll && poll.epoch === epoch && visible(poll.view) && state.requestVersion === poll.version
+    && poll.view.selected_candidate_id === poll.candidateId && poll.view.media?.selected?.candidate_id === poll.candidateId && poll.view.media?.selected?.task_id === poll.taskId;
 
-  /** 图片位下面那句中文说明：轮询中 / 已停止的原因。null 表示不显示任何说明。 */
-  function mediaPollNote(view) {
-    const taskId = String(view?.media?.selected?.task_id || "");
-    if (!taskId) return null;
-    const note = mediaPoll.notes.get(taskId);
-    if (note !== undefined) return note || null;
-    if (mediaPoll.taskId === taskId && mediaPoll.timer !== null) {
-      return `图片正在准备，已自动查询 ${mediaPoll.attempt} / ${MEDIA_POLL_DELAYS_MS.length} 次（逐次退避，最长 8 秒一次）。也可以先看下面的文字结果。`;
+  function stopMediaPoll() {
+    if (!activePoll) return;
+    if (activePoll.timer !== null) cancel(activePoll.timer);
+    activePoll.timer = null;
+    activePoll.inFlight = false;
+    activePoll.update = null;
+    activePoll.epoch += 1;
+    activePoll = null;
+  }
+
+  function ensureMediaPoll(view, update) {
+    const selected = view.media?.selected;
+    if (view.status === "presentation_failed" || selected?.candidate_id !== view.selected_candidate_id || !MEDIA_TASK_ID_RE.test(String(selected?.task_id || ""))) {
+      stopMediaPoll();
+      return null;
     }
-    return null;
+    let poll = polls.get(view);
+    if (!poll || poll.taskId !== selected.task_id || poll.candidateId !== selected.candidate_id || poll.version !== state.requestVersion) {
+      poll = { view, taskId: selected.task_id, candidateId: selected.candidate_id, version: state.requestVersion, timer: null, attempt: 0, epoch: 0, inFlight: false, stopped: false, note: "", update };
+      polls.set(view, poll);
+    }
+    if (activePoll !== poll) { stopMediaPoll(); activePoll = poll; }
+    poll.update = update;
+    if (pending(view) && !poll.stopped && poll.timer === null && !poll.inFlight) tickMediaPoll(poll);
+    return poll;
   }
 
-  function ensureMediaPoll(view) {
-    if (view?.status === "presentation_failed") return;
-    const media = view?.media;
-    const selected = media?.selected;
-    const taskId = String(selected?.task_id || "");
-    const pending = media?.status === "pending" || selected?.status === "pending";
-    // 只有「真的挂着 pending 且 task_id 合法」才轮询；ready/failed/unavailable
-    // 与预览模式的 null task_id 一律不轮询，也不在前端造任何图。
-    if (!pending || !MEDIA_TASK_ID_RE.test(taskId)) return;
-    // 同一个 task_id 只处理一次：要么正在轮询，要么已出终态。
-    // 这条判断同时挡住了 render() 重绘引起的重复排程与重复请求。
-    if (mediaPoll.taskId === taskId) return;
-    if (mediaPoll.timer !== null) { clearTimeout(mediaPoll.timer); mediaPoll.timer = null; }
-    mediaPoll.taskId = taskId;
-    mediaPoll.attempt = 0;
-    tickMediaPoll(taskId);
+  function tickMediaPoll(poll) {
+    const epoch = poll.epoch;
+    poll.timer = schedule(() => {
+      poll.timer = null;
+      if (current(poll, epoch)) void runMediaPoll(poll);
+    }, MEDIA_POLL_DELAYS_MS[poll.attempt]);
   }
 
-  function tickMediaPoll(taskId) {
-    mediaPoll.timer = setTimeout(() => { mediaPoll.timer = null; void runMediaPoll(taskId); }, MEDIA_POLL_DELAYS_MS[mediaPoll.attempt]);
-  }
-
-  async function runMediaPoll(taskId) {
-    mediaPoll.attempt += 1;
-    // 用户已经离开这一屏或换了方案：停止，不再刷新。
-    if (state.presentation?.media?.selected?.task_id !== taskId) return;
+  async function runMediaPoll(poll, manual = false) {
+    const epoch = poll.epoch;
+    if (!current(poll, epoch) || poll.inFlight) return;
+    poll.inFlight = true;
+    if (!manual) poll.attempt += 1;
+    poll.update?.();
     let data = null;
     try {
-      const response = await apiFetch(`/api/media/tasks/${taskId}`, null, { timeoutMs: MEDIA_POLL_TIMEOUT_MS, track: false });
+      const response = await apiFetch(`/api/media/tasks/${poll.taskId}`, null, { timeoutMs: MEDIA_POLL_TIMEOUT_MS, track: false });
       data = response.ok ? response.data : null;
     } catch {
       data = null;
     }
-    if (state.presentation?.media?.selected?.task_id !== taskId) return;
-    if (!data || typeof data.status !== "string") {
-      mediaPoll.notes.set(taskId, "图片状态没有取到（网络异常、超时，或该任务不存在）。已停止自动刷新，且不会自动重试；文字结果仍可查看。");
-      render();
-      return;
+    if (!current(poll, epoch)) return;
+    poll.inFlight = false;
+    if (!data || !["pending", ...MEDIA_TERMINAL].includes(data.status) || data.selected?.task_id !== poll.taskId || data.selected?.candidate_id !== poll.candidateId || data.selected?.status !== data.status) {
+      poll.note = "暂时无法更新图片";
+      poll.stopped = true;
+    } else {
+      poll.view.media = data;
+      poll.note = data.status === "failed" ? "效果图生成未成功" : data.status === "unavailable" ? "暂时没有效果图" : "";
+      if (manual) poll.attempt = 0;
+      poll.stopped = MEDIA_TERMINAL.has(data.status) || poll.attempt >= MEDIA_POLL_DELAYS_MS.length;
+      if (data.status === "pending" && poll.stopped) poll.note = "效果图还在生成";
     }
-    state.presentation.media = data;
-    if (MEDIA_TERMINAL.has(data.status)) {
-      mediaPoll.notes.set(taskId, data.status === "ready" ? "" : data.status === "failed"
-        ? "图片任务已失败（后端不会自动重试，前端也不会）。文字结果仍可查看。"
-        : "这次没有可用的图片（未启用图像服务，或未生成）。文字结果仍可查看。");
-      render();
-      return;
-    }
-    if (mediaPoll.attempt >= MEDIA_POLL_DELAYS_MS.length) {
-      mediaPoll.notes.set(taskId, `图片还在准备，已停止自动刷新（共查询 ${MEDIA_POLL_DELAYS_MS.length} 次）。文字结果仍可查看。`);
-      render();
-      return;
-    }
-    tickMediaPoll(taskId);
+    poll.update?.();
+    if (!poll.stopped && pending(poll.view)) tickMediaPoll(poll);
+  }
+
+  function mediaOptions(view, poll) {
+    const isPending = Boolean(poll && pending(view));
+    return {
+      pending: isPending && !poll.note,
+      message: poll?.note || (isPending ? "效果图生成中" : view.media?.status === "failed" ? "效果图生成未成功" : "暂时没有效果图"),
+      refreshing: Boolean(poll?.inFlight),
+      onRefresh: poll && view.media?.status !== "unavailable" && (poll.note || view.media?.status === "failed") ? () => { void runMediaPoll(poll, true); } : null,
+    };
   }
 
   function requestChips(request) {
@@ -201,8 +203,7 @@ export function createResultViews(ctx) {
   function renderPresentation() {
     const view = state.presentation;
     const failed = view.status === "presentation_failed";
-    // 图片是异步生成的：进入这一屏就按需开始轮询（终态或非 pending 时什么都不做）。
-    ensureMediaPoll(view);
+    if (failed) stopMediaPoll();
     const s = view.recheck_summary || {};
     const body = [];
 
@@ -220,9 +221,15 @@ export function createResultViews(ctx) {
     if (failed) {
       body.push(el("section", { class: "card card--fail" }, [errorBox(view.presentation_check?.errors, "没通过的原因")]));
     } else {
-      body.push(packagingMedia(view));
-      const imageNote = mediaPollNote(view);
-      if (imageNote) body.push(el("p", { class: "field__hint", text: imageNote }));
+      let mediaSlot;
+      const poll = ensureMediaPoll(view, () => {
+        if (!visible(view) || !mediaSlot?.isConnected) return;
+        const next = packagingMedia(view, mediaOptions(view, poll));
+        mediaSlot.replaceWith(next);
+        mediaSlot = next;
+      });
+      mediaSlot = packagingMedia(view, mediaOptions(view, poll));
+      body.push(mediaSlot);
       const sections = view.sections || [];
       const card = sections.find(sec => sec.title.includes("贺卡"));
       const others = sections.filter(sec => sec !== card);
@@ -294,5 +301,5 @@ export function createResultViews(ctx) {
     };
   }
 
-  return { renderRecommendation, renderPresentation, renderEncourage, withIcon };
+  return { renderRecommendation, renderPresentation, renderEncourage, withIcon, stopMediaPoll };
 }

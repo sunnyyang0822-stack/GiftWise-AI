@@ -690,6 +690,7 @@ function currentViewKey() {
 }
 
 function render() {
+  if (!state.presentation || !state.inFlow || state.busy || state.encourage || state.timeout || state.error) resultViews?.stopMediaPoll();
   renderBadges();
   renderBanners();
   renderSteps();
