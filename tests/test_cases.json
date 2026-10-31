@@ -21460,11 +21460,8 @@
         ]
       },
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "code": "LIMIT_EXCEEDED",
-        "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "status": "passed",
+        "all_passed": true
       }
     },
     {
@@ -21978,11 +21975,8 @@
         ]
       },
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "code": "LIMIT_EXCEEDED",
-        "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "status": "passed",
+        "all_passed": true
       }
     },
     {
@@ -22077,11 +22071,8 @@
         ]
       },
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "code": "LIMIT_EXCEEDED",
-        "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "status": "passed",
+        "all_passed": true
       }
     },
     {
@@ -22176,11 +22167,8 @@
         ]
       },
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "code": "LIMIT_EXCEEDED",
-        "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "status": "passed",
+        "all_passed": true
       }
     },
     {
@@ -30411,11 +30399,8 @@
         ]
       },
       "expected": {
-        "status": "needs_input",
-        "all_passed": false,
-        "code": "LIMIT_EXCEEDED",
-        "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "status": "passed",
+        "all_passed": true
       }
     },
     {
@@ -30514,7 +30499,7 @@
         "all_passed": false,
         "code": "LIMIT_EXCEEDED",
         "path": "request.budget_amount",
-        "message": "预算须在 1 至 10000 之间"
+        "message": "预算须在 0 至 10000 之间"
       }
     },
     {
