@@ -123,3 +123,11 @@ PASS 仅表示固定代码和夹具的离线结构/规则行为。SKIP：Dify、
 - `git diff --check`：PASS。
 
 本轮没有 Dify、模型或 provider 调用，model_calls=0，token/延迟/成本未测。历史失败证据未删除。
+
+## previous_gifts release probe（本次交付）
+
+固定工作流分支提交前执行，后台统一基线仍为 `f080ad51e0f22ca7384ce3a93f75d0dba91d0508`。新增 `tests/acceptance/retrieval_media/previous_gifts_release_probe.py`，比较 `workflow/intake.py` 与 `workflow/generated/intake_node.py` 的同一虚构输入：省略、空字符串、全空白、合法文本、非字符串、1001码点超长。
+
+六类均 PASS：省略/空白为 ready 且不造硬约束；合法文本 ready 并原样保留；非字符串为 `INVALID_TYPE` / `intake.previous_gifts`；超长为 `LIMIT_EXCEEDED` / `intake.previous_gifts`；源节点和 generated 节点结果完全一致。
+
+本轮命令退出码：build=0、probe=0、verify_local=0、nov01=0、avoid-history=0、retrieval-media=0、retrieval-media-v2=0、compileall=0、diff-check=0。Dify、Seedream、OpenCLI、模型调用均为0。
