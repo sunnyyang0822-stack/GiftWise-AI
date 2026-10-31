@@ -1,4 +1,5 @@
 import config from "./preview-config.js";
+import { recommendationMedia, selectedMedia } from "./media-preview.js";
 
 // 本阶段仅本地预览。同版本后端接入时由联调线替换适配层；不能通过地址参数开启旧API。
 export const PREVIEW_MODE = true;
@@ -8,6 +9,7 @@ let failed = false;
 let sequence = 0;
 const runs = new Map();
 const analyses = new Map();
+const presentations = new Map();
 export const previewScenarios = [
   ["normal", "正常流程"], ["loading", "延长加载"], ["error", "推荐失败后重试"],
   ["empty", "没有方案"], ["blocked", "方案未通过"],
@@ -20,6 +22,8 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const cents = value => Math.round(Number(value) * 100);
 
 export async function previewRequest(path, payload) {
+  const selectionKey = path === "/api/presentations" ? `${payload.recommendation_run_id}:${payload.selected_candidate_id}` : null;
+  if (selectionKey && presentations.has(selectionKey)) return presentations.get(selectionKey);
   if (path === "/api/intake/validate") return reply({ status: "ready", errors: [] });
   await pause(scenario === "loading" ? 3000 : 900);
   if (!failed && ((scenario === "error" && path === "/api/recommendations") ||
@@ -75,18 +79,23 @@ export async function previewRequest(path, payload) {
       selectable_candidate_ids: scenario === "empty" ? [] : results.filter(r => r.passed).map(r => r.id),
       selected_candidate_id: null, repair_count: 0, remaining_repairs: 1, business_data_verification: "not_verified" };
     runs.set(id, report);
+    Object.assign(report, recommendationMedia(report.candidates, noSpend));
     return reply(report);
   }
   if (path === "/api/presentations") {
+    if (presentations.has(selectionKey)) return presentations.get(selectionKey);
     const run = runs.get(payload.recommendation_run_id);
     const candidate = run?.candidates.find(c => c.id === payload.selected_candidate_id);
     if (!candidate || !run.selectable_candidate_ids.includes(candidate.id)) return reply(issue("请先选择一个通过检查的方案。", "INVALID_SELECTION"), 422);
-    return reply({ contract_version: config.contract_version, recommendation_run_id: run.recommendation_run_id,
+    const media = selectedMedia(run, candidate);
+    const palette = candidate.id.endsWith("2") ? "柔粉与深蓝，参考当前场景配色。" : candidate.id.endsWith("3") ? "牛皮纸暖棕、奶油白与细绳点色。" : "暖白纸面搭配深色缎带，参考当前场景配色。";
+    const response = reply({ contract_version: config.contract_version, recommendation_run_id: run.recommendation_run_id,
       selected_candidate_id: candidate.id, candidate, status: "completed", mode: "mock", generated_by: "mock", repair_count: 0, remaining_repairs: 1,
       presentation_check: { passed: true, errors: [] },
+      media,
       sections: [
-        { title: "① 包装风格", items: ["简洁、克制，突出礼物本身；这是本地预览示例。"] },
-        { title: "② 配色", items: ["暖白与深红，作为风格参考。"] },
+        { title: "① 包装风格", items: [media.selected.packaging.description, media.selected.packaging.scale.note] },
+        { title: "② 配色", items: [palette] },
         { title: "③ 贺卡", items: ["愿这份小小的心意，给你的日常多添一点快乐。"] },
         { title: "④ 赠送方式", items: ["在彼此方便的时机自然递出，不催促回应。"] },
       ],
@@ -94,6 +103,8 @@ export async function previewRequest(path, payload) {
         budget_range: run.request.budget_range, budget_amount: run.request.budget_amount, currency: "CNY", available_days: run.request.available_days,
         revised_estimated_preparation_days: candidate.estimated_preparation_days, passed: true, business_data_verification: "not_verified" },
     });
+    presentations.set(selectionKey, response);
+    return response;
   }
   return reply(issue("预览路径暂不可用。"), 404);
 }

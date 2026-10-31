@@ -10,6 +10,7 @@
  */
 
 import { PREVIEW_MODE, previewConfig, previewRequest, previewScenarios, setPreviewScenario } from "./js/preview-api.js";
+import { candidateMedia, packagingMedia } from "./js/media-view.js";
 
 const el = (tag, props = {}, children = []) => {
   const node = document.createElement(tag);
@@ -721,15 +722,21 @@ function renderRecommendation() {
     ], backToFormActions("修改需求后重新生成"));
   }
 
+  const candidateGrid = el("div", { class: "candidate-grid", "aria-label": "三个礼物方案" });
+  body.push(candidateGrid);
   report.candidates.forEach((candidate, index) => {
     const result = errorsByCandidate.get(candidate.id) || { passed: false, errors: [{ code: "MISSING_RESULT", message: "缺少校验结果，按不可选处理" }] };
     const canSelect = selectable.has(candidate.id) && result.passed === true;
-    body.push(
-      el("section", { class: `card ${canSelect ? "" : "card--fail"}` }, [
-        el("p", { class: "how__num", text: `思路 ${String(index + 1).padStart(2, "0")} · ${candidate.id}` }),
-        el("h2", { class: "card__title", text: candidate.name }),
+    const candidateCard = el("section", { class: `card gift-choice ${canSelect ? "" : "card--fail"}`, "data-candidate-id": candidate.id }, [
+        el("p", { class: "how__num", text: `方案 ${index + 1}` }),
+        candidateMedia(report, candidate),
+        el("div", { class: "gift-choice-heading" }, [
+          el("h2", { class: "card__title", text: candidate.name }),
+          el("span", { class: "gift-choice-price", text: `参考 ¥${candidate.estimated_total}`, "aria-label": `礼物参考估价${candidate.estimated_total}元，非成交价` }),
+        ]),
         el("p", { class: "card__lead", text: candidate.description }),
-        el("dl", { class: "kv" }, [
+        el("p", { class: "gift-choice-status", text: canSelect ? "模拟检查通过 · 可选择" : "未通过检查 · 不可选择" }),
+        el("details", { class: "candidate-evidence" }, [el("summary", { text: "查看依据与校验" }), el("dl", { class: "kv" }, [
           el("dt", { text: "理由" }),
           el("dd", { text: candidate.reason }),
           el("dt", { text: "用户事实引用" }),
@@ -768,20 +775,22 @@ function renderRecommendation() {
               ? el("ul", { class: "list" }, result.errors.map((e) => el("li", {}, [el("span", { text: e.message }), el("span", { class: "code", text: `（${e.code}）` })])))
               : null,
           ]),
-        ]),
+        ])]),
         el("div", { class: "suggest-row" }, [
           canSelect
             ? el("button", {
                 class: "btn btn--primary",
                 type: "button",
-                text: state.busy ? "正在生成呈现…" : "选择这个方案（选择后才生成包装与贺卡）",
+                text: state.busy ? "正在生成呈现…" : "选择这个方案",
                 disabled: state.busy,
                 onclick: () => selectCandidate(candidate.id),
               })
             : el("span", { class: "field__hint", text: "失败项不可选择；系统也不会自动替你改选其他方案。" }),
         ]),
-      ]),
-    );
+      ]);
+    const provenance = candidateCard.querySelector(".media-source");
+    if (provenance) candidateCard.querySelector(".candidate-evidence").append(provenance);
+    candidateGrid.append(candidateCard);
   });
 
   body.push(
@@ -860,6 +869,7 @@ function renderPresentation() {
   );
 
   if (!failed) {
+    body.push(packagingMedia(view));
     for (const section of view.sections) {
       body.push(
         el("section", { class: "card" }, [
