@@ -51,11 +51,13 @@ export const DOMESTIC_PLATFORMS = Object.freeze(Object.fromEntries(definitions.m
 export function normalizeDomesticRecord(id, record, ctx = {}) {
   const platform = DOMESTIC_PLATFORMS[id];
   if (!platform) throw new TypeError('不支持的国内来源');
-  const product_url = allowedUrl(record.product_url || record.item_url || record.url, platform.domains);
+  let product_url = allowedUrl(record.product_url || record.item_url || record.url, platform.domains);
   if (!product_url || !clean(record.title)) return null;
+  const canonical=new URL(product_url);for(const key of [...canonical.searchParams.keys()])if(!['id','skuId','sku','goods_id','goodsId','product_id','productId','offerId','itemId','gid','spuId'].includes(key))canonical.searchParams.delete(key);product_url=canonical.href;
   const price_text = clean(record.price_text || record.price) || null;
   // 保留区间、起批、券后等原文；区间或条件价不能静默变为确定报价。
-  const amount = price_text?.replace(/\s+/g,'').match(/^(?:[¥￥]|人民币)?(\d[\d,]*(?:\.\d+)?)(?:元)?$/);
+  const compact=price_text?.replace(/\s+/g,'')??'';
+  const amount = compact.match(/^(?:[¥￥]|人民币)(\d[\d,]*(?:\.\d{1,2})?)(?![\d.~\-至–—])/u)??compact.match(/^(\d[\d,]*(?:\.\d{1,2})?)(?:元)?$/);
   const observed = ctx.scrapedAt || ctx.observedAt;
   const scraped_at = observed && Number.isFinite(Date.parse(observed)) ? observed : null;
   return {
@@ -154,6 +156,7 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
         const record = platform.normalize({...raw,native_record:nativeRecords.find(r=>r.sku===raw.sku)??null}, { keyword, city, page: n, scrapedAt: entry.observed_at });
         if (record && !seen.has(record.product_url)) { seen.add(record.product_url); report.records.push(record); }
       }
+      if(report.records.length===previousCount&&n===1){report.status='no_valid_product_urls';report.limitations.push('页面条目没有通过商品直链校验，不计为已接通搜索');break;}
       onProgress({ ...report, records: undefined });
       if (platform.pagination === 'first_page_only') { report.limitations.push('仅已加载首屏，尚未核实滚动/分页覆盖，不声明查询全量'); break; }
       if (n > 1 && report.records.length === previousCount) { report.limitations.push('分页返回重复条目，已停止且不声明全量'); break; }

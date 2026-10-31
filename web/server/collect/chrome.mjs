@@ -71,7 +71,7 @@ export async function ensureChrome({ port = 19360, profileDir, headless = true, 
   }
 
   taskDirectory(profile);
-  const runtimeDir = taskDirectory(join(REPO_ROOT, '.tmp/domestic-runtime'));
+  const runtimeDir = taskDirectory(join(REPO_ROOT, '.tmp', `domestic-runtime-${port}`));
   const childEnv = taskProcessEnv(process.env, runtimeDir);
 
   const args = [

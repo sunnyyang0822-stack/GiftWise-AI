@@ -44,8 +44,9 @@ export function bindOptionalCandidateEvidence(evidence, candidates, references, 
    const product=evidence.products?.find(p=>p.product_id===reference.product_id);
    if(!product)throw new Error('UNKNOWN_PRODUCT');
    if(product.price_source==='browser_observed'&&!isDomesticProduct({...product,source_site:product.source_site??new URL(product.source_url).hostname,product_url:product.source_url}))throw new Error('FOREIGN_PURCHASE_SOURCE');
-   if(candidate.name!==product.name+' · '+product.variant)throw new Error('PRODUCT_SPEC_MISMATCH');
-   if(product.price_amount!==null&&candidate.estimated_total!==product.price_amount)throw new Error('PRICE_EVIDENCE_MISMATCH');
+   const exactName=candidate.name===product.name+' · '+product.variant||(candidate.name===product.name&&(!product.variant||product.name.includes(product.variant)));
+   if(!exactName)throw new Error('PRODUCT_SPEC_MISMATCH');
+   if(product.price_amount!==null&&cents(candidate.estimated_total)!==cents(product.price_amount))throw new Error('PRICE_EVIDENCE_MISMATCH');
    if(product.price_source==='browser_observed'&&(!Number.isFinite(Date.parse(product.observed_at))||Date.now()-Date.parse(product.observed_at)>600000))throw new Error('EVIDENCE_STALE');
    // This binds an observed item/photo, not a claim that conditional prices are universally available.
    bindings.set(candidate.id,product);seen.add(product.product_id);

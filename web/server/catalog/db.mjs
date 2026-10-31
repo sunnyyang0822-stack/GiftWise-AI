@@ -27,6 +27,7 @@ export const DOMESTIC_SOURCE_HOSTS = Object.freeze({
   dewu: ['dewu.com'], dianping: ['dianping.com'], smzdm: ['smzdm.com'],
   xianyu: ['goofish.com', '2.taobao.com'], goofish: ['goofish.com', '2.taobao.com'], dangdang: ['dangdang.com'],
   damai: ['damai.cn'], maoyan: ['maoyan.com'], bilibili: ['bilibili.com'],
+  yanxuan:['you.163.com'],xiaomi:['mi.com'],xiaohongshu_shop:['xiaohongshu.com'],
 });
 export function isDomesticProduct(product) {
   const source = String(product?.source_site ?? '').toLowerCase();

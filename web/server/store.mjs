@@ -134,7 +134,7 @@ export function publicReport(run) {
 /** Tool choices/failures stay in run.retrieval_audit; source observations remain reviewable. */
 export function retrievalView(retrieval) {
   if(!retrieval)return {status:'skipped',evidence_id:null,products:[],contents:[],images:[],warnings:[]};
-  const productKeys=['product_id','name','title','variant','quantity','price_amount','price_range','currency','price_unit','price_text','price_conditions','price_source','source_url','product_url','source_site','source_platform','page_kind','observed_at','price_observed_at','image_url','image_id','stock_status','shipping_status','evidence_ref','record_kind','city','address','physical'];
+  const productKeys=['product_id','name','title','variant','specifications','specifications_basis','quantity','price_amount','price_range','currency','price_unit','price_text','price_conditions','price_source','source_url','product_url','source_site','source_platform','page_kind','observed_at','price_observed_at','image_url','image_id','image_validation','image_provenance','stock_status','shipping_status','evidence_ref','record_kind','city','address','physical'];
   const contentKeys=['record_kind','purpose','title','source_url','source_site','source_platform','image_url','image_role','summary','author','location','source_time_text','observed_at'];
   const pick=(value,keys)=>Object.fromEntries(keys.filter(k=>value[k]!==undefined).map(k=>[k,value[k]]));
   return {status:retrieval.status,evidence_id:retrieval.evidence_id??null,products:(retrieval.products??[]).map(p=>pick(p,productKeys)),

@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 export const DOMESTIC_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','smzdm','damai','maoyan','bilibili','zhihu','weibo','douban','rednote','xiaohongshu','huodongxing']);
 
 export const GLOBAL_CONTENT_SOURCE_IDS = Object.freeze(['pinterest', 'pixiv', 'wikipedia']);
-export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','damai','maoyan']);
+export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','damai','maoyan','yanxuan','xiaomi','xiaohongshu_shop']);
 const PROMPT = readFileSync(new URL('../../../workflow/prompts/retrieval-plan.md', import.meta.url), 'utf8');
 const GENERIC = new Set(['礼物', '礼品', '送人', '生日礼物', '其他', 'unknown']);
 const clean = value => typeof value === 'string' ? value.trim() : '';

@@ -59,7 +59,7 @@ export class DomesticProvider {
   async details(records,options={}){return runDomesticDetails(records,{...this.options,...options});}
 }
 export async function runDomesticSearch(plan, {
-  dbPath, packageRoot, signal, timeoutMs = 90000, port = 19366, headless = true,
+  dbPath, packageRoot, signal, timeoutMs = 90000, port = 19366, headless = process.env.GW_DOMESTIC_HEADLESS === '1',
   profileDir = process.env.GW_DOMESTIC_PROFILE || join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
   pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
 } = {}) {
@@ -79,6 +79,7 @@ export async function runDomesticSearch(plan, {
   try {
     const { DOMESTIC_PLATFORMS, runDomesticSearch: searchPlatform } = await import('../collect/domestic-platforms.mjs');
     const { DOMESTIC_CONTENT_SOURCES, runDomesticContentSearch: searchContent } = await import('../collect/domestic-content.mjs');
+    const {DOMESTIC_EXTRA_PLATFORMS,runExtraPlatformSearch}=await import('../collect/domestic-extra-platforms.mjs');
     root = opencliPackageRoot(packageRoot); version = opencliVersion(root);
     if (dbPath) db = openDb(taskDatabasePath(dbPath)); // Explicit isolated database only; no shared default.
     const tasks = queries.flatMap(query => {
@@ -91,15 +92,19 @@ export async function runDomesticSearch(plan, {
         limitations: ['本次检索已取消或到达时限，未执行此来源；可继续模型推荐'] }); continue; }
       const inspiration = query.purpose === 'inspiration';
       const useContent = inspiration && Boolean(DOMESTIC_CONTENT_SOURCES[source]);
-      if (!['purchase','inspiration'].includes(query.purpose) || (query.purpose === 'purchase' && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]) || (!useContent && source !== 'dianping' && !DOMESTIC_PLATFORMS[source])) {
+      if (!['purchase','inspiration'].includes(query.purpose) || (query.purpose === 'purchase' && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source]) || (!useContent && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source])) {
         coverage.push({ source, keyword: query.keyword, status: 'SOURCE_NOT_ALLOWED', complete: false, pages_completed: 0,
           limitations: ['来源尚未接入或不适用于本次用途'] }); continue;
       }
       try {
-        page ??= await pageFactory({ port, headless, profileDir, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });
+        const desiredProfile=['taobao','tmall','1688'].includes(source)&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
+        if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
+        if(!page){page=await pageFactory({ port, headless, profileDir:desiredProfile, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });page.__taskProfile=desiredProfile;}
         const outcome = useContent
           ? await (contentSearch ?? searchContent)(page, { source, keyword: query.keyword, city: query.city ?? null,
             packageRoot: root, maxPages, signal: controller.signal })
+          : DOMESTIC_EXTRA_PLATFORMS[source]
+          ? await runExtraPlatformSearch(page,{platform:source,keyword:query.keyword,maxPages,signal:controller.signal})
           : source === 'dianping'
           ? await dianpingSearch(page, { ...query, packageRoot: root, maxPages, signal: controller.signal, onProgress })
           : await (platformSearch ?? searchPlatform)(page, { platform: source, keyword: query.keyword, city: query.city ?? null,
@@ -123,8 +128,8 @@ export async function runDomesticSearch(plan, {
           onProgress(sourceCoverage);
           continue;
         }
-        const records = (outcome.records ?? []).map(r => ({ ...r, source_site: r.source_site || DOMESTIC_PLATFORMS[source]?.source_site,
-          capability: r.capability || DOMESTIC_PLATFORMS[source]?.capability,
+        const records = (outcome.records ?? []).map(r => ({ ...r, source_site: r.source_site || DOMESTIC_PLATFORMS[source]?.source_site||DOMESTIC_EXTRA_PLATFORMS[source]?.source_site,
+          capability: r.capability || DOMESTIC_PLATFORMS[source]?.capability||DOMESTIC_EXTRA_PLATFORMS[source]?.capability,
           scraped_at: r.scraped_at || new Date().toISOString(), query_params: { ...r.query_params, keyword: query.keyword, city: query.city ?? null } })).filter(isDomesticProduct);
         products.push(...records.map(r => asEvidence(r, source)));
         if (db) saveRecords(db, records, sourceCoverage, version);
@@ -146,7 +151,7 @@ export async function runDomesticSearch(plan, {
 /** Detail URLs must come from this task's observed product records, never from model URLs. */
 export async function runDomesticDetails(records,{
  dbPath,signal,port=19366,profileDir=process.env.GW_DOMESTIC_PROFILE||join(REPO_ROOT,'.tmp/domestic-profile'),
- headless=true,pageFactory=createDomesticPage,
+ headless=process.env.GW_DOMESTIC_HEADLESS === '1',pageFactory=createDomesticPage,
 }={}){
  const products=[],coverage=[];let page,db;
  try{
