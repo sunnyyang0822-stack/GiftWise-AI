@@ -63,6 +63,8 @@ Python 解释器：`C:/Users/lenovo/AppData/Local/Programs/Python/Python312/pyth
 | `tests/test_revision_budget.py` | `0195c439a00ceeb0f74fac2df6d18c57f242e85014399d20076ccff492fccf9c` |
 | `web/tests/revision-rules.test.mjs` | `490cfaecb69e35f9187133e5534567cd7e5a56ed35aed267daabc5f3b12c264c` |
 
-## 提交前状态
+## 提交与 PR 状态
 
-尚未提交、推送或创建 PR。下一步将逐文件 `git add`，运行树差异检查与提交内容回读，再用 `workflow/tools/gh-cred.py` 推送 `line/nov01-rules` 并创建一个 PR 到 `release/2026-11-01-submission`。任务停在待 PM 审查，不自行合并。
+已逐文件暂存并提交：`c74a5142ff42644654e40d903362f52a64ea8565`。提交前 `HEAD^{tree}` 为 `e1405e41ab19f49badc2ab02d5c84f680d7932d4`，`origin/release/2026-11-01-submission^{tree}` 为 `047c6df80e80a23f231d7c3733689659576ffa20`，两棵树不同；已用 `git show HEAD:<文件>` 回读规则与 checker 关键新增内容。
+
+已通过主仓库 `workflow/tools/gh-cred.py` 推送 `line/nov01-rules`，并创建 PR [#48](https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/48) 到 `release/2026-11-01-submission`。实际确认 PR `state=OPEN`、`changedFiles=11`、`additions=632`、`deletions=51`。本报告更新后将再推送一笔仅文档记录提交；不合并、不 force push、不推 main/release，任务停在待 PM 审查。
