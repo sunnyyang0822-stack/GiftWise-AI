@@ -52,7 +52,7 @@ function mediaFigure(image, annotations = [], status = "ready", options = {}) {
   const safe = image && Object.hasOwn(kinds, image.kind) && localMediaUrl(image.url);
   const notes = validAnnotations(annotations, image?.version);
   const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}${options.pending ? " media-stage--pending" : ""}` });
-  const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: options.packaging && (!safe || status !== "ready") ? options.message || "暂时没有效果图" : safe ? "图片加载中…" : "暂无图片，文字结果仍可查看。" });
+  const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: options.packaging && (!safe || status !== "ready") ? options.message || "暂时没有效果图" : safe ? status === "pending" ? "图片正在准备，文字结果可先查看。" : "图片加载中…" : "暂无图片，文字结果仍可查看。" });
   const retry = node("button", { type: "button", class: "btn media-retry", text: "重试加载图片" }); retry.hidden = true;
   let img;
   const load = () => {
