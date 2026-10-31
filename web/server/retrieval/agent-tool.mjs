@@ -5,15 +5,16 @@ import {createSourceAvailabilityTracker}from'./source-availability.mjs';
 import {mergeReferenceEvidence}from'./reference-evidence.mjs';
 
 /** The model chooses whether to call; the server only validates and executes this fixed tool. */
-export function createOpencliToolSession({ search, signal, auditStore=null } = {}) {
+export function createOpencliToolSession({ search, signal, auditStore=null, initialRetrieval=null } = {}) {
   const audit=[];
   let persistence=null;
   function persist(method,...args){try{persistence=auditStore?.[method](...args)??null;}catch{persistence={status:'failed',code:'AUDIT_WRITE_FAILED'};}return persistence;}
   const availability=createSourceAvailabilityTracker();
   const queries=[];
   let aggregate={status:'skipped',evidence_id:null,products:[],references:[],contents:[],images:[],coverage:[],warnings:[],enrichment_only:true};
-  const sources=[...new Set(['duckduckgo','bing','dianping',...Object.keys(DOMESTIC_CONTENT_SOURCES).filter(s=>s!=='douyin')])];
-  const tools=[{type:'function',function:{name:'opencli_search',description:'按完整需求自主查公开图片与灵感。reference可用duckduckgo（已安装OpenCLI原生通路）或bing公开图片DOM，inspiration用于内容平台；均以本次实际状态为准，不默认假定可用或强制某个平台。当前全部国内电商直抓已停用，不能调用或重试。大众点评体验可用purchase。每次查询保留可获取的资料，但只对最多6张候选参考图做实际GET验证，只有image_validation.ok=true且有image_id的图才能引用。资料图不是实时SKU、商品实拍或报价。遇安全验证停止该来源，换可用公开资料或直接建议。无数据不阻断文字推荐。只读，不下单。',parameters:{type:'object',additionalProperties:false,properties:{purpose:{type:'string',enum:['purchase','inspiration','reference']},keyword:{type:'string',description:'本次具体图片或灵感检索词，不含姓名/联系方式/认证材料'},sources:{type:'array',items:{type:'string',enum:sources},minItems:1},city:{type:['string','null'],description:'仅相关本地商户查询需要；未知可为null'},reason:{type:'string',description:'内部工具使用理由，不面向用户'}},required:['purpose','keyword','sources','reason']}}}];
+  if(initialRetrieval)aggregate={...aggregate,...structuredClone(initialRetrieval)};
+  const sources=[...new Set(['web','dianping',...Object.keys(DOMESTIC_CONTENT_SOURCES).filter(s=>s!=='douyin')])];
+  const tools=[{type:'function',function:{name:'opencli_search',description:'按完整需求自主检索真实文字资料、做法、教程与案例。inspiration的web来源使用快速公开HTTP搜索摘要；选内容平台时也仅查其公开索引摘要，不宣称已读全文或直接接通平台。无图、无报价不丢资料。当前不抓推荐网图，不调用reference搜图；全部电商直抓仍停用。大众点评体验可用purchase。结合缓存和真实工具反馈选择资料，受限即停止，不绕验证。事实按来源与观察时刻，创意组合由模型结合用户上下文判断；不能把原创组合说成网上现成商品或编票价、库存。只读，不下单',parameters:{type:'object',additionalProperties:false,properties:{purpose:{type:'string',enum:['purchase','inspiration']},keyword:{type:'string',description:'本次具体文字资料或灵感检索词，不含姓名/联系方式/认证材料'},sources:{type:'array',items:{type:'string',enum:sources},minItems:1,maxItems:3},city:{type:['string','null'],description:'仅相关本地商户查询需要；未知可为null'},reason:{type:'string',description:'内部工具使用理由，不面向用户'}},required:['purpose','keyword','sources','reason']}}}];
   function merge(result){
     const dedup=(records,key)=>[...new Map(records.map(r=>[r[key],r])).values()];
     aggregate={...aggregate,status:result.status,evidence_id:result.evidence_id??aggregate.evidence_id,
@@ -26,10 +27,11 @@ export function createOpencliToolSession({ search, signal, auditStore=null } = {
     audit.push(entry);
     try{
       const args=typeof call.arguments==='string'?JSON.parse(call.arguments):call.arguments;
+      if(args?.purpose==='reference')throw new Error('REFERENCE_IMAGES_DISABLED_BY_USER');
       if(call.name==='opencli_product_details')throw new Error('COMMERCE_DISABLED_BY_USER');
       if(call.name!=='opencli_search')throw new Error('TOOL_NOT_ALLOWED');
       if(!args||Object.keys(args).some(k=>!['purpose','keyword','sources','city','reason'].includes(k)))throw new Error('INVALID_TOOL_ARGUMENTS');
-      if(!Array.isArray(args.sources)||args.sources.some(s=>!sources.includes(s)))throw new Error('SOURCE_DISABLED_OR_NOT_ALLOWED');
+      if(!Array.isArray(args.sources)||args.sources.length>3||args.sources.some(s=>!sources.includes(s)))throw new Error('SOURCE_DISABLED_OR_NOT_ALLOWED');
       const plan=normalizeRetrievalPlan({needs_retrieval:true,decision_reason:args.reason,queries:[args]});
       if(plan.queries.length!==1||!plan.needs_retrieval)throw new Error('INVALID_TOOL_ARGUMENTS');
       entry.plan=plan;

@@ -36,7 +36,7 @@ export function normalizeRetrievalPlan(plan = {}) {
   if (plan.needs_retrieval === true && Array.isArray(plan.queries)) for (const raw of plan.queries) {
     const keyword = clean(raw?.keyword);
     const purpose = ['purchase', 'inspiration','reference'].includes(raw?.purpose) ? raw.purpose : null;
-    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => purpose === 'purchase' ? PURCHASE_RETRIEVAL_SOURCES.includes(id) : purpose==='reference'?REFERENCE_SOURCE_IDS.includes(id):purpose === 'inspiration' && (['bilibili','zhihu','weibo','douban','xiaohongshu','huodongxing'].includes(id) || GLOBAL_CONTENT_SOURCE_IDS.includes(id))))];
+    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => purpose === 'purchase' ? PURCHASE_RETRIEVAL_SOURCES.includes(id) : purpose==='reference'?REFERENCE_SOURCE_IDS.includes(id):purpose === 'inspiration' && (['web','bilibili','zhihu','weibo','douban','xiaohongshu','huodongxing'].includes(id) || GLOBAL_CONTENT_SOURCE_IDS.includes(id))))];
     // No implicit source expansion: each query must name the platforms permitted for its purpose
     // selected by the model. Missing/overseas-only sources make this query unusable.
     if (!purpose || !keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }

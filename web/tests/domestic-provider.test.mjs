@@ -78,18 +78,11 @@ test('国内worker接受多需求与原话标点，单次取消不会毒化后�
   assert.equal((await worker.submit(p)).status,'unavailable');
   assert.equal((await worker.submit(p)).status,'skipped');
 });
-test('全球灵感与图独立返回和存档，不进入商品/SKU绑定；采购不调用内容源', async () => {
-  const dbPath=join(temp,'content-fixture.sqlite'); let calls=0;
-  const options={packageRoot:fixturePackage,dbPath,pageFactory:async()=>({close:async()=>{},fetchImage:async()=>new Response('fixture-unavailable',{status:404})}),contentSearch:async()=>{
-    calls++; return {records:[{record_kind:'content',purpose:'inspiration',title:'夹具参考图',source_url:'https://www.pinterest.com/pin/123/',
-      source_site:'pinterest.com',source_platform:'pinterest',product_url:null,image_url:'https://i.pinimg.com/fixture.jpg',
-      image_role:'inspiration_reference',observed_at:'2026-10-31T10:00:00Z'}],coverage:{pages_completed:1,complete:false,status:'ok'}};
-  }};
+test('全球灵感经公开文本索引返回，不抓网图/SKU且不创建OpenCLI浏览器', async () => {
+  const dbPath=join(temp,'content-fixture.sqlite');let calls=0;
+  const options={dbPath,pageFactory:()=>assert.fail('no browser for content index'),queryFetchImpl:async url=>{calls++;assert.match(new URL(url).searchParams.get('q'),/site:pinterest.com/);return new Response('<li class="b_algo"><h2><a href="https://www.pinterest.com/pin/123/">夹具灵感</a></h2><div class="b_caption"><p>这是公开索引的受控摘要，不是完整文章，也不是实时商品。</p></div></li>',{headers:{'content-type':'text/html'}});}};
   const result=await runDomesticSearch(plan([{purpose:'inspiration',keyword:'夹具灵感',sources:['pinterest']}]),options);
-  assert.equal(result.products.length,0);assert.equal(result.contents.length,1);assert.equal(result.images[0].kind,'inspiration_reference');
-  assert.equal(result.images[0].product_id,null);assert.equal(calls,1);
-  const db=new DatabaseSync(dbPath,{readOnly:true});
-  try{assert.equal(db.prepare('select count(*) as n from products').get().n,0);assert.equal(db.prepare('select count(*) as n from inspiration_observations').get().n,1);}finally{db.close();}
-  const forbidden=await runDomesticSearch(plan([query('pinterest')]),options);
-  assert.equal(calls,1);assert.equal(forbidden.contents.length,0);assert.equal(forbidden.coverage[0].status,'SOURCE_NOT_ALLOWED');
+  assert.equal(result.products.length,0);assert.equal(result.references.length,1);assert.equal(result.images.length,0);assert.equal(result.coverage[0].source,'pinterest');assert.equal(result.coverage[0].engine,'bing');assert.equal(calls,1);
+  const db=new DatabaseSync(dbPath,{readOnly:true});try{assert.equal(db.prepare('select count(*) as n from products').get().n,0);assert.equal(db.prepare('select count(*) as n from inspiration_observations').get().n,1);}finally{db.close();}
+  const forbidden=await runDomesticSearch(plan([query('pinterest')]),options);assert.equal(calls,1);assert.equal(forbidden.coverage[0].status,'SOURCE_NOT_ALLOWED');
 });

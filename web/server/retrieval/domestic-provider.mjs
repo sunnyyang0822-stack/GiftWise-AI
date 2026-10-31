@@ -91,7 +91,7 @@ export class DomesticProvider {
 export async function runDomesticSearch(plan, {
   dbPath, packageRoot, signal, timeoutMs = 90000, port = 19366, headless = process.env.GW_DOMESTIC_HEADLESS === '1',
   profileDir = process.env.GW_DOMESTIC_PROFILE || join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
-  pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
+  queryFetchImpl, pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
 } = {}) {
   const products = [], references=[], contents = [], images = [], coverage = [], warnings = [];
   let page, db, root, version;
@@ -110,7 +110,7 @@ export async function runDomesticSearch(plan, {
     const { DOMESTIC_PLATFORMS, runDomesticSearch: searchPlatform } = await import('../collect/domestic-platforms.mjs');
     const { DOMESTIC_CONTENT_SOURCES, runDomesticContentSearch: searchContent } = await import('../collect/domestic-content.mjs');
     const {DOMESTIC_EXTRA_PLATFORMS,runExtraPlatformSearch}=await import('../collect/domestic-extra-platforms.mjs');
-    root = opencliPackageRoot(packageRoot); version = opencliVersion(root);
+    // Browser/OpenCLI is initialized only for a requested purchase source.
     if (dbPath) db = openDb(taskDatabasePath(dbPath)); // Explicit isolated database only; no shared default.
     const tasks = queries.flatMap(query => {
       if (typeof query.keyword !== 'string' || !query.keyword.trim() || query.keyword.length > 200) throw new Error('INVALID_RETRIEVAL_QUERY');
@@ -124,6 +124,8 @@ export async function runDomesticSearch(plan, {
       if(!availability.allow_request){coverage.push({source,keyword:query.keyword,status:availability.reason_code,complete:false,pages_completed:0,observed_count:0});continue;}
       const publicReference=query.purpose==='reference'&&['duckduckgo','bing'].includes(source);
       const inspiration = query.purpose === 'inspiration';
+      const publicText=inspiration&&(source==='web'||Boolean(DOMESTIC_CONTENT_SOURCES[source]));
+      if(publicReference){coverage.push({source,keyword:query.keyword,status:'REFERENCE_IMAGES_DISABLED_BY_USER',complete:false,pages_completed:0,observed_count:0});continue;}
       const useContent = inspiration && Boolean(DOMESTIC_CONTENT_SOURCES[source]);
       const cached=query.purpose==='purchase'?observedQueryCache(db,source,query):[];
       if(cached.length){
@@ -131,15 +133,22 @@ export async function runDomesticSearch(plan, {
         coverage.push({source,keyword:query.keyword,status:'cached_observations',cached:true,pages_completed:0,observed_count:cached.length,complete:false,
           limitations:['复用同一查询的历史公开观察，具体所选规格与价格可继续调用详情工具核实']});continue;
       }
-      if (!['purchase','inspiration','reference'].includes(query.purpose) || (query.purpose === 'reference'&&!publicReference) || (query.purpose === 'purchase' && source !== 'dianping') || (!publicReference&&!useContent && source !== 'dianping')) {
+      if (!['purchase','inspiration','reference'].includes(query.purpose) || (query.purpose === 'reference'&&!publicReference) || (query.purpose === 'purchase' && source !== 'dianping') || (!publicReference&&!publicText&&!useContent && source !== 'dianping')) {
         coverage.push({ source, keyword: query.keyword, status: 'SOURCE_NOT_ALLOWED', complete: false, pages_completed: 0,
           limitations: ['来源尚未接入或不适用于本次用途'] }); continue;
       }
       try {
+        if(!publicText){
+        if(!root){root=opencliPackageRoot(packageRoot);version=opencliVersion(root);}
         const desiredProfile=['taobao','tmall','1688'].includes(source)&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
         if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
         if(!page){page=await pageFactory({ port, headless, profileDir:desiredProfile, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });page.__taskProfile=desiredProfile;}
-        const outcome = publicReference
+        }
+        const discoveryStart=performance.now();
+        const textDomain=source==='web'?null:DOMESTIC_CONTENT_SOURCES[source]?.source_site;
+        const outcome = publicText
+          ? await (await import('../collect/public-text-http.mjs')).runPublicTextHttpSearch({keyword:textDomain?`site:${textDomain} ${query.keyword}`:query.keyword,timeoutMs:Math.min(timeoutMs,8000),signal:controller.signal,fetchImpl:queryFetchImpl})
+          : publicReference
           ? await (await import('../collect/public-reference.mjs')).runPublicReferenceSearch(page,{source,keyword:query.keyword,packageRoot:root,maxPages:Math.min(maxPages,1),signal:controller.signal})
           : useContent
           ? await (contentSearch ?? searchContent)(page, { source, keyword: query.keyword, city: query.city ?? null,
@@ -152,6 +161,7 @@ export async function runDomesticSearch(plan, {
             maxPages, signal: controller.signal, onProgress, packageRoot: root });
         const sourceCoverage = { source, keyword: query.keyword, city: query.city ?? null,
           ...(outcome.coverage && typeof outcome.coverage === 'object' ? outcome.coverage : {}) };
+        if(publicText){sourceCoverage.engine_source=sourceCoverage.source;sourceCoverage.source=source;}
         // Some adapter versions expose coverage at the top level; preserve its exact completion statement.
         for (const key of ['pages_completed', 'pages_requested', 'reported_total', 'complete', 'limitations', 'status']) {
           if (sourceCoverage[key] === undefined && outcome[key] !== undefined) sourceCoverage[key] = outcome[key];
@@ -161,6 +171,12 @@ export async function runDomesticSearch(plan, {
         sourceCoverage.purpose = query.purpose;
         sourceAvailability.observe({source,coverage:sourceCoverage,observation_id:`${source}:${sourceCoverage.observed_at??Date.now()}`});
         coverage.push(sourceCoverage);
+        if(publicText){
+          sourceCoverage.discovery_ms=performance.now()-discoveryStart;
+          const records=(outcome.records??[]).filter(r=>!textDomain||new URL(r.source_url).hostname===textDomain||new URL(r.source_url).hostname.endsWith('.'+textDomain));
+          references.push(...records);sourceCoverage.observed_count=records.length;
+          if(db)saveContent(db,records,sourceCoverage,version);onProgress(sourceCoverage);continue;
+        }
         if(publicReference||useContent){
           const records=outcome.records??[];
           const resolved=await referenceRecords(page,records,{source,signal:controller.signal});references.push(...resolved);

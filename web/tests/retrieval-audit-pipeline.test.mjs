@@ -8,7 +8,7 @@ const intake=()=>({...structuredClone(base),budget_amount:'800',deadline_days:nu
 const directory=()=>mkdtempSync(join(taskDirectory(join(REPO_ROOT,'.tmp/audit-pipeline')),'case-'));
 const services=extra=>({libraryEnabled:false,provideRealProducts:async()=>({catalog:{status:'unavailable',results:[]}}),visualDirectionProvider:{derive:async()=>({ok:false,code:'OFFLINE'})},...extra});
 const modelFinal=input=>({ok:true,outputs:{candidates_json:buildMockCandidates(JSON.parse(input.requestJson)).candidates_json}});
-const call={name:'opencli_search',arguments:{purpose:'reference',keyword:'离线审计',sources:['bing'],reason:'PRIVATE_REASON'}};
+const call={name:'opencli_search',arguments:{purpose:'inspiration',keyword:'离线审计',sources:['web'],reason:'PRIVATE_REASON'}};
 test('工具返回前落盘，final后关联同run；公开report无内部审计，未请求工具也有明确记录',async()=>{
  for(const useTool of [true,false]){reset();const dir=directory(),audit=createRetrievalAudit({directory:dir});
   const outcome=await runRecommendation({intake:intake(),mode:'llm'},services({retrievalAuditStore:audit,retrievalWorker:{submit:async()=>({status:'unavailable',references:[],coverage:[{source:'bing',status:'empty',observed_count:0,complete:false}]})},requestCandidates:async input=>{
@@ -26,14 +26,14 @@ test('模型失败保留前序查询与明确失败状态；审计写失败不�
  const out=await runRecommendation({intake:intake(),mode:'llm'},services({retrievalAuditStore:broken,requestCandidates:async input=>modelFinal(input)}));assert.equal(out.kind,'report');assert.equal(out.report.selectable_candidate_ids.length,3);assert.equal(out.run.retrieval_audit.persistence.status,'failed');
 });
 
-test('补图只在A最终三候选成功边界启动，使用修订后冻结集合；失败不启动',async()=>{
+test('推荐网图已停用：成功或修订失败均不启动补图模型，保留三候选文字边界',async()=>{
  for(const repairOk of [true,false]){reset();let jobs=0;
   const outcome=await runRecommendation({intake:intake(),mode:'llm'},services({referenceImagesEnabled:true,
    requestCandidates:async input=>{const result=modelFinal(input),batch=JSON.parse(result.outputs.candidates_json);batch.candidates[0].estimated_total='900';result.outputs.candidates_json=JSON.stringify(batch);return result;},
    requestCandidateRevision:async input=>{if(!repairOk)return{ok:false,code:'CONTROLLED_REPAIR_FAILED'};const batch=JSON.parse(input.candidatesJson);batch.candidates[0].estimated_total='120';batch.candidates[0].name='最终修订礼物方向';return{ok:true,outputs:{candidates_json:JSON.stringify(batch)}};},
    requestReferenceImages:async input=>{jobs++;assert.equal(input.candidates.length,3);assert.equal(input.candidates[0].name,'最终修订礼物方向');assert.equal(input.candidates[0].estimated_total,'120');return{ok:true,reference_references:[],model_calls:0};},
   }));
-  if(repairOk){assert.equal(outcome.kind,'report');const before=JSON.stringify(outcome.run.candidates);await outcome.run.reference_image_job.promise;assert.equal(jobs,1);assert.equal(JSON.stringify(outcome.run.candidates),before);assert.equal(outcome.run.reference_image_slots.length,3);assert.ok(outcome.run.reference_image_slots.every(s=>s.status==='unavailable'));}
+  if(repairOk){assert.equal(outcome.kind,'report');assert.equal(jobs,0);assert.equal(outcome.run.reference_image_job,undefined);assert.deepEqual(outcome.report.selectable_candidate_ids,['c1','c2','c3']);}
   else{assert.equal(outcome.kind,'recommendation_failed');assert.equal(jobs,0);assert.equal(outcome.run.reference_image_job,undefined);}
  }
 });
