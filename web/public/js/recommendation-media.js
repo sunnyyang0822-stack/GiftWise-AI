@@ -45,6 +45,7 @@ export function createRecommendationMedia(ctx) {
       polls.set(report, poll);
     }
     if (active !== poll) { stopRecommendationMediaPoll(); active = poll; }
+    if (hasPending(report) && poll.attempt >= delays.length && !poll.inFlight) { poll.stopped = true; poll.note ||= "配图还在准备"; }
     if (visible(report) && hasPending(report) && !poll.stopped && !poll.inFlight && poll.timer === null) queue(poll);
     return poll;
   }

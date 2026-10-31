@@ -150,6 +150,17 @@ test("新run没有候选时也立即清理旧等待，不等旧timer到期", asy
   h.mount(); assert.equal(h.timers.size, 0); await h.next(); assert.equal(h.calls.length, 0);
 });
 
+test("最后一读在途离开再返回也不突破已耗尽窗口或产生零延迟查询", async () => {
+  let resolve;
+  const h = setup(async () => h.calls.length < 25 ? snapshot(["pending", "pending", "pending"]) : new Promise(done => { resolve = done; }));
+  for (let i = 0; i < 25; i++) await h.next();
+  assert.equal(h.elapsed, 180000); assert.equal(h.calls.length, 25);
+  h.views.stopRecommendationMediaPoll(); h.mount();
+  assert.equal(h.timers.size, 0); assert.match(h.root.textContent, /配图还在准备/);
+  resolve(snapshot()); await flush();
+  assert.equal(h.root.querySelectorAll("img").length, 0, "取消的末次读不能越过epoch更新页面");
+});
+
 test("unavailable终态不伪造图片或加载，三个候选仍可选择", async () => {
   const h = setup(async () => snapshot(["ready", "unavailable", "ready"])); await h.next();
   assert.equal(h.timers.size, 0); assert.equal(cards(h).length, 3); assert.equal(h.root.querySelectorAll("img").length, 2);
