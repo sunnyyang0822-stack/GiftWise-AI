@@ -1,0 +1,113 @@
+{
+  "passed": 26,
+  "results": [
+    {
+      "name": "缺省/空值/空白：0",
+      "passed": true
+    },
+    {
+      "name": "缺省/空值/空白：1",
+      "passed": true
+    },
+    {
+      "name": "缺省/空值/空白：2",
+      "passed": true
+    },
+    {
+      "name": "历史原意保留：3",
+      "passed": true
+    },
+    {
+      "name": "不自动拼入避免项事实或硬约束：4",
+      "passed": true
+    },
+    {
+      "name": "历史原意保留：5",
+      "passed": true
+    },
+    {
+      "name": "不自动拼入避免项事实或硬约束：6",
+      "passed": true
+    },
+    {
+      "name": "历史原意保留：7",
+      "passed": true
+    },
+    {
+      "name": "不自动拼入避免项事实或硬约束：8",
+      "passed": true
+    },
+    {
+      "name": "历史原意保留：9",
+      "passed": true
+    },
+    {
+      "name": "不自动拼入避免项事实或硬约束：10",
+      "passed": true
+    },
+    {
+      "name": "历史类型长度拒绝：11",
+      "passed": true
+    },
+    {
+      "name": "历史类型长度拒绝：12",
+      "passed": true
+    },
+    {
+      "name": "历史类型长度拒绝：13",
+      "passed": true
+    },
+    {
+      "name": "历史类型长度拒绝：14",
+      "passed": true
+    },
+    {
+      "name": "历史类型长度拒绝：15",
+      "passed": true
+    },
+    {
+      "name": "历史1000码点允许",
+      "passed": true
+    },
+    {
+      "name": "未映射风险信封阻止推荐：对某种金属过敏",
+      "passed": true
+    },
+    {
+      "name": "风险原文不被编造标签尺码：对某种金属过敏",
+      "passed": true
+    },
+    {
+      "name": "未映射风险信封阻止推荐：衣服尺码未知",
+      "passed": true
+    },
+    {
+      "name": "风险原文不被编造标签尺码：衣服尺码未知",
+      "passed": true
+    },
+    {
+      "name": "未映射风险信封阻止推荐：没有首饰",
+      "passed": true
+    },
+    {
+      "name": "风险原文不被编造标签尺码：没有首饰",
+      "passed": true
+    },
+    {
+      "name": "普通送礼历史仍为软上下文",
+      "passed": true
+    },
+    {
+      "name": "用户选择与未知信息保留",
+      "passed": true
+    },
+    {
+      "name": "不要求预算确认框",
+      "passed": true
+    }
+  ],
+  "model_calls": 0,
+  "semantic_model_validation": "未执行",
+  "history_explicit_exclusion_gate": "BLOCKED：待PM接入来源绑定确认",
+  "new_JS_parity": "BLOCKED：待接入同步"
+}

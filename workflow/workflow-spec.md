@@ -1,8 +1,32 @@
+## 当前增量：retrieval-media-v2（2026-10-31）
+
+本节采用后台已合入 release 的 retrieval-media-v2；历史 v1 文字仅作兼容背景，不覆盖当前字段。v2 使用 plan_version、execution、annotation_status、physical、image_version 和 curve。共享契约唯一写者为后台，固定基线 f080ad51e0f22ca7384ce3a93f75d0dba91d0508。
+
+- 先“需要避免的”识别/用户确认或澄清，再冻结预算/天数/事实；previous_gifts 独立软历史。合法预算输入不再增加确认框。
+- 受限检索计划仅 category/keywords/limit，当前只支持 confirmed tech_digital → maker/kit。预算在冻结 request，不让模型改写。足三种有据商品后再生成解释；不足前置澄清。
+- 推荐输入 retrieval_json，输出严格 candidates_json 及独立 product_references_json（每项仅 candidate_id/product_id）。名称严格 name + " · " + variant，金额原始字符串匹配；服务端再绑定核查并执行独立 validator。主线为三个礼物、选择理由、比较及用户选择；最多一次业务修订只作失败兜底。
+- physical 五项按 known/unknown/conflicting/suggested 保留来源、单位和 context；不得把组装尺寸当寄送尺寸，模型建议不是实测。
+- media.contract_version=retrieval-media-v2。选前 selected=null；选后无图也保留 task/candidate/product/physical/packaging/scene/unknowns，image=null、annotations=[]。无图不会丢失选择，不伪造生成成功。
+- 有图由服务端赋不可变 image.version。默认3–5处短中文标注，每项 id/text/target/label/image_version/text_style/curve；handwritten、最多30码点，曲线1或2个控制点。image_version必须匹配，换图重校准。数值验证不是视觉定位验证。
+- 完整光影造景、按物理证据适形包装、干净无字底图、道具非附送、包装不报价。完整宽高比，不裁主体；详见 prompts/packaging-image.md。
+
+Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `request_json`，在接入边界显式做 `intake_json -> request_json` 映射，映射后的冻结值再进入模型和 Code 节点。previous_gifts 随冻结需求传递但仍为软历史。
+
+本批为离线准备；Seedream验证已授权但未执行，接线与账号配置交后台/PM；Dify仍未授权。没有真实图像、token、调用延迟或费用结果。离线示例/坐标不是实际图像证明，不生成DSL。
+
 # 工作流设计规范 v0.2.1
+
+> retrieval-media-v2 离线增量：冻结需求携带 previous_gifts；生成输入为 retrieval_json，输出独立 product_references_json（candidate_id/product_id）。候选名称、规格、金额和来源由服务端证据绑定，模型不能改写。选后场景消费 physical；media.selected 使用 plan_version、execution、annotation_status，图像有 image_version 后才可绑定 curve 标注。3–5处手写感短中文和细曲箭头由前端叠加；尺寸未知明示比例未核实或澄清，坐标需最终图复核，不把结构合格冒充定位准确。
+
+> #59/#60 当前状态：后台 PR #61 已合入 release。工作流按 retrieval-media-v2 消费 sidecar、商品引用和媒体状态；本线不修改共享契约，不把离线夹具当真实 provider 结果。
+
+> Issue #59/#60 离线扩展：冻结需求→受限结构化检索计划→后台专用OpenCLI worker→标准化商品证据→三个商品解释及可信服务端价格绑定→同版独立规则→用户选择→同一礼物包装效果图及中文叠加标注。参见examples/retrieval-media/README.md。后台契约文件未进入基线前仅草案夹具，不调用真实工具。核心严格三候选不变：不足三件有效有据商品走前置不足/澄清，不伪造三项、不把两项送validator。图片失败不阻塞文本报告，选前无包装图任务。来源价非结算保证，图像示意非实拍或安全证据。
+
+> 2026-10-31 新输入离线增量以 [avoid-history 交接](examples/avoid-history/README.md) 为准：dislikes文案“需要避免的”；previous_gifts为独立软历史上下文，不自动拼入避免项。预算合法选择即可继续，无budget_confirmed门禁。先提议/确认避免项再冻结推荐；语义未映射先澄清。Python基本字段适配ready不等于获准推荐，尤其历史“不要再送”、过敏和尺码缺口的接入门禁尚待PM协调；本轮不连接旧前端、不宣称端到端或线上验证。
 
 VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格式与正式长度限制，已由 PM 在[契约决定](../docs/validator-contract-decisions.md)中锁定。以下涉及这六项的概述以该决定为准；开发与独立测试均应先读取，不能继续视为未决。
 
-更新日期：2026-10-29。状态：设计规范（**2026-10-30 已配置并真实运行，已发布 v1/v2、累计 13 次调用 / 38,326 tokens**）。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。
+更新日期：2026-10-29。状态：设计规范；历史线上运行记录保存在 evidence 文件中，本轮回归不重跑 Dify，不以历史调用替代当前统一 SHA 验证。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。
 
 ## 产品流程与语言
 
@@ -14,7 +38,7 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 ## 推荐阶段的数据契约
 
-以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 节点边界使用 JSON 字符串 `request_json`、`candidates_json`、`validation_json`，另提供浅层状态字段；实际 UI 必须声明对应类型。
+以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 对外节点边界使用 JSON 字符串 `intake_json`、`candidates_json`、`validation_json`；可信适配层可将 `intake_json` 映射为内部校验器参数 `request_json`，实际 UI 不得只声明旧的 request_json 而漏掉 intake_json。
 
 虚构用户输入示例：
 

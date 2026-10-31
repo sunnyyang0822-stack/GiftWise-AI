@@ -1,0 +1,132 @@
+{
+  "scope": "PR61固定契约夹具及oracle/实际validator，非后台编排或真实语义验证",
+  "passed": 30,
+  "results": [
+    {
+      "name": "固定商品ID与可信价绑定",
+      "passed": true
+    },
+    {
+      "name": "PR61固定商品字段与类型",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:0",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:True",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:-1",
+      "passed": true
+    },
+    {
+      "name": "price_conditions不是字符串",
+      "passed": true
+    },
+    {
+      "name": "区间跨预算不合格",
+      "passed": true
+    },
+    {
+      "name": "区间上端点等于预算可检查",
+      "passed": true
+    },
+    {
+      "name": "条件未确认不作为预算合格",
+      "passed": true
+    },
+    {
+      "name": "不足三件按契约partial",
+      "passed": true
+    },
+    {
+      "name": "不可用不假造证据",
+      "passed": true
+    },
+    {
+      "name": "实际独立validator执行",
+      "passed": true
+    },
+    {
+      "name": "改价oracle拒绝",
+      "passed": true
+    },
+    {
+      "name": "未知价格不填零",
+      "passed": true
+    },
+    {
+      "name": "不足三件前置拒绝",
+      "passed": true
+    },
+    {
+      "name": "异任务ID引用拒绝",
+      "passed": true
+    },
+    {
+      "name": "同商品不凑数",
+      "passed": true
+    },
+    {
+      "name": "外部文本仅字符串不执行",
+      "passed": true
+    },
+    {
+      "name": "选前selected为空",
+      "passed": true
+    },
+    {
+      "name": "图片缺失无假URL",
+      "passed": true
+    },
+    {
+      "name": "图像失败保留合格文本",
+      "passed": true
+    },
+    {
+      "name": "标注结构",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:-0.1",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:1.01",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:nan",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:inf",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:True",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:0.5",
+      "passed": true
+    },
+    {
+      "name": "合格选择ID",
+      "passed": true
+    },
+    {
+      "name": "错误选择归属",
+      "passed": true
+    }
+  ],
+  "OpenCLI": "未执行",
+  "Dify": "未执行",
+  "image_service": "未执行",
+  "model_calls": 0,
+  "token_latency_cost": "未执行",
+  "shared_contract": "PR61@27670b6 v1；精确计划和provider键名待后台补充"
+}

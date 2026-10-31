@@ -1,0 +1,216 @@
+{
+  "scope": "offline_v2_contract_fixture_not_provider_request_or_real_image",
+  "backend_contract_commit": "f080ad51e0f22ca7384ce3a93f75d0dba91d0508",
+  "plan": {
+    "category": "maker",
+    "keywords": [
+      "kit"
+    ],
+    "limit": 3
+  },
+  "media": {
+    "contract_version": "retrieval-media-v2",
+    "status": "unavailable",
+    "candidates": [],
+    "selected": {
+      "task_id": "offline-task-c1",
+      "status": "unavailable",
+      "candidate_id": "c1",
+      "product_id": "demo-p1",
+      "image": null,
+      "physical": {
+        "dimensions": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "shape": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "weight": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "fragility": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "materials": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        }
+      },
+      "packaging": {
+        "form": "undetermined",
+        "description": null,
+        "scale": {
+          "status": "illustrative",
+          "note": "尺寸未知，仅示意；不保证容纳或运输安全"
+        }
+      },
+      "scene": {
+        "description": null,
+        "props": [],
+        "props_are_included": false,
+        "text_baked_in": false
+      },
+      "annotations": [],
+      "unknowns": [
+        "尚无最终图，无法核对外观和标注定位",
+        "图像服务未接线；本夹具未调用服务"
+      ],
+      "plan_version": "packaging-seedream-v1",
+      "execution": "not_submitted",
+      "annotation_status": "not_verified"
+    }
+  },
+  "scene_proposal": {
+    "packaging": {
+      "form": "paper_wrap",
+      "description": "浅米纸与细带衬托已选蓝色杯子；仅示意比例",
+      "scale": {
+        "status": "illustrative",
+        "note": "尺寸未知，需核实容纳与防护"
+      }
+    },
+    "scene": {
+      "description": "围绕一只已选蓝色杯子构图，礼物及纸包为主体，安静桌边有侧面柔光与自然阴影，浅米纸材与低饱和细带呼应蓝色。纸包方案仅作比例未核实的示意；若运输防护取决于尺寸和易碎性，先澄清再确认包装。背景道具只营造环境，不是附送商品。干净底图不出现文字、箭头或新品牌，不改型号颜色数量及相对大小。AI效果示意，非商品实拍，比例未核实。",
+      "props": [
+        "桌面背景"
+      ],
+      "props_are_included": false,
+      "text_baked_in": false
+    }
+  },
+  "annotation_proposals": [
+    {
+      "id": "a1",
+      "text": "浅米纸衬着蓝色",
+      "target": {
+        "x": 0.35,
+        "y": 0.6
+      },
+      "label": {
+        "x": 0.1,
+        "y": 0.3
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.2,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a2",
+      "text": "细带收在这里",
+      "target": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "label": {
+        "x": 0.85,
+        "y": 0.25
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.30000000000000004,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a3",
+      "text": "贺卡靠在侧边",
+      "target": {
+        "x": 0.7,
+        "y": 0.75
+      },
+      "label": {
+        "x": 0.85,
+        "y": 0.88
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.4,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a4",
+      "text": "侧光留一点层次",
+      "target": {
+        "x": 0.25,
+        "y": 0.45
+      },
+      "label": {
+        "x": 0.12,
+        "y": 0.1
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.5,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a5",
+      "text": "留白让礼物更清楚",
+      "target": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "label": {
+        "x": 0.2,
+        "y": 0.92
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.6000000000000001,
+            "y": 0.4
+          }
+        ]
+      }
+    }
+  ],
+  "dify_input_mapping": {
+    "external": "intake_json",
+    "internal_legacy": "request_json",
+    "mapping": "intake_json -> request_json before generation/validation"
+  },
+  "previous_gifts": "去年送过一套蓝色杯具，想换个方向",
+  "retrieval_json": "{\"status\":\"ready\",\"evidence_id\":\"demo-evidence-1\",\"warnings\":[\"固定虚构证据，非实时\"],\"products\":[{\"product_id\":\"demo-p1\",\"name\":\"蓝色陶瓷杯\",\"variant\":\"蓝色示例款\",\"quantity\":1,\"price_amount\":\"150.00\",\"price_range\":null,\"currency\":\"CNY\",\"price_conditions\":[],\"price_source\":\"seed\",\"source_url\":null,\"observed_at\":null,\"image_id\":null,\"shipping_status\":\"unknown\",\"stock_status\":\"unknown\",\"evidence_ref\":\"fixture-p1\"},{\"product_id\":\"demo-p2\",\"name\":\"笔记本\",\"variant\":\"素色示例款\",\"quantity\":1,\"price_amount\":\"120.00\",\"price_range\":null,\"currency\":\"CNY\",\"price_conditions\":[],\"price_source\":\"seed\",\"source_url\":null,\"observed_at\":null,\"image_id\":null,\"shipping_status\":\"unknown\",\"stock_status\":\"unknown\",\"evidence_ref\":\"fixture-p2\"},{\"product_id\":\"demo-p3\",\"name\":\"收纳盒\",\"variant\":\"小号示例款\",\"quantity\":1,\"price_amount\":\"80.00\",\"price_range\":null,\"currency\":\"CNY\",\"price_conditions\":[],\"price_source\":\"seed\",\"source_url\":null,\"observed_at\":null,\"image_id\":null,\"shipping_status\":\"unknown\",\"stock_status\":\"unknown\",\"evidence_ref\":\"fixture-p3\"}]}",
+  "product_references_json": "[{\"candidate_id\":\"c1\",\"product_id\":\"demo-p1\"},{\"candidate_id\":\"c2\",\"product_id\":\"demo-p2\"},{\"candidate_id\":\"c3\",\"product_id\":\"demo-p3\"}]",
+  "intake_json": "{\"previous_gifts\":\"去年送过一套蓝色杯具，想换个方向\",\"currency\":\"CNY\",\"budget_amount\":\"300.00\",\"available_days\":5}"
+}
