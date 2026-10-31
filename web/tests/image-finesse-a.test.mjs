@@ -27,7 +27,7 @@ test('Seedream explicitly requests watermark false without changing single-image
 
 test('new plan combines gift content, selected packaging and mood, with no default annotations or forced form',()=>{
   const r=run(),p=buildImagePlan(r,'c1','a'.repeat(64));
-  assert.equal(IMAGE_PLAN_VERSION,'packaging-seedream-v6');assert.deepEqual(p.selected.annotations,[]);
+  assert.equal(IMAGE_PLAN_VERSION,'packaging-seedream-v7');assert.deepEqual(p.selected.annotations,[]);
   assert.equal(p.selected.packaging.form,'undetermined');
   for(const text of ['蓝色布面旅行手账','安静、松弛的旅行回忆','精致但松弛','半透明描图纸','半开护封露出布面','别太正式','亮粉色'])assert.ok(p.prompt.includes(text));
   assert.match(p.prompt,/材质真实，光线考究/);assert.match(p.prompt,/不要默认套奶油白/);

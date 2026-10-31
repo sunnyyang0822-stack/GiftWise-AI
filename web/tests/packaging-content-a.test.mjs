@@ -40,15 +40,23 @@ test('single string material/step responses are accepted and mapped, not sent th
 });
 
 test('no physical packaging and zero budget retain effective model explanation without forcing materials',async()=>{
-  const run=seed('zero-owner',true),p={color_palette:['米白'],materials:[],steps:[],description:'不需要实体包装。把整理好的电子相册私下发给对方，附上一句你最想分享的回忆。'};
-  const out=await present(run,p);assert.equal(out.view.status,'completed');
-  assert.deepEqual(out.view.sections.find(s=>s.key==='packaging').items,[p.description]);
+  const run=seed('zero-owner',true),p={color_palette:['米白'],materials:[],steps:[]};
+  const advice={timing:'对方方便时私下分享电子相册',wording:'整理了一点我们的回忆，想和你一起看看。',relationship_cautions:[]};
+  const out=await runPresentation({runId:run.run_id,selectedCandidateId:'c1',ownerScope:run.owner_scope},{requestPresentation:async()=>({ok:true,outputs:{presentation_json:JSON.stringify({...presentation(p),giving_advice:advice})}})});assert.equal(out.view.status,'completed');
+  assert.equal(out.view.sections.some(s=>s.key==='packaging'),false);
+  assert.ok(out.view.sections.find(s=>s.key==='giving').items.some(text=>text.includes(advice.timing)));
   assert.deepEqual(out.view.presentation_json.packaging,p);assert.equal(out.view.candidate.estimated_total,'0.00');
   assert.equal(out.view.presentation_json.additional_cost,undefined);assert.equal(out.view.presentation_json.revised_estimated_total,undefined);
 });
 
-test('palette-only, all-empty and incomplete instruction responses cannot silently complete an empty chapter',async()=>{
-  for(const p of [{color_palette:['米白']},{color_palette:['米白'],materials:[],steps:[]},{color_palette:['米白'],materials:['纸袋']},{color_palette:['米白'],description:'   '}]){
+test('missing optional packaging is omitted, while supplied incomplete or invalid content still fails',async()=>{
+  for(const p of [{color_palette:['米白']},{color_palette:['米白'],materials:[],steps:[]}]){
+    const run=seed();const out=await present(run,p);
+    assert.equal(out.view.status,'completed');assert.equal(out.view.sections.some(s=>s.key==='packaging'),false);
+    assert.deepEqual(out.view.sections.map(s=>s.key),['style','card','giving']);
+    assert.equal(run.repair_count,0);
+  }
+  for(const p of [{color_palette:['米白'],materials:['纸袋']},{color_palette:['米白'],description:'   '}]){
     assert.equal(check(p).passed,false);
     const run=seed();const out=await present(run,p);assert.equal(out.kind,'presentation_failed');
     assert.ok(out.view.presentation_check.errors.some(e=>e.code==='PRESENTATION_INVALID'&&e.path.startsWith('presentation.packaging')));
@@ -90,11 +98,12 @@ test('image plan receives actual model instructions/explanation together with se
   assert.equal(plan.references.length,0);assert.match(plan.prompt,/无需实体包装/);
 });
 
-test('prompt requests model-chosen instructions or nonphysical explanation and forbids fabricated packaging costs',()=>{
+test('prompt requests model-chosen physical instructions, omits pure-experience packaging and forbids costs',()=>{
   const messages=buildPresentMessages(buildPresentEnvelope({requestJson:JSON.stringify(request()),candidateJson:JSON.stringify(gift())}));
-  const system=messages[0].content;assert.match(system,/实体包装输出 materials、steps 非空字符串数组/);
+  const system=messages[0].content;assert.match(system,/确有实体包装时输出 materials、steps 非空字符串数组/);
   assert.match(system,/description/);assert.doesNotMatch(system,/packaging 不输出 materials\/steps/);
-  assert.match(system,/不为填章节强迫购买/);assert.match(system,/不得输出 material_tags、材料价格/);
+  assert.match(system,/不为填章节强迫购买/);assert.match(system,/不输出 material_tags、材料价格/);
+  assert.match(system,/纯体验且没有实体交付时不填写 materials、steps、description/);
   assert.match(system,/用户后续修正优先/);
 });
 

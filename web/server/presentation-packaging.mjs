@@ -12,3 +12,11 @@ export function packagingSectionItems(packaging = {}) {
     ...packagingTextItems(packaging.steps).map((text, i) => `步骤 ${i + 1}：${text}`),
   ];
 }
+
+/** Render the content chosen by the model; this does not classify the gift or infer materials. */
+export function packagingSections(packaging = {}) {
+  const items = packagingSectionItems(packaging);
+  if (!items.length) return [];
+  const hasInstructions = packagingTextItems(packaging.materials).length > 0 || packagingTextItems(packaging.steps).length > 0;
+  return [{ key: 'packaging', title: hasInstructions ? '② 包装材料与步骤' : '② 包装说明', items }];
+}

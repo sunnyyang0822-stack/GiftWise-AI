@@ -10,7 +10,7 @@
 
 ## 场景设计
 
-围绕同一礼物与包装构成完整赠礼场景，有光影、背景与空间氛围；礼物及包装为主体。保持型号、颜色、数量、相对大小，不能增加未选礼物。按可信物理信息选择 gift_bag/paper_wrap/cylinder/bouquet/transparent_display/irregular/combination；不能确定则 undetermined，不统一套方盒。
+由模型结合最终选定方案、用户原话和完整上下文判断交付形式与画面主体，构成有光影、背景与空间氛围的赠礼场景。有实体礼物或实际需要的邀请函、DIY纪念物时如实表现；没有实体交付时围绕活动内容、邀请方式和氛围，不凭空把建议变成盒子、票券、卡片或可采购物。不按固定关键词决定体验/实体形式，也不排斥体验方案中的真实实体安排。保持型号、颜色、数量、相对大小，不能增加未选礼物。按可信物理信息选择 gift_bag/paper_wrap/cylinder/bouquet/transparent_display/irregular/combination；不能确定则 undetermined，不统一套方盒。
 
 packaging 为 form/description/scale，scale 为 status/必填 note；status 仅 evidence_based/illustrative/needs_input，尺寸未知不得 evidence_based。scene 为 description/props/props_are_included/text_baked_in；后两项固定 false。道具只造景，不算附送商品。包装不报价、不计入礼物预算不等于免费。
 
