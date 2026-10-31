@@ -1,0 +1,20 @@
+== after-1440-failed
+18:36:53 POST presentations failed
+18:36:55 GET task failed pending 2s
+18:36:57 GET task failed pending 4s
+18:37:01 GET task failed pending 9s
+18:37:10 GET task failed failed 17s
+== after-390-failed
+18:37:55 POST presentations failed
+18:37:57 GET task failed pending 2s
+18:37:59 GET task failed pending 4s
+18:38:04 GET task failed pending 9s
+18:38:12 GET task failed failed 17s
+== after-1440-unavailable
+18:39:14 POST presentations unavailable
+== after-390-unavailable
+18:40:06 POST presentations unavailable
+== after-1440-leave
+18:41:06 POST presentations ready
+18:41:08 GET task ready pending 2s
+18:41:10 GET task ready pending 4s

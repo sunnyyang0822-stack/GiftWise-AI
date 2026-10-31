@@ -1,0 +1,12 @@
+{
+  "kind": "exported_real_public_search_snippets",
+  "file": "manifest.json",
+  "sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+  "records": 3,
+  "observed_at": [
+    "2026-10-31T20:02:53.286Z",
+    "2026-10-31T20:02:53.286Z",
+    "2026-10-31T20:02:53.286Z"
+  ],
+  "runtime_rule": "Copy/import once into the target worktree cache; production has no source-worktree dependency; no image/user/query/credential fields."
+}

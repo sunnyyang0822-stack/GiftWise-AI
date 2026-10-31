@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: final integrated HTTP: cached text -> real provider parser -> one repair -> selectable -> selected text/pending -> ready or failed, GET read-only and owner/task isolation
+not ok 1 - final integrated HTTP: cached text -> real provider parser -> one repair -> selectable -> selected text/pending -> ready or failed, GET read-only and owner/task isolation
+  ---
+  duration_ms: 318.2866
+  type: 'test'
+  location: 'E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\combined-http.test.mjs:20:1'
+  failureType: 'testCodeFailure'
+  error: 'QA_NETWORK_BLOCKED_DNS'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    reject (file:///E:/%E9%BB%91%E5%AE%A2%E6%9D%BE/.tmp/handoff-eceef056/qa-d/network-guard.mjs:9:46)
+    dns.lookup (file:///E:/%E9%BB%91%E5%AE%A2%E6%9D%BE/.tmp/handoff-eceef056/qa-d/network-guard.mjs:26:16)
+    lookupAndListen (node:net:2264:7)
+    Server.listen (node:net:2166:7)
+    net.Server.listen (file:///E:/%E9%BB%91%E5%AE%A2%E6%9D%BE/.tmp/handoff-eceef056/qa-d/network-guard.mjs:22:32)
+    file:///E:/%E9%BB%91%E5%AE%A2%E6%9D%BE/.worktrees/independent-qa-eceef056-20261031/web/server/server.mjs:656:8
+    ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    async node:internal/modules/esm/loader:633:26
+    async TestContext.<anonymous> (file:///E:/%E9%BB%91%E5%AE%A2%E6%9D%BE/.tmp/handoff-eceef056/qa-d/combined-http.test.mjs:24:12)
+    async Test.run (node:internal/test_runner/test:1313:7)
+  ...
+# QA_NETWORK_GUARD {"mode":"owned-loopback","port":8932,"listen":1,"connect":0,"fetch":0,"blocked":1}
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 915.143

@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "issue": 122,
+  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "evidence_git_commit": null,
+  "evidence_git_commit_note": "PM creates the publishing evidence commit after independent scan; this local manifest hash is not a Git commit SHA.",
+  "publication_allowlist_only": true,
+  "exclude": [
+    ".tmp/",
+    "any database",
+    "any credential/config secret",
+    "browser profile or live session",
+    "images or media assets"
+  ],
+  "no_new_tests_or_network": true,
+  "files": [
+    {
+      "path": "storage-portability.md",
+      "bytes": 19835,
+      "sha256": "386ee6618fcf1f780ac06d5eabb747e48d42bf01539b5c9ef6f8a95f57b3e4b1"
+    },
+    {
+      "path": "source-data.md",
+      "bytes": 5443,
+      "sha256": "8ed331477abac3dff04196eccba2909078d51647fe423ffe17b36b25b744a225"
+    },
+    {
+      "path": "source-index.json",
+      "bytes": 17364,
+      "sha256": "f4fc4d47adc2a2c3c894554243d74c041a0e8e5c6c69990664da615c33e6b038"
+    },
+    {
+      "path": "final-code-static-hashes.json",
+      "bytes": 5362,
+      "sha256": "5569f6e815b96cf16d0a0dcc9908b5ab789a919ab8a9bf7a52c33c43f6225842"
+    },
+    {
+      "path": "evidence/controlled-no-images.txt",
+      "bytes": 479,
+      "sha256": "44b1b9d150948ad75e337756548830da660b41ded37ace4e5f2840877dff2c40"
+    },
+    {
+      "path": "evidence/controlled-selected-ai.txt",
+      "bytes": 238,
+      "sha256": "dd634dd3efe0a59e29d1b2d628211d6c284583209ea4912a450ca8c95da16a7c"
+    },
+    {
+      "path": "evidence/controlled-text-integration.txt",
+      "bytes": 1314,
+      "sha256": "494a4608fa689cb4b4124b8f76def26a8628e637befd5c9f306a994321387981"
+    },
+    {
+      "path": "evidence/derived-source-use.json",
+      "bytes": 2614,
+      "sha256": "fe87847b29a43fbae049fe4030f4a99f9352f8b1f3526fe21b10ff0d280c9504"
+    },
+    {
+      "path": "evidence/measurement-plan.json",
+      "bytes": 353,
+      "sha256": "311f4780f735f87f271d6702da383025b7355818c79a5ddddee956033acfe734"
+    },
+    {
+      "path": "evidence/model-ledger.jsonl",
+      "bytes": 1265,
+      "sha256": "58958693c00b2541d05d3412f67661356e41148430808fbddea07fe0f267baf3"
+    },
+    {
+      "path": "evidence/new-recommendation-provider.json",
+      "bytes": 26727,
+      "sha256": "5c36c810cc1543fd67779bed3cf6267bbfc15e1127f5999b18df1bc804ecad92"
+    },
+    {
+      "path": "evidence/new-recommendation-response.json",
+      "bytes": 23940,
+      "sha256": "1c9a3b5a28f99178061b0e45ac498f369ff15819555ebbbcf0e13ba8e4a989c8"
+    },
+    {
+      "path": "evidence/public-material-manifest.json",
+      "bytes": 2125,
+      "sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4"
+    },
+    {
+      "path": "evidence/public-material-receipt.json",
+      "bytes": 449,
+      "sha256": "e648dfa027e4367e97976eb677ef80de660e5489991a500e4ecfc84d750f8fd0"
+    },
+    {
+      "path": "evidence/retrieval-audit.json",
+      "bytes": 9451,
+      "sha256": "10b2f70379e3b311568fa5e4fd05d2d810ff9b560adbb64f84bd5645e6a7791c"
+    },
+    {
+      "path": "evidence/text-observation-plan.json",
+      "bytes": 393,
+      "sha256": "e7c2ef5cdedec44c1f9d90d0f06e94835e802641f3e18a0f7caffb9a07c58198"
+    },
+    {
+      "path": "evidence/text-observation.json",
+      "bytes": 4282,
+      "sha256": "392c598e88f9be0de67c79e4243832fa6016104793af29ffc118b4cbcefda0b5"
+    },
+    {
+      "path": "evidence/timing.json",
+      "bytes": 11237,
+      "sha256": "dbc2d99474a8834829fdb522d230e259cb84344c35e3cd26961aab30d3f9da3b"
+    }
+  ]
+}

@@ -1,0 +1,391 @@
+{
+  "scope": "New model reasoning from real anonymous cached search snippets; snippets observed immediately before sample. Not a full intake/style/present/AI E2E or browser display benchmark.",
+  "kind": "report",
+  "run_id": "[REDACTED:run_id]",
+  "selectable": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "grounding": {
+    "status": "grounded",
+    "reference_ids": [
+      "web_1d8455cd71c6276b685f4d8b2d633c3a",
+      "web_95032af991e457b7a73f0835956f5d09"
+    ]
+  },
+  "model_calls": 3,
+  "new_text_searches": 3,
+  "source_browser_starts": 0,
+  "recommendation_image_requests": 0,
+  "reference_image_job_started": false,
+  "doh_requests": 0,
+  "material_observation_ms": 356,
+  "events": [
+    {
+      "phase": "real_material_cache_available",
+      "at": "2026-10-31T20:07:57.680Z",
+      "elapsed_ms": 7,
+      "records": 3
+    },
+    {
+      "phase": "material_in_model_context",
+      "at": "2026-10-31T20:07:57.697Z",
+      "elapsed_ms": 24,
+      "reference_ids": [
+        "web_af6bcf5bdc7889e6ee994e1d3ed29aa8",
+        "web_95032af991e457b7a73f0835956f5d09",
+        "web_1d8455cd71c6276b685f4d8b2d633c3a"
+      ]
+    },
+    {
+      "phase": "model_started",
+      "seq": 1,
+      "kind": "recommend",
+      "at": "2026-10-31T20:07:57.701Z",
+      "elapsed_ms": 29
+    },
+    {
+      "phase": "model_completed",
+      "seq": 1,
+      "kind": "recommend",
+      "at": "2026-10-31T20:08:06.343Z",
+      "elapsed_ms": 8670,
+      "ok": true,
+      "code": null,
+      "tool_calls": 2
+    },
+    {
+      "phase": "new_text_search_started",
+      "seq": 1,
+      "at": "2026-10-31T20:08:06.345Z",
+      "elapsed_ms": 8672
+    },
+    {
+      "phase": "new_text_search_started",
+      "seq": 2,
+      "at": "2026-10-31T20:08:06.353Z",
+      "elapsed_ms": 8680
+    },
+    {
+      "phase": "new_text_search_completed",
+      "at": "2026-10-31T20:08:07.079Z",
+      "elapsed_ms": 9407,
+      "status": "partial",
+      "coverage": [
+        {
+          "source": "web",
+          "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+          "city": null,
+          "engine": "bing",
+          "status": "ok",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 1,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "ok",
+              "observed_count": 1
+            }
+          ],
+          "started_at": "2026-10-31T20:08:06.439Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 230,
+          "response_bytes": 103137,
+          "parse_ms": 8,
+          "records_seen": 10,
+          "records_rejected": 9,
+          "materials_with_summary": 1,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:06.740Z",
+          "elapsed_ms": 301,
+          "purpose": "inspiration",
+          "discovery_ms": 308.27399999999943
+        },
+        {
+          "source": "web",
+          "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+          "city": null,
+          "engine": "bing",
+          "status": "ok",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 0,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "ok",
+              "observed_count": 1
+            }
+          ],
+          "started_at": "2026-10-31T20:08:06.748Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 94,
+          "response_bytes": 105955,
+          "parse_ms": 3,
+          "records_seen": 10,
+          "records_rejected": 9,
+          "materials_with_summary": 1,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:06.905Z",
+          "elapsed_ms": 157,
+          "purpose": "inspiration",
+          "discovery_ms": 157.07480000000032
+        },
+        {
+          "source": "web",
+          "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+          "city": null,
+          "engine": "bing",
+          "status": "ok",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 0,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "ok",
+              "observed_count": 1
+            }
+          ],
+          "started_at": "2026-10-31T20:08:06.905Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 91,
+          "response_bytes": 105338,
+          "parse_ms": 2,
+          "records_seen": 10,
+          "records_rejected": 9,
+          "materials_with_summary": 1,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:07.056Z",
+          "elapsed_ms": 150,
+          "purpose": "inspiration",
+          "discovery_ms": 150.67559999999867
+        }
+      ]
+    },
+    {
+      "phase": "new_text_search_completed",
+      "at": "2026-10-31T20:08:07.436Z",
+      "elapsed_ms": 9763,
+      "status": "unavailable",
+      "coverage": [
+        {
+          "source": "web",
+          "keyword": "法压壶 爱乐压 咖啡豆 初学者 在家冲煮 方法",
+          "city": null,
+          "engine": "bing",
+          "status": "no_allowed_reference",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 0,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "no_allowed_reference",
+              "observed_count": 0
+            }
+          ],
+          "started_at": "2026-10-31T20:08:07.121Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 94,
+          "response_bytes": 106198,
+          "parse_ms": 1,
+          "records_seen": 10,
+          "records_rejected": 10,
+          "materials_with_summary": 0,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:07.274Z",
+          "elapsed_ms": 153,
+          "purpose": "inspiration",
+          "discovery_ms": 153.32420000000093
+        },
+        {
+          "source": "web",
+          "keyword": "法压壶 爱乐压 咖啡豆 初学者 在家冲煮 方法",
+          "city": null,
+          "engine": "bing",
+          "status": "no_allowed_reference",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 0,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "no_allowed_reference",
+              "observed_count": 0
+            }
+          ],
+          "started_at": "2026-10-31T20:08:07.274Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 90,
+          "response_bytes": 105960,
+          "parse_ms": 2,
+          "records_seen": 10,
+          "records_rejected": 10,
+          "materials_with_summary": 0,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:07.427Z",
+          "elapsed_ms": 153,
+          "purpose": "inspiration",
+          "discovery_ms": 153.35040000000117
+        }
+      ]
+    },
+    {
+      "phase": "model_started",
+      "seq": 2,
+      "kind": "recommend",
+      "at": "2026-10-31T20:08:07.452Z",
+      "elapsed_ms": 9779
+    },
+    {
+      "phase": "model_completed",
+      "seq": 2,
+      "kind": "recommend",
+      "at": "2026-10-31T20:08:09.858Z",
+      "elapsed_ms": 12186,
+      "ok": true,
+      "code": null,
+      "tool_calls": 1
+    },
+    {
+      "phase": "new_text_search_started",
+      "seq": 3,
+      "at": "2026-10-31T20:08:09.859Z",
+      "elapsed_ms": 12186
+    },
+    {
+      "phase": "new_text_search_completed",
+      "at": "2026-10-31T20:08:10.054Z",
+      "elapsed_ms": 12382,
+      "status": "partial",
+      "coverage": [
+        {
+          "source": "web",
+          "keyword": "家庭咖啡 冲煮方式 摩卡壶 冷萃 手冲 对比 教程",
+          "city": null,
+          "engine": "bing",
+          "status": "ok",
+          "execution_mode": "public_http",
+          "native_executed": false,
+          "pages_requested": 1,
+          "pages_completed": 1,
+          "reported_total": null,
+          "observed_count": 1,
+          "complete": false,
+          "bounded": true,
+          "pages": [
+            {
+              "page": 1,
+              "status": "ok",
+              "observed_count": 1
+            }
+          ],
+          "started_at": "2026-10-31T20:08:09.872Z",
+          "limitations": [
+            "bounded_search_snippets_only",
+            "article_bodies_not_fetched"
+          ],
+          "http_status": 200,
+          "fetch_ms": 99,
+          "response_bytes": 105220,
+          "parse_ms": 2,
+          "records_seen": 10,
+          "records_rejected": 9,
+          "materials_with_summary": 1,
+          "limit_reached": false,
+          "scan_limit_reached": false,
+          "error_code": null,
+          "completed_at": "2026-10-31T20:08:10.030Z",
+          "elapsed_ms": 158,
+          "purpose": "inspiration",
+          "discovery_ms": 158.03369999999995
+        }
+      ]
+    },
+    {
+      "phase": "model_started",
+      "seq": 3,
+      "kind": "recommend",
+      "at": "2026-10-31T20:08:10.073Z",
+      "elapsed_ms": 12400
+    },
+    {
+      "phase": "model_completed",
+      "seq": 3,
+      "kind": "recommend",
+      "at": "2026-10-31T20:08:26.018Z",
+      "elapsed_ms": 28345,
+      "ok": true,
+      "code": null,
+      "tool_calls": 0
+    },
+    {
+      "phase": "recommendation_returned",
+      "at": "2026-10-31T20:08:26.065Z",
+      "elapsed_ms": 28393,
+      "kind": "report"
+    }
+  ],
+  "audit": {
+    "status": "saved",
+    "retrieval_session_id": "[REDACTED:retrieval_session_id]"
+  }
+}

@@ -1,0 +1,330 @@
+TAP version 13
+# Subtest: text returns with persisted pending while image Promise is unresolved; same selection is idempotent
+ok 1 - text returns with persisted pending while image Promise is unresolved; same selection is idempotent
+  ---
+  duration_ms: 91.5783
+  type: 'test'
+  ...
+# Subtest: supplier failure retains completed text and selected candidate; repeated POST/GET never regenerates
+ok 2 - supplier failure retains completed text and selected candidate; repeated POST/GET never regenerates
+  ---
+  duration_ms: 48.7872
+  type: 'test'
+  ...
+# Subtest: owner/run/candidate isolation also protects reused provider tasks
+ok 3 - owner/run/candidate isolation also protects reused provider tasks
+  ---
+  duration_ms: 74.1097
+  type: 'test'
+  ...
+# Subtest: reading interrupted task derives honest failure without mutating its stored record
+ok 4 - reading interrupted task derives honest failure without mutating its stored record
+  ---
+  duration_ms: 37.4324
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# {"scenario":"纯体验演唱会","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：深蓝","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：一起看一场喜欢的现场演出 —— 一起看一场喜欢的现场演出的赠送方向"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：先私下确认对方愿意及方便的场次，再一起安排","话术：想邀请你一起听喜欢的音乐，你愿意再一起选具体演出。","关系提示：不把邀请当作对方已答应"]}],"packaging":{"color_palette":["深蓝"],"materials":[],"steps":[]},"giving_advice":{"timing":"先私下确认对方愿意及方便的场次，再一起安排","wording":"想邀请你一起听喜欢的音乐，你愿意再一起选具体演出。","relationship_cautions":["不把邀请当作对方已答应"]},"real_model_calls":0,"real_image_calls":0}
+# {"scenario":"纯体验未知城市日期","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：米白","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：一起尝试手作体验 —— 一起尝试手作体验的赠送方向"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：等双方方便时再讨论地点和项目","话术：找个空闲时间一起试试手作，你有兴趣吗？"]}],"packaging":{"color_palette":["米白"]},"giving_advice":{"timing":"等双方方便时再讨论地点和项目","wording":"找个空闲时间一起试试手作，你有兴趣吗？","relationship_cautions":[]},"real_model_calls":0,"real_image_calls":0}
+# {"scenario":"实体礼物","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：米白","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：一本旅行相册 —— 一本旅行相册的赠送方向"]},{"key":"packaging","title":"② 包装材料与步骤","items":["材料：自备相册保护套","步骤 1：整理相册后放入保护套"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：见面时送出","话术：把这些回忆整理成了一本相册。"]}],"packaging":{"color_palette":["米白"],"materials":["自备相册保护套"],"steps":["整理相册后放入保护套"]},"giving_advice":{"timing":"见面时送出","wording":"把这些回忆整理成了一本相册。","relationship_cautions":[]},"real_model_calls":0,"real_image_calls":0}
+# {"scenario":"混合体验实体邀请","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：淡绿","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：手作体验与一张实体邀请函 —— 手作体验与一张实体邀请函的赠送方向"]},{"key":"packaging","title":"② 包装材料与步骤","items":["材料：已有纸张","材料：自备信封","步骤 1：写好邀请话语后放入信封"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：先问意愿，再商量具体体验安排","话术：如果你愿意，我们找个时间一起去体验一下。"]}],"packaging":{"color_palette":["淡绿"],"materials":["已有纸张","自备信封"],"steps":["写好邀请话语后放入信封"]},"giving_advice":{"timing":"先问意愿，再商量具体体验安排","wording":"如果你愿意，我们找个时间一起去体验一下。","relationship_cautions":[]},"real_model_calls":0,"real_image_calls":0}
+# {"scenario":"演唱会实体纪念卡","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：深蓝","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：演唱会回忆纪念卡 —— 演唱会回忆纪念卡的赠送方向"]},{"key":"packaging","title":"② 包装材料与步骤","items":["材料：已有硬卡纸","材料：已有信封","步骤 1：整理回忆做成卡片，再装入信封"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：私下见面时交给对方","话术：想把那次演唱会的回忆留在这张卡里。"]}],"packaging":{"color_palette":["深蓝"],"materials":["已有硬卡纸","已有信封"],"steps":["整理回忆做成卡片，再装入信封"]},"giving_advice":{"timing":"私下见面时交给对方","wording":"想把那次演唱会的回忆留在这张卡里。","relationship_cautions":[]},"real_model_calls":0,"real_image_calls":0}
+# {"scenario":"实体说明无材料枚举","controlled":true,"sections":[{"key":"style","title":"① 风格与配色","items":["配色：浅灰","风格取向：未指定，按低风险通用方向处理","关系与场合：朋友 · 生日（熟悉程度 未提供）","围绕方案：一本已有护封的书 —— 一本已有护封的书的赠送方向"]},{"key":"packaging","title":"② 包装说明","items":["保留书本已有护封，整齐整理后直接交付即可。"]},{"key":"card","title":"③ 贺卡正文与装饰物建议","items":["贺卡正文：希望和你分享这份心意。"]},{"key":"giving","title":"④ 赠送时机、方式与话术","items":["时机与方式：方便见面时","话术：这本书想分享给你。"]}],"packaging":{"color_palette":["浅灰"],"description":"保留书本已有护封，整齐整理后直接交付即可。"},"giving_advice":{"timing":"方便见面时","wording":"这本书想分享给你。","relationship_cautions":[]},"real_model_calls":0,"real_image_calls":0}
+# Subtest: final sections reflect model-chosen actual content: 纯体验演唱会
+ok 5 - final sections reflect model-chosen actual content: 纯体验演唱会
+  ---
+  duration_ms: 27.1524
+  type: 'test'
+  ...
+# Subtest: final sections reflect model-chosen actual content: 纯体验未知城市日期
+ok 6 - final sections reflect model-chosen actual content: 纯体验未知城市日期
+  ---
+  duration_ms: 4.1444
+  type: 'test'
+  ...
+# Subtest: final sections reflect model-chosen actual content: 实体礼物
+ok 7 - final sections reflect model-chosen actual content: 实体礼物
+  ---
+  duration_ms: 2.9761
+  type: 'test'
+  ...
+# Subtest: final sections reflect model-chosen actual content: 混合体验实体邀请
+ok 8 - final sections reflect model-chosen actual content: 混合体验实体邀请
+  ---
+  duration_ms: 2.5393
+  type: 'test'
+  ...
+# Subtest: final sections reflect model-chosen actual content: 演唱会实体纪念卡
+ok 9 - final sections reflect model-chosen actual content: 演唱会实体纪念卡
+  ---
+  duration_ms: 3.183
+  type: 'test'
+  ...
+# Subtest: final sections reflect model-chosen actual content: 实体说明无材料枚举
+ok 10 - final sections reflect model-chosen actual content: 实体说明无材料枚举
+  ---
+  duration_ms: 2.7248
+  type: 'test'
+  ...
+# Subtest: same final gift name can carry different model-selected packaging content without keyword routing
+ok 11 - same final gift name can carry different model-selected packaging content without keyword routing
+  ---
+  duration_ms: 2.4968
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# Subtest: 无初始素材首轮required；模型自主web/inspiration查询的无图无价文字先进入后续prompt再输出创意
+ok 12 - 无初始素材首轮required；模型自主web/inspiration查询的无图无价文字先进入后续prompt再输出创意
+  ---
+  duration_ms: 22.8021
+  type: 'test'
+  ...
+# Subtest: 一条批次真实素材可支持三个不同创意，不要求逐候选链接/同款/词匹配
+ok 13 - 一条批次真实素材可支持三个不同创意，不要求逐候选链接/同款/词匹配
+  ---
+  duration_ms: 7.0466
+  type: 'test'
+  ...
+# Subtest: 多个候选复用同一真实reference_id不因图片唯一性规则失败
+ok 14 - 多个候选复用同一真实reference_id不因图片唯一性规则失败
+  ---
+  duration_ms: 5.0085
+  type: 'test'
+  ...
+# Subtest: 已知合法文本缓存允许显式groundingRequired且无工具直接输出，不依赖图/报价
+ok 15 - 已知合法文本缓存允许显式groundingRequired且无工具直接输出，不依赖图/报价
+  ---
+  duration_ms: 4.2485
+  type: 'test'
+  ...
+# Subtest: 工具无可用素材时不能把最终自由建议标有据，最多一次有限continuation后NO_MATERIAL
+ok 16 - 工具无可用素材时不能把最终自由建议标有据，最多一次有限continuation后NO_MATERIAL
+  ---
+  duration_ms: 4.4551
+  type: 'test'
+  ...
+# Subtest: 存在真实资料但持续引用伪refid不等于确认依据，有限修正后BASIS_UNCONFIRMED
+ok 17 - 存在真实资料但持续引用伪refid不等于确认依据，有限修正后BASIS_UNCONFIRMED
+  ---
+  duration_ms: 12.749
+  type: 'test'
+  ...
+# Subtest: 有素材却未引用时只补一次确认；同ref贯穿上下文，修正引用后成功且不再搜索
+ok 18 - 有素材却未引用时只补一次确认；同ref贯穿上下文，修正引用后成功且不再搜索
+  ---
+  duration_ms: 9.1366
+  type: 'test'
+  ...
+# Subtest: 伪造source/缺观察时间/纯图标题或空摘要不能被refid sidecar洗成文本依据
+    # Subtest: 虚构来源域
+    ok 1 - 虚构来源域
+      ---
+      duration_ms: 3.9866
+      type: 'test'
+      ...
+    # Subtest: 商店来源
+    ok 2 - 商店来源
+      ---
+      duration_ms: 3.2112
+      type: 'test'
+      ...
+    # Subtest: 非HTTPS
+    ok 3 - 非HTTPS
+      ---
+      duration_ms: 3.7401
+      type: 'test'
+      ...
+    # Subtest: 缺观察时间
+    ok 4 - 缺观察时间
+      ---
+      duration_ms: 2.5021
+      type: 'test'
+      ...
+    # Subtest: 非法观察时间
+    ok 5 - 非法观察时间
+      ---
+      duration_ms: 2.0763
+      type: 'test'
+      ...
+    # Subtest: 非公开参考身份
+    ok 6 - 非公开参考身份
+      ---
+      duration_ms: 2.981
+      type: 'test'
+      ...
+    # Subtest: 缺标题
+    ok 7 - 缺标题
+      ---
+      duration_ms: 4.3475
+      type: 'test'
+      ...
+    # Subtest: 纯图标题无正文
+    ok 8 - 纯图标题无正文
+      ---
+      duration_ms: 2.6506
+      type: 'test'
+      ...
+    # Subtest: 空白摘要
+    ok 9 - 空白摘要
+      ---
+      duration_ms: 2.5093
+      type: 'test'
+      ...
+    1..9
+ok 19 - 伪造source/缺观察时间/纯图标题或空摘要不能被refid sidecar洗成文本依据
+  ---
+  duration_ms: 31.5198
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# Subtest: 推荐网图已停用：成功或修订失败均不启动补图模型，保留三候选文字边界
+ok 20 - 推荐网图已停用：成功或修订失败均不启动补图模型，保留三候选文字边界
+  ---
+  duration_ms: 78.0539
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# Subtest: default text adapter reaches model material without browser, image validation or OpenCLI dependency
+ok 21 - default text adapter reaches model material without browser, image validation or OpenCLI dependency
+  ---
+  duration_ms: 45.9951
+  type: 'test'
+  ...
+# Subtest: legacy reference image request is rejected before any executor or browser work
+ok 22 - legacy reference image request is rejected before any executor or browser work
+  ---
+  duration_ms: 2.453
+  type: 'test'
+  ...
+# Subtest: unrelated cached material is context rather than a mandatory menu; model can choose new material
+ok 23 - unrelated cached material is context rather than a mandatory menu; model can choose new material
+  ---
+  duration_ms: 6.6567
+  type: 'test'
+  ...
+# Subtest: actual permitted merchant observations remain material without a picture or quoted price
+ok 24 - actual permitted merchant observations remain material without a picture or quoted price
+  ---
+  duration_ms: 2.9988
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# Subtest: 纯体验无包装章节或替代包装占位，有用邀请安排保留在赠送方式
+ok 25 - 纯体验无包装章节或替代包装占位，有用邀请安排保留在赠送方式
+  ---
+  duration_ms: 7.2942
+  type: 'test'
+  ...
+# Subtest: 旧空包装和空白条目不留空步骤，不补默认准备指引
+ok 26 - 旧空包装和空白条目不留空步骤，不补默认准备指引
+  ---
+  duration_ms: 1.3713
+  type: 'test'
+  ...
+# Subtest: 实体方案完整展示实际材料步骤和贺卡，timeline不硬凑三步
+ok 27 - 实体方案完整展示实际材料步骤和贺卡，timeline不硬凑三步
+  ---
+  duration_ms: 1.8218
+  type: 'test'
+  ...
+# Subtest: 体验附实体邀请函按真实sections保留材料与安排，不按候选名称硬分流
+ok 28 - 体验附实体邀请函按真实sections保留材料与安排，不按候选名称硬分流
+  ---
+  duration_ms: 1.1295
+  type: 'test'
+  ...
+# Subtest: 实体合理description-only沿包装说明完整保留，不按packaging键一刀切删除
+ok 29 - 实体合理description-only沿包装说明完整保留，不按packaging键一刀切删除
+  ---
+  duration_ms: 1.325
+  type: 'test'
+  ...
+# Subtest: 所有章节为空时不生成空timeline、空贺卡或虚构摘要行
+ok 30 - 所有章节为空时不生成空timeline、空贺卡或虚构摘要行
+  ---
+  duration_ms: 0.4668
+  type: 'test'
+  ...
+# Subtest: AI图ready仅替换图片区，实际建议、贺卡、摘要与按钮DOM保持
+ok 31 - AI图ready仅替换图片区，实际建议、贺卡、摘要与按钮DOM保持
+  ---
+  duration_ms: 5.8976
+  type: 'test'
+  ...
+# Subtest: 错误候选图片响应不能覆盖指南，失败图片提示也不回填包装文案
+ok 32 - 错误候选图片响应不能覆盖指南，失败图片提示也不回填包装文案
+  ---
+  duration_ms: 1.5973
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+# Subtest: 停推荐网图：真实参考图响应也无img/空框，三文字与来源数据不变
+ok 33 - 停推荐网图：真实参考图响应也无img/空框，三文字与来源数据不变
+  ---
+  duration_ms: 7.0731
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：pending与重复render均不排程或发推荐GET
+ok 34 - 停推荐网图：pending与重复render均不排程或发推荐GET
+  ---
+  duration_ms: 4.86
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：错绑/重复/缺失图片不影响服务端三个可选候选
+ok 35 - 停推荐网图：错绑/重复/缺失图片不影响服务端三个可选候选
+  ---
+  duration_ms: 4.1244
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI pending依然文字先读且只排既有任务读取
+ok 36 - 停推荐网图：选后AI pending依然文字先读且只排既有任务读取
+  ---
+  duration_ms: 3.0133
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI ready原位补图，正文/按钮/AI标识保持
+ok 37 - 停推荐网图：选后AI ready原位补图，正文/按钮/AI标识保持
+  ---
+  duration_ms: 2.1223
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI failed保留文字与只读刷新，不伪造图片
+ok 38 - 停推荐网图：选后AI failed保留文字与只读刷新，不伪造图片
+  ---
+  duration_ms: 1.0195
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后读取受阻的刷新继续纯GET，重复点击无并发
+ok 39 - 停推荐网图：选后读取受阻的刷新继续纯GET，重复点击无并发
+  ---
+  duration_ms: 1.3233
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：错候选或错任务的AI快照仍被拒绝
+ok 40 - 停推荐网图：错候选或错任务的AI快照仍被拒绝
+  ---
+  duration_ms: 1.9727
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：离开选后页回文字三卡，旧AI响应不会串入
+ok 41 - 停推荐网图：离开选后页回文字三卡，旧AI响应不会串入
+  ---
+  duration_ms: 1.8168
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选择仍提交原生图呈现POST且pending文字立即进入状态
+ok 42 - 停推荐网图：选择仍提交原生图呈现POST且pending文字立即进入状态
+  ---
+  duration_ms: 9.4867
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"offline","port":null,"listen":0,"connect":0,"fetch":0,"blocked":0}
+1..42
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3337.2971

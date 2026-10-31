@@ -1,0 +1,307 @@
+{
+  "issue": 122,
+  "delivery_code_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "historical_real_recommendation_base": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+  "originals_preserved": true,
+  "no_new_execution": true,
+  "code_hash_rule": "Final frozen-code hashes are static inventory only; none substitute for missing command-time dirty hashes.",
+  "files": [
+    {
+      "file": "evidence/text-observation-plan.json",
+      "kind": "real_text_http",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\text-observation-plan.json",
+      "original_sha256": "e7c2ef5cdedec44c1f9d90d0f06e94835e802641f3e18a0f7caffb9a07c58198",
+      "published_sha256": "e7c2ef5cdedec44c1f9d90d0f06e94835e802641f3e18a0f7caffb9a07c58198",
+      "published_bytes": 393,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD_at_time_of_text_observation": "bc85f7300122b592d3dcbc62ba5e66c5b50f7618",
+        "working_tree": "dirty 112 implementation; exact parser file hash not captured",
+        "measurement_utc": "2026-10-31T20:02:52.940Z to 2026-10-31T20:02:53.295Z"
+      }
+    },
+    {
+      "file": "evidence/text-observation.json",
+      "kind": "real_text_http",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\text-observation.json",
+      "original_sha256": "392c598e88f9be0de67c79e4243832fa6016104793af29ffc118b4cbcefda0b5",
+      "published_sha256": "392c598e88f9be0de67c79e4243832fa6016104793af29ffc118b4cbcefda0b5",
+      "published_bytes": 4282,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD_at_time_of_text_observation": "bc85f7300122b592d3dcbc62ba5e66c5b50f7618",
+        "working_tree": "dirty 112 implementation; exact parser file hash not captured",
+        "measurement_utc": "2026-10-31T20:02:52.940Z to 2026-10-31T20:02:53.295Z"
+      }
+    },
+    {
+      "file": "evidence/measurement-plan.json",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\measurement-plan.json",
+      "original_sha256": "311f4780f735f87f271d6702da383025b7355818c79a5ddddee956033acfe734",
+      "published_sha256": "311f4780f735f87f271d6702da383025b7355818c79a5ddddee956033acfe734",
+      "published_bytes": 353,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/new-recommendation-provider.json",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\new-recommendation-provider.json",
+      "original_sha256": "5c36c810cc1543fd67779bed3cf6267bbfc15e1127f5999b18df1bc804ecad92",
+      "published_sha256": "5c36c810cc1543fd67779bed3cf6267bbfc15e1127f5999b18df1bc804ecad92",
+      "published_bytes": 26727,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/new-recommendation-response.json",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\new-recommendation-response.json",
+      "original_sha256": "3fea7573a358e3f1d98798afa795a82d36537f03b7f513a84d8e1a7639f69592",
+      "published_sha256": "1c9a3b5a28f99178061b0e45ac498f369ff15819555ebbbcf0e13ba8e4a989c8",
+      "published_bytes": 23940,
+      "redactions": {
+        "recommendation_run_id": 1
+      },
+      "transformations": [
+        "sensitive-value replacement",
+        "JSON serialization normalization"
+      ],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/model-ledger.jsonl",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\model-ledger.jsonl",
+      "original_sha256": "58958693c00b2541d05d3412f67661356e41148430808fbddea07fe0f267baf3",
+      "published_sha256": "58958693c00b2541d05d3412f67661356e41148430808fbddea07fe0f267baf3",
+      "published_bytes": 1265,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/timing.json",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\timing.json",
+      "original_sha256": "f3ffbf62272fd3148495681d092070f34d42b72f69fe354124c34acca8efcae9",
+      "published_sha256": "dbc2d99474a8834829fdb522d230e259cb84344c35e3cd26961aab30d3f9da3b",
+      "published_bytes": 11237,
+      "redactions": {
+        "run_id": 1,
+        "retrieval_session_id": 1
+      },
+      "transformations": [
+        "sensitive-value replacement",
+        "JSON serialization normalization"
+      ],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/retrieval-audit.json",
+      "kind": "real_recommendation",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\audit/[REDACTED:historical_retrieval_session_id].json",
+      "original_sha256": "c99549bb3d1131c71c0a28a04331d14dbc5fc7d40145dfb5ea3b3466e8f313d0",
+      "published_sha256": "10b2f70379e3b311568fa5e4fd05d2d810ff9b560adbb64f84bd5645e6a7791c",
+      "published_bytes": 9451,
+      "redactions": {
+        "retrieval_session_id": 1,
+        "run_id": 1
+      },
+      "transformations": [
+        "sensitive-value replacement",
+        "JSON serialization normalization"
+      ],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "e7580eaff5db4d507c625fc9334760cd9bddec7b",
+        "working_tree": "dirty/uncommitted implementation; not db5e74df or eceef056 clean checkout",
+        "exact_dirty_diff_or_file_hash_at_execution": "not captured; unavailable, not reconstructed",
+        "measurement_utc": "2026-10-31T20:07:57.680Z to 2026-10-31T20:08:26.065Z"
+      }
+    },
+    {
+      "file": "evidence/derived-source-use.json",
+      "kind": "derived",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-measure\\derived-source-use.json",
+      "original_sha256": "a7aa72005eab6263033363fc77029c732dd3bf6103bf21a2072179821d88c7dc",
+      "published_sha256": "fe87847b29a43fbae049fe4030f4a99f9352f8b1f3526fe21b10ff0d280c9504",
+      "published_bytes": 2614,
+      "redactions": {
+        "run_id": 1
+      },
+      "transformations": [
+        "sensitive-value replacement",
+        "JSON serialization normalization"
+      ],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "working_tree": "data or derived artifact, not executable-code validation",
+        "claims": "see original declared scope; not newly executed in handoff"
+      }
+    },
+    {
+      "file": "evidence/public-material-manifest.json",
+      "kind": "real_public_data",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\public-material-bundle-112\\manifest.json",
+      "original_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+      "published_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+      "published_bytes": 2125,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "working_tree": "data or derived artifact, not executable-code validation",
+        "claims": "see original declared scope; not newly executed in handoff"
+      }
+    },
+    {
+      "file": "evidence/public-material-receipt.json",
+      "kind": "derived_data_receipt",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\public-material-bundle-112\\receipt.json",
+      "original_sha256": "e648dfa027e4367e97976eb677ef80de660e5489991a500e4ecfc84d750f8fd0",
+      "published_sha256": "e648dfa027e4367e97976eb677ef80de660e5489991a500e4ecfc84d750f8fd0",
+      "published_bytes": 449,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "working_tree": "data or derived artifact, not executable-code validation",
+        "claims": "see original declared scope; not newly executed in handoff"
+      }
+    },
+    {
+      "file": "evidence/controlled-no-images.txt",
+      "kind": "controlled_test",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\grounded-pipeline-no-images.txt",
+      "original_sha256": "44b1b9d150948ad75e337756548830da660b41ded37ace4e5f2840877dff2c40",
+      "published_sha256": "44b1b9d150948ad75e337756548830da660b41ded37ace4e5f2840877dff2c40",
+      "published_bytes": 479,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "not recorded in raw test output",
+        "working_tree": "112 development worktree before final db5e74df; exact command-time file snapshot unavailable",
+        "claims": "injected offline controlled test, not real supplier/model/network"
+      }
+    },
+    {
+      "file": "evidence/controlled-selected-ai.txt",
+      "kind": "controlled_test",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\selected-ai-flow-preserved.txt",
+      "original_sha256": "dd634dd3efe0a59e29d1b2d628211d6c284583209ea4912a450ca8c95da16a7c",
+      "published_sha256": "dd634dd3efe0a59e29d1b2d628211d6c284583209ea4912a450ca8c95da16a7c",
+      "published_bytes": 238,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "not recorded in raw test output",
+        "working_tree": "112 development worktree before final db5e74df; exact command-time file snapshot unavailable",
+        "claims": "injected offline controlled test, not real supplier/model/network"
+      }
+    },
+    {
+      "file": "evidence/controlled-text-integration.txt",
+      "kind": "controlled_test",
+      "original_source": "E:\\黑客松\\.worktrees\\c-reference-image-speed-20261031\\.tmp\\text-final-incremental.txt",
+      "original_sha256": "494a4608fa689cb4b4124b8f76def26a8628e637befd5c9f306a994321387981",
+      "published_sha256": "494a4608fa689cb4b4124b8f76def26a8628e637befd5c9f306a994321387981",
+      "published_bytes": 1314,
+      "redactions": {},
+      "transformations": [],
+      "scenario": "public synthetic coffee/housewarming acceptance context and actual public search snippets; no private live user scenario",
+      "provenance": {
+        "frozen_delivery_commit": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+        "measured_code_commit": null,
+        "not_same_version_final_e2e": true,
+        "historical_HEAD": "not recorded in raw test output",
+        "working_tree": "112 development worktree before final db5e74df; exact command-time file snapshot unavailable",
+        "claims": "injected offline controlled test, not real supplier/model/network"
+      }
+    }
+  ],
+  "residual_pattern_scan": [],
+  "manual_boundaries": [
+    "No .env, database, browser profile, live cookie/session store, raw user database or image asset was read/copied.",
+    "Credential patterns and sensitive JSON values were redacted without loading or comparing any real credential file.",
+    "Public synthetic scenario text retained; redacted copies are derived publication copies, not unmodified originals."
+  ]
+}

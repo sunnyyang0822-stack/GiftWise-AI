@@ -1,0 +1,13 @@
+{
+  "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+  "comparisons": {
+    "web/public/js/media-view.js": "unchanged (normalized LF)",
+    "web/public/js/recommendation-media.js": "unchanged (normalized LF)",
+    "web/public/styles.css": "unchanged (normalized LF)",
+    "web/public/landing.css": "unchanged (normalized LF)",
+    "selected_ai_poll": "unchanged (normalized LF)",
+    "selected_guide_and_summary": "unchanged (normalized LF)",
+    "selected_loading_frame": "unchanged (normalized LF)",
+    "selected_POST": "unchanged (normalized LF)"
+  }
+}

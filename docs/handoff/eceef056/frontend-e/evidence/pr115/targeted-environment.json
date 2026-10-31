@@ -1,0 +1,39 @@
+{
+  "sha": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+  "cwd": "[REDACTED:HOST_ABSOLUTE_PATH]",
+  "node": "v24.16.0",
+  "command": [
+    "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-reporter=tap",
+    "web/tests/ui-actual-guide-sections.test.mjs"
+  ],
+  "environment": {
+    "Path": "[REDACTED:ENV_SEARCH_PATH]",
+    "PATH": "[REDACTED:ENV_SEARCH_PATH]",
+    "SystemRoot": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "SYSTEMROOT": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "WINDIR": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "windir": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "COMSPEC": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "ComSpec": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL",
+    "TEMP": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "TMP": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "TMPDIR": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "USERPROFILE": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "APPDATA": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "LOCALAPPDATA": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "XDG_CACHE_HOME": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "npm_config_cache": "[REDACTED:HOST_ABSOLUTE_PATH]",
+    "GW_MODE": "mock",
+    "GIFTWISE_RETRIEVAL": "unavailable",
+    "GIFTWISE_CATALOG_SCRAPE": "0",
+    "GIFTWISE_IMAGE_GENERATION": "0",
+    "GIFTWISE_LIVE_RETRIEVAL_TEST": "0",
+    "NODE_OPTIONS": "--import=[REDACTED:PROJECT_FILE_URL]"
+  },
+  "scope": "Only new actual presentation sections/UI compatibility regressions. No full regression. No model/image/collection calls."
+}

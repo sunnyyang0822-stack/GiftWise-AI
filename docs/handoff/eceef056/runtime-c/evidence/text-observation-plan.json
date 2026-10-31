@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-31T20:02:52.930Z",
+  "purpose": "One necessary actual public text observation for grounding; old cached image titles alone are not substantive summaries",
+  "queries": [
+    {
+      "source": "web",
+      "keyword": "coffee lover housewarming gift ideas pour over coffee corner",
+      "max_calls": 1
+    }
+  ],
+  "no_models": true,
+  "no_images": true,
+  "no_retry": true
+}

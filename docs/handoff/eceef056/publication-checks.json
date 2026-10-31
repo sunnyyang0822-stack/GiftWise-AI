@@ -1,0 +1,25 @@
+{
+  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "code_tree": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+  "scope": "Publication integrity/static checks only; not business tests, provider access or deployment",
+  "selected_file_count": 104,
+  "total_bytes": 583479,
+  "json_files_parsed": 37,
+  "jsonl_rows_parsed": 3,
+  "relative_links_checked": 15,
+  "static_assets_verified_from_git_blobs": 40,
+  "business_source_unchanged": true,
+  "credential_pattern_categories": [
+    "private_key",
+    "provider_key_like",
+    "github_token_like",
+    "cloud_key_like",
+    "session_cookie_like",
+    "bearer_token_like"
+  ],
+  "findings": [],
+  "preparation_notes": [
+    "The first static checker invocation exceeded the Node child-process default output buffer while reading a WOFF2 blob (ENOBUFS). Only the publisher checker buffer was raised to 16 MiB; no product source or evidence bytes were changed."
+  ],
+  "limitations": "Heuristic screening plus component publication review; does not prove absence of all possible sensitive data. Source/evidence SHA are different and identified in remote receipt."
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "reference_id": "web_af6bcf5bdc7889e6ee994e1d3ed29aa8",
+      "reference_kind": "public_reference",
+      "title": "Cafe 与 coffee 有什么区别？ - 知乎",
+      "summary": "2022年10月8日&ensp;·&ensp;Coffee就是咖啡的泛称，指的是咖啡饮品、咖啡熟豆，就像是Tea就是指茶的泛称一样。 但Cafe就完全不一样，在英 …",
+      "source_url": "https://www.zhihu.com/question/556769840",
+      "source_site": "www.zhihu.com",
+      "source_platform": "web",
+      "purpose": "inspiration",
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "material_kind": "search_snippet",
+      "has_summary": true,
+      "is_full_article": false
+    },
+    {
+      "reference_id": "web_95032af991e457b7a73f0835956f5d09",
+      "reference_kind": "public_reference",
+      "title": "espresso,long coffee,American三种咖啡有啥区别？ - 知乎",
+      "summary": "2023年5月11日&ensp;·&ensp;Espresso（意式浓缩咖啡）、Long coffee（加水浓缩咖啡）和American（美式咖啡）是三种不同类型的咖啡。 …",
+      "source_url": "https://www.zhihu.com/question/599895904",
+      "source_site": "www.zhihu.com",
+      "source_platform": "web",
+      "purpose": "inspiration",
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "material_kind": "search_snippet",
+      "has_summary": true,
+      "is_full_article": false
+    },
+    {
+      "reference_id": "web_1d8455cd71c6276b685f4d8b2d633c3a",
+      "reference_kind": "public_reference",
+      "title": "关于咖啡的几个基本概念和家庭咖啡普通指南 - 知乎",
+      "summary": "2022年8月10日&ensp;·&ensp;Brewed coffee is made by pouring hot water onto ground coffee beans, then allowing to brew. There are several …",
+      "source_url": "https://zhuanlan.zhihu.com/p/115002664",
+      "source_site": "zhuanlan.zhihu.com",
+      "source_platform": "web",
+      "purpose": "inspiration",
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "material_kind": "search_snippet",
+      "has_summary": true,
+      "is_full_article": false
+    }
+  ]
+}

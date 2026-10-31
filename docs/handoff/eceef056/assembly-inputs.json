@@ -1,0 +1,52 @@
+[
+  {
+    "role": "runtime-c",
+    "manifest_sha256": "7f10243f788242ddcba86078e2751f5b8dd5ccaa12aadbf24651fe444255147b",
+    "copied_files": 20,
+    "publication_source": "E:\\黑客松\\.tmp\\handoff-eceef056\\runtime-c",
+    "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d"
+  },
+  {
+    "role": "qa-d",
+    "manifest_sha256": "19cf81800821e27f626de9602c977770e8eee4bc038f8b0567b5b09cde6b0de1",
+    "copied_files": 40,
+    "publication_source": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\publish",
+    "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d"
+  },
+  {
+    "role": "frontend-e",
+    "manifest_sha256": "c065a69320713bb45f8a3bc9851551236c843201e72fcd58aa3f1248170e2f30",
+    "copied_files": 33,
+    "publication_source": "E:\\黑客松\\.tmp\\handoff-eceef056\\frontend-e",
+    "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d"
+  },
+  {
+    "role": "api-b",
+    "copied_files": 5,
+    "files": [
+      {
+        "path": "api-contract.md",
+        "sha256": "a6cb1432fcf7b87991b4e616e716070c675b3108787031b14ac3657388a0502c"
+      },
+      {
+        "path": "api-examples.json",
+        "sha256": "7749719fea2e6c1bdceb25aff860a7c34ec8ce75bcf383be13e3092567d27379"
+      },
+      {
+        "path": "sessions-timeouts.md",
+        "sha256": "936ad0b708aa4fb9b6db56b61b74d1738fc5e01da4cecd1abf2d404d4e9a7467"
+      },
+      {
+        "path": "env.example",
+        "sha256": "fc678b3224c7ec1554e65612394d10757f879a0607b1bbd05bc94c41cf29a51f"
+      },
+      {
+        "path": "runtime-dependencies.md",
+        "sha256": "3158d4f704bfb163e1beb375932e8761ca3f5c9f39dc41dfe4c84af2a1c6f5d7"
+      }
+    ],
+    "publication_source": "E:\\黑客松\\.tmp\\handoff-eceef056\\api-b",
+    "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+    "source_check_not_published": true
+  }
+]

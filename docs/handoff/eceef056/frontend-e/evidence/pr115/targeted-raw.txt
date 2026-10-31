@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: 纯体验无包装章节或替代包装占位，有用邀请安排保留在赠送方式
+ok 1 - 纯体验无包装章节或替代包装占位，有用邀请安排保留在赠送方式
+  ---
+  duration_ms: 22.9028
+  type: 'test'
+  ...
+# Subtest: 旧空包装和空白条目不留空步骤，不补默认准备指引
+ok 2 - 旧空包装和空白条目不留空步骤，不补默认准备指引
+  ---
+  duration_ms: 12.5825
+  type: 'test'
+  ...
+# Subtest: 实体方案完整展示实际材料步骤和贺卡，timeline不硬凑三步
+ok 3 - 实体方案完整展示实际材料步骤和贺卡，timeline不硬凑三步
+  ---
+  duration_ms: 18.1294
+  type: 'test'
+  ...
+# Subtest: 体验附实体邀请函按真实sections保留材料与安排，不按候选名称硬分流
+ok 4 - 体验附实体邀请函按真实sections保留材料与安排，不按候选名称硬分流
+  ---
+  duration_ms: 6.3508
+  type: 'test'
+  ...
+# Subtest: 实体合理description-only沿包装说明完整保留，不按packaging键一刀切删除
+ok 5 - 实体合理description-only沿包装说明完整保留，不按packaging键一刀切删除
+  ---
+  duration_ms: 9.0529
+  type: 'test'
+  ...
+# Subtest: 所有章节为空时不生成空timeline、空贺卡或虚构摘要行
+ok 6 - 所有章节为空时不生成空timeline、空贺卡或虚构摘要行
+  ---
+  duration_ms: 19.3467
+  type: 'test'
+  ...
+# Subtest: 后端自定义标题与文字保持原语义，只作文本显示
+ok 7 - 后端自定义标题与文字保持原语义，只作文本显示
+  ---
+  duration_ms: 1.9982
+  type: 'test'
+  ...
+# Subtest: AI图ready仅替换图片区，实际建议、贺卡、摘要与按钮DOM保持
+ok 8 - AI图ready仅替换图片区，实际建议、贺卡、摘要与按钮DOM保持
+  ---
+  duration_ms: 60.2773
+  type: 'test'
+  ...
+# Subtest: 通用赠送标题仍明确区分AI示意、参考图和商品来源图
+ok 9 - 通用赠送标题仍明确区分AI示意、参考图和商品来源图
+  ---
+  duration_ms: 3.2523
+  type: 'test'
+  ...
+# Subtest: 错误候选图片响应不能覆盖指南，失败图片提示也不回填包装文案
+ok 10 - 错误候选图片响应不能覆盖指南，失败图片提示也不回填包装文案
+  ---
+  duration_ms: 3.2785
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 852.3923
