@@ -416,5 +416,14 @@
     ],
     "currency": "CNY",
     "revised_estimated_preparation_days": 5
-  }
+  },
+  "exclusion_validation_cases": [
+    {"name": "unknown_top_level_key", "dislikes": "不要香水", "output": {"ai_exclusion_candidates": [], "ai_unmapped_notes": [], "extra": "forbidden"}, "expected_error": "AI_OUTPUT_INVALID"},
+    {"name": "term_not_in_source_span", "dislikes": "不要太甜", "output": {"ai_exclusion_candidates": [{"id": "xc1", "kind": "term", "tag": null, "term": "糖", "source_span": "不要太甜", "confidence": "high", "why": "模型猜测", "evidence": "user_text"}], "ai_unmapped_notes": []}, "expected_error": "AI_OUTPUT_UNANCHORED"},
+    {"name": "other_tag_rejected", "dislikes": "不要其他", "output": {"ai_exclusion_candidates": [{"id": "xc1", "kind": "tag", "tag": "other", "term": null, "source_span": "不要其他", "confidence": "high", "why": "泛化类别", "evidence": "user_text"}], "ai_unmapped_notes": []}, "expected_error": "AI_OUTPUT_INVALID"}
+  ],
+  "presentation_invalid_cases": [
+    {"name": "forbidden_price_fields", "output": {"contract_version": "giftwise-20261031-v2", "style": "简洁低压力", "packaging": {"color_palette": ["米白"]}, "card_text": "愿你顺利。", "giving_advice": {"timing": "方便时", "wording": "一点心意。", "relationship_cautions": []}, "unknowns": [], "currency": "CNY", "revised_estimated_preparation_days": 5, "additional_cost": "0.00"}, "expected_error": "PRESENTATION_INVALID"},
+    {"name": "materials_steps_forbidden", "output": {"contract_version": "giftwise-20261031-v2", "style": "简洁低压力", "packaging": {"color_palette": ["米白"], "materials": ["纸"]}, "card_text": "愿你顺利。", "giving_advice": {"timing": "方便时", "wording": "一点心意。", "relationship_cautions": []}, "unknowns": [], "currency": "CNY", "revised_estimated_preparation_days": 5}, "expected_error": "PRESENTATION_INVALID"}
+  ]
 }

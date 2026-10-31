@@ -228,9 +228,16 @@ def verify_nov01():
     item = data["exclusions"][0]["output"]["ai_exclusion_candidates"][0]
     expect("明确香水建议锚定与白名单", item["source_span"] in data["exclusions"][0]["dislikes"] and item["tag"] == "fragrance" and set(item) == {"id", "kind", "tag", "term", "source_span", "confidence", "why", "evidence"})
     expect("未知与注入夹具均待澄清", all(c["expected"] == "needs_input" and c["output"]["ai_unmapped_notes"] for c in data["exclusions"][1:]))
+    expect("排除项非法顶层字段待拒绝", "extra" in data["exclusion_validation_cases"][0]["output"] and data["exclusion_validation_cases"][0]["expected_error"] == "AI_OUTPUT_INVALID")
+    term_case = data["exclusion_validation_cases"][1]
+    term_item = term_case["output"]["ai_exclusion_candidates"][0]
+    expect("term 反向锚定失败夹具", term_item["term"] not in term_item["source_span"] and term_case["expected_error"] == "AI_OUTPUT_UNANCHORED")
+    expect("other 标签不进入识别白名单", data["exclusion_validation_cases"][2]["output"]["ai_exclusion_candidates"][0]["tag"] == "other" and data["exclusion_validation_cases"][2]["expected_error"] == "AI_OUTPUT_INVALID")
     p = data["presentation"]
     expect("新版呈现严格根字段", set(p) == {"contract_version", "style", "packaging", "card_text", "giving_advice", "unknowns", "currency", "revised_estimated_preparation_days"})
     expect("新版呈现没有报价材料步骤", set(p["packaging"]) == {"color_palette"} and p["packaging"]["color_palette"] and p["contract_version"] == data["contract_version"])
+    expect("呈现报价字段负例明确拒绝", "additional_cost" in data["presentation_invalid_cases"][0]["output"] and data["presentation_invalid_cases"][0]["expected_error"] == "PRESENTATION_INVALID")
+    expect("呈现材料步骤字段负例明确拒绝", "materials" in data["presentation_invalid_cases"][1]["output"]["packaging"] and data["presentation_invalid_cases"][1]["expected_error"] == "PRESENTATION_INVALID")
     # 运行现有公开规则与工作流，实证冻结约束和一次修订保护；不声称新规则已集成。
     raw = dump(req)
     before = copy.deepcopy(req)
