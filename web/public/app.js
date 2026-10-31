@@ -327,6 +327,8 @@ function renderBudget() {
       const dual = document.querySelector(".range-dual");
       if (dual) { dual.style.setProperty("--range-min", `${Number(f.budget_min) / 10}%`); dual.style.setProperty("--range-max", `${Number(f.budget_max) / 10}%`); }
       document.querySelectorAll('[data-budget-value]').forEach(n=>{n.textContent=f[`budget_${n.dataset.budgetValue}`]+" 元"});
+      const selected = document.querySelector(".range-dual__selected");
+      if (selected) selected.textContent = `${f.budget_min}–${f.budget_max} 元`;
       const confirm = $("budget-confirm"); if(confirm) confirm.checked = true;
     };
     body.push(
@@ -338,9 +340,9 @@ function renderBudget() {
           ...["min","max"].map(which => el("input",{type:"range",id:`budget-${which}`,min:"0",max:"1000",step:"50",value:f[`budget_${which}`],"aria-label":which === "min" ? "礼物预算下限" : "礼物预算上限","data-field":`budget-${which}`,oninput:e=>update(which,e)})),
         ]),
         el("div",{class:"range-dual__labels"},[
-          el("strong",{"data-budget-value":"min",text:`${f.budget_min} 元`} ),
-          el("span",{text:"0–1000 元"}),
-          el("strong",{"data-budget-value":"max",text:`${f.budget_max} 元`} ),
+          el("strong",{text:"0 元"}),
+          el("span",{class:"range-dual__selected",text:`${f.budget_min}–${f.budget_max} 元`}),
+          el("strong",{text:"1000 元"}),
         ]),
       ]),
       el("p",{class:"field__hint",text:"同一条轨道的两端都可拖动；左端是下限，右端是上限。也可用方向键调整，每次 50 元。"})
