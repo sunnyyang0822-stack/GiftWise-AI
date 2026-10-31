@@ -47,13 +47,20 @@ export function extractContent(payload) {
   if (!Array.isArray(choices) || choices.length === 0) return llmError("LLM_BAD_RESPONSE");
   const first = choices[0];
   const finish = first && typeof first.finish_reason === "string" ? first.finish_reason : null;
-  const content = first && first.message && first.message.content;
-  if (typeof content !== "string") return llmError("LLM_BAD_RESPONSE");
-  const text = content.trim();
-  if (!text && finish !== "length") return llmError("LLM_BAD_RESPONSE");
+  const content = first?.message?.content;
+  const calls = first?.message?.tool_calls;
+  const validCalls = Array.isArray(calls) && calls.length > 0 && calls.length <= 32
+    && calls.every(call => call && typeof call.id === 'string' && call.id && call.type === 'function'
+      && typeof call.function?.name === 'string' && call.function.name && typeof call.function.arguments === 'string')
+    && new Set(calls.map(call => call.id)).size === calls.length;
+  if (calls != null && !(Array.isArray(calls) && calls.length === 0) && !validCalls) return llmError('LLM_BAD_RESPONSE');
+  if (typeof content !== 'string' && !(content === null && validCalls)) return llmError('LLM_BAD_RESPONSE');
+  const text = typeof content === 'string' ? content.trim() : '';
+  if (!text && finish !== 'length' && !validCalls) return llmError('LLM_BAD_RESPONSE');
   return {
     ok: true,
     text,
+    ...(validCalls ? {tool_calls: structuredClone(calls), assistant_message: {role:'assistant', content, tool_calls:structuredClone(calls)}} : {}),
     finish_reason: typeof first.finish_reason === "string" ? first.finish_reason : null,
     model: typeof payload.model === "string" ? payload.model : null,
     usage: payload.usage && typeof payload.usage === "object" ? payload.usage : null,
@@ -98,6 +105,7 @@ export class OpenAiCompatibleTransport {
       model: String(call.model).trim(),
       messages: call.messages,
       stream: false,
+      ...(Array.isArray(call.tools) && call.tools.length ? {tools:call.tools, tool_choice:call.tool_choice ?? 'auto'} : {}),
       ...(Number.isFinite(call.maxTokens) && call.maxTokens > 0 ? { max_tokens: Math.floor(call.maxTokens) } : {}),
       ...(Number.isFinite(call.temperature) ? { temperature: call.temperature } : {}),
     });
@@ -109,7 +117,10 @@ export class OpenAiCompatibleTransport {
 
     for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
       attempts += 1;
+      if (call.signal?.aborted) return llmError('LLM_CANCELLED',{attempts:attempt,transport:this.name});
       const controller = new AbortController();
+      const cancel = () => controller.abort();
+      call.signal?.addEventListener('abort',cancel,{once:true});
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const response = await this.fetchImpl(url, {
@@ -151,6 +162,7 @@ export class OpenAiCompatibleTransport {
           return {
             ok: true,
             text: extracted.text,
+            ...(extracted.tool_calls ? {tool_calls:extracted.tool_calls,assistant_message:extracted.assistant_message} : {}),
             usage: extracted.usage,
             model: extracted.model,
             finish_reason: extracted.finish_reason,
@@ -161,6 +173,7 @@ export class OpenAiCompatibleTransport {
           };
         }
       } catch (err) {
+        if (call.signal?.aborted) return llmError('LLM_CANCELLED',{attempts,transport:this.name,elapsed_ms:this.now()-started});
         if (err && (err.name === "AbortError" || err.code === "ABORT_ERR")) {
           lastCode = "LLM_TIMEOUT";
         } else {
@@ -176,6 +189,7 @@ export class OpenAiCompatibleTransport {
         }
       } finally {
         clearTimeout(timer);
+        call.signal?.removeEventListener('abort',cancel);
       }
       // 线性退避：250ms * (attempt+1)。测试里注入 sleepImpl，不阻塞。
       await this.sleep(250 * (attempt + 1));

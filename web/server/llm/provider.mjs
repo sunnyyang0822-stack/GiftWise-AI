@@ -130,7 +130,7 @@ export class LlmProvider {
    * 发一次真实调用，并记账。
    * @returns {Promise<object>} {ok:true, text, transport, …} | llmError
    */
-  async invoke({ kind, messages, maxTokens }) {
+  async invoke({ kind, messages, maxTokens, tools, tool_choice, signal }) {
     const cfg = this.config();
     if (!cfg.baseUrl || !cfg.apiKey || !cfg.model) {
       return llmError("LLM_NOT_CONFIGURED", { attempts: 0, transport: "live" });
@@ -149,6 +149,7 @@ export class LlmProvider {
       apiKey: cfg.apiKey,
       model: cfg.model,
       messages,
+      tools, tool_choice, signal,
       timeoutMs: cfg.timeoutMs,
       maxRetries: cfg.maxRetries,
       maxTokens: Number.isFinite(maxTokens) ? maxTokens : cfg.maxTokens,
@@ -184,54 +185,72 @@ export class LlmProvider {
    *   inputParse：第 1 步自然语言解析出的**用户硬约束**（原文/±带宽/城市），
    *   由 buildRecommendEnvelope 放进 input_constraints，不改变 request_json。
    */
-  async requestCandidates({ requestJson, intakeJson = null, retrieval = null, library = null, inputParse = null }) {
-    if (!this.available()) return llmError("LLM_NOT_CONFIGURED", { attempts: 0, transport: "live" });
+  async requestCandidates({ requestJson, intakeJson = null, retrieval = null, library = null, inputParse = null, tools = [], executeTool, signal, maxToolRounds = 4 }) {
+    if (!this.available()) return llmError('LLM_NOT_CONFIGURED', {attempts:0,transport:'live'});
     const guard = assertIntakeHasNoDerivedFields(intakeJson);
-    if (!guard.ok) {
-      return llmError("LLM_INTAKE_DERIVED_FIELD", { fields: guard.fields, attempts: 0 });
+    if (!guard.ok) return llmError('LLM_INTAKE_DERIVED_FIELD',{fields:guard.fields,attempts:0});
+    const registered = new Map();
+    for (const tool of tools) {
+      if (tool?.type !== 'function' || !/^[a-zA-Z0-9_-]{1,64}$/.test(tool.function?.name ?? '') || registered.has(tool.function.name)) return llmError('LLM_TOOL_CONFIG_INVALID');
+      registered.set(tool.function.name,tool);
     }
-    const envelope = buildRecommendEnvelope({
-      requestJson,
-      intakeJson,
-      // 检索不可用时不出现 retrieval_json 键（对齐可选语义；空值不用以掩盖缺失）。
-      retrieval: retrieval && retrieval.status !== "unavailable" ? retrieval : null,
-      // 库优先：库里真实存在的商品随信封一起给模型，避免它凭空想一个买不到的东西。
-      library,
-      inputParse,
-    });
-    const maxOutputRetries = this.outputRetries();
-    let reply = null;
-    let parsed = null;
-    let outputAttempts = 0;
-    for (let round = 0; round <= maxOutputRetries; round += 1) {
-      outputAttempts += 1;
-      reply = await this.invoke({ kind: "recommend", messages: buildRecommendMessages(envelope), maxTokens: this.config().maxTokens });
-      if (!reply.ok) return reply;
-      parsed = parseModelJson(reply.text, {
-        requireKey: "candidates",
-        finishReason: reply.finish_reason,
-        usage: reply.usage,
-        maxTokens: this.config().maxTokens,
-      });
-      if (parsed.ok) break;
-      // 被 max_tokens 截断（含被 reasoning 吃光额度）不是格式问题：重试同样会截断，只会白花一次额度。
-      if (parsed.code === "LLM_OUTPUT_TRUNCATED" || parsed.code === "LLM_OUTPUT_REASONING_EXHAUSTED") break;
-    }
-    if (!parsed.ok) {
-      return { ...parsed, transport: reply.transport, attempts: reply.attempts, output_attempts: outputAttempts };
-    }
-    return {
-      ok: true,
-      outputs: { candidates_json: dump(parsed.value) },
-      transport: reply.transport,
-      attempts: reply.attempts ?? 0,
-      output_attempts: outputAttempts,
-      usage: reply.usage ?? null,
-      model: reply.model ?? null,
-      http_status: reply.http_status ?? null,
-      finish_reason: reply.finish_reason ?? null,
-      elapsed_ms: reply.elapsed_ms ?? null,
+    const envelope = buildRecommendEnvelope({requestJson,intakeJson,retrieval:retrieval && retrieval.status !== 'unavailable' ? retrieval : null,library,inputParse});
+    const messages = buildRecommendMessages(envelope);
+    const toolAudit = [];
+    const cfg = this.config();
+    const redact = (value, depth = 0) => {
+      if (depth > 16) return '[omitted]';
+      if (typeof value === 'string') return cfg.apiKey ? value.split(cfg.apiKey).join('[redacted]') : value;
+      if (Array.isArray(value)) return value.map(v=>redact(v,depth+1));
+      if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).filter(([k])=>!/(?:password|cookie|authorization|token|secret|api.?key|prompt|messages)/i.test(k)).map(([k,v])=>[k,redact(v,depth+1)]));
+      return value;
     };
+    let reply, parsed;
+    let modelCalls = 0, toolRounds = 0, outputAttempts = 0;
+    const toolLimit = Number.isInteger(maxToolRounds) ? Math.max(0,Math.min(maxToolRounds,4)) : 4;
+    const meta = () => ({tool_audit:toolAudit,model_calls:modelCalls,synthetic:this.live?.synthetic === true});
+    while (true) {
+      const toolChoice = toolRounds >= toolLimit ? 'none' : 'auto';
+      reply = await this.invoke({kind:'recommend',messages,maxTokens:cfg.maxTokens,...(registered.size ? {tools:[...registered.values()],tool_choice:toolChoice} : {}),signal});
+      modelCalls += 1;
+      if (!reply.ok) return {...reply,...meta(),...(registered.size ? {tool_protocol_status:'http_or_transport_error',tool_protocol_support:'unverified'} : {})};
+      if (reply.tool_calls?.length) {
+        if (!registered.size || toolChoice === 'none') return {...llmError('LLM_TOOL_PROTOCOL_UNSUPPORTED'),...meta(),tool_protocol_status:'tool_choice_ignored'};
+        messages.push(reply.assistant_message ?? {role:'assistant',content:null,tool_calls:reply.tool_calls});
+        for (const call of reply.tool_calls) {
+          const name = call.function.name;
+          let args = null, result;
+          if (!registered.has(name)) result = {ok:false,error:{code:'TOOL_NOT_REGISTERED'}};
+          else {
+            try { strictParse(call.function.arguments); args = JSON.parse(call.function.arguments); if (!args || typeof args !== 'object' || Array.isArray(args)) throw new Error(); }
+            catch { result = {ok:false,error:{code:'TOOL_ARGUMENTS_INVALID'}}; }
+            if (!result) {
+              if (signal?.aborted) result = {ok:false,error:{code:'TOOL_CANCELLED'}};
+              else if (typeof executeTool !== 'function') result = {ok:false,error:{code:'TOOL_EXECUTOR_UNAVAILABLE'}};
+              else {
+                try {
+                  result = await executeTool({name,arguments:args,id:call.id});
+                  if (!result || typeof result !== 'object') result = {ok:false,error:{code:'TOOL_RESULT_INVALID'}};
+                  result = redact(result);
+                  if (JSON.stringify(result).length > 256000) result = {ok:false,error:{code:'TOOL_RESULT_TOO_LARGE'}};
+                } catch { result = {ok:false,error:{code:'TOOL_EXECUTION_FAILED'}}; }
+              }
+            }
+          }
+          const safeResult = redact(result);
+          toolAudit.push(redact({tool_call_id:call.id,name,arguments:registered.has(name) ? redact(args) : null,result:safeResult}));
+          messages.push({role:'tool',tool_call_id:call.id,content:JSON.stringify(safeResult)});
+        }
+        toolRounds += 1;
+        continue;
+      }
+      outputAttempts += 1;
+      parsed = parseModelJson(reply.text,{requireKey:'candidates',finishReason:reply.finish_reason,usage:reply.usage,maxTokens:cfg.maxTokens});
+      if (parsed.ok) break;
+      if (outputAttempts > this.outputRetries() || ['LLM_OUTPUT_TRUNCATED','LLM_OUTPUT_REASONING_EXHAUSTED'].includes(parsed.code)) return {...parsed,transport:reply.transport,attempts:reply.attempts,output_attempts:outputAttempts,...meta()};
+    }
+    const {product_references, ...candidateOutput} = parsed.value;
+    return {ok:true,outputs:{candidates_json:dump(candidateOutput),...(product_references !== undefined ? {product_references_json:dump(product_references)} : {})},transport:reply.transport,attempts:reply.attempts ?? 0,output_attempts:outputAttempts,usage:reply.usage ?? null,model:reply.model ?? null,http_status:reply.http_status ?? null,finish_reason:reply.finish_reason ?? null,elapsed_ms:reply.elapsed_ms ?? null,...meta()};
   }
 
   /**
@@ -371,6 +390,11 @@ export async function requestCandidates(requestJson, retrieval = null, options =
     intakeJson: options.intakeJson ?? null,
     retrieval,
     library: options.library ?? null,
+    inputParse: options.inputParse ?? null,
+    tools: options.tools ?? [],
+    executeTool: options.executeTool,
+    signal: options.signal,
+    maxToolRounds: options.maxToolRounds,
   });
 }
 
