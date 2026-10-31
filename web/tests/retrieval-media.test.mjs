@@ -33,3 +33,6 @@ const id=e.products[0].product_id;assert.throws(()=>bindCandidates(e,[{candidate
 assert.equal(bindCandidates(e,[{candidate_id:'c',product_id:id,estimated_total:'20.00'}],'100').get('c').quantity,1);
 assert.throws(()=>bindCandidates(e,[{candidate_id:'c',product_id:id,estimated_total:'20.00'}],'19'));
 });
+
+import {verifyCandidateEvidence} from '../server/retrieval/evidence.mjs';
+test('模型提供者引用一一对应规格与金额',()=>{const e=freezeEvidence([{name:'虚构礼物',variant:'蓝色',quantity:1,currency:'CNY',price_amount:'30',price_conditions:[]}],{source:'seed'});const id=e.products[0].product_id;const c=[{id:'c',name:'虚构礼物 · 蓝色',estimated_total:'30'}];assert.equal(verifyCandidateEvidence(e,c,[{candidate_id:'c',product_id:id}],'40').size,1);assert.throws(()=>verifyCandidateEvidence(e,c,null,'40'));assert.throws(()=>verifyCandidateEvidence(e,[{...c[0],name:'红色'}],[{candidate_id:'c',product_id:id}],'40'));});

@@ -19,3 +19,9 @@ export function bindCandidates(evidence,references,budget){
  for(const ref of references){if(bindings.has(ref.candidate_id))throw new Error('DUPLICATE_CANDIDATE');const p=evidence.products.find(p=>p.product_id===ref.product_id);if(!p)throw new Error('UNKNOWN_PRODUCT');if(p.price_amount!==ref.estimated_total)throw new Error('PRICE_EVIDENCE_MISMATCH');if(checkPrice(p,budget)!=='within_budget')throw new Error('PRICE_NOT_VERIFIED_WITHIN_BUDGET');bindings.set(ref.candidate_id,p);}
  return bindings;
 }
+
+export function verifyCandidateEvidence(evidence,candidates,references,budget){
+ if(!Array.isArray(candidates)||!Array.isArray(references)||references.length!==candidates.length)throw new Error('PRODUCT_REFERENCES_REQUIRED');
+ const seen=new Set();const refs=candidates.map(c=>{const matches=references.filter(r=>r.candidate_id===c.id);if(matches.length!==1)throw new Error('PRODUCT_REFERENCES_REQUIRED');const r=matches[0];if(Object.keys(r).some(k=>!['candidate_id','product_id'].includes(k)))throw new Error('INVALID_PRODUCT_REFERENCE');if(seen.has(r.product_id))throw new Error('DUPLICATE_PRODUCT');seen.add(r.product_id);const product=evidence.products.find(p=>p.product_id===r.product_id);if(!product||c.name!==product.name+' · '+product.variant)throw new Error('PRODUCT_SPEC_MISMATCH');return {...r,estimated_total:c.estimated_total};});
+ return bindCandidates(evidence,refs,budget);
+}

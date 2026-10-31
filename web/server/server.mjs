@@ -286,6 +286,7 @@ async function handleApi(req, res, url) {
       errors: outcome.errors,
       mode: outcome.mode,
       notices: outcome.notices || [],
+      ...(outcome.retrieval ? {retrieval:outcome.retrieval,media:outcome.media} : {}),
     });
     return true;
   }

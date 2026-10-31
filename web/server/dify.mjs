@@ -70,9 +70,9 @@ export async function runWorkflow(path, inputs) {
 }
 
 /** 推荐阶段：把已适配的 request 交给 Dify 生成三候选。 */
-export async function requestCandidates(requestJson) {
+export async function requestCandidates(requestJson, retrieval = null) {
   const cfg = difyConfig();
-  return runWorkflow(cfg.recommendPath, { action: "recommend", request_json: requestJson, request_json_type: "String" });
+  return runWorkflow(cfg.recommendPath, { action: "recommend", request_json: requestJson, request_json_type: "String", ...(retrieval ? {retrieval_json: dump(retrieval)} : {}) });
 }
 
 /** 呈现阶段：只围绕用户已选候选生成呈现内容。 */

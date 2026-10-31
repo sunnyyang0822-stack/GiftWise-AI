@@ -1,3 +1,4 @@
+import { verifyCandidateEvidence } from "./retrieval/evidence.mjs";
 import { RetrievalWorker, unavailableProvider } from "./retrieval/worker.mjs";
 import { mediaProvider } from "./media/provider.mjs";
 import { ApplePublicProvider } from "./retrieval/apple-provider.mjs";
@@ -115,10 +116,16 @@ export async function runRecommendation(input) {
   let validation = null;
   let repairCount = 0;
 
+  const retrievalEnabled = mode === "dify" && process.env.GIFTWISE_RETRIEVAL === "apple-public";
+  const retrieval = retrievalEnabled ? await retrievalWorker.submit({category:"home",keywords:[],limit:3}).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["未启用真实检索；价格为估算"]};
+  if (retrievalEnabled && new Set(retrieval.products.map(p=>p.name)).size < 3) {
+    return {kind:"needs_input",status:"needs_input",mode,notices,errors:[{code:"RETRIEVAL_INSUFFICIENT",path:"retrieval",message:"公开来源不足三种不同且有据的礼物，请调整范围或稍后重试。"}],retrieval,media:mediaProvider.candidates()};
+  }
+  let productReferences = null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
-    const call = await requestCandidates(requestJson);
+    const call = await requestCandidates(requestJson, retrievalEnabled ? retrieval : null);
     callCounts.recommend += 1;
     if (!call.ok) {
       return {
@@ -131,6 +138,7 @@ export async function runRecommendation(input) {
     }
     const raw = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     candidatesJson = raw;
+    productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
   } else if (demo === "model_error") {
     const broken = buildBrokenModelOutput();
     callCounts.recommend += 1;
@@ -205,6 +213,8 @@ export async function runRecommendation(input) {
     });
   }
 
+  let evidenceBindings = new Map();
+  if(retrievalEnabled){try {evidenceBindings = verifyCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates,productReferences,request.budget_amount);}catch {workflowErrors.push({code:"PRODUCT_EVIDENCE_MISMATCH",path:"retrieval",message:"商品规格、引用或价格与服务端证据不一致，候选不可选。"});}}
   let status = validation.status;
   if (workflowErrors.length > 0 && !["error", "needs_input"].includes(status)) status = "failed";
   const selectable = computeSelectable(validation, workflowErrors);
@@ -226,8 +236,9 @@ export async function runRecommendation(input) {
     notices,
     idempotency_key: key,
   });
-  run.retrieval = mode === "dify" ? await retrievalWorker.submit({ category: "home", keywords: [], limit: 3 }).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["模拟模式不执行真实检索"]};
-  run.media = mediaProvider.candidates();
+  run.retrieval = retrieval;
+  run.product_bindings = evidenceBindings;
+  run.media = mediaProvider.candidates([...evidenceBindings].map(([candidate_id,p])=>({candidate_id,product_id:p.product_id})));
   run.call_counts = callCounts;
   run.demo = demo;
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];

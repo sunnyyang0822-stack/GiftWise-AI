@@ -29,3 +29,7 @@ annotations = [{id,text,target:{x,y},label:{x,y}}]；坐标必须有限且在 0�
 ## 实施状态
 
 此提交只冻结结构。真实浏览器搜索、商品详情读取、provider、安全下载及业务接线均待实现与独立 QA；不可用夹具结果证明真实检索成功。
+
+## 生成提供者增量（PR #61 明示给 PM）
+
+仅启用真实检索时，生成调用新增 retrieval_json 字符串输入；提供者须返回独立 product_references_json 字符串，值为 [{candidate_id,product_id}]，不修改严格 candidates_json。引用须与每个候选一一对应且商品ID不重复，候选name须等于服务端商品name + " · " + variant；estimated_total须原样匹配证据价格。引用缺失、不匹配或条件未核实均阻止选择。检索不足三种不同商品时不调用生成提供者，返回 RETRIEVAL_INSUFFICIENT。工作流需按此增量适配，未真实联调。
