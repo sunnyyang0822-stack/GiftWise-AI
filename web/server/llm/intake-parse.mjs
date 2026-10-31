@@ -1,34 +1,4 @@
-/**
- * 第 1 步 · 自然语言 ⇒ **现有 intake 字段**（唯一职责）。
- *
- * 产品负责人 2026-10-31 定调：「你不需要完全自由的与用户沟通，保持我们现有的固定字段，
- * 接入是为了读取用户的输入需求以进行之后的返回。」因此本模块：
- *
- *   - **字段清单与取值范围由代码固定**（`INTAKE_FIELDS`：web/server/intake.mjs，
- *     标签枚举：web/server/labels.mjs）。模型只能"把用户的话对应到这些字段上"，
- *     清单外的键、枚举外的值、超范围的数量**一律丢弃并如实记账**（`parse.dropped`）；
- *   - **不做多轮自由对话**：一次调用、一个严格 JSON、没有会话状态；
- *   - **用户没提到的字段不填**：模型输出里"没出现的键"＝用户没提到 ⇒ 保持表单原值或空/默认，
- *     绝不用"常见值"补齐；
- *   - **推断必须如实标记**：兴趣用契约里已有的 `interest_confidence: "inferred"`；
- *     契约里没有推断标记的字段，用一个**不进入 intake 对象**的 `parse.inferred_fields`
- *     如实登记（最小改动，不改字段清单）；
- *   - **失败一律回落**：解析失败/超时/输出非法 ⇒ 用用户原样提交的表单字段继续跑，
- *     并把降级原因写进响应与账本（账本由 provider 的 `kind: "intake_parse"` 记录）；
- *   - **不成为后门**：产出仍旧是普通 intake 对象，必须再过 `adaptIntakeObject()`
- *     与 `checker.mjs` 的同一套硬校验；模型输出不能绕过任何规则。
- *
- * 四条产品裁定的落地位置（逐条）：
- *   1. 「同时输入文本又选了选项 ⇒ 以用户输入为主」→ 模型**只看到用户原话**（根本看不到
- *      表单选项），合并顺序固定为「文本 > 表单」，冲突写进 `parse.overridden_from_form`；
- *   2. 「确定金额/时间 ⇒ 展示用户输入的那个值」→ `parse.echo` 原样回显用户数值与说法片段；
- *      「价格约束 ±50 / 天数约束 ±1 天」→ `parse.constraints` 的 budget_band / days_band，
- *      并由 pipeline.mjs 用同一份常量做候选侧 gate；
- *   3. 「喜好填了文本 ⇒ 直接抓原文，不与预设选项匹配」→ `literal_preferences` 原样保留，
- *      写进 `additional_context` 并作为硬约束随推荐请求发给模型；
- *   4. 「体验类 ⇒ 必须问城市 / 考虑地域价格」→ `experiential_mentioned` + `city` +
- *      `required_followups`（缺城市时必答）+ `region_price` 口径。
- */
+/** 自然语言解析只填现有 intake 契约；原话、推断与待确认信息分别返回。 */
 
 import { createHash } from "node:crypto";
 
@@ -42,7 +12,7 @@ import { loadPromptBody } from "./prompt.mjs";
 import { llmProvider } from "./provider.mjs";
 
 /** 解析结果的结构版本：任何字段语义变化都必须递增（写进响应，便于前端与复核对齐）。 */
-export const INTAKE_PARSE_SCHEMA = "intake-parse-v1";
+export const INTAKE_PARSE_SCHEMA = "intake-parse-v3";
 
 /** 解析结果的状态。⛔ 不使用「成功」以外的模糊词：每种状态都能对应到一句可核验的中文。 */
 export const PARSE_STATUS = Object.freeze({
@@ -63,10 +33,9 @@ export function relationIds() {
   return [...PRODUCT_RELATIONS.map((item) => item.id), "unknown"];
 }
 
-/** 目标金额/天数约束带宽（与 pipeline 的候选侧 gate 共用同一份常量）。 */
+/** 预算带宽；时间不参与推荐判断。 */
 export const BANDS = Object.freeze({
   budgetCny: INTAKE_PARSE_CONFIG.budgetBandCny,
-  days: INTAKE_PARSE_CONFIG.daysBand,
 });
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
@@ -139,8 +108,8 @@ export function fieldCatalogue() {
       gift_styles: Object.keys(GIFT_STYLE_TABLE).map((id) => ({ id, zh: GIFT_STYLE_TABLE[id] })),
       exclusion_tags: Object.keys(EXCLUSION_TABLE).map((id) => ({ id, zh: EXCLUSION_TABLE[id] })),
     },
-    ranges: { budget_amount: "1 至 10000 的十进制字符串（0 仅用于「不花钱」）", deadline_days: "0 至 365 的整数" },
-    bands: { ...BANDS },
+    ranges: { budget_amount: "1 至 10000 的十进制字符串（0 仅用于「不花钱」）", deadline_days: "可省略或未知；明确天数仅为参考，不影响推荐" },
+    bands: { budgetCny: BANDS.budgetCny },
   };
 }
 
@@ -165,7 +134,7 @@ export function buildIntakeParseMessages({ text, now = new Date() }) {
     "- 禁忌类别 ID：" + catalogue.enums.exclusion_tags.map((item) => `${item.id}=${item.zh}`).join("、"),
     `- 金额范围：${catalogue.ranges.budget_amount}；天数范围：${catalogue.ranges.deadline_days}`,
     "",
-    "# 今天（Asia/Shanghai，用于把「明天 / 下周 / 下个月」换算成天数）",
+    "# 今天（Asia/Shanghai；仅换算明确日期。下周、下个月等没有具体日期时保留原话，不猜天数、不追问期限）",
     `${today.date}（${today.weekday}）`,
   ];
   const system = `${body ?? FALLBACK_BODY}\n\n${lines.join("\n")}`;
@@ -178,9 +147,9 @@ export function buildIntakeParseMessages({ text, now = new Date() }) {
 
 const FALLBACK_BODY =
   "你是 GiftWise AI 第 1 步的输入解析器。只输出一个严格 JSON 对象，把用户原话对应到固定字段清单上；" +
-  "用户没提到的字段不要出现；不许新增字段或枚举值；不确定的值宁可不输出。";
+  "用户没提到的字段不要出现；只用现有字段；选项外喜好保留原话，自定义关系和场合用 other 及对应 custom 字段；不确定信息保留原话并标注。";
 
-/* ── 用户原文里的**明确金额区间**（代码级识别，与 deadlineCrossCheck 同一思路）──
+/* ── 用户原文里的**明确金额区间**（以用户原话核对）──
    2026-11-01 缺陷 A 的相关口径：用户写「预算 800–1000」时，**区间本身就是他输入的东西**，
    产品裁定要求"展现给用户的就是他输入的东西"⇒ 该区间必须原样保留（不能压成一个数、
    更不能变成 0–×××）。提示词要求模型只给单个金额（`budget.amount`），模型对区间的处理
@@ -297,8 +266,8 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       return null;
     }
     const cleaned = value.trim();
-    if (codePointLength(cleaned) > 100) {
-      drop(customKey, cleaned, "自定义文本超过 100 码点");
+    if (codePointLength(cleaned) > 1000) {
+      drop(customKey, cleaned, "自定义文本超过 1000 码点");
       return null;
     }
     if (chosen && chosen !== "other") {
@@ -375,7 +344,7 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       user_amount: amountOfCents(high),
       band_cny: config.budgetBandCny,
       contract_range: { min: amountOfCents(low), max: amountOfCents(high) },
-      basis: `用户给出金额区间 ${amountOfCents(low)}–${amountOfCents(high)} ⇒ 界面显示用户输入的原区间（不显示 0–×××）；候选价格约束带宽为区间两端各不超过 ${config.budgetBandCny} 元（产品负责人 2026-10-31 裁定）`,
+      basis: `预算 ${amountOfCents(low)}–${amountOfCents(high)} 元，以用户上限为准`,
       display: `界面显示用户输入的原区间：${amountOfCents(low)}–${amountOfCents(high)}`,
     };
     meta.budget_check = {
@@ -425,39 +394,28 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
         user_amount: amountOfCents(cents),
         band_cny: config.budgetBandCny,
         contract_range: { min: amountOfCents(zero ? 0n : low), max: amountOfCents(cents) },
-        basis: zero ? "用户明确说「不花钱」⇒ 预算固定为 0" : `用户给出确定金额 ${amountOfCents(cents)} ⇒ 价格约束带宽为上下不超过 ${config.budgetBandCny} 元（产品负责人 2026-10-31 裁定）`,
+        basis: zero ? "不新增礼物支出" : `预算上限 ${amountOfCents(cents)} 元`,
         display: `界面显示用户输入的原值：${amountOfCents(cents)}（不显示区间）`,
       };
     }
   }
 
-  /* ---------- 时间：确定天数 + 上下 1 天的约束带宽 ---------- */
+  /* ---------- 时间仅作用户主动提供的参考，不生成推荐约束或追问 ---------- */
   const deadlineEntry = raw.deadline;
   if (deadlineEntry !== undefined && deadlineEntry !== null) {
-    const daysRaw = typeof deadlineEntry === "object" ? deadlineEntry.days : deadlineEntry;
+    const entry = typeof deadlineEntry === "object" ? deadlineEntry : { days: deadlineEntry };
+    const phrase = snippet(entry.phrase, 200);
+    if (phrase && text.includes(phrase)) meta.echo.deadline_phrase = phrase;
+    const calendarUncertain = phrase && /下个?月|下月|来月|下周|下个?星期/u.test(phrase) && !/\d{1,2}\s*[日号]/u.test(phrase);
+    const daysRaw = entry.days;
     const days = typeof daysRaw === "number" && Number.isInteger(daysRaw) ? daysRaw : typeof daysRaw === "string" && /^\d{1,3}$/.test(daysRaw.trim()) ? Number(daysRaw.trim()) : null;
-    if (days === null || days < 0 || days > 365) {
-      drop("deadline.days", daysRaw, "不是 0–365 的整数");
-    } else {
-      patch.deadline_days = days;
-      meta.mentioned_text_fields.push("deadline_days");
-      if (typeof deadlineEntry === "object" && deadlineEntry.explicit === true) meta.explicit_fields.push("deadline_days");
-      meta.echo.deadline_days = days;
-      meta.echo.deadline_phrase = snippet(typeof deadlineEntry === "object" ? deadlineEntry.phrase : null, 40);
-      // 相对时间词的代码级交叉校验：矛盾时**要求确认**（不静默改写模型给的天数）。
-      meta.deadline_check = deadlineCrossCheck({ phrase: typeof deadlineEntry === "object" ? deadlineEntry.phrase : null, days });
-      if (meta.deadline_check && meta.deadline_check.ok === false) {
-        meta.notes.push(`⚠ 期限需要确认：${meta.deadline_check.reason}`);
-      }
-      meta.constraints.days_band = {
-        min: clamp(days - config.daysBand, 0, 365),
-        max: clamp(days + config.daysBand, 0, 365),
-        user_days: days,
-        band_days: config.daysBand,
-        basis: `用户给出确定天数 ${days} 天 ⇒ 时间约束带宽为上下不超过 ${config.daysBand} 天（产品负责人 2026-10-31 裁定）`,
-        display: `界面显示用户输入的原值：${days} 天（不显示区间）`,
-      };
-    }
+    // 不确定的表达替换旧表单参考值为 null；模型猜出的期限不能冒充用户确定天数。
+    const known = !calendarUncertain && days !== null && days >= 0 && days <= 365;
+    patch.deadline_days = known ? days : null;
+    meta.echo.deadline_days = known ? days : null;
+    meta.mentioned_text_fields.push("deadline_days");
+    if (known && entry.explicit === true) meta.explicit_fields.push("deadline_days");
+    else meta.inferred_fields.push("deadline_days");
   }
 
   /* ---------- 兴趣：ID 只是"便于检索"的附加物，原话才是硬约束 ---------- */
@@ -531,8 +489,14 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       drop("exclusion_terms", cleaned, "超过契约上限（20 项 / 每项 1000 码点）");
       continue;
     }
+    const confidence = typeof item === "object" && item !== null ? item.confidence : "high";
+    if (!text.includes(cleaned) || confidence !== "high") {
+      drop("exclusion_terms", cleaned, "排除项需有原话依据且把握高；请确认原文含义");
+      continue;
+    }
     if (!terms.includes(cleaned)) terms.push(cleaned);
   }
+  meta.termList = terms;
   if (terms.length > 0) meta.mentioned_text_fields.push("hard_exclusions.terms");
   // 类别：**不**写进 intake（契约明确「词不自动推断类别」），只作为待用户确认的建议返回。
   for (const item of Array.isArray(raw.exclusion_tags) ? raw.exclusion_tags : []) {
@@ -542,7 +506,7 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       drop("exclusion_tags", item, "禁忌类别不在固定清单内");
       continue;
     }
-    meta.proposed_tags.push({ id, zh: EXCLUSION_TABLE[id], evidence, needs_user_confirmation: true, reason: "契约要求类别由用户确认：词不自动推断类别" });
+    meta.proposed_tags.push({ id, zh: EXCLUSION_TABLE[id], evidence, needs_user_confirmation: true, reason: "请确认排除范围" });
   }
   meta.proposed_tags = dedupeBy(meta.proposed_tags, (item) => item.id);
 
@@ -571,7 +535,7 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
     patch.previous_gifts = previousGifts;
     meta.mentioned_text_fields.push("previous_gifts");
   }
-  const additional = freeText("additional_context", "additional_context", 600);
+  const additional = freeText("additional_context", "additional_context", 1000);
   if (additional) {
     patch.additional_context = additional;
     meta.mentioned_text_fields.push("additional_context");
@@ -581,10 +545,10 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
   const cityEntry = raw.city;
   if (cityEntry !== undefined && cityEntry !== null) {
     const value = typeof cityEntry === "object" ? cityEntry.value : cityEntry;
-    if (typeof value === "string" && value.trim() && codePointLength(value.trim()) <= 20) {
+    if (typeof value === "string" && value.trim() && codePointLength(value.trim()) <= 20 && text.includes(value.trim())) {
       meta.city = value.trim();
     } else {
-      drop("city", value, "城市名必须是不超过 20 码点的非空字符串");
+      drop("city", value, "城市须为用户提到的不超过 20 码点的文字");
     }
   }
   meta.experiential_mentioned = raw.experiential_mentioned === true;
@@ -597,8 +561,12 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       continue;
     }
     const cleaned = item.trim();
-    if (codePointLength(cleaned) > 200) {
-      drop("literal_preferences", cleaned, "单条原文超过 200 码点");
+    if (!text.includes(cleaned)) {
+      drop("literal_preferences", cleaned, "喜好须保留用户原话，包括不确定语气");
+      continue;
+    }
+    if (codePointLength(cleaned) > 1000) {
+      drop("literal_preferences", cleaned, "单条原文超过 1000 码点");
       continue;
     }
     if (literals.length >= LIMITS.maxArrayItems) {
@@ -606,6 +574,10 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
       continue;
     }
     if (!literals.includes(cleaned)) literals.push(cleaned);
+  }
+  for (const entry of interestEntries) {
+    const evidence = typeof entry === "object" && entry !== null ? entry.evidence : null;
+    if (typeof evidence === "string" && evidence.trim() && text.includes(evidence.trim()) && !literals.some(value => value.includes(evidence.trim())) && literals.length < LIMITS.maxArrayItems) literals.push(evidence.trim());
   }
   meta.literal_preferences = literals;
   if (literals.length > 0) meta.mentioned_text_fields.push("literal_preferences");
@@ -651,55 +623,31 @@ function safeJson(value) {
   }
 }
 
-/* ── 相对时间词的**代码级**交叉校验（2026-10-31 实测：同一句「下个月」被模型算出 30 天，也被算成 1 天）──
-   模型对相对时间不稳定。这里**不静默改写**模型给的天数（那等于猜），只做两件事：
-     1. 矛盾时把结论标出来，并要求用户确认期限；
-     2. 记进 parse.deadline_check，让界面有据可依。
-   宁可多问一句，也不能拿一个 1 天的期限去生成方案（会把用户直接卡死）。 */
-const DEADLINE_UNIT_RULES = [
-  { re: /(\d+)\s*个月|下个?月|下月|来月/, unit: "月", approx: 30 },
-  { re: /(\d+)\s*(周|个?星期)|下周|下个?星期/, unit: "周", approx: 7 },
-  { re: /后天/, unit: "天", approx: 2 },
-  { re: /明天|次日/, unit: "天", approx: 1 },
-  { re: /(\d+)\s*天|今天|当天/, unit: "天", approx: null },
-];
-
-export function deadlineCrossCheck({ phrase, days }) {
-  if (typeof phrase !== "string" || !phrase.trim() || !Number.isInteger(days)) return null;
-  for (const rule of DEADLINE_UNIT_RULES) {
-    const match = rule.re.exec(phrase);
-    if (!match) continue;
-    if (rule.unit === "天") {
-      if (rule.approx !== null && days !== rule.approx) {
-        return { phrase, days, unit: rule.unit, expected: rule.approx, ok: false, reason: `原话「${phrase}」指的是 ${rule.approx} 天，模型算出 ${days} 天` };
-      }
-      return { phrase, days, unit: rule.unit, expected: days, ok: true };
-    }
-    const expected = match[1] ? Number(match[1]) * rule.approx : rule.approx;
-    // 月的容差放宽（有的月 28/31 天）；周的容差放宽（「下周」也可能是 3–10 天）。
-    const tolerance = rule.unit === "月" ? Math.max(3, Math.round(expected * 0.2)) : 3;
-    const ok = Math.abs(days - expected) <= tolerance;
-    return { phrase, days, unit: rule.unit, expected, tolerance, ok, reason: ok ? null : `原话「${phrase}」约等于 ${expected} 天（容差 ${tolerance} 天），模型算出 ${days} 天，偏差过大` };
-  }
-  return null;
-}
-
-/** 把确定性派生的文本拼进 additional_context（不改字段清单，只是填现有字段）。 */
-export function composeAdditionalContext({ formValue, meta, config = INTAKE_PARSE_CONFIG }) {
+/** additional_context 只保存用户内容；处理规则留在 parse 元数据及提示词里。 */
+export function composeAdditionalContext({ formValue, parsedValue, meta }) {
   const parts = [];
-  const literals = Array.isArray(meta?.literal_preferences) ? meta.literal_preferences.filter((item) => typeof item === "string" && item.trim()) : [];
-  if (typeof formValue === "string" && formValue.trim()) parts.push(formValue.trim());
-  if (meta?.city) parts.push(`所在城市：${meta.city}`);
-  if (literals.length > 0) {
-    parts.push(`用户原话（硬约束，不得用预设类目替代）：${literals.join(" / ")}`);
-  }
-  if (parts.length === 0) return null;
-  let text = parts.join("\n");
-  const max = Math.min(config.literalContextCodePoints ?? 600, LIMITS.maxStringCodePoints);
-  if (codePointLength(text) > max) {
-    text = `${[...text].slice(0, max - 1).join("")}…`;
-  }
-  return text;
+  const append = value => {
+    if (typeof value !== "string" || !value.trim()) return;
+    const clean = value.trim();
+    if (parts.some(part => part.includes(clean))) return;
+    if (parts.length && codePointLength([...parts, clean].join("\n")) > LIMITS.maxStringCodePoints) {
+      if (meta) {
+        meta.unmapped ??= [];
+        if (!meta.unmapped.includes(clean)) meta.unmapped.push(clean);
+        meta.notes ??= [];
+        if (!meta.notes.includes("补充内容较长，其余原话保留在解析明细中。")) meta.notes.push("补充内容较长，其余原话保留在解析明细中。");
+      }
+      return;
+    }
+    parts.push(clean);
+  };
+  append(formValue);
+  append(parsedValue);
+  for (const value of meta?.literal_preferences ?? []) append(value);
+  append(meta?.city);
+  append(meta?.echo?.deadline_phrase);
+  // 保留已有表单原文；可选补充超限时留在解析明细，不让合法表单整体失败。
+  return parts.length ? parts.join("\n") : null;
 }
 
 /**
@@ -718,6 +666,7 @@ export function mergeIntake({ form = {}, patch = {}, meta = {} }) {
       if (!isAppend) overridden.push({ field: key, from_form: intake[key], to_text: value, rule: "用户输入优先于选项（产品负责人 2026-10-31 裁定 1）" });
     }
     intake[key] = value;
+    if (["recipient_relation", "occasion"].includes(key) && value !== "other" && !Object.hasOwn(patch, `${key}_custom`)) delete intake[`${key}_custom`];
   }
   // 禁忌：把文本里的字面词并入表单里已有的禁忌，绝不覆盖用户已确认的类别。
   const terms = meta.termList ?? [];
@@ -804,43 +753,29 @@ export async function parseIntakeText(input = {}) {
     /* 裁定 3：用户原文是硬约束 ⇒ 必须落到**现有**字段上带去后续步骤（用 additional_context，
        不新增字段）。城市同理（裁定 4）。这样 request_json.notes 里就带着用户原话，
        第 2 步的推荐提示词与候选侧 gate 都看得到它。 */
-    const composed = composeAdditionalContext({ formValue: patch.additional_context ?? form.additional_context, meta: mergedMeta });
+    const composed = composeAdditionalContext({ formValue: form.additional_context, parsedValue: patch.additional_context, meta: mergedMeta });
     if (composed) patch = { ...patch, additional_context: composed };
     const { intake, overridden } = mergeIntake({ form, patch, meta: mergedMeta });
-    // 体验类必须问城市（裁定 4）：缺城市时给出**必答**追问项。
+    // 仅在城市影响体验推荐时返回可跳过的问题。
     const followups = [];
-    const wantsExperience =
-      mergedMeta.experiential_mentioned === true ||
-      (Array.isArray(intake.interests) && intake.interests.includes("experiences_activities")) ||
-      (Array.isArray(intake.gift_styles) && intake.gift_styles.includes("experiential"));
+    const wantsExperience = mergedMeta.experiential_mentioned === true;
     if (wantsExperience && !mergedMeta.city) {
       followups.push({
         id: "city",
         field: "additional_context",
-        question: "这个体验打算在哪个城市使用？（不同城市价格差别很大，估价与推荐会按这个城市来）",
-        required: true,
-        reason: "产品负责人 2026-10-31 裁定 4：体验类必须提问所在城市",
+        question: "如果考虑当地的体验，打算在哪个城市使用？",
+        required: false,
+        reason: "城市会影响当地体验的地点、档期和价格，可补充后再比较",
       });
     }
     if (typeof intake.dislikes === "string" && intake.dislikes.trim()) {
       followups.push({
         id: "exclusion_analysis",
         field: "dislikes",
-        question: "你提到「不喜欢」的内容需要先识别并逐项确认，才能进入生成方案。",
+        question: "请确认需要避开的内容。",
         required: true,
         endpoint: "POST /api/exclusions/analyze",
         reason: "现有契约要求排除项必须由用户确认",
-      });
-    }
-    if (mergedMeta.deadline_check && mergedMeta.deadline_check.ok === false) {
-      followups.push({
-        id: "deadline_confirm",
-        field: "deadline_days",
-        question: `你说的是「${mergedMeta.deadline_check.phrase}」，但解析出的可用天数是 ${mergedMeta.deadline_check.days} 天，请确认期限（按原话大约是 ${mergedMeta.deadline_check.expected} 天）。`,
-        required: true,
-        current_value: mergedMeta.deadline_check.days,
-        suggested_value: mergedMeta.deadline_check.expected,
-        reason: "相对时间由模型换算，实测不稳定（同一句「下个月」曾算出 30 天与 1 天）；这里只提示确认，服务端不擅自改写模型给的值",
       });
     }
     const regionPrice =
@@ -849,20 +784,24 @@ export async function parseIntakeText(input = {}) {
             applicable: wantsExperience,
             city: mergedMeta.city,
             tier: cityTier(mergedMeta.city),
-            note: REGION_PRICE_CONFIG.note,
-            source: REGION_PRICE_CONFIG.source,
+            note: "价格为估算，具体地点、档期和价格以实际信息为准。",
+            source: "用户城市与模型估算",
             is_estimate: true,
-            enforced_by: "提示词硬约束 + 响应标注；本地库没有买家城市维度，无法按城市过滤或比价",
+            enforced_by: "估价提示",
           }
         : null;
 
     const validation = adaptIntakeObject(intake);
+    if (mergedMeta.dropped.some(item => item.field === "budget.amount") && !Object.hasOwn(patch, "budget_amount")) {
+      validation.status = "needs_input";
+      validation.errors.push({ code: "INTAKE_CLARIFICATION_REQUIRED", path: "intake.budget_amount", message: "请确认预算，金额须在 0 至 10000 元之间。" });
+    }
     // mentioned_text_fields 去重（同一个字段可能被归一化与合并两处各记一次）。
     mergedMeta.mentioned_text_fields = [...new Set(mergedMeta.mentioned_text_fields)];
     const untouched = untouchedFields({ form, patch, meta: mergedMeta });
     const unknownFormKeys = Object.keys(form).filter((key) => !INTAKE_FIELDS.has(key));
     if (unknownFormKeys.length > 0) {
-      notices.push(`⚠ 表单里有未声明的字段：${unknownFormKeys.join("、")}。已**原样**提交给现有校验（不做静默删除），校验会按契约拒绝它们。`);
+      notices.push(`请检查未支持的字段：${unknownFormKeys.join("、")}。`);
     }
     return {
       status: status === PARSE_STATUS.READY && validation.status !== "ready" ? PARSE_STATUS.NEEDS_INPUT : status,
@@ -895,14 +834,14 @@ export async function parseIntakeText(input = {}) {
     return finish({
       status: PARSE_STATUS.DISABLED,
       reasonCode: "LLM_PARSE_DISABLED",
-      extraNotices: ["自然语言解析已被服务端开关关闭（GIFTWISE_INTAKE_PARSE=0）；直接使用表单字段。本次没有发起任何模型调用。"],
+      extraNotices: ["自然语言解析暂未启用，请填写表单。"],
     });
   }
   if (!text.trim()) {
     return finish({
       status: PARSE_STATUS.DISABLED,
       reasonCode: "LLM_PARSE_DISABLED",
-      extraNotices: ["本次没有提供自由文本，跳过解析；直接使用表单字段。本次没有发起任何模型调用。"],
+      extraNotices: ["请填写送礼需求或使用表单。"],
     });
   }
 
@@ -926,7 +865,7 @@ export async function parseIntakeText(input = {}) {
         reasonCode: "LLM_NOT_CONFIGURED",
         degraded: true,
         llm: { attempted: false, calls: 0 },
-        extraNotices: ["服务端没有可用的直连模型 provider，已**回落到你提交的表单字段**继续；没有用模拟解析结果顶替。"],
+        extraNotices: ["解析服务暂不可用，请检查或补充表单。"],
       });
     }
     if (typeof provider.available === "function" && !provider.available()) {
@@ -935,7 +874,7 @@ export async function parseIntakeText(input = {}) {
         reasonCode: "LLM_NOT_CONFIGURED",
         degraded: true,
         llm: { attempted: false, calls: 0 },
-        extraNotices: ["服务端未配置直连大模型凭证，未发起任何真实调用；已**回落到你提交的表单字段**继续。"],
+        extraNotices: ["解析服务暂不可用，请检查或补充表单。"],
       });
     }
 
@@ -948,7 +887,7 @@ export async function parseIntakeText(input = {}) {
         reasonCode: error?.code ?? "LLM_REQUEST_FAILED",
         degraded: true,
         llm: { attempted: true, calls: 1, error: String(error?.message ?? error).slice(0, 200) },
-        extraNotices: ["自然语言解析调用抛出异常，已**回落到你提交的表单字段**继续；未采用任何模型输出。"],
+        extraNotices: ["解析暂未完成，请检查或补充表单。"],
       });
     }
     const llm = {
@@ -970,10 +909,7 @@ export async function parseIntakeText(input = {}) {
         reasonCode: call.code,
         degraded: true,
         llm,
-        extraNotices: [
-          `自然语言解析失败（${call.code}），已**回落到你提交的表单字段**继续；没有用猜测值顶替、也没有把失败伪装成成功。`,
-          call.message ?? "",
-        ].filter(Boolean),
+        extraNotices: ["解析暂未完成，请检查或补充表单。"],
       });
     }
 
@@ -986,7 +922,7 @@ export async function parseIntakeText(input = {}) {
     })();
     const { patch, meta } = normalizeParseOutput(raw, { text, form, now: input.now ?? new Date() });
     // 禁忌字面词要参与合并，因此显式带进 meta（归一化阶段已逐项校验过）。
-    meta.termList = Array.isArray(meta.termList) && meta.termList.length ? meta.termList : collectTermsFromPatch(raw);
+    meta.termList ??= [];
     const recognized = meta.mentioned_text_fields.filter((field) => field !== "literal_preferences");
     if (recognized.length === 0 && meta.literal_preferences.length === 0 && !meta.experiential_mentioned) {
       return finish({
@@ -996,7 +932,7 @@ export async function parseIntakeText(input = {}) {
         meta,
         llm,
         extraNotices: [
-          "这次输入**没有识别出任何可落地的字段**（过于含糊或与送礼无关）：已如实留空并标记，没有猜测、没有填默认值；请补充关系/场合/预算/时间中的任意一项。",
+          "请补充送给谁、什么场合或预算。",
         ],
       });
     }
@@ -1020,19 +956,6 @@ export async function parseIntakeText(input = {}) {
   return run;
 }
 
-/** 从归一化前的原始输出里取禁忌字面词（归一化阶段已校验过，这里只是搬运）。 */
-function collectTermsFromPatch(raw) {
-  const terms = [];
-  for (const item of Array.isArray(raw?.exclusion_terms) ? raw.exclusion_terms : []) {
-    const value = typeof item === "object" && item !== null ? item.text : item;
-    if (typeof value === "string" && value.trim()) {
-      const cleaned = value.trim();
-      if (codePointLength(cleaned) <= LIMITS.maxStringCodePoints && !terms.includes(cleaned)) terms.push(cleaned);
-    }
-  }
-  return terms.slice(0, LIMITS.maxArrayItems);
-}
-
 export function cityTier(city) {
   if (!city) return "unknown";
   if (REGION_PRICE_CONFIG.tier1Cities.includes(city)) return "tier1";
@@ -1050,7 +973,6 @@ export function toRecommendConstraints(parse) {
   if (Array.isArray(parse.literal_preferences) && parse.literal_preferences.length) constraints.literal_preferences = parse.literal_preferences;
   if (parse.city) constraints.city = parse.city;
   if (parse.constraints?.budget_band) constraints.budget_band = parse.constraints.budget_band;
-  if (parse.constraints?.days_band) constraints.days_band = parse.constraints.days_band;
   if (parse.region_price?.applicable) {
     constraints.region_price = { city: parse.region_price.city, tier: parse.region_price.tier, note: parse.region_price.note, is_estimate: true };
   }
