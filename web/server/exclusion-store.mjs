@@ -12,10 +12,10 @@ function prune() {
     ids.forEach(id => analyses.delete(id));
   }
 }
-export function createAnalysis({ intake, mode, candidates, status, errors = [] }) {
+export function createAnalysis({ intake, mode, candidates, status, errors = [], semantic_constraints = [], clarification_questions = [], clarifications = [], unmapped_notes = [] }) {
   prune();
   const id = `xa-${randomUUID()}`;
-  analyses.set(id, { id, createdAt: Date.now(), intake: structuredClone(intake), mode, candidates: structuredClone(candidates), status, errors: structuredClone(errors) });
+  analyses.set(id, { id, createdAt: Date.now(), intake: structuredClone(intake), mode, candidates: structuredClone(candidates), status, errors: structuredClone(errors), semantic_constraints: structuredClone(semantic_constraints), clarification_questions: structuredClone(clarification_questions), clarifications: structuredClone(clarifications), unmapped_notes: structuredClone(unmapped_notes) });
   prune();
   return id;
 }

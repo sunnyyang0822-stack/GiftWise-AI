@@ -344,13 +344,13 @@ export class LlmProvider {
   }
 
   /** 排除项识别：返回模型原始严格 JSON 字符串，交由 exclusion-checker 校验。 */
-  async recognizeExclusions({ dislikes }) {
+  async recognizeExclusions({ dislikes, clarifications = [] }) {
     if (!this.available()) throw Object.assign(new Error("LLM_NOT_CONFIGURED"), { code: "LLM_NOT_CONFIGURED" });
     const maxOutputRetries = this.outputRetries();
     let reply = null;
     let parsed = null;
     for (let round = 0; round <= maxOutputRetries; round += 1) {
-      reply = await this.invoke({ kind: "exclusions", messages: buildExclusionsMessages({ dislikes }), maxTokens: this.config().maxTokens });
+      reply = await this.invoke({ kind: "exclusions", messages: buildExclusionsMessages({ dislikes, clarifications }), maxTokens: this.config().maxTokens });
       if (!reply.ok) throw Object.assign(new Error(reply.code), { code: reply.code });
       parsed = parseModelJson(reply.text, { requireKey: "ai_exclusion_candidates", finishReason: reply.finish_reason, usage: reply.usage, maxTokens: this.config().maxTokens });
       if (parsed.ok) break;
