@@ -1,0 +1,9 @@
+{
+  "command": [
+    "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "tests/acceptance/retrieval_media/run_prepare.py",
+    "--out",
+    "docs/test-reports/retrieval-media/runs/preparation-20261031"
+  ],
+  "exit_code": 0
+}

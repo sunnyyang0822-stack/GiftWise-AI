@@ -1,0 +1,42 @@
+{
+  "scope": "TEST_PREPARATION_ONLY",
+  "time": "2026-10-31T13:18:19.411644+08:00",
+  "command": [
+    "tests/acceptance/retrieval_media/run_prepare.py",
+    "--out",
+    "docs/test-reports/retrieval-media/runs/preparation-20261031"
+  ],
+  "preparation_sha": "3890aa57a2c728d3bd94fea00b9117f9d0a8aa93",
+  "initial_status": "?? docs/test-reports/retrieval-media/\n?? tests/acceptance/retrieval_media/\n",
+  "asset_self_check": "PASS",
+  "business_counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 63
+  },
+  "groups": {
+    "R": 15,
+    "P": 18,
+    "M": 20,
+    "F": 10
+  },
+  "layers": {
+    "real_retrieval": 1,
+    "controlled": 32,
+    "browser": 21,
+    "http": 8,
+    "image_service": 1
+  },
+  "source_hashes": {
+    "AGENTS.md": "18cb1a498e3c533be4d960efec457e0b965df39cf0f75506daf8adcdaa1e3400",
+    "docs/test-plan.md": "d7b6f27b2b3ed625005b79eb0ec12bb99c8e65fd15b865ff5de64a98cdce4813",
+    "docs/product-requirements.md": "0df603092fd0cab928d250e4566ee206214c3df06da075736a002145237f5788",
+    "docs/development-process.md": "e62d6d211dd7af040f542d03e087a33d5dd03c808107f3016cc49dc93b4f078f"
+  },
+  "asset_hashes": {
+    "matrix.json": "52eff4d05aa86519746966d7b1576435262043013769cc1b727c06cced30c4df",
+    "fixtures.json": "c32d9a07d7e1f6e960756777f8875d3fd88734f31f4c9c9d66de377ce3b77e76"
+  },
+  "note": "未运行产品测试；无HTTP/浏览器/真实检索/图像服务/模型调用。"
+}

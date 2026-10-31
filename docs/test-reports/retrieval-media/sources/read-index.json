@@ -1,0 +1,17 @@
+{
+  "release_sha": "3890aa57a2c728d3bd94fea00b9117f9d0a8aa93",
+  "contract_pr": 61,
+  "contract_commit": "dbb4cad9370d04ed07742be820fc7383981797d2",
+  "contract_in_release": false,
+  "prior_qa_commit": "902cbd4071d49a1acacce5841347452bb0512f75",
+  "prior_report_content_matches_commit": true,
+  "sources": {
+    "issue-1.json": "51783c857dc52d288becc5a3fb4d6a5a4c4d5f0813340968a0570d5e157cd0d3",
+    "issue-59.json": "a801c8e38575a21df3be93065786f92501f64eb42cd3db17ca5c294325b33051",
+    "issue-60.json": "5ce5363d52f4a95a42acc01faf5c3e9cf004bf8df87872fd0e1fa23453f3ef16",
+    "pr61.json": "18918bb1360066b1f53e82ed07ae7f141fa000a8b1ce24c4a41a397b70941aba",
+    "qa51-final-report-snapshot.md": "a365ef87dbf2cd260aceba134a4aff64387278d6549eb2aa8f2441d74ea676b2",
+    "retrieval-media-contract-pr61.md": "6e84802996ed334d2b1d599e4b259a4bb79cfc0b9aeed458542b264b23f004d5"
+  },
+  "tracked_changes_before_staging": []
+}

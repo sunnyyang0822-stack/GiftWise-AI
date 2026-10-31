@@ -1,0 +1,442 @@
+{
+  "notice": "全为QA虚构数据。不是商品证据、API请求或真实图片；不得发起网络/付费调用。",
+  "products": [
+    {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "200.00",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    {
+      "product_id": "p-cup",
+      "name": "虚构蓝色杯",
+      "variant": "300ml蓝色/1只",
+      "quantity": 1,
+      "price_amount": "120.00",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im2",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    {
+      "product_id": "p-book",
+      "name": "虚构图文册",
+      "variant": "平装/1册",
+      "quantity": 1,
+      "price_amount": "80.00",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im3",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    }
+  ],
+  "prices": {
+    "ordinary": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "200.00",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "one_cent_over": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "200.01",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "member": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "169.00",
+      "currency": "CNY",
+      "price_conditions": [
+        "需会员"
+      ],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "coupon": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "159.00",
+      "currency": "CNY",
+      "price_conditions": [
+        "需满减券，资格未知"
+      ],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "multi": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 2,
+      "price_amount": "300.00",
+      "currency": "CNY",
+      "price_conditions": [
+        "两件合计价，非单件价"
+      ],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "no_price": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": null,
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "unknown",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "cross_range": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": null,
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": {
+        "min": "180.00",
+        "max": "220.00"
+      },
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "stale": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "200.00",
+      "currency": "CNY",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": "2000-01-01T00:00:00Z",
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    },
+    "wrong_currency": {
+      "product_id": "p-notebook",
+      "name": "虚构留白笔记本",
+      "variant": "A5米白/1本",
+      "quantity": 1,
+      "price_amount": "51.77",
+      "currency": "GBP",
+      "price_conditions": [],
+      "price_source": "seed",
+      "source_url": null,
+      "observed_at": null,
+      "image_id": "im1",
+      "price_range": null,
+      "shipping_status": "unknown",
+      "stock_status": "unknown",
+      "evidence_ref": null
+    }
+  },
+  "valid_annotations": [
+    {
+      "id": "qa-a1",
+      "text": "米白色带",
+      "target": {
+        "x": 0,
+        "y": 1
+      },
+      "label": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "id": "qa-a2",
+      "text": "贺卡放在礼物前侧",
+      "target": {
+        "x": 0.5,
+        "y": 0.75
+      },
+      "label": {
+        "x": 0.2,
+        "y": 0.3
+      }
+    }
+  ],
+  "invalid_annotations": [
+    {
+      "field": "target.x",
+      "value": -0.01
+    },
+    {
+      "field": "target.x",
+      "value": 1.01
+    },
+    {
+      "field": "target.x",
+      "value": "NaN"
+    },
+    {
+      "field": "target.x",
+      "value": "Infinity"
+    },
+    {
+      "field": "target.x",
+      "value": "0.5"
+    },
+    {
+      "field": "target.x",
+      "value": true
+    },
+    {
+      "field": "target.x",
+      "value": null
+    },
+    {
+      "field": "target.y",
+      "value": -0.01
+    },
+    {
+      "field": "target.y",
+      "value": 1.01
+    },
+    {
+      "field": "target.y",
+      "value": "NaN"
+    },
+    {
+      "field": "target.y",
+      "value": "Infinity"
+    },
+    {
+      "field": "target.y",
+      "value": "0.5"
+    },
+    {
+      "field": "target.y",
+      "value": true
+    },
+    {
+      "field": "target.y",
+      "value": null
+    },
+    {
+      "field": "label.x",
+      "value": -0.01
+    },
+    {
+      "field": "label.x",
+      "value": 1.01
+    },
+    {
+      "field": "label.x",
+      "value": "NaN"
+    },
+    {
+      "field": "label.x",
+      "value": "Infinity"
+    },
+    {
+      "field": "label.x",
+      "value": "0.5"
+    },
+    {
+      "field": "label.x",
+      "value": true
+    },
+    {
+      "field": "label.x",
+      "value": null
+    },
+    {
+      "field": "label.y",
+      "value": -0.01
+    },
+    {
+      "field": "label.y",
+      "value": 1.01
+    },
+    {
+      "field": "label.y",
+      "value": "NaN"
+    },
+    {
+      "field": "label.y",
+      "value": "Infinity"
+    },
+    {
+      "field": "label.y",
+      "value": "0.5"
+    },
+    {
+      "field": "label.y",
+      "value": true
+    },
+    {
+      "field": "label.y",
+      "value": null
+    }
+  ],
+  "nonfinite_transport_cases": [
+    "原始JSON NaN",
+    "原始JSON Infinity",
+    "内存float(nan)",
+    "内存float(inf)"
+  ],
+  "private_input": {
+    "raw": "虚构姓名小岚 QA_NAME_59，电话 QA_PHONE_59，追求对象私事 QA_REL_59，过敏详情 QA_ALLERGY_59，地址 QA_ADDR_59。想找笔记本，预算200元。",
+    "must_not_leave": [
+      "QA_NAME_59",
+      "QA_PHONE_59",
+      "QA_REL_59",
+      "QA_ALLERGY_59",
+      "QA_ADDR_59"
+    ]
+  },
+  "unsafe_search": [
+    "; echo QA_COMMAND_SENTINEL",
+    "$(echo QA_COMMAND_SENTINEL)",
+    "eval(\"QA\")",
+    "javascript:alert(1)",
+    "<script>QA</script>"
+  ],
+  "unsafe_urls": [
+    "http://127.0.0.1/",
+    "http://[::1]/",
+    "http://10.0.0.1/",
+    "http://169.254.169.254/",
+    "file:///QA",
+    "javascript:QA",
+    "https://public.example.invalid/redirect-to-private",
+    "https://rebind.example.invalid/"
+  ],
+  "unsafe_media": [
+    "image/svg+xml含脚本",
+    "HTML伪装PNG",
+    "MIME与签名不符",
+    "超过交付字节上限",
+    "永不结束响应"
+  ],
+  "media": {
+    "status": "ready",
+    "candidates": [
+      {
+        "candidate_id": "c1",
+        "product_id": "p-notebook",
+        "image": {
+          "id": "im1",
+          "url": "https://qa-assets.example.invalid/1.png",
+          "kind": "demo",
+          "alt": "开发样例，非对应商品实拍",
+          "source_url": null,
+          "attribution": "QA虚构占位，禁止网络加载"
+        }
+      },
+      {
+        "candidate_id": "c2",
+        "product_id": "p-cup",
+        "image": {
+          "id": "im2",
+          "url": "https://qa-assets.example.invalid/2.png",
+          "kind": "demo",
+          "alt": "开发样例，非对应商品实拍",
+          "source_url": null,
+          "attribution": "QA虚构占位，禁止网络加载"
+        }
+      },
+      {
+        "candidate_id": "c3",
+        "product_id": "p-book",
+        "image": {
+          "id": "im3",
+          "url": "https://qa-assets.example.invalid/3.png",
+          "kind": "demo",
+          "alt": "开发样例，非对应商品实拍",
+          "source_url": null,
+          "attribution": "QA虚构占位，禁止网络加载"
+        }
+      }
+    ],
+    "selected": null
+  }
+}
