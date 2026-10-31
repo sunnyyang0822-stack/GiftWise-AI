@@ -231,6 +231,7 @@ async function runRecommendationCore(input, services = {}) {
 
   const run = createRun({
     owner_scope:input.ownerScope || "internal",
+    media_generation_authorized:mode === "dify" && (services.enableImageGeneration === true || !services.requestCandidates),
     mode,
     request_json: requestJson,
     request,
@@ -480,7 +481,7 @@ async function runPresentationCore(input, services = {}) {
 
   run.selected_candidate_id = selectedCandidateId;
   run.presentation = { presentation, recheck };
-  run.media = await mediaProvider.packaging(run, selectedCandidateId);
+  try {run.media = await mediaProvider.packaging(run, selectedCandidateId);} catch {run.media = {...mediaProvider.candidates(),status:"failed",warnings:["图像任务不可用，文字结果仍可查看；不自动重复调用"]};}
   run.status = "completed";
   const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media };
   run.selections.set(selectedCandidateId, view);

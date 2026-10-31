@@ -51,6 +51,7 @@ import {
 import { adaptIntakeObject } from "./intake.mjs";
 import { runRecommendation, runPresentation } from "./pipeline.mjs";
 import { getRun, runCount } from "./store.mjs";
+import {mediaProvider} from "./media/provider.mjs";
 import { recognizeExclusions } from "./exclusion-provider.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
 import { createAnalysis, getAnalysis } from "./exclusion-store.mjs";
@@ -199,6 +200,18 @@ async function handleApi(req, res, url) {
   if (req.method === "GET" && pathname === "/healthz") {
     sendJson(res, 200, { status: "ok", mode: MODE.current, runs: runCount() });
     return true;
+  }
+  if(req.method==='GET'&&/^\/api\/media\/(tasks|assets)\/[a-f0-9]{64}$/.test(pathname)){
+    try {
+      const id=pathname.split('/').at(-1);
+      const stored=await mediaProvider.store.read(id);const run=getRun(stored.run_id);
+      if(!run||run.owner_scope!==owner)throw new Error('NOT_FOUND');
+      const record=await mediaProvider.task(run,id);
+      if(pathname.includes('/tasks/')){run.media=record.media;sendJson(res,200,record.media);return true;}
+      if(record.media.status!=='ready')throw new Error('NOT_FOUND');
+      const bytes=await mediaProvider.store.readAsset(record);
+      res.writeHead(200,{'content-type':record.asset.type,'content-length':bytes.length,'cache-control':'private, no-store','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'"});res.end(bytes);return true;
+    }catch{sendJson(res,404,{status:'error',errors:[{code:'MEDIA_NOT_FOUND',message:'图片任务不存在、未就绪或不属于当前会话。'}]});return true;}
   }
   if (req.method === "GET" && pathname.startsWith("/api/runs/")) {
     const run = getRun(pathname.slice("/api/runs/".length));

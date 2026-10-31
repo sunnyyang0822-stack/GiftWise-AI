@@ -58,3 +58,26 @@
 当前无需操作个人浏览器。后台不依赖用户会话；真实搜索和价格绑定已在本机完成。工作流/前端/独立QA需在各自PR消费契约并复核，已有明确通知，不将通知等同验收。
 
 仍需单独授权才可实测的是：实际Dify/模型调用范围及图像服务（支持参考图）、费用上限和可信服务端凭证配置。此前“不新增付费调用”继续生效，因此本线只做受控生成联调，不读取现存Key擅自调用。真实图像外观一致性、中文曲线视觉定位、手机裁切由同版前端与独立QA验证；暂无图像生成授权时合法结果就是unavailable。服务器资源/上线另批。本PR可供独立复核，不应据此把#59/#60或全产品标为已上线/全面验收通过。
+
+
+## Seedream 4.5 小批接线（提交后续 e0c76ca）
+
+Seedream provider已接入现有media模块，未新增后端/数据库/编排。固定调用ModelVerse `POST https://api.modelverse.cn/v1/images/generations`，服务端读取IMAGE_API_KEY，不打印、不返回、不落库。只使用官方字段：model、prompt、images（仅获批参考图的安全读取后data URL）、size=2K、sequential_image_generation=disabled、stream=false、response_format=b64_json、watermark=true。
+
+真实授权验证命令：`$env:GIFTWISE_SEEDREAM_LIVE_TEST='1'; node research/opencli-prototype/verify-seedream-live.mjs`。结果：**PASS**，pending→ready；重复选择相同task_id，实际生图调用1次；Dify调用0；浏览器检索状态unavailable（本次刻意未执行检索，分别报告）。实际模型`doubao-seedream-4-5-251128`，2304×1728，8230ms，usage generated_images=1/output_tokens=15552/total_tokens=15552；图片825366 bytes，SHA256保存并核对，费用`not_measured`。真实视觉和箭头位置未验收。
+
+新增状态：pending/ready/failed/unavailable，execution区分not_submitted/rejected/failed/unknown/succeeded_output_invalid/succeeded_output_unavailable。超时/网络不确定不当作供应商未执行，不自动重试；首次提交前落盘pending，进程中断后读回转execution=unknown。按run/candidate/plan_version=`packaging-seedream-v1`幂等，跨会话任务/资产404。
+
+参考图必须匹配product_id+variant并有permission.status=approved、usage_basis、evidence_ref；安全读取限制白名单HTTPS/DNS/重定向/MIME/字节/超时/栅格文件头，官方`images`数组传data URL，首版至多2张。当前商品图片无使用依据，所以真实验证reference_count=0，不转载图片。
+
+服务端GET入口：`/api/media/tasks/{64位task_id}`查询状态，`/api/media/assets/{64位task_id}`读取同源受保护图片；GET不触发生图。图片只在当前会话、ready状态可读。图片kind=ai_illustration，alt含“AI包装效果示意”，中文批注和曲线仍独立，annotations为空且annotation_status=not_verified。尺寸/耗时/实际模型/供应商usage保存；无账单不填费用。
+
+Seedream测试：`node --test web/tests/retrieval-media-seedream.test.mjs` **7 PASS**；覆盖官方请求字段、images安全权限、超时未知、不重试、响应栅格/尺寸/指纹、未选门禁、持久化pending、重启未知和跨会话。previous_gifts测试 **3 PASS**；接入层回归 **41 PASS**；HTTP隔离测试获回环权限后 **1 PASS**。真实Dify、前端轮询/视觉、独立QA仍未验证。
+
+## 三线映射与不兼容项
+
+前端PR57当前消费`media.selected`、`candidate_id`、`physical`、`packaging.scale.note`、`scene.description`、`image.version`和`annotations.image_version/curve`，均保留；新增`plan_version`、`execution`、`generation`、`annotation_status`、`appearance_consistency`可向后兼容忽略。前端仍无任务轮询且旧文案写“授权摄影开发夹具”，需其负责人更新为按status/kind展示真实AI结果。
+
+工作流PR58仍按旧v1提示，尚未消费Seedream任务字段；后台不改workflow文件。需要工作流负责人确认其呈现输出不会写入图片说明/坐标或改动可信价格。真实Dify调用未获本轮授权，不能宣称同版端到端。
+
+QA可固定提交运行以上命令，另运行`node --test web/tests/retrieval-media-history.test.mjs`（3 PASS）和`node --test web/tests/retrieval-media-http.test.mjs`（需回环权限，1 PASS）。

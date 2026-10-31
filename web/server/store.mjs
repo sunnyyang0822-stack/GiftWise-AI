@@ -30,6 +30,7 @@ export function createRun(init) {
   const run = {
     run_id: runId,
     owner_scope: init.owner_scope || "internal",
+    media_generation_authorized: init.media_generation_authorized === true,
     created_at: nowIso(),
     mode: init.mode,
     request_json: init.request_json,
