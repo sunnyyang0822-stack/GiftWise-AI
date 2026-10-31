@@ -24,6 +24,8 @@ def build_test(case):
         errors = actual["errors"] + [e for c in actual["candidate_results"] for e in c["errors"]]
         if case["code"]:
             self.assertIn((case["code"], case["path"]), [(e["code"], e["path"]) for e in errors], actual)
+        if case["status"] == "needs_input":
+            self.assertFalse(any(c["passed"] for c in actual["candidate_results"]), actual)
         if case["status"] == "passed":
             self.assertEqual(len(actual["candidate_results"]), 3)
             for candidate in actual["candidate_results"]:

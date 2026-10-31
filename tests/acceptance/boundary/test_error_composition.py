@@ -92,7 +92,7 @@ class ErrorComposition(DeepEdgeMixin, unittest.TestCase):
     """多个错误并存时是否都上报（不去重、不互相吞掉）。"""
 
     def test_two_range_errors_are_both_reported(self):
-        result = run(raw('"0"', "366"))
+        result = run(raw('"10000.01"', "366"))
         self.assert_status(result, "needs_input", "预算与天数同时越界")
         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.available_days"))
@@ -101,19 +101,19 @@ class ErrorComposition(DeepEdgeMixin, unittest.TestCase):
         self.assertFalse(result["all_passed"])
 
     def test_range_and_type_errors_coexist(self):
-        result = run(raw('"0"', "-1"))
+        result = run(raw('"10000.01"', "-1"))
         self.assertEqual(["INVALID_TYPE"], codes_at(result, "request.available_days"))
         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
         self.assert_status(result, "needs_input", "范围 + 类型")
 
     def test_range_and_currency_errors_coexist(self):
-        result = run(raw('"0"', "3", '"USD"'))
+        result = run(raw('"10000.01"', "3", '"USD"'))
         self.assertEqual(["LIMIT_EXCEEDED"], codes_at(result, "request.budget_amount"))
         self.assertEqual(["UNSUPPORTED_CURRENCY"], codes_at(result, "request.currency"))
         self.assert_status(result, "needs_input", "范围 + 币种")
 
     def test_three_distinct_errors_all_reported(self):
-        result = run(raw('"0"', "-1", '"USD"'))
+        result = run(raw('"10000.01"', "-1", '"USD"'))
         found = {c for c, _ in pairs(result)}
         self.assertEqual({"INVALID_TYPE", "LIMIT_EXCEEDED", "UNSUPPORTED_CURRENCY"}, found,
                          f"三类错误应全部上报，实际={pairs(result)}")
