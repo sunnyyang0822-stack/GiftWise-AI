@@ -16,7 +16,7 @@ import { llmProvider } from '../server/llm/provider.mjs';
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j2ioAAAAASUVORK5CYII=','base64');
 const imageResult=()=>({bytes:png,extension:'png',type:'image/png',width:1,height:1,actual_model:'controlled-fixture',usage:{generated_images:1},reference_count:0,reference_status:'none_provided'});
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
-const presentation=()=>({contract_version:'giftwise-20261031-v2',style:'自然轻松',packaging:{color_palette:['米白']},card_text:'生日快乐，愿你享受自己的节奏。',giving_advice:{timing:'方便时送出',wording:'一点小心意',relationship_cautions:[]},unknowns:[],currency:'CNY',revised_estimated_preparation_days:2});
+const presentation=()=>({contract_version:'giftwise-20261031-v2',style:'自然轻松',packaging: { color_palette: ['米白'], description: "受控呈现说明：无需新增包装，可直接交付所选礼物并附上贺卡。" },card_text:'生日快乐，愿你享受自己的节奏。',giving_advice:{timing:'方便时送出',wording:'一点小心意',relationship_cautions:[]},unknowns:[],currency:'CNY',revised_estimated_preparation_days:2});
 
 function makeRun(owner='owner-a') {
   const request={contract_version:'giftwise-20261031-v2',recipient_relation:'朋友',recipient_relation_id:'friend',occasion:'生日',budget_amount:'800',currency:'CNY',available_days:null,facts:[],forbidden_tags:[],forbidden_terms:[],notes:'',exclusion_context:{original:'别太正式',semantic_constraints:[{source_span:'别太正式',interpretation:'表达自然轻松'}],clarifications:[{answer:'贺卡像朋友聊天，不写承诺'}]}};

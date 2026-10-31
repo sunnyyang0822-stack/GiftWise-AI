@@ -63,11 +63,11 @@ test("新版 intake 派生 max 并原样保留 dislikes，伪造区间不静默�
   assert.ok(unknownMode.errors.some((e) => e.code === "INVALID_BUDGET_RANGE" && e.path === "intake.budget_mode"));
 });
 
-test("新版呈现通过：只给风格与色调，不接收报价字段", () => {
+test("新版呈现通过：包含有效呈现说明，不接收报价字段", () => {
   const req = request({ budget_amount: "150", contract_version: "giftwise-20261031-v2", budget_range: { min: "100", max: "150" } });
   const selected = candidate("c1", "138.00", 3);
   const presentation = {
-    contract_version: "giftwise-20261031-v2", style: "克制、低压力", packaging: { color_palette: ["米白", "深绿"] },
+    contract_version: "giftwise-20261031-v2", style: "克制、低压力", packaging: { color_palette: ["米白", "深绿"], description: "受控呈现说明：无需新增包装，可直接交付所选礼物并附上贺卡。" },
     card_text: "祝你今天愉快，愿你有自己的节奏。", giving_advice: { timing: "方便时送出", wording: "一点小心意，请轻松收下。", relationship_cautions: ["不要求即时回应"] },
     unknowns: ["实际购买渠道未核实"], currency: "CNY", revised_estimated_preparation_days: 3,
   };
@@ -79,7 +79,7 @@ test("新版呈现通过：只给风格与色调，不接收报价字段", () =>
 test("新版呈现拒绝改价、超期、缺字段和禁忌色调/风格", () => {
   const req = request({ budget_amount: "150", available_days: 2, forbidden_terms: ["红色"], contract_version: "giftwise-20261031-v2", budget_range: { min: "100", max: "150" } });
   const selected = candidate("c1", "138.00", 2);
-  const base = { contract_version: "giftwise-20261031-v2", style: "红色风格", packaging: { color_palette: ["红色"] }, card_text: "祝你愉快", giving_advice: { timing: "方便时", wording: "小心意", relationship_cautions: [] }, unknowns: [], currency: "CNY", revised_estimated_preparation_days: 3 };
+  const base = { contract_version: "giftwise-20261031-v2", style: "红色风格", packaging: { color_palette: ["红色"], description: "受控呈现说明：无需新增包装，可直接交付所选礼物并附上贺卡。" }, card_text: "祝你愉快", giving_advice: { timing: "方便时", wording: "小心意", relationship_cautions: [] }, unknowns: [], currency: "CNY", revised_estimated_preparation_days: 3 };
   const out = checkPresentation(req, selected, base);
   assert.ok(out.errors.some((e) => e.code === "FORBIDDEN_TERM"));
   assert.ok(out.errors.some((e) => e.code === "PREPARATION_TOO_LONG"));

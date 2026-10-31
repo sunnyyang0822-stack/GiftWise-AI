@@ -11,7 +11,7 @@ const request = (extra = {}) => ({ contract_version:'giftwise-20261031-v2', reci
 const candidate = (id, prep = 8, extra = {}) => ({ id, name:`礼物${id}`, description:`不同方向${id}`, estimated_total:'780.00', currency:'CNY', estimated_preparation_days:prep, tags:['other'], reason:'生日心意', fact_refs:[], inferences:[], unknowns:['库存未知'], fulfillment:'online', ...extra });
 const batch = (first = candidate('c1')) => ({candidates:[first,candidate('c2'),candidate('c3')]});
 const rawCheck = (r, b) => validate(JSON.stringify(r),JSON.stringify(b),strictParse);
-const presentation = (days = 3) => ({contract_version:'giftwise-20261031-v2',style:'朴素',packaging:{color_palette:['米白']},card_text:'生日快乐',giving_advice:{timing:'方便时送出',wording:'一点心意',relationship_cautions:[]},unknowns:['库存未知'],currency:'CNY',revised_estimated_preparation_days:days});
+const presentation = (days = 3) => ({contract_version:'giftwise-20261031-v2',style:'朴素',packaging: { color_palette: ['米白'], description: "受控呈现说明：无需新增包装，可直接交付所选礼物并附上贺卡。" },card_text:'生日快乐',giving_advice:{timing:'方便时送出',wording:'一点心意',relationship_cautions:[]},unknowns:['库存未知'],currency:'CNY',revised_estimated_preparation_days:days});
 
 test('time policy preserves untouched raw failures and allows three overdue candidates', () => {
   const raw = rawCheck(request(),batch());

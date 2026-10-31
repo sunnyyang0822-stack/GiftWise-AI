@@ -8,8 +8,8 @@
  *
  * 两条契约分支（与 checker.mjs 一致）：
  *   - contract_version === "giftwise-20261031-v2"：根恰好 8 个键，
- *     packaging 只允许 color_palette；**不得**出现 additional_cost /
- *     revised_estimated_total / materials / steps / material_tags（任何报价别名都会被拒）。
+ *     packaging 支持 color_palette、materials、steps、description；本地示例明确标注来源。
+ *     不得出现 additional_cost / revised_estimated_total / material_tags 或包装报价。
  *   - 旧契约：packaging 需 materials/steps/color_palette，并带
  *     additional_cost 与 revised_estimated_total（两者和必须等于候选原估算）。
  *
@@ -18,6 +18,7 @@
  */
 
 import { dump } from "../jsonstrict.mjs";
+import { packagingSectionItems } from "../presentation-packaging.mjs";
 import { norm } from "../checker.mjs";
 import { CLOSENESS_TABLE } from "../labels.mjs";
 
@@ -138,7 +139,7 @@ export function buildLocalPresentation(request, candidate, options = {}) {
     presentation = {
       contract_version: "giftwise-20261031-v2",
       style: styleText,
-      packaging: { color_palette: colorPalette },
+      packaging: { color_palette: colorPalette, description: `本地呈现示例：把${candidate?.name ?? "所选礼物"}自然交给对方，配上以下贺卡和简短说明；本示例不要求新增包装采购。` },
       card_text: cardText,
       giving_advice: { timing, wording, relationship_cautions: cautions },
       unknowns: sharedUnknowns,
@@ -187,8 +188,6 @@ export function buildLocalPresentation(request, candidate, options = {}) {
 /** ① 风格与配色 ② 包装材料与步骤 ③ 贺卡正文与装饰物 ④ 赠送时机、方式与话术 */
 function buildLocalSections(presentation, candidate, request, ctx) {
   const packaging = presentation.packaging || {};
-  const materials = Array.isArray(packaging.materials) ? packaging.materials : [];
-  const steps = Array.isArray(packaging.steps) ? packaging.steps : [];
   return [
     {
       key: "style",
@@ -203,10 +202,7 @@ function buildLocalSections(presentation, candidate, request, ctx) {
     {
       key: "packaging",
       title: "② 包装材料与步骤",
-      items: [
-        ...(materials.length > 0 ? materials.map((m) => `材料：${m}`) : [`配色落地方案：以${ctx.colorPalette.join("、")}为主色，包装只做收口，不加复杂教程`]),
-        ...steps.map((s, i) => `步骤 ${i + 1}：${s}`),
-      ],
+      items: packagingSectionItems(packaging),
     },
     {
       key: "card",
