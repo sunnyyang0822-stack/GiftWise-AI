@@ -3,12 +3,10 @@
    所有服务端/用户文本一律以 textContent 渲染。 */
 import { icon } from "./icons.js";
 import { packagingMedia } from "./media-view.js";
-import { createRecommendationMedia } from "./recommendation-media.js";
 import { friendlyMessages, cardWarnings } from "./friendly.js";
 
 export function createResultViews(ctx) {
   const { el, state, selectCandidate, resetToForm, backToEncourage, backToHome, errorBox, stateView, render, apiFetch } = ctx;
-  const recommendationMedia = createRecommendationMedia(ctx);
   const withIcon = (name, text, cls = "") => el("span", { class: cls }, [icon(name, { size: 18 }), text]);
   const money = (v, cur = "CNY") => (cur === "CNY" ? `¥${v}` : `${v} ${cur}`);
 
@@ -121,7 +119,6 @@ export function createResultViews(ctx) {
   /* ---------------------------------------------------- 三个礼物思路 */
   function renderRecommendation() {
     const report = state.report;
-    recommendationMedia.begin(report);
     const body = [];
     const facts = new Map((report.request?.facts || []).map(f => [f.id, f.text]));
     const results = new Map((report.validation?.candidate_results || []).map(r => [r.id, r]));
@@ -155,7 +152,6 @@ export function createResultViews(ctx) {
           el("span", { class: "gift-choice__no", "aria-hidden": "true", text: ["壹", "贰", "叁"][index] || String(index + 1) }),
           el("span", { class: "sr-only", text: `方案 ${index + 1}` }),
         ]),
-        recommendationMedia.candidateSlot(report, candidate),
         el("div", { class: "gift-choice-heading" }, [
           el("h2", { class: "card__title", id: `gift-title-${index}`, text: candidate.name }),
           el("span", { class: "gift-choice-price", text: price }),
@@ -180,9 +176,6 @@ export function createResultViews(ctx) {
           el("button", { class: "btn btn--primary", type: "button", disabled: state.busy, onclick: () => selectCandidate(candidate.id) }, state.busy ? [el("span", { class: "gw-dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "sr-only", text: "加载中" })] : [icon("gift", { size: 18 }), "就选它"]),
         ]),
       ]);
-      // 图片来源收进“为什么推荐它”，卡片正面保持干净。
-      const provenance = card.querySelector(".media-source");
-      if (provenance) card.querySelector(".candidate-evidence").append(provenance);
       grid.append(card);
     });
     body.push(grid);
@@ -318,7 +311,7 @@ export function createResultViews(ctx) {
         el("header", { class: "result-head result-head--loading" }, [el("div", {}, [bar("skel--title"), el("div", { class: "result-chips" }, [bar("skel--chip"), bar("skel--chip")])])]),
         loader(["把你说的，再细细想一遍", "挑几个最像你们的方向", "好的心意，值得等一下"]),
         el("div", { class: "candidate-grid candidate-grid--loading", "aria-hidden": "true" }, ["壹", "贰", "叁"].map(no => el("div", { class: "card gift-choice skel-card" }, [
-          el("span", { class: "gift-choice__no", text: no }), bar("skel--media"), bar("skel--line skel--w70"), bar("skel--line"), bar("skel--line skel--w50"),
+          el("span", { class: "gift-choice__no", text: no }), bar("skel--line skel--w70"), bar("skel--line"), bar("skel--line skel--w50"),
         ]))),
       ],
       actions: [],
@@ -370,5 +363,5 @@ export function createResultViews(ctx) {
     };
   }
 
-  return { renderRecommendation, renderPresentation, renderEncourage, renderRecommendationLoading, renderPresentationLoading, withIcon, stopMediaPoll, stopRecommendationMediaPoll: recommendationMedia.stopRecommendationMediaPoll };
+  return { renderRecommendation, renderPresentation, renderEncourage, renderRecommendationLoading, renderPresentationLoading, withIcon, stopMediaPoll };
 }
