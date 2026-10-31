@@ -1,5 +1,17 @@
 # Issue #59/#60：检索推荐与选后图像工作流离线准备
 
+## 最新对齐：后台PR #61共享契约v1
+
+已只读fetch后台PR61，读取`27670b6fe88b0cffacf0a8fafccdd81f7adc8829:docs/design/retrieval-media-contract.md`。文件已提交但尚未进入release；下文首次开工的“未提交”是历史状态，不再是当前阻塞。
+
+本次提交`c2059c8`按该契约补齐商品固定字段，price_conditions改字符串数组，加入price_range、shipping_status、stock_status、evidence_ref，quantity正整数；区间按max判断，条件未确认不放行，不足三个有据商品明确partial，无检索能力unavailable。图像provider未配置/未授权用unavailable，不付费调用；选后同run/candidate幂等，失败不改全局修订计数，image与annotations严格sidecar。
+
+检索计划允许品类/非敏感词/数量/预算，但契约**没有精确JSON键名和枚举上限**；模型商品引用输出与图像provider输入的精确信封也未规定。本线仅按允许内容写提示词，不发明共享字段，等待后台补充。这是剩余接线BLOCKED项。
+
+实际运行Python312 `docs/test-reports/retrieval-media/verify_committed.py`：全新git archive副本、先验原件9/9，再重建9/9，产物逐字节不变。主套件337、旧探针46、新版29、stage C 39、输入26、检索媒体30项全部PASS，命令退出码均0；原始输出在`bytes-20261031T131544319879+0800`。新增检查包括商品完整字段/数量、条件数组类型、区间上端点/跨预算、条件价未确认、partial/unavailable状态。仍是固定契约oracle，不是后台服务校验或provider执行。
+
+本轮没有修改共享契约、服务端、intake/validator/generated；既有PR58输入增量保持，不冒称跨端支持。未访问Dify、OpenCLI、模型或图像服务，调用0；token/服务延迟/成本均未执行。下文初次20项记录保留为历史批次，现行为本批次30项。
+
 2026-10-31，Asia/Shanghai。基线3890aa5包含PR55；继续独立worktree gw-context-nov01、codex/workflow-avoid-history及开放PR58，整理此前新增输入工作，不双写提示词。
 
 已读取AGENTS、Issue #1/#59/#60、最新交付变更契约、intake/工作流规范及提示词。后台共享契约docs/design/retrieval-media-contract.md尚不在该release，开工查询没有对应开放PR；本线按#60草案做夹具和内容约束，**未发明冻结计划API或provider字段，接线BLOCKED**。
