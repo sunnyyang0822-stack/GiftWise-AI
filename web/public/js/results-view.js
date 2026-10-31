@@ -250,7 +250,7 @@ export function createResultViews(ctx) {
         row("gift", view.candidate?.name || "所选礼物", s.gift_estimated_total !== undefined ? `参考 ${money(s.gift_estimated_total, s.currency)}` : "—", "bill__total"),
         row("coins", "你的预算", s.budget_range ? `${s.budget_range.min}–${s.budget_range.max} 元` : "—"),
         row("ribbon", "包装与贺卡", "风格与色调建议"),
-        row("clock", "准备时间", Number.isFinite(s.revised_estimated_preparation_days) ? `约 ${s.revised_estimated_preparation_days} 天 / 可用 ${s.available_days} 天` : "—"),
+        Number.isFinite(s.revised_estimated_preparation_days) ? row("clock", "准备时间", `约 ${s.revised_estimated_preparation_days} 天${Number.isFinite(s.available_days) ? ` / 可用 ${s.available_days} 天` : ""}`) : null,
         tags || terms ? row("ban", "已避开", [tags, terms].filter(Boolean).join("、")) : null,
         row("shield", "符合你的要求", el("span", { class: `bill-status ${s.passed ? "" : "bill-status--fail"}` }, [icon(s.passed ? "check" : "x", { size: 16 }), s.passed ? "都符合" : "有不符合"])),
       ]),

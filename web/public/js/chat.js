@@ -1008,6 +1008,7 @@ function sheetValue(item) {
     default: return byId(item.qid).answer();
   }
 }
+const visibleSheet = () => SHEET.filter(item => item.qid !== "deadline" || sheetValue(item));
 /* --------------------------------- 解析结果在结算卡上的呈现（4 条裁定） */
 
 /** 相对时间的必答确认：模型算出来的天数与原话不符时，把这题的差额摆出来让用户点。 */
@@ -1033,7 +1034,7 @@ function summaryAttach() {
     el("article", { class: "greeting-card gw-summary", "aria-label": "需求小结" }, [
       el("p", { class: "greeting-card__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
       el("h3", { class: "greeting-card__title", text: `送给${relation}的${occasion ? (/礼物?$/.test(occasion) ? occasion : `${occasion}礼物`) : "礼物"}` }),
-      el("dl", { class: "gw-summary__list" }, SHEET.map(item => el("div", { class: "gw-summary__row" }, [
+      el("dl", { class: "gw-summary__list" }, visibleSheet().map(item => el("div", { class: "gw-summary__row" }, [
         el("dt", {}, [el("span", { class: "gw-summary__icon", "aria-hidden": "true" }, [icon(item.qid === "relation" ? OPTION_ICONS[f.recipient_relation] || "user" : item.icon, { size: 14 })]), item.term]),
         el("dd", { text: sheetValue(item) || "—" }),
       ]))),
@@ -1153,11 +1154,12 @@ function currentTurn(q, typing, entering) {
 
 function panelHead() {
   const c = chat();
-  // 进度与右侧心意清单共用同一口径（固定 9 项），不随条件追问题增减。
-  const filled = SHEET.filter(item => sheetValue(item)).length;
+  // 进度与心意清单共用实际显示项；未指定时间不占一项。
+  const items = visibleSheet();
+  const filled = items.filter(item => sheetValue(item)).length;
   const q = current();
-  const at = SHEET.findIndex(item => item.covers.includes(q.id));
-  const p = { done: q.kind === "summary", index: at >= 0 ? at + 1 : Math.min(filled + 1, SHEET.length), total: SHEET.length };
+  const at = items.findIndex(item => item.covers.includes(q.id));
+  const p = { done: q.kind === "summary", index: at >= 0 ? at + 1 : Math.min(filled + 1, items.length), total: items.length };
   return el("header", { class: "gw-chat-head" }, [
     botAvatar("lg"),
     el("div", { class: "gw-chat-head__id" }, [
@@ -1171,7 +1173,7 @@ function panelHead() {
     el("button", {
       type: "button", class: "gw-sheet-pill", "aria-expanded": String(Boolean(c.sheetOpen)), "aria-controls": "gw-sheet", "data-field": "sheet-pill",
       onclick: () => { c.sheetOpen = !c.sheetOpen; api.render(); },
-    }, [icon("ribbon", { size: 15 }), `清单 ${filled}/${SHEET.length}`]),
+    }, [icon("ribbon", { size: 15 }), `清单 ${filled}/${items.length}`]),
     el("button", {
       type: "button", class: `gw-icon-btn${c.confirmRestart ? " is-armed" : ""}`, "data-field": "chat-restart",
       "aria-label": c.confirmRestart ? "再点一次清空并重新开始" : "重新开始", title: c.confirmRestart ? "再点一次清空重来" : "重新开始",
@@ -1190,19 +1192,20 @@ function sheet(q) {
   const c = chat();
   const opening = Boolean(c.sheetOpen) && !sheetWasOpen;
   sheetWasOpen = Boolean(c.sheetOpen);
-  const active = SHEET.find(item => item.covers.includes(q.id))?.qid;
+  const items = visibleSheet();
+  const active = items.find(item => item.covers.includes(q.id))?.qid;
   const ready = q.kind === "summary";
-  const filled = SHEET.filter(item => sheetValue(item)).length;
+  const filled = items.filter(item => sheetValue(item)).length;
   return el("aside", { class: `gw-sheet${c.sheetOpen ? " is-open" : ""}${opening ? " is-opening" : ""}`, id: "gw-sheet", "aria-label": "心意清单" }, [
     el("button", { type: "button", class: "gw-sheet__scrim", "aria-label": "关闭清单", tabindex: "-1", onclick: () => { c.sheetOpen = false; api.render(); } }),
     el("div", { class: "gw-sheet__card" }, [
       el("div", { class: "gw-sheet__head" }, [
         el("p", { class: "gw-sheet__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
-        el("span", { class: "gw-sheet__count", text: `${filled} / ${SHEET.length}` }),
+        el("span", { class: "gw-sheet__count", text: `${filled} / ${items.length}` }),
         el("button", { type: "button", class: "gw-icon-btn gw-sheet__close", "aria-label": "关闭清单", onclick: () => { c.sheetOpen = false; api.render(); } }, [icon("x", { size: 16 })]),
       ]),
       el("p", { class: "gw-sheet__title", text: "边聊边记下来" }),
-      el("ul", { class: "gw-sheet__list" }, SHEET.map(item => {
+      el("ul", { class: "gw-sheet__list" }, items.map(item => {
         const value = sheetValue(item);
         const fresh = Boolean(value) && sheetMemo.has(item.qid) && sheetMemo.get(item.qid) !== value;
         sheetMemo.set(item.qid, value || "");
@@ -1214,7 +1217,7 @@ function sheet(q) {
         }, [
           el("span", { class: "gw-sheet__icon", "aria-hidden": "true" }, [icon(item.icon, { size: 15 })]),
           el("span", { class: "gw-sheet__term", text: item.term }),
-          el("span", { class: "gw-sheet__value", text: value || (item.qid === "deadline" ? "未指定（选填）" : isActive ? "正在聊…" : "待聊") }),
+          el("span", { class: "gw-sheet__value", text: value || (isActive ? "正在聊…" : "待聊") }),
           value ? el("span", { class: "gw-sheet__edit", "aria-hidden": "true" }, [icon("edit", { size: 13 })]) : null,
         ])]);
       })),
