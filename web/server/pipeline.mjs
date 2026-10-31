@@ -1,3 +1,9 @@
+import { verifyCandidateEvidence } from "./retrieval/evidence.mjs";
+import { RetrievalWorker, unavailableProvider, checkPrice } from "./retrieval/worker.mjs";
+import { mediaProvider } from "./media/provider.mjs";
+import { DfrobotPublicProvider } from "./retrieval/dfrobot-provider.mjs";
+import { RETRIEVAL_CONFIG } from "./config.mjs";
+const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrobot-public" && RETRIEVAL_CONFIG.packageRoot ? new DfrobotPublicProvider(RETRIEVAL_CONFIG.packageRoot) : unavailableProvider, RETRIEVAL_CONFIG);
 /**
  * 接入层主流程：适配 → （真实/模拟）生成三候选 → 独立规则校验 → 最多一次自动修订 →
  * 等待用户选择 → 选择校验 → 呈现四段 → 呈现复核（含全局修订额度）。
@@ -45,7 +51,15 @@ function computeSelectable(validation, workflowErrors) {
 /**
  * @param {{intake: unknown, demo?: string|null, mode?: string, pursuitReady?: boolean}} input
  */
-export async function runRecommendation(input) {
+const pendingRecommendations=new Map();
+export async function runRecommendation(input, services = {}) {
+ const key=canonical({owner:input.ownerScope||'internal',intake:input.intake,confirmation:input.exclusion_confirmation||null,mode:input.mode,demo:input.demo||null});
+ if(pendingRecommendations.has(key))return pendingRecommendations.get(key);
+ if(pendingRecommendations.size>=200)return {kind:'infrastructure_error',status:'error',mode:input.mode,errors:[{code:'RETRIEVAL_QUEUE_FULL',path:'retrieval',message:'后台任务繁忙，请稍后重试。'}]};
+ const job=runRecommendationCore(input,services);pendingRecommendations.set(key,job);
+ try{return await job;}finally{pendingRecommendations.delete(key);}
+}
+async function runRecommendationCore(input, services = {}) {
   let effectiveIntake = input.intake;
   if (input.analysis && input.exclusion_confirmation && Array.isArray(input.exclusion_confirmation.confirmed_ids)) {
     const selected = input.analysis.candidates.filter(c => input.exclusion_confirmation.confirmed_ids.includes(c.id));
@@ -87,7 +101,7 @@ export async function runRecommendation(input) {
       return { kind: "needs_input", status: "needs_input", errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", path: "exclusion_confirmation.confirmed_ids", message: "请确认全部识别到的排除项，且每项只能确认一次。" }], mode, notices };
     }
   }
-  const key = canonical({ intake: effectiveIntake, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
+  const key = canonical({ owner:input.ownerScope || "internal", intake: effectiveIntake, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
   const cached = getRunByRecommendationKey(key);
   if (cached) return { kind: "report", status: cached.status, run: cached, report: publicReport(cached), idempotent: true };
   const requestJson = adapterResult.request_json;
@@ -111,10 +125,17 @@ export async function runRecommendation(input) {
   let validation = null;
   let repairCount = 0;
 
+  const retrievalEnabled = mode === "dify" && (services.retrievalEnabled ?? RETRIEVAL_CONFIG.provider === "dfrobot-public");
+  if(retrievalEnabled && !(effectiveIntake.interests?.includes('tech_digital') && effectiveIntake.interest_confidence?.tech_digital==='confirmed'))return {kind:'needs_input',status:'needs_input',mode,notices,errors:[{code:'RETRIEVAL_SCOPE_UNSUPPORTED',path:'retrieval',message:'当前公开来源仅覆盖已确认科技兴趣的创客方向，不将其推荐给兴趣未知或不符的用户。'}]};
+  const retrieval = retrievalEnabled ? await (services.retrievalWorker ?? retrievalWorker).submit({category:"maker",keywords:[],limit:3},{signal:input.signal}).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["未启用真实检索；价格为估算"]};
+  if (retrievalEnabled && new Set(retrieval.products.filter(p=>checkPrice(p,request.budget_amount)==='within_budget'&&p.stock_status!=='out_of_stock').map(p=>p.name)).size < 3) {
+    return {kind:"needs_input",status:"needs_input",mode,notices,errors:[{code:"RETRIEVAL_INSUFFICIENT",path:"retrieval",message:"公开来源不足三种不同且有据的礼物，请调整范围或稍后重试。"}],retrieval,media:mediaProvider.candidates()};
+  }
+  let productReferences = null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
-    const call = await requestCandidates(requestJson);
+    const call = await (services.requestCandidates ?? requestCandidates)(requestJson, retrievalEnabled ? retrieval : null);
     callCounts.recommend += 1;
     if (!call.ok) {
       return {
@@ -127,6 +148,7 @@ export async function runRecommendation(input) {
     }
     const raw = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     candidatesJson = raw;
+    productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
   } else if (demo === "model_error") {
     const broken = buildBrokenModelOutput();
     callCounts.recommend += 1;
@@ -201,11 +223,15 @@ export async function runRecommendation(input) {
     });
   }
 
+  let evidenceBindings = new Map();
+  if(retrievalEnabled){try {evidenceBindings = verifyCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates,productReferences,request.budget_amount);}catch {workflowErrors.push({code:"PRODUCT_EVIDENCE_MISMATCH",path:"retrieval",message:"商品规格、引用或价格与服务端证据不一致，候选不可选。"});}}
   let status = validation.status;
   if (workflowErrors.length > 0 && !["error", "needs_input"].includes(status)) status = "failed";
   const selectable = computeSelectable(validation, workflowErrors);
 
   const run = createRun({
+    owner_scope:input.ownerScope || "internal",
+    media_generation_authorized:mode === "dify" && (services.enableImageGeneration === true || !services.requestCandidates),
     mode,
     request_json: requestJson,
     request,
@@ -222,6 +248,9 @@ export async function runRecommendation(input) {
     notices,
     idempotency_key: key,
   });
+  run.retrieval = retrieval;
+  run.product_bindings = evidenceBindings;
+  run.media = mediaProvider.candidates([...evidenceBindings].map(([candidate_id,p])=>({candidate_id,product_id:p.product_id})));
   run.call_counts = callCounts;
   run.demo = demo;
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];
@@ -311,9 +340,18 @@ function presentationView(run, candidate, presentation, recheck, extras) {
 /**
  * @param {{runId: string, selectedCandidateId: string|null, demo?: string|null}} input
  */
-export async function runPresentation(input) {
+export async function runPresentation(input, services = {}) {
+ const run=getRun(input.runId);
+ if(run&&run.owner_scope===(input.ownerScope||'internal')&&typeof input.selectedCandidateId==='string'){
+  run.presentation_jobs??=new Map();if(run.presentation_jobs.has(input.selectedCandidateId))return run.presentation_jobs.get(input.selectedCandidateId);
+  const job=runPresentationCore(input, services);run.presentation_jobs.set(input.selectedCandidateId,job);
+  try{return await job;}finally{run.presentation_jobs.delete(input.selectedCandidateId);}
+ }
+ return runPresentationCore(input, services);
+}
+async function runPresentationCore(input, services = {}) {
   const run = getRun(input.runId);
-  if (!run) {
+  if (!run || run.owner_scope !== (input.ownerScope || "internal")) {
     return {
       kind: "not_found",
       status: "error",
@@ -362,6 +400,10 @@ export async function runPresentation(input) {
       ],
     };
   }
+  if(run.product_bindings?.size){
+    try{const product=run.product_bindings.get(selectedCandidateId);verifyCandidateEvidence(run.retrieval,[candidate],[{candidate_id:selectedCandidateId,product_id:product?.product_id}],run.request.budget_amount);}
+    catch{return {kind:'rejected',status:'selection_rejected',errors:[{code:'PRODUCT_EVIDENCE_STALE',path:'selected_candidate_id',message:'商品证据已过期或不匹配，请重新检索生成。'}]};}
+  }
   // 幂等：同一选择重复提交返回同一份呈现，不重复消耗修订额度，并显式告知调用方这是重放。
   if (run.selections.has(selectedCandidateId)) {
     const cached = run.selections.get(selectedCandidateId);
@@ -377,7 +419,7 @@ export async function runPresentation(input) {
   let presentation = null;
   let generatedBy = "mock";
   if (run.mode === "dify") {
-    const call = await requestPresentation(run.request_json, dump(candidate));
+    const call = await (services.requestPresentation ?? requestPresentation)(run.request_json, dump(candidate));
     run.call_counts.presentation += 1;
     if (!call.ok) {
       return {
@@ -439,8 +481,9 @@ export async function runPresentation(input) {
 
   run.selected_candidate_id = selectedCandidateId;
   run.presentation = { presentation, recheck };
+  try {run.media = await mediaProvider.packaging(run, selectedCandidateId);} catch {run.media = {...mediaProvider.candidates(),status:"failed",warnings:["图像任务不可用，文字结果仍可查看；不自动重复调用"]};}
   run.status = "completed";
-  const view = presentationView(run, candidate, presentation, recheck, extras);
+  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media };
   run.selections.set(selectedCandidateId, view);
   return { kind: "presentation", run, view };
 }

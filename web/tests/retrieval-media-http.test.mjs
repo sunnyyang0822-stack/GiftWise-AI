@@ -1,0 +1,24 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {once} from 'node:events';
+process.env.GW_PORT='0';process.env.GW_MODE='mock';delete process.env.DIFY_API_KEY;
+const {server}=await import('../server/server.mjs');
+if(!server.listening)await once(server,'listening');
+const base='http://127.0.0.1:'+server.address().port;
+const intake=JSON.parse(readFileSync(new URL('../../workflow/examples/intake.json',import.meta.url)));
+const headers=cookie=>({'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})});
+test('HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图',async()=>{try{
+ const a=await fetch(base+'/api/config');const cookieA=a.headers.get('set-cookie').split(';')[0];const b=await fetch(base+'/api/config');const cookieB=b.headers.get('set-cookie').split(';')[0];assert.notEqual(cookieA,cookieB);
+ const recommend=await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieA),body:JSON.stringify({intake})});const report=await recommend.json();assert.equal(recommend.status,200);assert.equal(report.media.selected,null);assert.equal(report.retrieval.status,'unavailable');
+ const id=report.recommendation_run_id;assert.ok(id);
+ assert.equal((await fetch(base+'/api/runs/'+id,{headers:headers(cookieB)})).status,404);
+ assert.equal((await fetch(base+'/api/runs/'+id,{headers:headers(cookieA.slice(0,-1)+(cookieA.endsWith('0')?'1':'0'))})).status,404);
+ assert.equal((await fetch(base+'/api/runs/'+id,{headers:headers(cookieA)})).status,200);
+ const forged=await fetch(base+'/api/presentations',{method:'POST',headers:headers(cookieB),body:JSON.stringify({recommendation_run_id:id,selected_candidate_id:'c1'})});assert.equal(forged.status,404);
+ const modern={...intake,contract_version:'giftwise-20261031-v2',budget_mode:'other',budget_range:{min:'0',max:'300'},dislikes:'不要香水'};delete modern.budget_amount;
+ const analysis=await(await fetch(base+'/api/exclusions/analyze',{method:'POST',headers:headers(cookieA),body:JSON.stringify({intake:modern})})).json();assert.ok(analysis.analysis_id);
+ const wrongAnalysis=await(await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieB),body:JSON.stringify({intake:modern,exclusion_confirmation:{analysis_id:analysis.analysis_id,confirmed_ids:['xc1']}})})).json();assert.equal(wrongAnalysis.errors[0].code,'EXCLUSION_ANALYSIS_STALE');
+ const select=()=>fetch(base+'/api/presentations',{method:'POST',headers:headers(cookieA),body:JSON.stringify({recommendation_run_id:id,selected_candidate_id:report.selectable_candidate_ids[0]})});const selected=await select();const view=await selected.json();assert.equal(selected.status,200);assert.equal(view.media.status,'unavailable');assert.equal(view.media.selected.image,null);assert.equal(view.media.selected.physical.dimensions.status,'unknown');assert.equal(view.media.selected.scene.text_baked_in,false);const replay=await(await select()).json();assert.equal(replay.media.selected.task_id,view.media.selected.task_id);
+ const other=await(await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieB),body:JSON.stringify({intake})})).json();assert.notEqual(id,other.recommendation_run_id);
+}finally{await new Promise(resolve=>server.close(resolve));server.closeAllConnections();}});
