@@ -1,5 +1,13 @@
 # #59/#60 离线接线准备（待后台契约）
 
+## PR61对齐更新（覆盖下文开工时的未提交状态）
+
+后台契约已在PR61提交`27670b6fe88b0cffacf0a8fafccdd81f7adc8829`，v1冻结草案，尚未合入release。已通过git show读取原件，不复制或修改后台共享文件。下文“未提交”描述仅为开工时记录。
+
+夹具按v1补齐price_conditions数组、price_range、shipping_status、stock_status、evidence_ref；quantity正整数。price_range按max上端点检查，条件未确认、无价或跨预算不能视为预算通过；不足三项明确partial，不向严格validator送两项。检索不可用unavailable，seed/unknown降级不能冒充browser_observed；观察价非结算保证。媒体固定image/annotations字段、未授权provider返回unavailable、按运行/候选幂等、失败不改修订计数。
+
+仍待后台补充：受限计划精确键名/枚举上限、推荐模型引用输出精确信封、图像provider请求参数、过期窗口及稳定错误路径。契约仅描述允许内容而未给JSON键名，本线不发明接口。图片与核心候选保持sidecar分离。本线oracle不代替后台实现；暂无真实检索/模型/图像/前端联调。
+
 基线3890aa5包含PR55；之前输入任务PR58同分支整理，无提示词双写。开工时后台docs/design/retrieval-media-contract.md不在release，也无对应开放PR。cases.json只用#60草案商品/媒体字段，oracle内部参数不是共享API。计划schema、模型引用schema、错误码和provider接口必须由后台单一写者冻结，本线不发明。
 
 ## 待后台实现/PM协调

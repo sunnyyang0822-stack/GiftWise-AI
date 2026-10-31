@@ -4,6 +4,7 @@ import json
 import math
 from pathlib import Path
 import sys
+from decimal import Decimal
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT))
 from validator.rules import validate
@@ -24,6 +25,18 @@ def binds(batch,bindings,products):
         if p['price_amount'] is None or p['currency']!='CNY' or c['estimated_total']!=p['price_amount']:return False
     return True
 
+def product_shape(p):
+    required={'product_id','name','variant','quantity','price_amount','currency','price_conditions','price_source','source_url','observed_at','image_id','price_range','shipping_status','stock_status','evidence_ref'}
+    return (set(p)==required and type(p['quantity']) is int and p['quantity']>0
+            and isinstance(p['price_conditions'],list) and all(isinstance(x,str) for x in p['price_conditions'])
+            and p['price_source'] in {'browser_observed','user_provided','seed','unknown'})
+
+def eligible(p, budget):
+    # 固定证据oracle；本例不具备条件已确认的可信快照，所以非空条件保守不采用。
+    if not product_shape(p) or p['price_amount'] is None or p['price_conditions']:return False
+    upper=p['price_range']['max'] if p['price_range'] is not None else p['price_amount']
+    return Decimal(upper)<=Decimal(budget)
+
 def annotation(a):
     if set(a)!={'id','text','target','label'} or not isinstance(a['text'],str) or not a['text'].strip():return False
     for k in ('target','label'):
@@ -42,6 +55,22 @@ def run():
         assert ok,name
         checks.append({'name':name,'passed':True})
     expect('固定商品ID与可信价绑定',binds(batch,binding,products))
+    expect('PR61固定商品字段与类型',all(product_shape(p) for p in products))
+    for bad in (0,True,-1):
+        p=copy.deepcopy(products[0]);p['quantity']=bad
+        expect('数量正整数:'+str(bad),not product_shape(p))
+    p=copy.deepcopy(products[0]);p['price_conditions']='会员价'
+    expect('price_conditions不是字符串',not product_shape(p))
+    p=copy.deepcopy(products[0]);p['price_range']={'min':'100','max':'301'}
+    expect('区间跨预算不合格',not eligible(p,'300'))
+    p['price_range']['max']='300'
+    expect('区间上端点等于预算可检查',eligible(p,'300'))
+    p['price_conditions']=['仅会员可用']
+    expect('条件未确认不作为预算合格',not eligible(p,'300'))
+    partial={'status':'partial','evidence_id':f['retrieval']['evidence_id'],'products':products[:2],'warnings':['有效有据商品不足三个，需澄清']}
+    expect('不足三件按契约partial',partial['status']=='partial' and len(partial['products'])<3 and bool(partial['warnings']))
+    unavailable={'status':'unavailable','evidence_id':None,'products':[],'warnings':['未配置检索能力']}
+    expect('不可用不假造证据',unavailable['evidence_id'] is None and not unavailable['products'])
     actual=validate(dump(old['request']),dump(batch))
     expect('实际独立validator执行',actual['all_passed'])
     changed=copy.deepcopy(batch);changed['candidates'][0]['estimated_total']='1.00'
@@ -65,5 +94,5 @@ def run():
     passed={r['id'] for r in actual['candidate_results'] if r['passed']}
     expect('合格选择ID', 'c1' in passed)
     expect('错误选择归属', 'other-run-c9' not in passed)
-    print(json.dumps({'scope':'固定草案夹具及oracle/实际validator，非后台编排或真实语义验证','passed':len(checks),'results':checks,'OpenCLI':'未执行','Dify':'未执行','image_service':'未执行','model_calls':0,'token_latency_cost':'未执行','shared_contract':'BLOCKED：等待后台唯一契约'},ensure_ascii=False,indent=2))
+    print(json.dumps({'scope':'PR61固定契约夹具及oracle/实际validator，非后台编排或真实语义验证','passed':len(checks),'results':checks,'OpenCLI':'未执行','Dify':'未执行','image_service':'未执行','model_calls':0,'token_latency_cost':'未执行','shared_contract':'PR61@27670b6 v1；精确计划和provider键名待后台补充'},ensure_ascii=False,indent=2))
 if __name__=='__main__':run()
