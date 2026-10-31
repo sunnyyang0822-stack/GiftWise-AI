@@ -1,0 +1,64 @@
+{
+  "kind": "derived_from_unchanged_originals",
+  "run_id": "[REDACTED:run_id]",
+  "originals": [
+    "timing.json",
+    "new-recommendation-provider.json",
+    "new-recommendation-response.json",
+    "model-ledger.jsonl"
+  ],
+  "material_reference_ids": [
+    "web_1d8455cd71c6276b685f4d8b2d633c3a",
+    "web_95032af991e457b7a73f0835956f5d09"
+  ],
+  "material_basis": [
+    {
+      "reference_id": "web_1d8455cd71c6276b685f4d8b2d633c3a",
+      "title": "关于咖啡的几个基本概念和家庭咖啡普通指南 - 知乎",
+      "summary": "2022年8月10日&ensp;·&ensp;Brewed coffee is made by pouring hot water onto ground coffee beans, then allowing to brew. There are several …",
+      "reference_kind": "public_reference",
+      "source_url": "https://zhuanlan.zhihu.com/p/115002664",
+      "source_platform": "web",
+      "source_site": "zhuanlan.zhihu.com",
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "cache_observation": "cached_public_material",
+      "is_realtime": false
+    },
+    {
+      "reference_id": "web_95032af991e457b7a73f0835956f5d09",
+      "title": "espresso,long coffee,American三种咖啡有啥区别？ - 知乎",
+      "summary": "2023年5月11日&ensp;·&ensp;Espresso（意式浓缩咖啡）、Long coffee（加水浓缩咖啡）和American（美式咖啡）是三种不同类型的咖啡。 …",
+      "reference_kind": "public_reference",
+      "source_url": "https://www.zhihu.com/question/599895904",
+      "source_platform": "web",
+      "source_site": "www.zhihu.com",
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "cache_observation": "cached_public_material",
+      "is_realtime": false
+    }
+  ],
+  "model_tool_callbacks": 3,
+  "actual_http_discoveries": 6,
+  "candidate_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "ledger_model_ms": 26975,
+  "recommended_ready_ms": 28393,
+  "notes": [
+    "This is a warm material context plus incremental text queries, not a zero-network cache sample.",
+    "Model used two initial real text snippets; new irrelevant movie/software results are not adopted.",
+    "Original audit predates the final material_basis persistence addition. This derived linkage does not rewrite original audit; final persistence covered by incremental controlled test.",
+    "Not a full style/present/AI or browser display timing."
+  ],
+  "unadopted_reference_ids": [
+    "web_af6bcf5bdc7889e6ee994e1d3ed29aa8",
+    "web_e26c58971dc1764ed72d17ec87b69f6d",
+    "web_97aba475f74763b1e42657b27e92bd07"
+  ],
+  "new_unadopted_reference_ids": [
+    "web_e26c58971dc1764ed72d17ec87b69f6d",
+    "web_97aba475f74763b1e42657b27e92bd07"
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "run": "2026-10-31T21-24-05-798Z",
+  "phase": [
+    {
+      "phase": "startup",
+      "samples": 2,
+      "rss_bytes": {
+        "n": 2,
+        "min": 53129216,
+        "median": 61138944.0,
+        "max": 69148672
+      },
+      "wall_seconds": 0.287,
+      "cpu_seconds": 0.313,
+      "cpu_one_core_percent": 109.05923344947736
+    },
+    {
+      "phase": "idle",
+      "samples": 19,
+      "rss_bytes": {
+        "n": 19,
+        "min": 69656576,
+        "median": 69668864,
+        "max": 69668864
+      },
+      "wall_seconds": 2.011,
+      "cpu_seconds": 0.0,
+      "cpu_one_core_percent": 0.0
+    },
+    {
+      "phase": "http-load",
+      "samples": 3,
+      "rss_bytes": {
+        "n": 3,
+        "min": 69668864,
+        "median": 70647808,
+        "max": 76156928
+      },
+      "wall_seconds": 0.129,
+      "cpu_seconds": 0.218,
+      "cpu_one_core_percent": 168.9922480620155
+    },
+    {
+      "phase": "media-fixture",
+      "samples": 9,
+      "rss_bytes": {
+        "n": 9,
+        "min": 76156928,
+        "median": 80871424,
+        "max": 87347200
+      },
+      "wall_seconds": 0.929,
+      "cpu_seconds": 0.235,
+      "cpu_one_core_percent": 25.296017222820236
+    },
+    {
+      "phase": "retained-idle",
+      "samples": 26,
+      "rss_bytes": {
+        "n": 26,
+        "min": 82862080,
+        "median": 82862080.0,
+        "max": 82862080
+      },
+      "wall_seconds": 2.624,
+      "cpu_seconds": 0.047,
+      "cpu_one_core_percent": 1.791158536585366
+    },
+    {
+      "phase": "finished",
+      "samples": 2,
+      "rss_bytes": {
+        "n": 2,
+        "min": 82862080,
+        "median": 82864128.0,
+        "max": 82866176
+      },
+      "wall_seconds": 0.005,
+      "cpu_seconds": 0.0,
+      "cpu_one_core_percent": 0.0
+    }
+  ],
+  "windows": {
+    "Id": 47220,
+    "WorkingSet64": 82862080,
+    "PeakWorkingSet64": 90746880,
+    "PrivateMemorySize64": 88768512,
+    "CPUSeconds": 0.921875
+  },
+  "http_recommend_ms": {
+    "n": 20,
+    "min": 2.849999999999909,
+    "median": 5.259700000000066,
+    "max": 25.838200000000143
+  },
+  "http_present_ms": {
+    "n": 20,
+    "min": 2.0635999999999513,
+    "median": 4.131350000000111,
+    "max": 12.025300000000243
+  },
+  "http_all_200": true,
+  "http_input_bytes": {
+    "n": 20,
+    "min": 104,
+    "median": 104.0,
+    "max": 104
+  },
+  "media_text_ms": {
+    "n": 10,
+    "min": 4.49369999999999,
+    "median": 8.335650000000214,
+    "max": 12.049299999999675
+  },
+  "media_ready_ms": {
+    "n": 8,
+    "min": 167.92100000000028,
+    "median": 182.2503499999998,
+    "max": 195.31910000000016
+  },
+  "media_failure_ms": {
+    "n": 2,
+    "min": 165.15750000000025,
+    "median": 173.60935000000018,
+    "max": 182.0612000000001
+  },
+  "disk_bytes": {
+    "assets": 6400544,
+    "tasks": 26668
+  },
+  "disk_total_bytes": 6427212,
+  "telemetry_and_client_record_bytes": 40633,
+  "blocked_external_fetches": 0,
+  "fixture_errors": []
+}

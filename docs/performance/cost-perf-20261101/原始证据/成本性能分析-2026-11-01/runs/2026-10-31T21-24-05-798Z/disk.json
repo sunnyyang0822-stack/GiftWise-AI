@@ -1,0 +1,25 @@
+{
+  "before": {},
+  "after": {
+    ".tmp\\measured-media-47220\\assets\\02dd80303738cfee3928f03f916b2fd9ccf32ff5a6ab54b4222ae458fe28cfb6.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\17507aa0e1e100b3ddbd3ce4776abe77dfe97f8ea4d8120cf552ae1290ca2459.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\2cf9457553c3a414f5fbf7b659774750bd18732165d7dbb1ecfdcc22ee5e3ce5.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\2d3f86d498005d9b4b6fd644cea0f6fb1aaeebb812db0e9739431df642ae8730.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\6d7089c087f5afb0630e66b0b59749cc84caec1fcf24b7e1a03a55fabd3bbdcf.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\a1f10d804851c9a02747c59d6301a5577dcfc2f414c2741d2f697f027c5262d1.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\b9f3ed44efe3ef5037c3eaf5273fce4266f125e26812d4b87be8836eb7bf045b.png": 800068,
+    ".tmp\\measured-media-47220\\assets\\e381998ca8d0e8abf74e38c55440b3cb3904b5d1a557f655ba392a4ddc2be840.png": 800068,
+    ".tmp\\measured-media-47220\\tasks\\03bc3011cd4a48ecdda29e76827be67e621d895c0c98a9f12fac6299565a464e.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\18751c92c415b49d90d208eb7387b0ef08a5a3e284e713838e1cb9b3fcd03f12.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\3119ab7f8d25abd8413ab77f4652b241ba7f1e5d025efb9cfb9d904987ec311a.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\58cbef28b994110ef8d2d6c698b9598750c692b103a57e599740d9e52f6968d4.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\5b1075939a5fbcd2e06a3938b5da93ee0172fdc17d474a4d6f4f0ba16052ba47.json": 2218,
+    ".tmp\\measured-media-47220\\tasks\\a2b477a8726f3489dd3f48c3a259a5bbfe15aae6c04c560fcc54d6ccf20f54d9.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\cd2f4eb0480a2f446568d8af8b1baa54177fa44983daf3bd90905aec5521550e.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\cf151c70f6e029f72b9301e78d24d53c29a66d552c04351f594c01ba55144636.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\d219d1f71250a69693c770ae4885480338ab8f9848abf5aa6a3640d6276098ff.json": 2779,
+    ".tmp\\measured-media-47220\\tasks\\d799611e3fc8b7fc1572a49c9ddb0ee6e3f8883bac875304670e35d8db611e6f.json": 2218
+  },
+  "logical_delta_bytes": 6427212,
+  "note": "logical file bytes, .tmp only; source/log telemetry excluded"
+}

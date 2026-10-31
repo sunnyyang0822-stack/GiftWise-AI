@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "signal": null,
+  "duration_ms": 1319,
+  "network_attempts": 0,
+  "tests": 10,
+  "pass": 10,
+  "fail": 0,
+  "skipped": 0,
+  "cancelled": 0
+}

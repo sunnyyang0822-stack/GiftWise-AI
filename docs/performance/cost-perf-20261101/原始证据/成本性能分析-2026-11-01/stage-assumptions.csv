@@ -1,0 +1,6 @@
+﻿stage,logical_calls,prompt_tokens,completion_tokens,budget_cny,evidence
+parse_assumption,1,2750,450,0.0091,推算假设
+exclusion_assumption,1,1500,400,0.0062,推算假设
+recommend_historical_tool_path,3,18563,3684,0.066598,历史usage
+direction_assumption,1,350,600,0.0055,推算假设
+present_assumption,1,2600,1200,0.0148,推算假设

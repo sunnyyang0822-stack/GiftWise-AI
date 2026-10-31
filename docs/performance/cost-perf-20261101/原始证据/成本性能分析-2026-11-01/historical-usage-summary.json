@@ -1,0 +1,11 @@
+{
+  "prompt_tokens": 18563,
+  "completion_tokens": 3684,
+  "total_tokens": 22247,
+  "cached_tokens": 6656,
+  "reasoning_tokens_in_completion": 2223,
+  "elapsed_ms_sum": 26975,
+  "budget_cny_without_cache_discount": 0.066598,
+  "version": "historical e7580ea + dirty; not final SHA",
+  "unattributed": "no request/run ids in ledger; do not infer E2E solely from timestamps"
+}

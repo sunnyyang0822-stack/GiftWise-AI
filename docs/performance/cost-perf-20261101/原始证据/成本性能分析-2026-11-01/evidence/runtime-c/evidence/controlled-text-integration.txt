@@ -1,0 +1,19 @@
+✔ anonymous text bundles import through an injected cache while preserving source and original observation time (27.6509ms)
+✔ import can return safe records without a cache and retains honest title-only material (24.2714ms)
+✔ only safe fields reach cache: user/query/auth/body/image payloads are omitted rather than exported (23.6447ms)
+✔ commerce/private/authentication sources and unsafe text cannot enter accepted material (24.9435ms)
+✔ manifest schema, byte/record limits and strict JSON reject before any cache write (122.3825ms)
+✔ outside-project paths and simulated junction markers are rejected before reading contents (19.9421ms)
+✔ ambiguous duplicate references and invalid observation dates do not overwrite good material (31.916ms)
+✔ cache failures are safe and leave returned text available for caller-controlled retry (53.826ms)
+✔ default text adapter reaches model material without browser, image validation or OpenCLI dependency (90.073ms)
+✔ legacy reference image request is rejected before any executor or browser work (2.3593ms)
+✔ unrelated cached material is context rather than a mandatory menu; model can choose new material (9.6461ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 608.3717

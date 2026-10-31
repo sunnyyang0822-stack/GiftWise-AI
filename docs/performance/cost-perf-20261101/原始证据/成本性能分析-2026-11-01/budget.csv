@@ -1,0 +1,10 @@
+﻿scenario,evidence,attempt_equivalents,prompt_tokens,completion_tokens,input_cny_per_million,output_cny_per_million,image_cny_per_success,charged_image_min,charged_image_max,text_budget_cny,task_min_cny,task_max_cny,hundred_min_cny,hundred_max_cny,paid_cny,notes
+typical_success,推算,7,25763,6334,2,8,0.25,1,1,0.102198,0.352198,0.352198,35.2198,35.2198,未测,7逻辑文本调用；含解析与1次排除识别；推荐3轮；选1项
+no_optional_parse_or_exclusion,推算,5,21513,5484,2,8,0.25,1,1,0.086898,0.336898,0.336898,33.6898,33.6898,未测,结构化输入且无排除原文；其余同典型
+business_revision_once,推算,8,34263,9834,2,8,0.25,1,1,0.147198,0.397198,0.397198,39.7198,39.7198,未测,推荐业务修订1次；其后独立复核；非呈现模拟修订
+format_retry_once,推算,8,28363,7534,2,8,0.25,1,1,0.116998,0.366998,0.366998,36.6998,36.6998,未测,呈现JSON格式失败额外1次；假定两次均达到该用量
+one_transport_retry_unknown,推算,8,33263,8834,2,8,0.25,1,1,0.137198,0.387198,0.387198,38.7198,38.7198,未测,推荐一次传输重试；假定失联尝试也执行满额；逻辑调用仍7/物理8
+all_text_default_3_attempts,推算,21,77289,19002,2,8,0.25,1,1,0.306594,0.556594,0.556594,55.6594,55.6594,未测,每逻辑调用3次尝试均计满；压力预算假设，非精确硬上限
+image_execution_unknown,推算,7,25763,6334,2,8,0.25,0,1,0.102198,0.102198,0.352198,10.2198,35.2198,未测,已提交但客户端不知供应商结果；图片预算预留0至1张；实付未知
+image_confirmed_generated_images_zero,推算,7,25763,6334,2,8,0.25,0,0,0.102198,0.102198,0.102198,10.2198,10.2198,未测,仅供应商明确generated_images=0才按官方规则记0图费；文本仍计
+all_three_selected_sequentially,推算,9,30963,8734,2,8,0.25,3,3,0.131798,0.881798,0.881798,88.1798,88.1798,未测,同run分别选择3个合格候选；已选项重放不再生成

@@ -1,0 +1,192 @@
+[
+  {
+    "label": "offline",
+    "exit_code": 0,
+    "tap_summary": {
+      "tests": 51,
+      "suites": 0,
+      "pass": 51,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "guard_events": [
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      },
+      {
+        "mode": "offline",
+        "port": null,
+        "listen": 0,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 0
+      }
+    ],
+    "test_sources": [
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\recommendation-grounding.test.mjs",
+        "sha256": "bf93b9d067f8423b71017dbca258d2462f9ff3a7002d2942160e3a2e71462c08"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\text-material-pipeline.test.mjs",
+        "sha256": "bbb60e8d4d2eb418f00eba984a64172ab598cf4558fceb0df0025d281f83b65d"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\retrieval-audit-pipeline.test.mjs",
+        "sha256": "b5d02f8ac84a3507183b138f2b95aadd42a246b8a796344ba7c9be3727319dd1"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\experience-presentation-a.test.mjs",
+        "sha256": "ba00ecf4d8059a26b7880387b2dc6669f1207017ed4b34c4c1765ac4edde383b"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\ui-actual-guide-sections.test.mjs",
+        "sha256": "c3d284a3602e53b56425d3b94b1bd94e4da69cd3dfbb83c9c41c24aa629b182d"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\ui-recommendation-without-images.test.mjs",
+        "sha256": "643dcb997f9dc196be4c8b0a303e7f5342a48163580fbf0c331ef41b141b4d31"
+      },
+      {
+        "path": "E:\\黑客松\\.worktrees\\independent-qa-eceef056-20261031\\web\\tests\\backend-async-image-a.test.mjs",
+        "sha256": "1e91fcd2a2cc3c4b4c9b34a49a3892906a6a994add05f01f9bf0530615adf500"
+      }
+    ]
+  },
+  {
+    "label": "http",
+    "exit_code": 1,
+    "tap_summary": {
+      "tests": 1,
+      "suites": 0,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "guard_events": [
+      {
+        "mode": "owned-loopback",
+        "port": 8932,
+        "listen": 1,
+        "connect": 0,
+        "fetch": 0,
+        "blocked": 1
+      }
+    ],
+    "test_sources": [
+      {
+        "path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\combined-http-attempt-1.test.mjs",
+        "sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549"
+      }
+    ]
+  },
+  {
+    "label": "http-attempt-2",
+    "exit_code": 1,
+    "tap_summary": {
+      "tests": 1,
+      "suites": 0,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "guard_events": [
+      {
+        "mode": "owned-loopback",
+        "port": 8932,
+        "listen": 1,
+        "connect": 2,
+        "fetch": 2,
+        "numeric_loopback_lookup": 1,
+        "blocked": 0
+      }
+    ],
+    "test_sources": [
+      {
+        "path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\combined-http.test.mjs",
+        "sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549"
+      }
+    ]
+  },
+  {
+    "label": "http-attempt-3",
+    "exit_code": 0,
+    "tap_summary": {
+      "tests": 1,
+      "suites": 0,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "guard_events": [
+      {
+        "mode": "owned-loopback",
+        "port": 8932,
+        "listen": 1,
+        "connect": 2,
+        "fetch": 26,
+        "numeric_loopback_lookup": 1,
+        "blocked": 0
+      }
+    ],
+    "test_sources": [
+      {
+        "path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\combined-http.test.mjs",
+        "sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8"
+      }
+    ]
+  }
+]

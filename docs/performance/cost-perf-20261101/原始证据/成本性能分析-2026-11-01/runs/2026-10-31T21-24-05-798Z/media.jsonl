@@ -1,0 +1,10 @@
+{"run_id":"gw-mvwwsax7-0d159fdd","text_ms":12.049299999999675,"terminal_ms":181.75139999999965,"status":"ready","execution":"succeeded","task_id":"a2b477a8726f3489dd3f48c3a259a5bbfe15aae6c04c560fcc54d6ccf20f54d9"}
+{"run_id":"gw-mvwwsax7-098f4462","text_ms":12.024899999999889,"terminal_ms":182.74929999999995,"status":"ready","execution":"succeeded","task_id":"3119ab7f8d25abd8413ab77f4652b241ba7f1e5d025efb9cfb9d904987ec311a"}
+{"run_id":"gw-mvwwsb2b-ce468ab6","text_ms":4.49369999999999,"terminal_ms":167.92100000000028,"status":"ready","execution":"succeeded","task_id":"cf151c70f6e029f72b9301e78d24d53c29a66d552c04351f594c01ba55144636"}
+{"run_id":"gw-mvwwsb2b-34b4bc73","text_ms":4.623600000000351,"terminal_ms":169.10730000000012,"status":"ready","execution":"succeeded","task_id":"d219d1f71250a69693c770ae4885480338ab8f9848abf5aa6a3640d6276098ff"}
+{"run_id":"gw-mvwwsb71-399efa1e","text_ms":5.968000000000302,"terminal_ms":165.15750000000025,"status":"failed","execution":"unknown","task_id":"d799611e3fc8b7fc1572a49c9ddb0ee6e3f8883bac875304670e35d8db611e6f"}
+{"run_id":"gw-mvwwsb71-d45278d5","text_ms":6.099100000000362,"terminal_ms":174.50960000000032,"status":"ready","execution":"succeeded","task_id":"58cbef28b994110ef8d2d6c698b9598750c692b103a57e599740d9e52f6968d4"}
+{"run_id":"gw-mvwwsbbx-821e5808","text_ms":8.12310000000025,"terminal_ms":192.9005000000002,"status":"ready","execution":"succeeded","task_id":"18751c92c415b49d90d208eb7387b0ef08a5a3e284e713838e1cb9b3fcd03f12"}
+{"run_id":"gw-mvwwsbbx-0bf58d6d","text_ms":8.548200000000179,"terminal_ms":195.31910000000016,"status":"ready","execution":"succeeded","task_id":"cd2f4eb0480a2f446568d8af8b1baa54177fa44983daf3bd90905aec5521550e"}
+{"run_id":"gw-mvwwsbhh-d3effd96","text_ms":11.88650000000007,"terminal_ms":182.0612000000001,"status":"failed","execution":"unknown","task_id":"5b1075939a5fbcd2e06a3938b5da93ee0172fdc17d474a4d6f4f0ba16052ba47"}
+{"run_id":"gw-mvwwsbhh-cce5a905","text_ms":11.650900000000092,"terminal_ms":189.2473,"status":"ready","execution":"succeeded","task_id":"03bc3011cd4a48ecdda29e76827be67e621d895c0c98a9f12fac6299565a464e"}

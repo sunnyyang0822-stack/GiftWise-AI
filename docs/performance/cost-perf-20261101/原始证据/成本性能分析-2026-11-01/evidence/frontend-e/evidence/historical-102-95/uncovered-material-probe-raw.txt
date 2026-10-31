@@ -1,0 +1,1 @@
+{"result":"PASS","scope":"offline DOM only; not Chrome","nonempty_material_items":3,"guide_steps":3,"budget":"0–0","text_node_preserved_after_ready":true,"empty_step_is_guidance_only":true,"status_calls":[{"url":"/api/media/tasks/[REDACTED:OPERATION_IDENTIFIER]","body":null}],"real_api_calls":0}

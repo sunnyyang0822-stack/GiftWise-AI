@@ -1,0 +1,363 @@
+{
+  "tested_code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "tested_tree": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+  "evidence_commit": "Not yet committed. See PM remote delivery receipt / fixed URL.",
+  "scope": "Selected text only; no DB/media task/session/profile/credential/env files copied.",
+  "manual_review": "Selected reports contain reviewer prose and explicitly synthetic fixture examples, not private user quotations. Raw TAP logs and execution metadata contain no emitted owner IDs/session cookies. Source code variable names for Cookie/owner are not credential values. Historical public task IDs and content hashes are evidence identifiers, not session authentication.",
+  "self_hash_rule": "This manifest excludes itself to avoid self-reference; its hash is sent separately to PM.",
+  "artifacts": [
+    {
+      "published_path": "independent-qa-eceef056.md",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\independent-qa-eceef056.md",
+      "original_sha256": "011a756fee7e35717a47b1de858cb7d7b450ef8c409325ce6ad1828c4a533b0c",
+      "published_sha256": "011a756fee7e35717a47b1de858cb7d7b450ef8c409325ce6ad1828c4a533b0c",
+      "bytes": 10930,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "results-index.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\results-index.json",
+      "original_sha256": "1fa9a5b99edff9913a20152b64de6e5f442bf58f26a615853fa93dfbf7128da6",
+      "published_sha256": "1fa9a5b99edff9913a20152b64de6e5f442bf58f26a615853fa93dfbf7128da6",
+      "bytes": 5063,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/offline/stdout.tap",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\offline\\stdout.tap",
+      "original_sha256": "d1f5d3ec1deeafa9df38d05bcadbe95d3a8663f8d82472894273c021c8076559",
+      "published_sha256": "d1f5d3ec1deeafa9df38d05bcadbe95d3a8663f8d82472894273c021c8076559",
+      "bytes": 18513,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/offline/stderr.txt",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\offline\\stderr.txt",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/offline/execution.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\offline\\execution.json",
+      "original_sha256": "7771bc0179a4f1018a84501b4178fb829d72eded18df9636ce1122660deb1dc1",
+      "published_sha256": "7771bc0179a4f1018a84501b4178fb829d72eded18df9636ce1122660deb1dc1",
+      "bytes": 5586,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/stdout.tap",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\stdout.tap",
+      "original_sha256": "9fc573ee18c57abbfa33d651d754cd3569eda59825c3ea480afa7e995cadd26f",
+      "published_sha256": "9fc573ee18c57abbfa33d651d754cd3569eda59825c3ea480afa7e995cadd26f",
+      "bytes": 1642,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/stderr.txt",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\stderr.txt",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/execution.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\execution.json",
+      "original_sha256": "b5aae093e81aa0998c8e7af1bf8a2815c86426482a51e6f39ff1eb4ad3c0ab3a",
+      "published_sha256": "b5aae093e81aa0998c8e7af1bf8a2815c86426482a51e6f39ff1eb4ad3c0ab3a",
+      "bytes": 3574,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/stdout.tap",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\stdout.tap",
+      "original_sha256": "1b7b139cd4f0391ec5fb4f182c482a63c92b7e16fea427a286bf6af8d45903bf",
+      "published_sha256": "1b7b139cd4f0391ec5fb4f182c482a63c92b7e16fea427a286bf6af8d45903bf",
+      "bytes": 1451,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/stderr.txt",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\stderr.txt",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/execution.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\execution.json",
+      "original_sha256": "bb4533a13086c1f71eebfcf26a435b6138352b3ec2a6bab35b9543d219e2c01a",
+      "published_sha256": "bb4533a13086c1f71eebfcf26a435b6138352b3ec2a6bab35b9543d219e2c01a",
+      "bytes": 3644,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/stdout.tap",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-3\\stdout.tap",
+      "original_sha256": "070abd1ae69a6d57e72696115dea6c9b8922c08fd003f9e5ebea2afe3c7c35a3",
+      "published_sha256": "070abd1ae69a6d57e72696115dea6c9b8922c08fd003f9e5ebea2afe3c7c35a3",
+      "bytes": 1457,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/stderr.txt",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-3\\stderr.txt",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/execution.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-3\\execution.json",
+      "original_sha256": "31fb65e9d94db2e4a3aa79cf1c630f7c65cdd22819b7e79bb4184d2b8b7a5c61",
+      "published_sha256": "31fb65e9d94db2e4a3aa79cf1c630f7c65cdd22819b7e79bb4184d2b8b7a5c61",
+      "bytes": 3644,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/offline/network-guard-used.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\network-guard-attempt-1.mjs",
+      "original_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "published_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "bytes": 2035,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/network-guard-used.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\network-guard-attempt-1.mjs",
+      "original_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "published_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "bytes": 2035,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/probe-used.test.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\combined-http-attempt-1.test.mjs",
+      "original_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "published_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "bytes": 9726,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http/runner-used.py",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http\\run-qa-attempt-1.py",
+      "original_sha256": "5cd66a6508ae08f0bb3fabbcab12683836cdd13b0c2092c0f41396fba38fa1ab",
+      "published_sha256": "5cd66a6508ae08f0bb3fabbcab12683836cdd13b0c2092c0f41396fba38fa1ab",
+      "bytes": 5050,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/network-guard-used.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\network-guard.mjs",
+      "original_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "bytes": 2336,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/probe-used.test.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\combined-http.test.mjs",
+      "original_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "published_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "bytes": 9726,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-2/runner-used.py",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\http-attempt-2\\run-qa.py",
+      "original_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "bytes": 5218,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/network-guard-used.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\network-guard.mjs",
+      "original_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "bytes": 2336,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/probe-used.test.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\combined-http.test.mjs",
+      "original_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "published_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "bytes": 9800,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "artifacts/http-attempt-3/runner-used.py",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\run-qa.py",
+      "original_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "bytes": 5218,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "history/pr115-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr115-final-review\\pr115-independent-review.md",
+      "original_sha256": "e2827c4230cbc3e22e1c86442deb0fc455adb4036e555212c61a757ab6fbf988",
+      "published_sha256": "b23b4a78e8da94b72184a82f76177dd4fbdd0b4785d127aa2c4ebf010ee7feb6",
+      "bytes": 6389,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr117-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr117-final-review\\pr117-independent-review.md",
+      "original_sha256": "d2d6892add195265e4b4c6dd3d9b041d5a26b061add893ed22fd4ecfdc4cc531",
+      "published_sha256": "41329d4256cb1c18a152ad1a081b0967dd807593e2109130fcad14e46db544bf",
+      "bytes": 8318,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr120-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr120-final-review\\pr120-independent-review.md",
+      "original_sha256": "7f10a4f235aaa4d0eccf74f37c5890dd01041eb6760efbb3346cd153f2432988",
+      "published_sha256": "86e4f7509778aa80efb8628aff39f360d097a94cafb5d2657d1a74af2f20449b",
+      "bytes": 6532,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr121-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr121-final-review\\review.md",
+      "original_sha256": "5c18d09d3c60ff65f00e437776919d528179bde2edc6150be64a1fa36f5fda31",
+      "published_sha256": "13374ecd17f4510c52dbf50d9d331b56d4df105f322a9a07993a91596c176f59",
+      "bytes": 6774,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr83-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr83-independent-review.md",
+      "original_sha256": "ea6bc34b9818f4ea58a95b361d02a07399a1fbc478a9344b76080b04442d54e1",
+      "published_sha256": "0dd96d627e17815e5122deef30dc77f9376a65717728c47cc88a62e2079f7cd4",
+      "bytes": 6221,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr84-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\pr84-independent-review.md",
+      "original_sha256": "ba3cc960bbbe27cc975cf86bba3451fa6cfd9b18dbac427ae7ed10998ba7b60e",
+      "published_sha256": "3db3f8f6749ef0c946534734025ccb4b4739f51af77767983dfa439270582105",
+      "bytes": 6275,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr95-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\frontend-final-102-95\\pr95-independent-review.md",
+      "original_sha256": "71babc5dd997e8deb6a8d534793373ef5ae0cd24863fc508aa71b508ed2c0af8",
+      "published_sha256": "8b22e12506602a3d4863455805a4e016fa35a9f80d5c631ff3c9380a1eedcf85",
+      "bytes": 4322,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/pr102-independent-review.md",
+      "original_local_path": "E:\\黑客松\\.worktrees\\backend-independent-review\\.tmp\\frontend-final-102-95\\pr102-independent-review.md",
+      "original_sha256": "77ced7acc0e6e7ef0ff4e62e8081537adcbcd9f6b17155196cc69c0b4c1a9320",
+      "published_sha256": "30ffbded4f74aeb5ecce1bc5be5683f89fe7f6f07bfbb489d657d3ffceb97926",
+      "bytes": 6150,
+      "redaction_counts": {},
+      "context_header_added": true
+    },
+    {
+      "published_path": "history/index.md",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\history-index.md",
+      "original_sha256": "54fe4d201dc9da8f7cefe7b486ab09f458114c03bd525972bccb1c606aad8770",
+      "published_sha256": "54fe4d201dc9da8f7cefe7b486ab09f458114c03bd525972bccb1c606aad8770",
+      "bytes": 3433,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "commands.md",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\commands.md",
+      "original_sha256": "c315aaaea4316f9e901ac81c87c3a8675555af72eb8e7186c3ec7807b6ead8e4",
+      "published_sha256": "c315aaaea4316f9e901ac81c87c3a8675555af72eb8e7186c3ec7807b6ead8e4",
+      "bytes": 3524,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "tools/run-qa.py",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\run-qa.py",
+      "original_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "bytes": 5218,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "tools/network-guard.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\network-guard.mjs",
+      "original_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "bytes": 2336,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "tools/combined-http.test.mjs",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\combined-http.test.mjs",
+      "original_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "published_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "bytes": 9800,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "tools/prepare-publication.py",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\prepare-publication.py",
+      "original_sha256": "9877dc8ced87fca564c67f92e01dcaa78bbd42e641a0768b6e6e9939d03caa3a",
+      "published_sha256": "9877dc8ced87fca564c67f92e01dcaa78bbd42e641a0768b6e6e9939d03caa3a",
+      "bytes": 10709,
+      "redaction_counts": {},
+      "context_header_added": false
+    },
+    {
+      "published_path": "final-code-state.json",
+      "original_local_path": "E:\\黑客松\\.tmp\\handoff-eceef056\\qa-d\\final-code-state.json",
+      "original_sha256": "6e493a137afea517713f2acc0fd90f129e1f11f4c4afc99ae3a499aec690a4be",
+      "published_sha256": "6e493a137afea517713f2acc0fd90f129e1f11f4c4afc99ae3a499aec690a4be",
+      "bytes": 345,
+      "redaction_counts": {},
+      "context_header_added": false
+    }
+  ],
+  "total_redactions": 0,
+  "published_file_count_excluding_this_manifest": 39
+}

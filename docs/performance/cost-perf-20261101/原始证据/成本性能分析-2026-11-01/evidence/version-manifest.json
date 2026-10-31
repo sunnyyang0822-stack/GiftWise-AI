@@ -1,0 +1,233 @@
+{
+  "repository": "https://github.com/sunnyyang0822-stack/GiftWise-AI",
+  "code_branch": "main",
+  "code_sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "code_tree": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+  "prepared_reference_sha": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+  "frontend_backend_same_tree": true,
+  "materials_branch": "codex/integration-handoff-eceef056-20261031",
+  "materials_commit": "See pinned remote delivery receipt and materials PR; do not substitute code_sha",
+  "code_archive": "https://github.com/sunnyyang0822-stack/GiftWise-AI/archive/15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879.zip",
+  "main_pr": "https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/111",
+  "main_merged": true,
+  "user_walkthrough_approved": true,
+  "cloud_deployed": false,
+  "added_prs_since_reference": [
+    {
+      "number": 121,
+      "merge": "a02dc3662e495fd1b853bc012a443ddf3150c700",
+      "head": "db5e74df236983c979093b0e40c279686f0aa055"
+    },
+    {
+      "number": 117,
+      "merge": "cb8a1c6f11fcc6484bd29508a569ae074e1368a8",
+      "head": "cacfe958aa8dbf6fcdda51c6bc8754d503291067"
+    },
+    {
+      "number": 115,
+      "merge": "86f01f9c549ed09c38809e8f87347339c12732a4",
+      "head": "dd51324a67832991c11cb76d3d039d35656a3128"
+    },
+    {
+      "number": 120,
+      "merge": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+      "head": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879"
+    }
+  ],
+  "excluded_cancelled_prs": [
+    {
+      "number": 118,
+      "reason": "Product owner cancelled recommendation network images; not merged",
+      "head": "a565fdee1bef465b6d9135512b0dee2b50a623d3"
+    }
+  ],
+  "differences_since_reference": [
+    {
+      "status": "M",
+      "path": "web/public/app.js"
+    },
+    {
+      "status": "M",
+      "path": "web/public/js/media-view.js"
+    },
+    {
+      "status": "M",
+      "path": "web/public/js/results-view.js"
+    },
+    {
+      "status": "M",
+      "path": "web/server/checker.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/server/collect/public-text-http.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/llm/errors.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/llm/presentation.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/llm/prompt.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/llm/provider.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/media/plan.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/pipeline.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/presentation-packaging.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/retrieval/agent-tool.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/retrieval/audit-store.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/retrieval/domestic-provider.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/server/retrieval/grounding.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/server/retrieval/material-bundle.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/server/retrieval/material-cache.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/retrieval/query-plan.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/retrieval/worker.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/server/store.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/domestic-provider.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/experience-presentation-a.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/image-finesse-a.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/llm-agent-source.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/llm-tools.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/material-bundle.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/material-cache.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/material-throughput.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/packaging-content-a.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/public-text-http.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/recommendation-grounding.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/retrieval-audit-pipeline.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/retrieval-audit.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/text-material-pipeline.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/ui-actual-guide-sections.test.mjs"
+    },
+    {
+      "status": "D",
+      "path": "web/tests/ui-async-reference-cards.test.mjs"
+    },
+    {
+      "status": "A",
+      "path": "web/tests/ui-recommendation-without-images.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "web/tests/ui-results.test.mjs"
+    },
+    {
+      "status": "M",
+      "path": "workflow/prompts/evidence-recommendation.md"
+    },
+    {
+      "status": "M",
+      "path": "workflow/prompts/generate.md"
+    },
+    {
+      "status": "M",
+      "path": "workflow/prompts/packaging-image.md"
+    },
+    {
+      "status": "M",
+      "path": "workflow/prompts/presentation.md"
+    },
+    {
+      "status": "M",
+      "path": "workflow/prompts/retrieval-plan.md"
+    }
+  ],
+  "material_data_manifest_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+  "runtime_required_untracked_source_files": [],
+  "secrets_included": false,
+  "qa_tested_code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "main_merged_at": "2026-10-31T20:54:40Z",
+  "main_merge_parents": [
+    "bd1b17e5a9232ee3ced1987990531f84bfeccd2a",
+    "eceef056ce80399b83c61f62860a32d0ead16e3d"
+  ],
+  "main_tree_equals_qa_tree": true,
+  "qa_reexecuted_after_merge": false
+}

@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "typical_success": 80,
+    "business_revision_once": 10,
+    "image_execution_unknown": 10
+  },
+  "budget_min_cny": 33.1698,
+  "budget_max_cny": 35.6698,
+  "paid_cny": "未测",
+  "not_a_failure_rate_estimate": true
+}

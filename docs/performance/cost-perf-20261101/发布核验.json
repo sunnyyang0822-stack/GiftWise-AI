@@ -1,0 +1,12 @@
+{
+  "text_files_scanned": 139,
+  "secret_pattern_findings": [],
+  "private_home_findings": [],
+  "broken_local_links": [],
+  "manifest_files_verified": 146,
+  "data_only_exit": 0,
+  "data_only_stdout": "data-only: resource/budget calculations and fixture assertions passed; archives/runtime not rechecked",
+  "budget_byte_identical": true,
+  "resource_summary_identical": true,
+  "scope": "local publication verification; no service/model calls or independent QA claim"
+}

@@ -1,0 +1,36 @@
+✔ text returns with persisted pending while image Promise is unresolved; same selection is idempotent (30.157ms)
+✔ supplier failure retains completed text and selected candidate; repeated POST/GET never regenerates (14.4422ms)
+✔ missing image configuration is unavailable immediately, with no fake pending or supplier call (3.613ms)
+✔ switching back restores selected task binding and reuses image instead of starting another (17.8945ms)
+✔ owner/run/candidate isolation also protects reused provider tasks (13.843ms)
+✔ image plan preserves selected presentation and exclusion original/clarifications without invented references (13.432ms)
+✔ reading interrupted task derives honest failure without mutating its stored record (5.9254ms)
+GiftWise web 接入层已启动：http://127.0.0.1:8787
+模式：mock（模拟数据；未配置直连大模型凭证）
+追求对象契约已落地：是（工作区未提交改动）
+✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (98.5056ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 493.1489
+
+✖ failing tests:
+
+test at web\tests\backend-async-image-a.test.mjs:112:1
+✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (98.5056ms)
+  [TypeError: fetch failed] {
+    [cause]: Error: connect ECONNREFUSED 127.0.0.1:8904
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:2021:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8904
+    }
+  }
+
+exit_code=1

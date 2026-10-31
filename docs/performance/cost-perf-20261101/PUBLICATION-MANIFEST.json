@@ -1,0 +1,882 @@
+{
+  "analysis_sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "scope": "new evidence directory only; no business changes",
+  "files": [
+    {
+      "path": "PPT更新提示词.md",
+      "source_sha256": "677f85a4aeef0475a16cf7600fb8ba11d444d91b7ff77c18e08cdd33cad31028",
+      "published_sha256": "677f85a4aeef0475a16cf7600fb8ba11d444d91b7ff77c18e08cdd33cad31028",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "README.md",
+      "source_sha256": "36b26811f86c544cfd42755f92b0e386d7282c59150ad4b1d51d1ea6cf3c7c6b",
+      "published_sha256": "36b26811f86c544cfd42755f92b0e386d7282c59150ad4b1d51d1ea6cf3c7c6b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/.gitignore",
+      "source_sha256": "943d89dca7aac69344d088a34bfa224a565a7ce8cd7117456afa6da35ab2d92c",
+      "published_sha256": "943d89dca7aac69344d088a34bfa224a565a7ce8cd7117456afa6da35ab2d92c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/async-fixture-check.txt",
+      "source_sha256": "7b5363b6d71cd4d46aab4a9c9f2e0aa2627982957b34f231b3cff17da7ce353b",
+      "published_sha256": "7b5363b6d71cd4d46aab4a9c9f2e0aa2627982957b34f231b3cff17da7ce353b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/async-fixture-completed-check.txt",
+      "source_sha256": "35b5f364be938d3382c54e831b05850c2c470fec68c790ca251d0cbe54dcfb18",
+      "published_sha256": "35b5f364be938d3382c54e831b05850c2c470fec68c790ca251d0cbe54dcfb18",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/async-fixture-isolated-check.txt",
+      "source_sha256": "fe3e76c687d2cc577f9b9db49bd82665c9411e733c4c2157e4ce3e1c83dd27cb",
+      "published_sha256": "fe3e76c687d2cc577f9b9db49bd82665c9411e733c4c2157e4ce3e1c83dd27cb",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/budget.csv",
+      "source_sha256": "82f2fcc6e4a80978e9865c5597ac4b7fbf15a9967fbd6ac91a018d5544facb64",
+      "published_sha256": "82f2fcc6e4a80978e9865c5597ac4b7fbf15a9967fbd6ac91a018d5544facb64",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/check-fixtures.mjs",
+      "source_sha256": "69b151f7dd96f58db0ec524b3babc9bb74e87dc9da35262ef00621cfbd2db756",
+      "published_sha256": "69b151f7dd96f58db0ec524b3babc9bb74e87dc9da35262ef00621cfbd2db756",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/commit-15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879.json",
+      "source_sha256": "e3b66a10889d2395122fef903c478dcdbe558ec3f51372aa8a790a051ef4ebf8",
+      "published_sha256": "e3b66a10889d2395122fef903c478dcdbe558ec3f51372aa8a790a051ef4ebf8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/commit-eceef056ce80399b83c61f62860a32d0ead16e3d.json",
+      "source_sha256": "5c6162053568cea44397256427b35c2ce6e53dc65895e04bad7b5ed076c8ed32",
+      "published_sha256": "5c6162053568cea44397256427b35c2ce6e53dc65895e04bad7b5ed076c8ed32",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/.gitattributes",
+      "source_sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "published_sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/api-b/api-contract.md",
+      "source_sha256": "a6cb1432fcf7b87991b4e616e716070c675b3108787031b14ac3657388a0502c",
+      "published_sha256": "a6cb1432fcf7b87991b4e616e716070c675b3108787031b14ac3657388a0502c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/api-b/api-examples.json",
+      "source_sha256": "7749719fea2e6c1bdceb25aff860a7c34ec8ce75bcf383be13e3092567d27379",
+      "published_sha256": "7749719fea2e6c1bdceb25aff860a7c34ec8ce75bcf383be13e3092567d27379",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/api-b/env.example",
+      "source_sha256": "fc678b3224c7ec1554e65612394d10757f879a0607b1bbd05bc94c41cf29a51f",
+      "published_sha256": "fc678b3224c7ec1554e65612394d10757f879a0607b1bbd05bc94c41cf29a51f",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/api-b/runtime-dependencies.md",
+      "source_sha256": "3158d4f704bfb163e1beb375932e8761ca3f5c9f39dc41dfe4c84af2a1c6f5d7",
+      "published_sha256": "3158d4f704bfb163e1beb375932e8761ca3f5c9f39dc41dfe4c84af2a1c6f5d7",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/api-b/sessions-timeouts.md",
+      "source_sha256": "936ad0b708aa4fb9b6db56b61b74d1738fc5e01da4cecd1abf2d404d4e9a7467",
+      "published_sha256": "936ad0b708aa4fb9b6db56b61b74d1738fc5e01da4cecd1abf2d404d4e9a7467",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/assembly-inputs.json",
+      "source_sha256": "fea4a22a5e9d1101c9d79319bda081b6c98dbb3ddf25b067148f523321f676fe",
+      "published_sha256": "fea4a22a5e9d1101c9d79319bda081b6c98dbb3ddf25b067148f523321f676fe",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/font-fontprobe-ff.mjs",
+      "source_sha256": "42f2d7a8a586fcdc1f806cef58995ff22b9a40422467a6aed0551c6dcfe70a71",
+      "published_sha256": "42f2d7a8a586fcdc1f806cef58995ff22b9a40422467a6aed0551c6dcfe70a71",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/font-probe-dynamic.txt",
+      "source_sha256": "a383d03b43e1f06884860673682f220bdf8d3d4097ae1f156d65250049532d7a",
+      "published_sha256": "a383d03b43e1f06884860673682f220bdf8d3d4097ae1f156d65250049532d7a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/font-probe-home.txt",
+      "source_sha256": "808fda9d726bae7232890f9244a0668997dc869ee0219b0c6a9ff69d2da6f927",
+      "published_sha256": "808fda9d726bae7232890f9244a0668997dc869ee0219b0c6a9ff69d2da6f927",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/font-subset-run.txt",
+      "source_sha256": "0413930bf8133c80cf130a17210f5baf0799fa94e5b11b6af224687dde59f0ae",
+      "published_sha256": "0413930bf8133c80cf130a17210f5baf0799fa94e5b11b6af224687dde59f0ae",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/media-runs.txt",
+      "source_sha256": "f573e256645377f1ae282f647b4b375a9f6e04d2152bed0883ba6fe3e8d711e1",
+      "published_sha256": "f573e256645377f1ae282f647b4b375a9f6e04d2152bed0883ba6fe3e8d711e1",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/media-v3-1440-log.json",
+      "source_sha256": "d20eb5b590ccbfcc039d8b0cdf485975c1c58639d130689fa4d1ca3a94f35299",
+      "published_sha256": "d20eb5b590ccbfcc039d8b0cdf485975c1c58639d130689fa4d1ca3a94f35299",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/media-v3-390-log.json",
+      "source_sha256": "aaf3b906b01f11364d449cc4e03dff1d154e8a5abf4047c02054ad2f57fd1dc9",
+      "published_sha256": "aaf3b906b01f11364d449cc4e03dff1d154e8a5abf4047c02054ad2f57fd1dc9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/pr102-independent-review.md",
+      "source_sha256": "0acec3fdd521f99a3655cbab3d20ec9b8ffa0a8201c0392ec24c620833ee29ab",
+      "published_sha256": "0acec3fdd521f99a3655cbab3d20ec9b8ffa0a8201c0392ec24c620833ee29ab",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/pr95-independent-review.md",
+      "source_sha256": "b9960e4f60378de44fc467f38bcb69ee30f8cd5bc8f5275d69c68362570d38a6",
+      "published_sha256": "b9960e4f60378de44fc467f38bcb69ee30f8cd5bc8f5275d69c68362570d38a6",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/review-evidence-manifest.json",
+      "source_sha256": "13738915f1237dc0854fd0b99b70a50b872a9e9bac88d808ed82f96d47de8118",
+      "published_sha256": "13738915f1237dc0854fd0b99b70a50b872a9e9bac88d808ed82f96d47de8118",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/static-audit.json",
+      "source_sha256": "c9733b8fa39546f155fdb77bd47a3ff68a8909348daba661d6213aee433dcdf5",
+      "published_sha256": "c9733b8fa39546f155fdb77bd47a3ff68a8909348daba661d6213aee433dcdf5",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-102-95/uncovered-material-probe-raw.txt",
+      "source_sha256": "f7853e6f81d2771af4fb79c9e6e19121427d4170253adcbbeb889d2cde884e70",
+      "published_sha256": "f7853e6f81d2771af4fb79c9e6e19121427d4170253adcbbeb889d2cde884e70",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/historical-ai83/summary.json",
+      "source_sha256": "1fc5671090d0508f6e985f5e02a0f21d9aa5def99ee6b53714b684f40500e88c",
+      "published_sha256": "1fc5671090d0508f6e985f5e02a0f21d9aa5def99ee6b53714b684f40500e88c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/network-attempts.jsonl",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/offline-guard.mjs",
+      "source_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "published_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/run-targeted.mjs",
+      "source_sha256": "f7d6ad9d4f0d321d6a4d96277836bce4c1b5a28c9e27cabfd10c185d7e48d7ae",
+      "published_sha256": "f7d6ad9d4f0d321d6a4d96277836bce4c1b5a28c9e27cabfd10c185d7e48d7ae",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/targeted-environment.json",
+      "source_sha256": "0dcc7a468d0fc542b1263599a8e009a7febcaf295dc4d9d26ba280029d36ec94",
+      "published_sha256": "0dcc7a468d0fc542b1263599a8e009a7febcaf295dc4d9d26ba280029d36ec94",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/targeted-raw.txt",
+      "source_sha256": "17e005bfc31e51cd72b7df905ad85a46fe2c1aa57def0efc54f1a0a3e4d3e0a4",
+      "published_sha256": "17e005bfc31e51cd72b7df905ad85a46fe2c1aa57def0efc54f1a0a3e4d3e0a4",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr115/targeted-result.json",
+      "source_sha256": "5a3f30cbfa8841a0d20c631eee2420e9a24f1731e8ed239b85f50a5dbd361afb",
+      "published_sha256": "5a3f30cbfa8841a0d20c631eee2420e9a24f1731e8ed239b85f50a5dbd361afb",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/check-preserved-selected.mjs",
+      "source_sha256": "20b06bc5e62622548409aba9838213cab3624e70caea219aeddbf7ada2305de0",
+      "published_sha256": "20b06bc5e62622548409aba9838213cab3624e70caea219aeddbf7ada2305de0",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/delivery-correction.txt",
+      "source_sha256": "03c290aefcd17541b126bb379db994b04770b4abb380dc0b68e7697622c8ff49",
+      "published_sha256": "03c290aefcd17541b126bb379db994b04770b4abb380dc0b68e7697622c8ff49",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/network-attempts.jsonl",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/offline-guard.mjs",
+      "source_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "published_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/run-targeted.mjs",
+      "source_sha256": "f9d4f906a9fba31701c2a23eb2d34231d085d6de757b7cb7abac523205adb7e9",
+      "published_sha256": "f9d4f906a9fba31701c2a23eb2d34231d085d6de757b7cb7abac523205adb7e9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/selected-preservation-check.json",
+      "source_sha256": "a9bfba02ac65c92afa70522c3349e9a65f8ac73a1002c3c4ded7cf469e3f1c55",
+      "published_sha256": "a9bfba02ac65c92afa70522c3349e9a65f8ac73a1002c3c4ded7cf469e3f1c55",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/selected-preservation-raw.txt",
+      "source_sha256": "127ca115016ee9ee93fbca503a6c7ec858f1d4869ec5e01e76d077c35f03820a",
+      "published_sha256": "127ca115016ee9ee93fbca503a6c7ec858f1d4869ec5e01e76d077c35f03820a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/targeted-environment.json",
+      "source_sha256": "5ca0b48534c9d3336ffc748e3fad1265482a348a3461868ea87c709739a6df08",
+      "published_sha256": "5ca0b48534c9d3336ffc748e3fad1265482a348a3461868ea87c709739a6df08",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/targeted-raw.txt",
+      "source_sha256": "1b82350a699c2b7bb1b41f1dea5af50cb155137f5859d11a78024fb074a0367a",
+      "published_sha256": "1b82350a699c2b7bb1b41f1dea5af50cb155137f5859d11a78024fb074a0367a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence/pr120/targeted-result.json",
+      "source_sha256": "ad9dc81773899f896e9666a8b69c37aeaa90d3dd4a2482f16d4f7848158a7694",
+      "published_sha256": "ad9dc81773899f896e9666a8b69c37aeaa90d3dd4a2482f16d4f7848158a7694",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/evidence-index.json",
+      "source_sha256": "ea61608a5a37ba9deeb25db3561d707c274888edf2c4b8c4beaa5bb4f56c65ec",
+      "published_sha256": "ea61608a5a37ba9deeb25db3561d707c274888edf2c4b8c4beaa5bb4f56c65ec",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/frontend-handoff.md",
+      "source_sha256": "f005bb0d139954b3c9477471814a4196490abd5eb8aa0c87e5b75bb536c57c0a",
+      "published_sha256": "f005bb0d139954b3c9477471814a4196490abd5eb8aa0c87e5b75bb536c57c0a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/material-audit.json",
+      "source_sha256": "c065a69320713bb45f8a3bc9851551236c843201e72fcd58aa3f1248170e2f30",
+      "published_sha256": "c065a69320713bb45f8a3bc9851551236c843201e72fcd58aa3f1248170e2f30",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/frontend-e/static-assets-manifest.json",
+      "source_sha256": "e3809605f0a024aa643004587f72daf31962e13d295b41c0d7273325d91ddd49",
+      "published_sha256": "e3809605f0a024aa643004587f72daf31962e13d295b41c0d7273325d91ddd49",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/HANDOFF-REPORT.md",
+      "source_sha256": "be6ce7bfc25d45d315a70e3c7b68d9bfa916f31d29c80dca9f672d26582cd0e5",
+      "published_sha256": "be6ce7bfc25d45d315a70e3c7b68d9bfa916f31d29c80dca9f672d26582cd0e5",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/MAIN-RELEASE.md",
+      "source_sha256": "f03b1792a8486cf69a964b8c74754d661bb3b127e45869da046a269434847f89",
+      "published_sha256": "f03b1792a8486cf69a964b8c74754d661bb3b127e45869da046a269434847f89",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/publication-checks.json",
+      "source_sha256": "cd1daaaee4d0649317db99ebd6c431f7c3cf0d45d3b10cc0eb86e1dfeab3de27",
+      "published_sha256": "cd1daaaee4d0649317db99ebd6c431f7c3cf0d45d3b10cc0eb86e1dfeab3de27",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/execution.json",
+      "source_sha256": "b5aae093e81aa0998c8e7af1bf8a2815c86426482a51e6f39ff1eb4ad3c0ab3a",
+      "published_sha256": "b5aae093e81aa0998c8e7af1bf8a2815c86426482a51e6f39ff1eb4ad3c0ab3a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/network-guard-used.mjs",
+      "source_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "published_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/probe-used.test.mjs",
+      "source_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "published_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/runner-used.py",
+      "source_sha256": "5cd66a6508ae08f0bb3fabbcab12683836cdd13b0c2092c0f41396fba38fa1ab",
+      "published_sha256": "5cd66a6508ae08f0bb3fabbcab12683836cdd13b0c2092c0f41396fba38fa1ab",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/stderr.txt",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http/stdout.tap",
+      "source_sha256": "9fc573ee18c57abbfa33d651d754cd3569eda59825c3ea480afa7e995cadd26f",
+      "published_sha256": "9fc573ee18c57abbfa33d651d754cd3569eda59825c3ea480afa7e995cadd26f",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/execution.json",
+      "source_sha256": "bb4533a13086c1f71eebfcf26a435b6138352b3ec2a6bab35b9543d219e2c01a",
+      "published_sha256": "bb4533a13086c1f71eebfcf26a435b6138352b3ec2a6bab35b9543d219e2c01a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/network-guard-used.mjs",
+      "source_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/probe-used.test.mjs",
+      "source_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "published_sha256": "6c6ce5e5f14937052d45d186b87976a4d7440f9db6c8df54abab820f3963a549",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/runner-used.py",
+      "source_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/stderr.txt",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-2/stdout.tap",
+      "source_sha256": "1b7b139cd4f0391ec5fb4f182c482a63c92b7e16fea427a286bf6af8d45903bf",
+      "published_sha256": "1b7b139cd4f0391ec5fb4f182c482a63c92b7e16fea427a286bf6af8d45903bf",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/execution.json",
+      "source_sha256": "31fb65e9d94db2e4a3aa79cf1c630f7c65cdd22819b7e79bb4184d2b8b7a5c61",
+      "published_sha256": "31fb65e9d94db2e4a3aa79cf1c630f7c65cdd22819b7e79bb4184d2b8b7a5c61",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/network-guard-used.mjs",
+      "source_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/probe-used.test.mjs",
+      "source_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "published_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/runner-used.py",
+      "source_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/stderr.txt",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/http-attempt-3/stdout.tap",
+      "source_sha256": "070abd1ae69a6d57e72696115dea6c9b8922c08fd003f9e5ebea2afe3c7c35a3",
+      "published_sha256": "070abd1ae69a6d57e72696115dea6c9b8922c08fd003f9e5ebea2afe3c7c35a3",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/offline/execution.json",
+      "source_sha256": "7771bc0179a4f1018a84501b4178fb829d72eded18df9636ce1122660deb1dc1",
+      "published_sha256": "7771bc0179a4f1018a84501b4178fb829d72eded18df9636ce1122660deb1dc1",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/offline/network-guard-used.mjs",
+      "source_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "published_sha256": "af4c1877ca3d646e72cf5cd5eb427e2f412a4cd4f7db1ef3097b9dcd72ed6de8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/offline/stderr.txt",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/artifacts/offline/stdout.tap",
+      "source_sha256": "d1f5d3ec1deeafa9df38d05bcadbe95d3a8663f8d82472894273c021c8076559",
+      "published_sha256": "d1f5d3ec1deeafa9df38d05bcadbe95d3a8663f8d82472894273c021c8076559",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/commands.md",
+      "source_sha256": "c315aaaea4316f9e901ac81c87c3a8675555af72eb8e7186c3ec7807b6ead8e4",
+      "published_sha256": "c315aaaea4316f9e901ac81c87c3a8675555af72eb8e7186c3ec7807b6ead8e4",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/final-code-state.json",
+      "source_sha256": "6e493a137afea517713f2acc0fd90f129e1f11f4c4afc99ae3a499aec690a4be",
+      "published_sha256": "6e493a137afea517713f2acc0fd90f129e1f11f4c4afc99ae3a499aec690a4be",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/index.md",
+      "source_sha256": "54fe4d201dc9da8f7cefe7b486ab09f458114c03bd525972bccb1c606aad8770",
+      "published_sha256": "54fe4d201dc9da8f7cefe7b486ab09f458114c03bd525972bccb1c606aad8770",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr102-independent-review.md",
+      "source_sha256": "30ffbded4f74aeb5ecce1bc5be5683f89fe7f6f07bfbb489d657d3ffceb97926",
+      "published_sha256": "30ffbded4f74aeb5ecce1bc5be5683f89fe7f6f07bfbb489d657d3ffceb97926",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr115-independent-review.md",
+      "source_sha256": "b23b4a78e8da94b72184a82f76177dd4fbdd0b4785d127aa2c4ebf010ee7feb6",
+      "published_sha256": "b23b4a78e8da94b72184a82f76177dd4fbdd0b4785d127aa2c4ebf010ee7feb6",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr117-independent-review.md",
+      "source_sha256": "41329d4256cb1c18a152ad1a081b0967dd807593e2109130fcad14e46db544bf",
+      "published_sha256": "41329d4256cb1c18a152ad1a081b0967dd807593e2109130fcad14e46db544bf",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr120-independent-review.md",
+      "source_sha256": "86e4f7509778aa80efb8628aff39f360d097a94cafb5d2657d1a74af2f20449b",
+      "published_sha256": "86e4f7509778aa80efb8628aff39f360d097a94cafb5d2657d1a74af2f20449b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr121-independent-review.md",
+      "source_sha256": "13374ecd17f4510c52dbf50d9d331b56d4df105f322a9a07993a91596c176f59",
+      "published_sha256": "13374ecd17f4510c52dbf50d9d331b56d4df105f322a9a07993a91596c176f59",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr83-independent-review.md",
+      "source_sha256": "0dd96d627e17815e5122deef30dc77f9376a65717728c47cc88a62e2079f7cd4",
+      "published_sha256": "0dd96d627e17815e5122deef30dc77f9376a65717728c47cc88a62e2079f7cd4",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr84-independent-review.md",
+      "source_sha256": "3db3f8f6749ef0c946534734025ccb4b4739f51af77767983dfa439270582105",
+      "published_sha256": "3db3f8f6749ef0c946534734025ccb4b4739f51af77767983dfa439270582105",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/history/pr95-independent-review.md",
+      "source_sha256": "8b22e12506602a3d4863455805a4e016fa35a9f80d5c631ff3c9380a1eedcf85",
+      "published_sha256": "8b22e12506602a3d4863455805a4e016fa35a9f80d5c631ff3c9380a1eedcf85",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/independent-qa-eceef056.md",
+      "source_sha256": "011a756fee7e35717a47b1de858cb7d7b450ef8c409325ce6ad1828c4a533b0c",
+      "published_sha256": "011a756fee7e35717a47b1de858cb7d7b450ef8c409325ce6ad1828c4a533b0c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/publication-manifest.json",
+      "source_sha256": "19cf81800821e27f626de9602c977770e8eee4bc038f8b0567b5b09cde6b0de1",
+      "published_sha256": "19cf81800821e27f626de9602c977770e8eee4bc038f8b0567b5b09cde6b0de1",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/results-index.json",
+      "source_sha256": "1fa9a5b99edff9913a20152b64de6e5f442bf58f26a615853fa93dfbf7128da6",
+      "published_sha256": "1fa9a5b99edff9913a20152b64de6e5f442bf58f26a615853fa93dfbf7128da6",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/tools/combined-http.test.mjs",
+      "source_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "published_sha256": "d8e11d7adf5979653bb6ba58bd1a01d9c5686bb8af9c2132505b256e63dfeac8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/tools/network-guard.mjs",
+      "source_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "published_sha256": "b3bfaa80ee6bcb80dc7e7f5e9ac172a640e52b9ad6e393a55f725829b01635dc",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/tools/prepare-publication.py",
+      "source_sha256": "9877dc8ced87fca564c67f92e01dcaa78bbd42e641a0768b6e6e9939d03caa3a",
+      "published_sha256": "9877dc8ced87fca564c67f92e01dcaa78bbd42e641a0768b6e6e9939d03caa3a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/qa-d/tools/run-qa.py",
+      "source_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "published_sha256": "36a506ea169fa7ed70f5cd0b6a65134d7d04a018d73ff615487f968400cd25db",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/README.md",
+      "source_sha256": "79382e2a248281a67d513557216b597f55c7584abd3f8b996fb0d8c3dd8cff55",
+      "published_sha256": "da37ad676309026e2d510e627d965792170fc9c4ed0c5fdf6b2d73b8420fbd99",
+      "changed_for_path_redaction": true
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/controlled-no-images.txt",
+      "source_sha256": "44b1b9d150948ad75e337756548830da660b41ded37ace4e5f2840877dff2c40",
+      "published_sha256": "44b1b9d150948ad75e337756548830da660b41ded37ace4e5f2840877dff2c40",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/controlled-selected-ai.txt",
+      "source_sha256": "dd634dd3efe0a59e29d1b2d628211d6c284583209ea4912a450ca8c95da16a7c",
+      "published_sha256": "dd634dd3efe0a59e29d1b2d628211d6c284583209ea4912a450ca8c95da16a7c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/controlled-text-integration.txt",
+      "source_sha256": "494a4608fa689cb4b4124b8f76def26a8628e637befd5c9f306a994321387981",
+      "published_sha256": "494a4608fa689cb4b4124b8f76def26a8628e637befd5c9f306a994321387981",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/derived-source-use.json",
+      "source_sha256": "fe87847b29a43fbae049fe4030f4a99f9352f8b1f3526fe21b10ff0d280c9504",
+      "published_sha256": "fe87847b29a43fbae049fe4030f4a99f9352f8b1f3526fe21b10ff0d280c9504",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/measurement-plan.json",
+      "source_sha256": "311f4780f735f87f271d6702da383025b7355818c79a5ddddee956033acfe734",
+      "published_sha256": "311f4780f735f87f271d6702da383025b7355818c79a5ddddee956033acfe734",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/model-ledger.jsonl",
+      "source_sha256": "58958693c00b2541d05d3412f67661356e41148430808fbddea07fe0f267baf3",
+      "published_sha256": "58958693c00b2541d05d3412f67661356e41148430808fbddea07fe0f267baf3",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/new-recommendation-provider.json",
+      "source_sha256": "5c36c810cc1543fd67779bed3cf6267bbfc15e1127f5999b18df1bc804ecad92",
+      "published_sha256": "5c36c810cc1543fd67779bed3cf6267bbfc15e1127f5999b18df1bc804ecad92",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/new-recommendation-response.json",
+      "source_sha256": "1c9a3b5a28f99178061b0e45ac498f369ff15819555ebbbcf0e13ba8e4a989c8",
+      "published_sha256": "1c9a3b5a28f99178061b0e45ac498f369ff15819555ebbbcf0e13ba8e4a989c8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/public-material-manifest.json",
+      "source_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+      "published_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/public-material-receipt.json",
+      "source_sha256": "e648dfa027e4367e97976eb677ef80de660e5489991a500e4ecfc84d750f8fd0",
+      "published_sha256": "e648dfa027e4367e97976eb677ef80de660e5489991a500e4ecfc84d750f8fd0",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/retrieval-audit.json",
+      "source_sha256": "10b2f70379e3b311568fa5e4fd05d2d810ff9b560adbb64f84bd5645e6a7791c",
+      "published_sha256": "10b2f70379e3b311568fa5e4fd05d2d810ff9b560adbb64f84bd5645e6a7791c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/text-observation-plan.json",
+      "source_sha256": "e7c2ef5cdedec44c1f9d90d0f06e94835e802641f3e18a0f7caffb9a07c58198",
+      "published_sha256": "e7c2ef5cdedec44c1f9d90d0f06e94835e802641f3e18a0f7caffb9a07c58198",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/text-observation.json",
+      "source_sha256": "392c598e88f9be0de67c79e4243832fa6016104793af29ffc118b4cbcefda0b5",
+      "published_sha256": "392c598e88f9be0de67c79e4243832fa6016104793af29ffc118b4cbcefda0b5",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/evidence/timing.json",
+      "source_sha256": "dbc2d99474a8834829fdb522d230e259cb84344c35e3cd26961aab30d3f9da3b",
+      "published_sha256": "dbc2d99474a8834829fdb522d230e259cb84344c35e3cd26961aab30d3f9da3b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/final-code-static-hashes.json",
+      "source_sha256": "5569f6e815b96cf16d0a0dcc9908b5ab789a919ab8a9bf7a52c33c43f6225842",
+      "published_sha256": "5569f6e815b96cf16d0a0dcc9908b5ab789a919ab8a9bf7a52c33c43f6225842",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/release-manifest.json",
+      "source_sha256": "7f10243f788242ddcba86078e2751f5b8dd5ccaa12aadbf24651fe444255147b",
+      "published_sha256": "7f10243f788242ddcba86078e2751f5b8dd5ccaa12aadbf24651fe444255147b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/SHA256SUMS.txt",
+      "source_sha256": "5a70ae72c3df9ad17c58b08bd1d51e8aec398a06de9338f64635ae7adedc9fde",
+      "published_sha256": "5a70ae72c3df9ad17c58b08bd1d51e8aec398a06de9338f64635ae7adedc9fde",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/source-data.md",
+      "source_sha256": "8ed331477abac3dff04196eccba2909078d51647fe423ffe17b36b25b744a225",
+      "published_sha256": "8ed331477abac3dff04196eccba2909078d51647fe423ffe17b36b25b744a225",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/source-index.json",
+      "source_sha256": "f4fc4d47adc2a2c3c894554243d74c041a0e8e5c6c69990664da615c33e6b038",
+      "published_sha256": "f4fc4d47adc2a2c3c894554243d74c041a0e8e5c6c69990664da615c33e6b038",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/runtime-c/storage-portability.md",
+      "source_sha256": "386ee6618fcf1f780ac06d5eabb747e48d42bf01539b5c9ef6f8a95f57b3e4b1",
+      "published_sha256": "386ee6618fcf1f780ac06d5eabb747e48d42bf01539b5c9ef6f8a95f57b3e4b1",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/SHA256SUMS",
+      "source_sha256": "c718896f8036a0754fc2a616ebf19c006f7f5cbe7183a242e62b19112c00ace6",
+      "published_sha256": "c718896f8036a0754fc2a616ebf19c006f7f5cbe7183a242e62b19112c00ace6",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/source-secret-screening.json",
+      "source_sha256": "a69f1ea37e5becdd63b2b092b6c6deaf34e2e3960ec49674a945c360cbb86fd8",
+      "published_sha256": "a69f1ea37e5becdd63b2b092b6c6deaf34e2e3960ec49674a945c360cbb86fd8",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/evidence/version-manifest.json",
+      "source_sha256": "f34cf055d4a6318d397a48d4a77f9c1bd17bf8fc1ce7cef7f79a613801e0bbd1",
+      "published_sha256": "f34cf055d4a6318d397a48d4a77f9c1bd17bf8fc1ce7cef7f79a613801e0bbd1",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/historical-usage-summary.json",
+      "source_sha256": "6c4edc1079723e766e170d6f45082b733f7631004257c6c1c880f449a2dc2e76",
+      "published_sha256": "6c4edc1079723e766e170d6f45082b733f7631004257c6c1c880f449a2dc2e76",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/measure.mjs",
+      "source_sha256": "c4b3fa84d0cbf962791bc2cd6e965f1eedf02d42b8f6af72d4eb6f8342536995",
+      "published_sha256": "c4b3fa84d0cbf962791bc2cd6e965f1eedf02d42b8f6af72d4eb6f8342536995",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/mixed-100.json",
+      "source_sha256": "1cc10e41ffe6550b3ce49e5d0ff9202780d5dec2300551521f1d4e8f67ad58fd",
+      "published_sha256": "1cc10e41ffe6550b3ce49e5d0ff9202780d5dec2300551521f1d4e8f67ad58fd",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/official-image-api.html",
+      "source_sha256": "0b4e9f305a2540500e270b5ad837e99fd2affd9e8a7e92c421ec373f89c42c20",
+      "published_sha256": "0b4e9f305a2540500e270b5ad837e99fd2affd9e8a7e92c421ec373f89c42c20",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/official-model-catalog.json",
+      "source_sha256": "555f10d8200b18e51a39b4ef60a77ba3fde173e6f28ef1d3c7c40acc835a3e5c",
+      "published_sha256": "555f10d8200b18e51a39b4ef60a77ba3fde173e6f28ef1d3c7c40acc835a3e5c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/official-price.html",
+      "source_sha256": "dff6fc6665d7a870472b31d206da0c23d2c6d3e0657aeac384e4293c6d4059f4",
+      "published_sha256": "dff6fc6665d7a870472b31d206da0c23d2c6d3e0657aeac384e4293c6d4059f4",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/prepare-runtime.ps1",
+      "source_sha256": "115e7ab3d2073fb3d8eeb028561dbc9e72021e6679564331a07390d1450f1da9",
+      "published_sha256": "115e7ab3d2073fb3d8eeb028561dbc9e72021e6679564331a07390d1450f1da9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/price-extract.json",
+      "source_sha256": "82d25b089db5de715d395920ba25661ebc5b2f09b147d3e5f74457a44184e57b",
+      "published_sha256": "82d25b089db5de715d395920ba25661ebc5b2f09b147d3e5f74457a44184e57b",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/provenance.json",
+      "source_sha256": "426725c876b6ce3ce66dfbeb132518435d289de3b211dd8f687c37d34246f9fe",
+      "published_sha256": "426725c876b6ce3ce66dfbeb132518435d289de3b211dd8f687c37d34246f9fe",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/README.md",
+      "source_sha256": "9a23bf0176cc597358742e49e0914a66a1f844b1b613b029932ea10bc85d4b96",
+      "published_sha256": "9a23bf0176cc597358742e49e0914a66a1f844b1b613b029932ea10bc85d4b96",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/resource-summary.json",
+      "source_sha256": "a34267e44531628a827ac6f2bbfa1b1d68eb768647b224270ea64da1c5c9f2ab",
+      "published_sha256": "a34267e44531628a827ac6f2bbfa1b1d68eb768647b224270ea64da1c5c9f2ab",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-23-44-396Z/conditions.json",
+      "source_sha256": "1bd42b4e331df55e33a50eee3ca67e35f2a56116cef2e31c6d7c989338392d5c",
+      "published_sha256": "1bd42b4e331df55e33a50eee3ca67e35f2a56116cef2e31c6d7c989338392d5c",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-23-44-396Z/samples.jsonl",
+      "source_sha256": "be4e5db8fe078b23c9567ca00bb0a8d5143fb0f3bf284a3e29ebaeba34d5e171",
+      "published_sha256": "be4e5db8fe078b23c9567ca00bb0a8d5143fb0f3bf284a3e29ebaeba34d5e171",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-23-44-396Z/stdout.txt",
+      "source_sha256": "9aedd7d21239dd8f7d323df7c5bb1b1e891dd1584ee5a5b839f31a096b1d672e",
+      "published_sha256": "9aedd7d21239dd8f7d323df7c5bb1b1e891dd1584ee5a5b839f31a096b1d672e",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/conditions.json",
+      "source_sha256": "4450c371dbd1bdcb864453f4f2593e69b5a0a4ad5d04838af7a8209969b37045",
+      "published_sha256": "4450c371dbd1bdcb864453f4f2593e69b5a0a4ad5d04838af7a8209969b37045",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/disk.json",
+      "source_sha256": "6733ed4fdaba275f7f39f795ce7cf00c140e37eeb387fdd78f880c48c7e33bad",
+      "published_sha256": "6733ed4fdaba275f7f39f795ce7cf00c140e37eeb387fdd78f880c48c7e33bad",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/fixture.jsonl",
+      "source_sha256": "d2338c6c4dc05313ad3ea972f6d6f904f73c81994457f38a0ab503458ca7eab3",
+      "published_sha256": "d2338c6c4dc05313ad3ea972f6d6f904f73c81994457f38a0ab503458ca7eab3",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/http.json",
+      "source_sha256": "11b83a976bd6e6f2ae1d998ecb191c51f913f42c19bb8b98e6161f3fa3031688",
+      "published_sha256": "11b83a976bd6e6f2ae1d998ecb191c51f913f42c19bb8b98e6161f3fa3031688",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/media.jsonl",
+      "source_sha256": "71053518fd6ffd1168962671f43ca34e95089e1bdf9d66177bf546c5795c1795",
+      "published_sha256": "71053518fd6ffd1168962671f43ca34e95089e1bdf9d66177bf546c5795c1795",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/samples.jsonl",
+      "source_sha256": "3e0101e9d84bc0199c5c5242f12c353de65239427c979e96ecd9ddb8b466c4d9",
+      "published_sha256": "3e0101e9d84bc0199c5c5242f12c353de65239427c979e96ecd9ddb8b466c4d9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/stdout.txt",
+      "source_sha256": "199d35270449785ec3190e3703dd6c62a28caccfa317454932034bb1369728c9",
+      "published_sha256": "199d35270449785ec3190e3703dd6c62a28caccfa317454932034bb1369728c9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/runs/2026-10-31T21-24-05-798Z/windows-process.json",
+      "source_sha256": "85882e6fee76a51eb25d353d5a82034a9bc79adf2acbc5323cde119bb0fe7e9a",
+      "published_sha256": "85882e6fee76a51eb25d353d5a82034a9bc79adf2acbc5323cde119bb0fe7e9a",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/source-retrieval-metadata.json",
+      "source_sha256": "89f343bec8579ad2d440a07ea715f1b8437731e1da54ace687f7243c45dadbd9",
+      "published_sha256": "89f343bec8579ad2d440a07ea715f1b8437731e1da54ace687f7243c45dadbd9",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/stage-assumptions.csv",
+      "source_sha256": "52e7eb3fc60b0a593e54dd34b619a9ac3640291e50495334e8721fad9ceff524",
+      "published_sha256": "52e7eb3fc60b0a593e54dd34b619a9ac3640291e50495334e8721fad9ceff524",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/summarize.py",
+      "source_sha256": "3d0ff293111a8fa2d98fb0ac730b90a2c92a690305236afcec57b8d5d91109fb",
+      "published_sha256": "3d0ff293111a8fa2d98fb0ac730b90a2c92a690305236afcec57b8d5d91109fb",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/历史专项原稿.md",
+      "source_sha256": "ed01831c4496f72be62bbdd904b75bb63d8105590f1f43e2234d5509b9ae0d06",
+      "published_sha256": "ed01831c4496f72be62bbdd904b75bb63d8105590f1f43e2234d5509b9ae0d06",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/审查稿.md",
+      "source_sha256": "d9cf33951fcce1a14f52d5631985262a39390c3953c47a1a451306af80ebd207",
+      "published_sha256": "d9cf33951fcce1a14f52d5631985262a39390c3953c47a1a451306af80ebd207",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "原始证据/成本性能分析-2026-11-01/答辩摘要与P07建议.md",
+      "source_sha256": "55cca03cff16186c59f1f1f0f718a8c43e866a71b270038572acff2632e13f04",
+      "published_sha256": "55cca03cff16186c59f1f1f0f718a8c43e866a71b270038572acff2632e13f04",
+      "changed_for_path_redaction": false
+    },
+    {
+      "path": "成本与性能分析-2026-11-01.md",
+      "source_sha256": "35bccff98d274fb903199f35a4d0b6f3f6a9c22b9cb73b9d86623f831b2b2247",
+      "published_sha256": "35bccff98d274fb903199f35a4d0b6f3f6a9c22b9cb73b9d86623f831b2b2247",
+      "changed_for_path_redaction": false
+    }
+  ]
+}

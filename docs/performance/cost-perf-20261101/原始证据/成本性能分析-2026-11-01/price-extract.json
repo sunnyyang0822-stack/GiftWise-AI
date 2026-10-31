@@ -1,0 +1,59 @@
+{
+  "checked_date_asia_shanghai": "2026-11-01",
+  "url": "https://api.ucloud.cn/?Action=ListCModelCenterModels",
+  "model": {
+    "ModelId": "umodel-1792230508",
+    "Name": "deepseek-v4.1-flash-1017",
+    "Vendor": "DeepSeek",
+    "VendorLogo": "https://cdnv2-cache.udelivrs.com/2026/05/c04f5db8b6af8431a2c566e9497df2ae_1779245685944.svg",
+    "Icon": "https://cdnv2-cache.udelivrs.com/2026/05/c04f5db8b6af8431a2c566e9497df2ae_1779245685944.svg",
+    "ModalTypes": [
+      "Text Generation",
+      "Vision Understanding",
+      "Deep Thinking"
+    ],
+    "Languages": [],
+    "MaxModelLen": 1024000,
+    "SupportedCapabilities": [],
+    "TagIds": [],
+    "Tags": [],
+    "InputModalities": [
+      "text",
+      "image"
+    ],
+    "OutputModalities": [
+      "text"
+    ],
+    "ContextCacheSupported": true,
+    "BatchInferenceSupported": false,
+    "DiscountBps": 10000,
+    "ApiDocUrl": "https://www.compshare.cn/docs/modelverse/introduce/modelapi",
+    "PublishedAt": 1792230508,
+    "PriceSummary": [
+      {
+        "ChargeItem": "input",
+        "ChargeItemDescription": "输入",
+        "ChargeItemDescriptionEn": "Input",
+        "Price": "2",
+        "Unit": "元/百万 Token",
+        "UnitEn": "CNY/million tokens"
+      },
+      {
+        "ChargeItem": "output_text_tokens",
+        "ChargeItemDescription": "文本输出",
+        "ChargeItemDescriptionEn": "Text Output",
+        "Price": "8",
+        "Unit": "元/百万 Token",
+        "UnitEn": "CNY/million tokens"
+      }
+    ]
+  },
+  "cache_rate": "not_public_in_catalog; conservative full input rate",
+  "image": {
+    "model": "doubao-seedream-4.5",
+    "cny_per_successful_image": 0.25,
+    "price_url": "https://www.compshare.cn/docs/modelverse/price",
+    "billing_url": "https://www.compshare.cn/docs/modelverse/models/image_api/doubao-seedream",
+    "failure_rule": "charge successful generated_images, client timeout unknown reserves one successful image"
+  }
+}

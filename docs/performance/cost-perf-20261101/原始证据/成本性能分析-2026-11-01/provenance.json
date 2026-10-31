@@ -1,0 +1,18 @@
+{
+  "analysis_sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "tree_comparison": {
+    "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+    "eceef056ce80399b83c61f62860a32d0ead16e3d": "2772f6d022a15ca98d0d8be9ec0f82033445c182"
+  },
+  "source_zip_comment": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "runtime_pristine_files_checked": 627,
+  "mismatches": [],
+  "handoff_evidence_sha": "147e45a60f7a7fc9f2cc8c7e9d8146af3dc5f405",
+  "sha256": {
+    "source.zip": "80377a69293db25e405a097f8a3c713790c2bb7d5953de072ed70e7d53465269",
+    "handoff.zip": "ed6f56b9bba063b86bc1936aa14d76b1400589f21541bc8aa940a746c93fea66",
+    "official-model-catalog.json": "555f10d8200b18e51a39b4ef60a77ba3fde173e6f28ef1d3c7c40acc835a3e5c",
+    "official-price.html": "dff6fc6665d7a870472b31d206da0c23d2c6d3e0657aeac384e4293c6d4059f4",
+    "official-image-api.html": "0b4e9f305a2540500e270b5ad837e99fd2affd9e8a7e92c421ec373f89c42c20"
+  }
+}

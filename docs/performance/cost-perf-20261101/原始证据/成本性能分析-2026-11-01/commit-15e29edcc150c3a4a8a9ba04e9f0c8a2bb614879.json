@@ -1,0 +1,9 @@
+{
+  "sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "tree": {
+    "sha": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+    "url": "https://api.github.com/repos/sunnyyang0822-stack/GiftWise-AI/git/trees/2772f6d022a15ca98d0d8be9ec0f82033445c182"
+  },
+  "source_url": "https://api.github.com/repos/sunnyyang0822-stack/GiftWise-AI/git/commits/15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "publication_transform": "only sha/tree/source; omit public author email and signature"
+}

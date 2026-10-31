@@ -1,0 +1,22 @@
+TAP version 13
+# GiftWise web 接入层已启动：http://127.0.0.1:8932
+# 模式：mock（模拟数据；未配置直连大模型凭证）
+# 追求对象契约已落地：是（工作区未提交改动）
+# {"scenario":"ready","controlled":true,"three_selectable":true,"repair_count":1,"recommendation_image_calls":0,"selected_image_fixture_calls":1,"presentation_fixture_calls":1,"pending_get_did_not_write":true,"owner_and_unknown_task_rejected":true,"packaging_section":false,"external_supplier_calls":0}
+# {"scenario":"failed","controlled":true,"three_selectable":true,"repair_count":1,"recommendation_image_calls":0,"selected_image_fixture_calls":1,"presentation_fixture_calls":1,"pending_get_did_not_write":true,"owner_and_unknown_task_rejected":true,"packaging_section":true,"external_supplier_calls":0}
+# Subtest: final integrated HTTP: cached text -> real provider parser -> one repair -> selectable -> selected text/pending -> ready or failed, GET read-only and owner/task isolation
+ok 1 - final integrated HTTP: cached text -> real provider parser -> one repair -> selectable -> selected text/pending -> ready or failed, GET read-only and owner/task isolation
+  ---
+  duration_ms: 990.1078
+  type: 'test'
+  ...
+# QA_NETWORK_GUARD {"mode":"owned-loopback","port":8932,"listen":1,"connect":2,"fetch":26,"numeric_loopback_lookup":1,"blocked":0}
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1742.1331

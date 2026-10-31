@@ -1,0 +1,663 @@
+{
+  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "date": "2026-10-31",
+  "new_tests_or_browsers_run": false,
+  "originals_unchanged": true,
+  "redaction_count_unit": "Each substituted field value or text match counts once; a whole PATH value counts once, not once per component. JSON redaction may reserialize JSON; exact original/publication hashes distinguish it.",
+  "files": [
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/targeted-raw.txt",
+      "published_path": "evidence/pr115/targeted-raw.txt",
+      "original_sha256": "17e005bfc31e51cd72b7df905ad85a46fe2c1aa57def0efc54f1a0a3e4d3e0a4",
+      "publication_sha256": "17e005bfc31e51cd72b7df905ad85a46fe2c1aa57def0efc54f1a0a3e4d3e0a4",
+      "original_bytes": 2396,
+      "publication_bytes": 2396,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/targeted-result.json",
+      "published_path": "evidence/pr115/targeted-result.json",
+      "original_sha256": "5a3f30cbfa8841a0d20c631eee2420e9a24f1731e8ed239b85f50a5dbd361afb",
+      "publication_sha256": "5a3f30cbfa8841a0d20c631eee2420e9a24f1731e8ed239b85f50a5dbd361afb",
+      "original_bytes": 162,
+      "publication_bytes": 162,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/targeted-environment.json",
+      "published_path": "evidence/pr115/targeted-environment.json",
+      "original_sha256": "0b78786638b167aea23f3470aa6996ceb5e721c516f65648d82502c893ef4ceb",
+      "publication_sha256": "0dcc7a468d0fc542b1263599a8e009a7febcaf295dc4d9d26ba280029d36ec94",
+      "original_bytes": 7197,
+      "publication_bytes": 1575,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 16,
+        "ENV_SEARCH_PATH": 2,
+        "PROJECT_FILE_URL": 1
+      },
+      "redaction_substitutions": 19,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/run-targeted.mjs",
+      "published_path": "evidence/pr115/run-targeted.mjs",
+      "original_sha256": "864315de4dc4062e31c0bd2e5ff758a3f9e6b33ac7c6b251deebb11fb05602ab",
+      "publication_sha256": "f7d6ad9d4f0d321d6a4d96277836bce4c1b5a28c9e27cabfd10c185d7e48d7ae",
+      "original_bytes": 2622,
+      "publication_bytes": 2560,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 2
+      },
+      "redaction_substitutions": 2,
+      "transform": "text redaction",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": "Redacted audit script; absolute path placeholders make this copy unsuitable for direct execution. Committed test source remains in the code repository."
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/offline-guard.mjs",
+      "published_path": "evidence/pr115/offline-guard.mjs",
+      "original_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "publication_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "original_bytes": 558,
+      "publication_bytes": 558,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": "Redacted audit script; absolute path placeholders make this copy unsuitable for direct execution. Committed test source remains in the code repository."
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-actual-guide-sections-20261031/network-attempts.jsonl",
+      "published_path": "evidence/pr115/network-attempts.jsonl",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "publication_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "publication_bytes": 0,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "dd51324a67832991c11cb76d3d039d35656a3128",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as dd51324a67832991c11cb76d3d039d35656a3128; not a run at the committed SHA or final eceef056.",
+        "binding_limit": "Original environment records base SHA; it does not contain a contemporaneous worktree-diff hash. Subsequent commit mapping comes from the execution delivery record, not a new test.",
+        "tests": 10,
+        "selection": "Entire new ui-actual-guide-sections.test.mjs file",
+        "applicable": "Actual sections filtering/labels, pure/physical/mixed controlled payloads, selected AI DOM lifecycle.",
+        "not_applicable": "No live model, real image generation, browser pixel/layout or complete final-version E2E."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/targeted-raw.txt",
+      "published_path": "evidence/pr120/targeted-raw.txt",
+      "original_sha256": "1b82350a699c2b7bb1b41f1dea5af50cb155137f5859d11a78024fb074a0367a",
+      "publication_sha256": "1b82350a699c2b7bb1b41f1dea5af50cb155137f5859d11a78024fb074a0367a",
+      "original_bytes": 4389,
+      "publication_bytes": 4389,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/targeted-result.json",
+      "published_path": "evidence/pr120/targeted-result.json",
+      "original_sha256": "ad9dc81773899f896e9666a8b69c37aeaa90d3dd4a2482f16d4f7848158a7694",
+      "publication_sha256": "ad9dc81773899f896e9666a8b69c37aeaa90d3dd4a2482f16d4f7848158a7694",
+      "original_bytes": 161,
+      "publication_bytes": 161,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/targeted-environment.json",
+      "published_path": "evidence/pr120/targeted-environment.json",
+      "original_sha256": "01ad43716eee642a091b8baed880ebaa294b646b7a4aae082b7c436ecebbec4f",
+      "publication_sha256": "5ca0b48534c9d3336ffc748e3fad1265482a348a3461868ea87c709739a6df08",
+      "original_bytes": 7320,
+      "publication_bytes": 1708,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 16,
+        "ENV_SEARCH_PATH": 2,
+        "PROJECT_FILE_URL": 1
+      },
+      "redaction_substitutions": 19,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/run-targeted.mjs",
+      "published_path": "evidence/pr120/run-targeted.mjs",
+      "original_sha256": "667f8ffd46a64fcbc34e4e662b0704dbf42d037a714bdfe29e3cba8605d19a05",
+      "publication_sha256": "f9d4f906a9fba31701c2a23eb2d34231d085d6de757b7cb7abac523205adb7e9",
+      "original_bytes": 2743,
+      "publication_bytes": 2683,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 2
+      },
+      "redaction_substitutions": 2,
+      "transform": "text redaction",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": "Redacted audit script; absolute path placeholders make this copy unsuitable for direct execution. Committed test source remains in the code repository."
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/offline-guard.mjs",
+      "published_path": "evidence/pr120/offline-guard.mjs",
+      "original_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "publication_sha256": "1ced3d405ae9cb7ddfacb2a1b56228fd395b6d5f2adc56be3d265f14d64c1a68",
+      "original_bytes": 558,
+      "publication_bytes": 558,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": "Redacted audit script; absolute path placeholders make this copy unsuitable for direct execution. Committed test source remains in the code repository."
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/network-attempts.jsonl",
+      "published_path": "evidence/pr120/network-attempts.jsonl",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "publication_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "publication_bytes": 0,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/selected-preservation-check.json",
+      "published_path": "evidence/pr120/selected-preservation-check.json",
+      "original_sha256": "a9bfba02ac65c92afa70522c3349e9a65f8ac73a1002c3c4ded7cf469e3f1c55",
+      "publication_sha256": "a9bfba02ac65c92afa70522c3349e9a65f8ac73a1002c3c4ded7cf469e3f1c55",
+      "original_bytes": 559,
+      "publication_bytes": 559,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/selected-preservation-raw.txt",
+      "published_path": "evidence/pr120/selected-preservation-raw.txt",
+      "original_sha256": "127ca115016ee9ee93fbca503a6c7ec858f1d4869ec5e01e76d077c35f03820a",
+      "publication_sha256": "127ca115016ee9ee93fbca503a6c7ec858f1d4869ec5e01e76d077c35f03820a",
+      "original_bytes": 573,
+      "publication_bytes": 573,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/check-preserved-selected.mjs",
+      "published_path": "evidence/pr120/check-preserved-selected.mjs",
+      "original_sha256": "5b30e4406575fb4e6a0efeb74d6bafb7a1b4b83df8b0fe90ed2eb73085d564c6",
+      "publication_sha256": "20b06bc5e62622548409aba9838213cab3624e70caea219aeddbf7ada2305de0",
+      "original_bytes": 2283,
+      "publication_bytes": 2223,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 2
+      },
+      "redaction_substitutions": 2,
+      "transform": "text redaction",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".tmp/frontend-text-recommendations-20261031/delivery-correction.txt",
+      "published_path": "evidence/pr120/delivery-correction.txt",
+      "original_sha256": "03c290aefcd17541b126bb379db994b04770b4abb380dc0b68e7697622c8ff49",
+      "publication_sha256": "03c290aefcd17541b126bb379db994b04770b4abb380dc0b68e7697622c8ff49",
+      "original_bytes": 527,
+      "publication_bytes": 527,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "base": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
+        "subsequent_change_commit": "6d162dfd41ea6c08f1110112d8869a2fd9bbe879",
+        "execution": "Base HEAD plus uncommitted changes subsequently committed as 6d162dfd41ea6c08f1110112d8869a2fd9bbe879; not a final-eceef056 test run.",
+        "binding_limit": "Original environment records base SHA without a contemporaneous diff hash; later commit mapping is documented, not retroactive execution at that commit.",
+        "tests": 19,
+        "selection": "Name filter 停推荐网图：|三卡无网图： over two files; NOT both full files or all web tests.",
+        "applicable": "Recommendation no-image/no-poll contracts, retained selected-AI controlled states, source preservation comparison against base.",
+        "not_applicable": "No live model/image/browser; code does not itself prove C real-text retrieval semantics or final combined full-suite status.",
+        "known_difference": "D final diff --check exit 1: ui-recommendation-without-images.test.mjs:127 new blank line at EOF. Nonblocking. Development worktree check omitted then-untracked new file; no final diffcheck-pass claim."
+      },
+      "notes": ""
+    },
+    {
+      "source_locator_project_relative": ".worktrees/backend-independent-review/.tmp/frontend-final-102-95/pr102-independent-review.md",
+      "published_path": "evidence/historical-102-95/pr102-independent-review.md",
+      "original_sha256": "77ced7acc0e6e7ef0ff4e62e8081537adcbcd9f6b17155196cc69c0b4c1a9320",
+      "publication_sha256": "0acec3fdd521f99a3655cbab3d20ec9b8ffa0a8201c0392ec24c620833ee29ab",
+      "original_bytes": 5812,
+      "publication_bytes": 5809,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 1
+      },
+      "redaction_substitutions": 1,
+      "transform": "text redaction",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "D historical review bound to PR102 1db4949 / PR95 1447b42; source locators inside copied report may be redacted; not rerun."
+    },
+    {
+      "source_locator_project_relative": ".worktrees/backend-independent-review/.tmp/frontend-final-102-95/pr95-independent-review.md",
+      "published_path": "evidence/historical-102-95/pr95-independent-review.md",
+      "original_sha256": "71babc5dd997e8deb6a8d534793373ef5ae0cd24863fc508aa71b508ed2c0af8",
+      "publication_sha256": "b9960e4f60378de44fc467f38bcb69ee30f8cd5bc8f5275d69c68362570d38a6",
+      "original_bytes": 3985,
+      "publication_bytes": 3986,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 1
+      },
+      "redaction_substitutions": 1,
+      "transform": "text redaction",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "D historical review bound to PR102 1db4949 / PR95 1447b42; source locators inside copied report may be redacted; not rerun."
+    },
+    {
+      "source_locator_project_relative": ".worktrees/backend-independent-review/.tmp/frontend-final-102-95/static-audit.json",
+      "published_path": "evidence/historical-102-95/static-audit.json",
+      "original_sha256": "9ac1ac2e608bdf3a71d38447993020ed8103f959726b915c638ec70db1682bd0",
+      "publication_sha256": "c9733b8fa39546f155fdb77bd47a3ff68a8909348daba661d6213aee433dcdf5",
+      "original_bytes": 16158,
+      "publication_bytes": 15470,
+      "byte_identical": false,
+      "redactions": {
+        "CONVERSATION_CONTENT": 11
+      },
+      "redaction_substitutions": 11,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "D historical review bound to PR102 1db4949 / PR95 1447b42; source locators inside copied report may be redacted; not rerun."
+    },
+    {
+      "source_locator_project_relative": ".worktrees/backend-independent-review/.tmp/frontend-final-102-95/uncovered-material-probe-raw.txt",
+      "published_path": "evidence/historical-102-95/uncovered-material-probe-raw.txt",
+      "original_sha256": "9921ab20cae361eed76839439c38d68842c404f07ea9ea5b3cedd7f75e5c4c7c",
+      "publication_sha256": "f7853e6f81d2771af4fb79c9e6e19121427d4170253adcbbeb889d2cde884e70",
+      "original_bytes": 333,
+      "publication_bytes": 300,
+      "byte_identical": false,
+      "redactions": {
+        "OPERATION_IDENTIFIER": 1
+      },
+      "redaction_substitutions": 1,
+      "transform": "text redaction",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "D historical review bound to PR102 1db4949 / PR95 1447b42; source locators inside copied report may be redacted; not rerun."
+    },
+    {
+      "source_locator_project_relative": ".worktrees/backend-independent-review/.tmp/frontend-final-102-95/review-evidence-manifest.json",
+      "published_path": "evidence/historical-102-95/review-evidence-manifest.json",
+      "original_sha256": "bfe6e686d5e75c7a506976ccb46c602fa6f212ca640dee47b32a55579a91174b",
+      "publication_sha256": "13738915f1237dc0854fd0b99b70a50b872a9e9bac88d808ed82f96d47de8118",
+      "original_bytes": 987,
+      "publication_bytes": 643,
+      "byte_identical": false,
+      "redactions": {
+        "HOST_ABSOLUTE_PATH": 4
+      },
+      "redaction_substitutions": 4,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "D historical review bound to PR102 1db4949 / PR95 1447b42; source locators inside copied report may be redacted; not rerun."
+    },
+    {
+      "source_locator_project_relative": ".tools/font-fix/probe-home.txt",
+      "published_path": "evidence/historical-102-95/font-probe-home.txt",
+      "original_sha256": "808fda9d726bae7232890f9244a0668997dc869ee0219b0c6a9ff69d2da6f927",
+      "publication_sha256": "808fda9d726bae7232890f9244a0668997dc869ee0219b0c6a9ff69d2da6f927",
+      "original_bytes": 517,
+      "publication_bytes": 517,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Existing font evidence only; no probe or subset generation executed for this handoff."
+    },
+    {
+      "source_locator_project_relative": ".tools/font-fix/probe-dynamic.txt",
+      "published_path": "evidence/historical-102-95/font-probe-dynamic.txt",
+      "original_sha256": "a383d03b43e1f06884860673682f220bdf8d3d4097ae1f156d65250049532d7a",
+      "publication_sha256": "a383d03b43e1f06884860673682f220bdf8d3d4097ae1f156d65250049532d7a",
+      "original_bytes": 543,
+      "publication_bytes": 543,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Existing font evidence only; no probe or subset generation executed for this handoff."
+    },
+    {
+      "source_locator_project_relative": ".tools/font-fix/fontprobe-ff.mjs",
+      "published_path": "evidence/historical-102-95/font-fontprobe-ff.mjs",
+      "original_sha256": "d7fb7c4614462c7adfa8f5b083fb3320c912e2eaf9216e0c61b36dd060f63c3c",
+      "publication_sha256": "42f2d7a8a586fcdc1f806cef58995ff22b9a40422467a6aed0551c6dcfe70a71",
+      "original_bytes": 3333,
+      "publication_bytes": 3340,
+      "byte_identical": false,
+      "redactions": {
+        "LOCAL_TEST_ORIGIN": 1
+      },
+      "redaction_substitutions": 1,
+      "transform": "text redaction",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Existing font evidence only; no probe or subset generation executed for this handoff."
+    },
+    {
+      "source_locator_project_relative": ".tools/font-fix/subset-run.txt",
+      "published_path": "evidence/historical-102-95/font-subset-run.txt",
+      "original_sha256": "0413930bf8133c80cf130a17210f5baf0799fa94e5b11b6af224687dde59f0ae",
+      "publication_sha256": "0413930bf8133c80cf130a17210f5baf0799fa94e5b11b6af224687dde59f0ae",
+      "original_bytes": 298,
+      "publication_bytes": 298,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Existing font evidence only; no probe or subset generation executed for this handoff."
+    },
+    {
+      "source_locator_project_relative": ".tools/media-replay/tmp/runs.txt",
+      "published_path": "evidence/historical-102-95/media-runs.txt",
+      "original_sha256": "f573e256645377f1ae282f647b4b375a9f6e04d2152bed0883ba6fe3e8d711e1",
+      "publication_sha256": "f573e256645377f1ae282f647b4b375a9f6e04d2152bed0883ba6fe3e8d711e1",
+      "original_bytes": 654,
+      "publication_bytes": 654,
+      "byte_identical": true,
+      "redactions": {},
+      "redaction_substitutions": 0,
+      "transform": "exact bytes",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Existing Edge fixture run record only; final v3 values must be read from D report, not obsolete PR narrative."
+    },
+    {
+      "source_locator_project_relative": ".tools/media-replay/shots/v3-1440/log.json",
+      "published_path": "evidence/historical-102-95/media-v3-1440-log.json",
+      "original_sha256": "2cb8331d39ed9ff4b59694d34805bacd1046d946b2ddb58f8480f391b3f43ff6",
+      "publication_sha256": "d20eb5b590ccbfcc039d8b0cdf485975c1c58639d130689fa4d1ca3a94f35299",
+      "original_bytes": 3602,
+      "publication_bytes": 1779,
+      "byte_identical": false,
+      "redactions": {
+        "CONVERSATION_CONTENT": 15
+      },
+      "redaction_substitutions": 15,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Historical Edge fixture record; original execution SHA may not be embedded. D later reviewed against PR102. No screenshot/profile copied and no new replay."
+    },
+    {
+      "source_locator_project_relative": ".tools/media-replay/shots/v3-390/log.json",
+      "published_path": "evidence/historical-102-95/media-v3-390-log.json",
+      "original_sha256": "f9f15f612ea0149c10da417519ee929d7dd0a74759b5eac721ed010c6f037f7f",
+      "publication_sha256": "aaf3b906b01f11364d449cc4e03dff1d154e8a5abf4047c02054ad2f57fd1dc9",
+      "original_bytes": 3603,
+      "publication_bytes": 1780,
+      "byte_identical": false,
+      "redactions": {
+        "CONVERSATION_CONTENT": 15
+      },
+      "redaction_substitutions": 15,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "execution": "D historical final review bound to PR102 1db4949bf7edee0d6c617a6b71958747ea325587 and PR95 1447b4233773e28bfbdd50636eb6af148166536f. Original probe execution SHA may be absent; later byte/static binding does not retroactively make it a full-code run at those SHAs.",
+        "applicable": "Only unchanged resource/block applicability described in frontend-handoff.md.",
+        "not_applicable": "Not final eceef056 browser QA, not current image-plan v7 aesthetics, not cancelled recommendation-image functionality."
+      },
+      "notes": "Historical Edge fixture record; original execution SHA may not be embedded. D later reviewed against PR102. No screenshot/profile copied and no new replay."
+    },
+    {
+      "source_locator_project_relative": ".tmp/async-media-shared/backend-82-244d06bb/summary.json",
+      "published_path": "evidence/historical-ai83/summary.json",
+      "original_sha256": "f0ef8dd7de35ce09f06e37baeaa71442606d0467a65d4fc5bb68312fb87354e1",
+      "publication_sha256": "1fc5671090d0508f6e985f5e02a0f21d9aa5def99ee6b53714b684f40500e88c",
+      "original_bytes": 1142,
+      "publication_bytes": 1088,
+      "byte_identical": false,
+      "redactions": {
+        "OPERATION_IDENTIFIER": 3
+      },
+      "redaction_substitutions": 3,
+      "transform": "field-value redaction plus JSON serialization",
+      "context": {
+        "associated_pr_head": "26df1432218a15f49f3de1a796dc19d3d63da287",
+        "execution_sha_embedded_in_original": false,
+        "execution": "Historical backend PR83 delivery association; original summary does not pin execution SHA. Controlled text, one real image task; no new generation.",
+        "applicable": "Historical bytes/hash/dimensions and one-task timing/HTTP record only.",
+        "not_applicable": "Not current frontend or v7 aesthetic verification, not final eceef056 E2E."
+      },
+      "notes": "Backend PR83 delivery association, not an execution-SHA claim; identifiers redacted, bytes and hash retained."
+    }
+  ],
+  "redaction_totals": {
+    "HOST_ABSOLUTE_PATH": 44,
+    "ENV_SEARCH_PATH": 4,
+    "PROJECT_FILE_URL": 2,
+    "CONVERSATION_CONTENT": 41,
+    "OPERATION_IDENTIFIER": 4,
+    "LOCAL_TEST_ORIGIN": 1
+  }
+}

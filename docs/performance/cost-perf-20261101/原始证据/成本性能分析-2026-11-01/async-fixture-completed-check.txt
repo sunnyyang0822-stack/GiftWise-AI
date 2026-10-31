@@ -1,0 +1,21 @@
+✔ text returns with persisted pending while image Promise is unresolved; same selection is idempotent (29.6273ms)
+✔ supplier failure retains completed text and selected candidate; repeated POST/GET never regenerates (15.4219ms)
+✔ missing image configuration is unavailable immediately, with no fake pending or supplier call (4.0837ms)
+✔ switching back restores selected task binding and reuses image instead of starting another (16.0832ms)
+✔ owner/run/candidate isolation also protects reused provider tasks (13.3127ms)
+✔ image plan preserves selected presentation and exclusion original/clarifications without invented references (11.4568ms)
+✔ reading interrupted task derives honest failure without mutating its stored record (5.5668ms)
+GiftWise web 接入层已启动：http://127.0.0.1:8904
+模式：mock（模拟数据；未配置直连大模型凭证）
+追求对象契约已落地：是（工作区未提交改动）
+✔ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (164.4872ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 553.4931
+
+exit_code=0
