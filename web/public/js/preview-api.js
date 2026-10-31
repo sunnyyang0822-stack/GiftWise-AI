@@ -1,8 +1,12 @@
 import config from "./preview-config.js";
 import { recommendationMedia, selectedMedia } from "./media-preview.js";
 
-// 本阶段仅本地预览。同版本后端接入时由联调线替换适配层；不能通过地址参数开启旧API。
-export const PREVIEW_MODE = true;
+// 开发预览适配器：**默认关闭**，只有显式带 ?preview=1（或 ?preview=true）才启用。
+// 它仍然会伪造 4 个主端点（/api/intake/validate、/api/exclusions/analyze、
+// /api/recommendations、/api/presentations）的响应，所以绝不能默认打开：
+// 默认打开等于用户看到的不是后端结果。正式路径一律走 app.js 的 apiFetch → 真实 HTTP。
+const previewParams = new URLSearchParams(globalThis.location?.search || "");
+export const PREVIEW_MODE = previewParams.get("preview") === "1" || previewParams.get("preview") === "true";
 export const previewConfig = config;
 let scenario = new URLSearchParams(globalThis.location?.search || "").get("preview") || "normal";
 let failed = false;

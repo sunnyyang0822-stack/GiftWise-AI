@@ -8,6 +8,10 @@
  *   - 前端不解释“需要避免的”原话里的关键词，原话交给 /api/exclusions/analyze 识别并逐条确认。
  */
 import { icon, OPTION_ICONS, DEADLINE_ICONS } from "./icons.js";
+import {
+  applyParsedToForm, budgetDisplayText, deadlineDisplayText, overriddenRows, literalPreferences,
+  requiredFollowups, echoBudgetAmount, echoDeadlineDays, echoDeadlinePhrase,
+} from "./parse-intake.js";
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
 export const codePoints = value => [...value].length;
@@ -34,7 +38,11 @@ const intakeKey = () => JSON.stringify(api.buildIntake());
 
 export function newChatState() {
   return { done: [], shownKey: null, entryKey: null, entryInterests: null, notes: [], draft: "", enterMe: null,
-    analyzing: false, analysisError: null, analysisToken: 0, confirmRestart: false, sheetOpen: false };
+    analyzing: false, analysisError: null, analysisToken: 0, confirmRestart: false, sheetOpen: false,
+    /* 第 1 步解析：parsing = 正在等解析响应；parseReport = 最近一次解析的展示信息
+       （原话 / 覆盖 / 原文 / 必答追问）；deadlineAlert = 相对时间必须由用户确认的提示。
+       都只是前端记账，不下发任何新字段。 */
+    parsing: false, parseReport: null, deadlineAlert: null };
 }
 export function ensureChat() {
   if (!st().chat) st().chat = newChatState();
@@ -69,10 +77,18 @@ const sliderValues = () => {
   const ok = f.budget_mode === "slider" && !budgetProblems().length;
   return ok ? { min: f.budget_min, max: f.budget_max } : { min: "100", max: "300" };
 };
-const budgetText = () => {
+const budgetText = () => budgetDisplayText(form(), parseBlock());
+/**
+ * 最近一次第 1 步解析的 parse 块；没有解析过就是 null（展示层据此决定是否回显原值）。
+ * 兜底读 chat().parseReport.parse：只要这次对话确实解析过，⛔ 就绝不能退回显示服务端带宽。
+ */
+const parseBlock = () => st().parseintake?.parse || chat().parseReport?.parse || null;
+/** 用户自己改了预算 ⇒ 之前解析回显的原值不再代表当前输入，清掉（避免展示与提交不一致）。 */
+function clearParsedBudget() {
   const f = form();
-  return f.budget_mode === "zero" ? "不花钱的心意" : `¥${f.budget_min} – ¥${f.budget_max}`;
-};
+  f.budget_amount = "";
+  f.budget_phrase = "";
+}
 const textLimit = (value, message) => codePoints(value) > 1000 ? message : null;
 const LONG_TEXT = "需要避免的、以前送过的礼物和补充说明，每项最多 1000 字。";
 
@@ -146,7 +162,8 @@ const QUESTIONS = [
     options: () => (deadlineOptions() || []).map(r => opt(String(r.days), DEADLINE_SHORT[r.days] || r.label, DEADLINE_ICONS[r.days])),
     selected: () => form().deadline_days,
     pick: id => { form().deadline_days = id; },
-    answer: () => { const days = Number(form().deadline_days); return DEADLINE_SHORT[days] || (deadlineOptions() || []).find(r => r.days === days)?.label || ""; },
+    // 原值回显优先：解析给过 echo.deadline_days 且仍然是当前取值时，显示用户输入的原值（不显示 ±1 天区间）。
+    answer: () => deadlineDisplayText(form(), parseBlock()) || (deadlineOptions() || []).find(r => String(r.days) === form().deadline_days)?.label || "",
     check: () => {
       const options = deadlineOptions();
       if (!options) return "准备时间的选项还没有准备好，请稍后刷新再试。";
@@ -256,11 +273,32 @@ const applicable = () => QUESTIONS.filter(q => !q.when || q.when(form()));
 const current = () => applicable().find(q => q.kind === "summary" || !chat().done.includes(q.id));
 const understanding = c => c.kind === "tag" ? (zh(labels().exclusions, c.tag) || c.tag) : c.term;
 
+/**
+ * 第 1 步解析留下的**必答**项（`required_followups[].required === true`）。
+ * 已答完时返回 []。城市走 additional_context 这条既有字段；相对时间必须由用户确认，
+ * 因为模型对相对时间不稳定（后端实测：同一句「下个月」一次 30 天、一次 1 天）。
+ * 其余必答项（例如排除项识别）由既有 /api/exclusions/analyze 流程负责，这里不重复拦。
+ */
+export function parseFollowups() {
+  const report = chat().parseReport;
+  if (!report || !report.parse) return [];
+  const f = form();
+  return requiredFollowups(report.parse).filter(item => {
+    if (item.id === "deadline_confirm") return report.deadlinePending === true;
+    if (item.id === "city") return !String(f.city_answer || "").trim();
+    return false;
+  });
+}
+
 /** 提交前整体校验：返回第一个需要回到的题目与提示。 */
 export function chatProblems() {
   for (const q of applicable()) {
     const message = q.check?.();
     if (message) return [{ qid: q.id, code: "INTAKE_CLARIFICATION_REQUIRED", message }];
+  }
+  const pending = parseFollowups();
+  if (pending.length) {
+    return [{ qid: "summary", code: "INTAKE_CLARIFICATION_REQUIRED", message: pending[0].question || "还有一个必答问题需要你确认。" }];
   }
   return [];
 }
@@ -283,6 +321,11 @@ function finish(q) {
     c.analysisError = null;
   }
   if (q.id === "interests" && c.entryInterests !== JSON.stringify(form().interests)) c.done = c.done.filter(x => x !== "confidence");
+  // 用户亲手选了期限（含「跳过」之外的任何一次选择）就视为完成了相对时间的必答确认。
+  if (q.id === "deadline") {
+    c.deadlineAlert = null;
+    if (c.parseReport) c.parseReport.deadlinePending = false;
+  }
   c.notes = [];
   c.draft = "";
   c.enterMe = q.id;
@@ -458,6 +501,7 @@ function applyText(q, text) {
     case "unknown": q.unknownAction(); finish(q); return;
     case "budget":
       f.budget_mode = result.mode; f.budget_min = result.min; f.budget_max = result.max;
+      clearParsedBudget();
       attempt(q, said); return;
     case "text":
       if (q.kind === "avoid") { f.dislikes = text; attempt(q, said); return; }
@@ -471,6 +515,22 @@ function choose(q, id, userText) {
   q.pick(id);
   attempt(q, userText);
 }
+
+/* ------------------------------------------------- 第 1 步：自然语言解析 */
+/*
+ * 用户在输入框里写的那句话**就是**要用 `/api/intake/parse` 解析的用户原话。
+ * 这里只做分流，不做任何业务猜测：
+ *   · ready / needs_input → 把服务端合并好的 intake 落到**现有**表单字段上，跳过已被覆盖的题；
+ *   · empty               → ⛔ 不猜：一个字段都不改，只如实说「没读懂」；
+ *   · degraded / disabled / 真实传输失败 → ⛔ 不报错：回落到本地规则（接入大模型之前的既有表单路径）。
+ * 三态都必须让用户能走到三个候选 —— 没有「卡在解析」的分支。
+ */
+const PARSE_KINDS = new Set(["single", "multi", "budget", "text", "avoid"]);
+const PARSE_EMPTY_NOTE =
+  "这句我没读出能落到清单上的信息，所以没有替你猜：一个字段都没改。你可以直接点下面的选项，或换一句更具体的说法（例如「女朋友，生日，预算 600，下个月要用」）。";
+const PARSE_DEGRADED_NOTE =
+  "这一次的自然语言解析没有完成，我没有改你填的任何内容；按你原来的填写继续就好。";
+
 function send() {
   const c = chat();
   const q = current();
@@ -478,7 +538,88 @@ function send() {
     if (q.kind === "avoid") commitAvoid(q);
     return;
   }
-  applyText(q, c.draft);
+  const said = c.draft;
+  if (!PARSE_KINDS.has(q.kind) || typeof api.parseText !== "function") { applyText(q, said); return; }
+  void answerWithParse(q, said);
+}
+
+/** 解析在途时先把用户原话留在对话里，并按三态分流。 */
+async function answerWithParse(q, said) {
+  const c = chat();
+  c.parsing = true;
+  c.notes = [];
+  c.draft = "";
+  api.render();
+  let result = null;
+  try { result = await api.parseText(said); } catch { result = null; }
+  c.parsing = false;
+  const status = result?.status || "degraded";
+  const parse = result?.parse || null;
+  const overrides = overriddenRows(parse);
+  const literals = literalPreferences(parse);
+  c.parseReport = {
+    text: said, status, parse, overrides, literals,
+    notices: Array.isArray(result?.notices) ? result.notices : [],
+    applied: [], dropped: [], deadlinePending: false,
+  };
+
+  if (status === "ready" || status === "needs_input") {
+    const applied = applyParsedToForm({ form: form(), config: st().config, result });
+    c.parseReport.applied = applied.notes;
+    c.parseReport.dropped = applied.dropped;
+    if (applied.qids.length > 0) {
+      st().parseText = said;
+      for (const qid of applied.qids) if (!c.done.includes(qid)) c.done.push(qid);
+      // 解析改动了 intake ⇒ 之前的限制识别结果作废，必须重新逐条确认（与 finish() 同口径）。
+      api.invalidateAnalysis();
+      c.done = c.done.filter(x => x !== "avoid_confirm");
+      const lines = ["我按你这句原话把清单填好了：", ...applied.notes.map(n => `· ${n}`)];
+      if (overrides.length) {
+        lines.push("你填的选项已被你的原话覆盖：", ...overrides.map(r => `· ${r.label}：${r.from} → ${r.to}`));
+      }
+      if (literals.length) {
+        lines.push("你的喜好原话（原样保留，不用预设类目替代）：", ...literals.map(t => `「${t}」`));
+      }
+      /* 相对时间（例：「下个月」）模型换算不稳定 ⇒ ⛔ 不静默采用：
+         把期限这一题退回去，让用户看着模型算的值与原话的差额**亲自确认一次**。 */
+      const confirmItem = requiredFollowups(parse).find(item => item.id === "deadline_confirm");
+      if (confirmItem) {
+        c.deadlineAlert = {
+          phrase: parse?.deadline_check?.phrase || echoDeadlinePhrase(parse) || "",
+          current: Number.isInteger(confirmItem.current_value) ? confirmItem.current_value : null,
+          expected: Number.isInteger(confirmItem.expected) ? confirmItem.expected
+            : (Number.isInteger(confirmItem.suggested_value) ? confirmItem.suggested_value : null),
+          reason: typeof confirmItem.reason === "string" ? confirmItem.reason : (parse?.deadline_check?.reason || ""),
+        };
+        c.parseReport.deadlinePending = true;
+        c.done = c.done.filter(x => x !== "deadline");
+        lines.push("还有一件事要你亲自确认：期限是相对时间，模型换算不稳定，下面这题请你点一个要用的准备时间。");
+      }
+      c.done = [...new Set(c.done)];
+      c.notes = [{ role: "me", text: said }, { role: "bot", texts: lines }];
+      api.render();
+      revealCurrent();
+      return;
+    }
+    // ready 但没有任何字段能落到表单上 ⇒ 等同于没读懂，按 empty 的口径处理（不猜）。
+  }
+
+  if (status === "empty") {
+    c.notes = [{ role: "me", text: said }, { role: "bot", text: PARSE_EMPTY_NOTE }];
+    api.render();
+    revealCurrent();
+    return;
+  }
+
+  /* degraded / disabled / 传输失败：⛔ 不报错，回落到既有表单路径继续。 */
+  c.notes = [{ role: "me", text: said }];
+  applyText(q, said);
+  const reason = c.parseReport.notices[0] || PARSE_DEGRADED_NOTE;
+  if (!c.notes.some(n => n.role === "bot" && (n.text === reason || (n.texts || []).includes(reason)))) {
+    c.notes.push({ role: "bot", text: reason });
+  }
+  api.render();
+  revealCurrent();
 }
 function commitAvoid(q) {
   form().dislikes = chat().draft;
@@ -631,7 +772,8 @@ function singleAttach(q) {
   // 回到某题重答时，上次的选择以细描边提示；点任意一项即作答。
   const buttons = options.map((o, i) => optionButton(o, false, () => choose(q, o.id, o.label), i, `opt-${q.id}-${o.id}`, selected === o.id ? "gw-opt--was" : ""));
   if (q.skip) buttons.push(optionButton(opt("skip", q.skip, "skip"), false, () => { q.skipAction?.(); finish(q); }, options.length, `opt-${q.id}-skip`, "gw-opt--quiet"));
-  return attach([optionGrid(q.ask().at(-1), buttons, options.length > 4 ? "gw-opts--grid" : "")]);
+  const alert = q.id === "deadline" ? deadlineAlertNode() : null;
+  return attach([alert, optionGrid(q.ask().at(-1), buttons, options.length > 4 ? "gw-opts--grid" : "")].filter(Boolean));
 }
 function multiAttach(q, { confirmLabel = "选好了", none = null } = {}) {
   const list = q.list();
@@ -655,7 +797,7 @@ function budgetAttach(q) {
   const f = form();
   const other = f.budget_mode === "other";
   const chips = optionGrid("其他预算方式", [
-    optionButton(opt("zero", "不花钱的心意", "heart"), false, () => { const f = form(); f.budget_mode = "zero"; f.budget_min = "0"; f.budget_max = "0"; attempt(q, "不花钱的心意"); }, 0, "budget-zero"),
+    optionButton(opt("zero", "不花钱的心意", "heart"), false, () => { const f = form(); f.budget_mode = "zero"; f.budget_min = "0"; f.budget_max = "0"; clearParsedBudget(); attempt(q, "不花钱的心意"); }, 0, "budget-zero"),
     other
       ? optionButton(opt("slider", "用滑条选", "arrow-left"), false, () => { const f = form(); f.budget_mode = "slider"; f.budget_min = "100"; f.budget_max = "300"; api.render(); }, 1, "budget-slider-mode")
       : optionButton(opt("other", "其他金额", "coins"), false, () => { form().budget_mode = "other"; api.render(); }, 1, "budget-other-mode"),
@@ -679,7 +821,7 @@ function budgetAttach(q) {
         el("div", { class: "gw-money-row" }, [field("min"), el("span", { class: "gw-money__dash", "aria-hidden": "true", text: "—" }), field("max")]),
         el("div", { class: "gw-attach__foot" }, [
           el("span", { class: "gw-attach__count", text: "0–10000 元，最多两位小数" }),
-          el("button", { type: "button", class: "gw-send-btn", id: "budget-done", "data-field": "budget-done", onclick: () => attempt(q, budgetText()) }, ["用这个金额", icon("arrow-right", { size: 15 })]),
+          el("button", { type: "button", class: "gw-send-btn", id: "budget-done", "data-field": "budget-done", onclick: () => { clearParsedBudget(); attempt(q, budgetText()); } }, ["用这个金额", icon("arrow-right", { size: 15 })]),
         ]),
       ]),
       chips,
@@ -713,6 +855,7 @@ function budgetAttach(q) {
             f.budget_mode = "slider";
             f.budget_min = range.querySelector("#budget-min").value;
             f.budget_max = range.querySelector("#budget-max").value;
+            clearParsedBudget();
             attempt(q, budgetText());
           },
         }, ["就这个范围", icon("arrow-right", { size: 15 })]),
@@ -729,6 +872,7 @@ function slide(which, event, range, readout) {
   if (which === "max" && max < min) max = min;
   minInput.value = String(min); maxInput.value = String(max);
   f.budget_mode = "slider"; f.budget_min = String(min); f.budget_max = String(max);
+  clearParsedBudget();
   range.style.setProperty("--minf", String(min / 1000));
   range.style.setProperty("--maxf", String(max / 1000));
   range.classList.toggle("is-min-top", min >= 900);
@@ -802,10 +946,102 @@ function sheetValue(item) {
     default: return byId(item.qid).answer();
   }
 }
+/* --------------------------------- 解析结果在结算卡上的呈现（4 条裁定） */
+
+/** 相对时间的必答确认：模型算出来的天数与原话不符时，把这题的差额摆出来让用户点。 */
+function deadlineAlertNode() {
+  const a = chat().deadlineAlert;
+  if (!a) return null;
+  const said = a.phrase ? `你说的是「${a.phrase}」` : "你的原话是相对时间";
+  const model = a.current === null ? "" : `，模型算成 ${a.current} 天`;
+  const expected = a.expected === null ? "" : `，按原话大约是 ${a.expected} 天`;
+  return el("section", { class: "gw-parse-block gw-parse-block--required", "aria-label": "必答：期限确认" }, [
+    el("h4", { class: "gw-parse-block__title", text: "期限要你亲自确认" }),
+    el("p", { class: "gw-parse-block__ask", text: `${said}${model}${expected}。请点一个你这次要用的准备时间。` }),
+    a.reason ? el("p", { class: "gw-parse-block__why", text: a.reason }) : null,
+  ]);
+}
+
+function cityCard(item) {
+  const f = form();
+  const input = el("input", {
+    type: "text", id: "parse-city", class: "gw-parse-block__input", value: f.city_answer || "",
+    placeholder: "例如：杭州", "aria-label": "体验使用的城市", "data-field": "parse-city",
+    oninput: e => { form().city_answer = e.target.value; },
+    onkeydown: e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); confirmCity(); } },
+  });
+  return el("section", { class: "gw-parse-block gw-parse-block--required", "aria-label": "必答：城市" }, [
+    el("h4", { class: "gw-parse-block__title", text: "还差一个必答问题" }),
+    el("p", { class: "gw-parse-block__ask", text: item.question || "这个体验打算在哪个城市使用？" }),
+    el("div", { class: "gw-parse-block__row" }, [
+      input,
+      el("button", { type: "button", class: "gw-send-btn", id: "parse-city-ok", "data-field": "parse-city-ok", onclick: () => confirmCity() }, ["确认城市", icon("arrow-right", { size: 15 })]),
+    ]),
+    item.reason ? el("p", { class: "gw-parse-block__why", text: item.reason }) : null,
+  ]);
+}
+function confirmCity() {
+  const f = form();
+  f.city_answer = String(f.city_answer || "").trim();
+  api.render();
+}
+
+/** 结算卡上的解析区块：原话可见、覆盖提示、原值回显、必答追问 —— 全部来自响应，不造数据。 */
+function summaryExtras() {
+  const c = chat();
+  const report = c.parseReport;
+  const nodes = [];
+  if (!report) return nodes;
+  const parse = report.parse || null;
+  const long = e => [...e].length > 1000 ? [...e].slice(0, 999).join("") + "…" : e;
+
+  // 原文可见：用户说过的那句话始终原样可见。
+  if (report.text) nodes.push(el("p", { class: "gw-parse-block__quote", text: `你刚才说的：「${long(report.text)}」` }));
+
+  // 原值回显：金额/天数显示用户输入的原值，⛔ 界面不显示 ±50 / ±1 的区间。
+  const amount = echoBudgetAmount(parse);
+  const days = echoDeadlineDays(parse);
+  if (amount !== null && form().budget_amount) {
+    nodes.push(el("p", { class: "gw-summary__note gw-summary__note--strong", text: `预算按你输入的原值：${amount} 元（不显示区间）` }));
+  }
+  if (days !== null && String(form().deadline_days) === String(days)) {
+    nodes.push(el("p", { class: "gw-summary__note gw-summary__note--strong", text: `准备时间按你输入的原值：${days} 天（不显示区间）` }));
+  }
+
+  // 覆盖提示：文本优先于选项，逐条如实列出。
+  if (report.overrides.length) {
+    nodes.push(el("section", { class: "gw-parse-block", "aria-label": "覆盖提示" }, [
+      el("h4", { class: "gw-parse-block__title", text: "你填的选项已被你的原话覆盖" }),
+      el("ul", { class: "gw-parse-block__list" }, report.overrides.map(r => el("li", { text: `${r.label}：${r.from} → ${r.to}` }))),
+    ]));
+  }
+
+  // 喜好原文：逐字保留，不用预设类目替代。
+  if (report.literals.length) {
+    nodes.push(el("section", { class: "gw-parse-block", "aria-label": "喜好原文" }, [
+      el("h4", { class: "gw-parse-block__title", text: "你的喜好原话（原样保留）" }),
+      el("ul", { class: "gw-parse-block__list" }, report.literals.map(t => el("li", { text: `「${long(t)}」` }))),
+    ]));
+  }
+
+  // 必答追问（未答完的排在最前）：「体验类」缺城市 ⇒ 在结算卡上直接问。
+  // 相对时间（deadline_confirm）不在这里问：它由 deadlineAlertNode 把那道题退回去让用户亲自点。
+  const pending = new Map(parseFollowups().map(item => [item.id, item]));
+  for (const item of pending.values()) {
+    if (item.id === "city") nodes.push(cityCard(item));
+  }
+
+  // 解析的如实说明（降级/空/未采用项），不是报错态。
+  for (const notice of report.notices) nodes.push(el("p", { class: "gw-summary__note", text: long(notice) }));
+  for (const dropped of report.dropped) nodes.push(el("p", { class: "gw-summary__note", text: `未采用：${dropped}` }));
+  return nodes;
+}
+
 function summaryAttach() {
   const f = form();
   const relation = sheetValue(SHEET[0])?.split(" · ")[0] || "TA";
   const occasion = sheetValue(SHEET[1]) || "";
+  const blocked = parseFollowups().length > 0;
   return attach([
     el("article", { class: "greeting-card gw-summary", "aria-label": "需求小结" }, [
       el("p", { class: "greeting-card__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
@@ -815,8 +1051,12 @@ function summaryAttach() {
         el("dd", { text: sheetValue(item) || "—" }),
       ]))),
       el("p", { class: "greeting-card__sign", text: "—— 为 TA 准备的心意" }),
-      el("button", { type: "button", class: "gw-cta", id: "step-next", "data-field": "step-next", onclick: () => api.submit() }, [
-        icon("sparkles", { size: 18 }), "生成三个礼物思路",
+      ...summaryExtras(),
+      el("button", {
+        type: "button", class: "gw-cta", id: "step-next", "data-field": "step-next", disabled: blocked,
+        onclick: () => api.submit(),
+      }, [
+        icon("sparkles", { size: 18 }), blocked ? "先回答上面的必答问题" : "生成三个礼物思路",
       ]),
     ]),
   ], "gw-attach--summary");
@@ -871,6 +1111,14 @@ function pastTurn(q, enter) {
 function currentTurn(q, typing, entering) {
   const c = chat();
   const turn = el("li", { class: `gw-turn gw-turn--current${typing ? " is-typing" : ""}${entering ? " is-entering" : ""}`, "data-question": q.id });
+  if (c.parsing) {
+    turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
+      botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
+        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]), el("span", { class: "gw-typing__text", text: "正在读你这句原话…" }),
+      ])]),
+    ]));
+    return turn;
+  }
   if (q.kind === "confirm" && (c.analyzing || (!st().analysis && !c.analysisError))) {
     if (!st().analysis && !c.analyzing) setTimeout(runAnalysis, 0);
     turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
@@ -889,7 +1137,10 @@ function currentTurn(q, typing, entering) {
   }
   if (q.kind === "summary") texts = [ackFor(q), "我把你说的整理成了一张心意清单，看看对不对："].filter(Boolean);
   turn.append(typingGroup(), botGroup(texts, currentAttach(q)));
-  for (const n of c.notes) turn.append(n.role === "me" ? meGroup(n.text) : botGroup([n.text], null, "gw-group--note"));
+  // notes 里的 bot 项可以是多行（解析回执），逐条渲染成紧贴的气泡。
+  for (const n of c.notes) {
+    turn.append(n.role === "me" ? meGroup(n.text) : botGroup([].concat(n.texts || n.text).filter(Boolean), null, "gw-group--note"));
+  }
   return turn;
 }
 

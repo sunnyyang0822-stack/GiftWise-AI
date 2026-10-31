@@ -3,14 +3,16 @@ import { MOCK_DISLIKES, MOCK_AI_JSON } from '../tests/fixtures/exclusions/mock.m
 
 /**
  * provider: async ({dislikes}) => 原始严格 JSON 字符串；只调用一次。
- * mode 必填 mock/dify；mock 只支持标注的固定虚构原文。
+ * mode 必填 mock/dify/llm/replay；mock 只支持标注的固定虚构原文。
  * 空白原文返回 ok=true/ai_json=null 与显式跳过码，接入层无需确认。
  * ok 仅表示获取到字符串；接入层必须另调用 checkAiExclusions 后才能展示确认。
+ * llm/replay 走服务端直连 provider（默认回放，不消耗额度）；缺 provider 时如实报未配置，
+ * **不**静默改用 mock 夹具。
  */
 export async function recognizeExclusions({dislikes = '', mode, provider} = {}) {
   const result = (ok, ai_json, errors = []) => ({ok, mode, ai_json, errors});
   const fail = (code, message, path = 'provider') => result(false, null, [{code, path, message}]);
-  if (!['mock', 'dify'].includes(mode)) return fail('AI_OUTPUT_INVALID', '识别模式须明确为 mock 或 dify', 'mode');
+  if (!['mock', 'dify', 'llm', 'replay'].includes(mode)) return fail('AI_OUTPUT_INVALID', '识别模式须明确为 mock / dify / llm / replay', 'mode');
   if (typeof dislikes !== 'string') return fail('AI_OUTPUT_INVALID', '不喜欢的东西须为文字', 'dislikes');
   if ([...dislikes].length > 1000) return fail('AI_OUTPUT_LIMIT', '原文最多 1000 码点', 'dislikes');
   if (!dislikes.trim()) return result(true, null, [{code: 'EXCLUSION_RECOGNITION_SKIPPED', path: 'dislikes', message: '原文为空，已跳过识别，无需确认'}]);

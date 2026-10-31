@@ -15,13 +15,324 @@
 
 import { JsonFloat, codePointLength } from "./jsonstrict.mjs";
 import { TAGS } from "./labels.mjs";
-import { LIMITS } from "./config.mjs";
+import { LIMITS, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG } from "./config.mjs";
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?(?![\s\S])/;
 export const CONTRACT_VERSION = "giftwise-20261031-v2";
 
 export function error(errors, code, path, message) {
   errors.push({ code, path, message });
+}
+
+/* ================================================================== 接入层新增规则
+ *
+ * 下面两块**不是** validator/rules.py 的镜像，而是本接入层按产品负责人 2026-10-31
+ * 追加要求实现的新规则。刻意不放进镜像函数体（`candidate()`），原因是
+ * `web/tools/parity-check.mjs:157-173` 会逐项比对 JS 与 Python 的 `errors` / `passed`；
+ * 把新错误码塞进镜像函数会让 parity 出现**假差异**。warnings 不在 parity 比对范围内，
+ * 但为了口径统一，这里仍然用同一套 `{code, path, message}` 结构。
+ *
+ * ── 一、运输时间（要求：准备 + 运输 <= 可用天数）─────────────────────────
+ * `estimated_shipping_days` 允许未知。未知时用 SHIPPING_CONFIG.defaultDays 参与判定，
+ * 并一律标注为估算。绝不把运输时间写成保证，也绝不假装知道物流。
+ *
+ * ── 二、独特性启发式（warning 级，绝不硬错）───────────────────────────────
+ * 独特性是主观的，因此这里只说「用可检验的启发式**降低**大众化倾向」，
+ * 不声明任何「保证独特」。三个码：
+ *   TOO_GENERIC            命中大众品类黑名单；
+ *   NOT_GROUNDED           没有指回用户任何一条具体输入（换一个人也成立）；
+ *   HOMOGENEOUS_CANDIDATES 三个方案同质（同品类换皮）。
+ */
+
+/**
+ * 从页面原文里解析时长（天）。中文电商的写法很多，这里只做**保守**解析：
+ *   - 「预计 3–5 天」取**上限 5 天**（不确定区间一律取最坏情况）；
+ *   - 「48 小时内发货」「24 小时」按 24 小时 = 1 天**向上取整**；
+ *   - 「7 天内发货」「预售 15 天」直接取数字；
+ *   - 解析不出来返回 `null`，由调用方按「未知 + 保守默认」处理，
+ *     ⛔ 绝不把「没解析出来」当成「没有预售」。
+ * @returns {{days: number|null, source_text: string|null, upper_bound: boolean}}
+ */
+export function parseDurationDays(text) {
+  if (typeof text !== "string" || !text.trim()) return { days: null, source_text: null, upper_bound: false };
+  const raw = text.trim();
+  // 区间：取上限（保守）
+  const range = raw.match(/(\d+(?:\.\d+)?)\s*[-–~至到]\s*(\d+(?:\.\d+)?)\s*(天|日)/);
+  if (range) {
+    const upper = Number(range[2]);
+    if (Number.isFinite(upper)) return { days: Math.ceil(upper), source_text: raw, upper_bound: true };
+  }
+  const hours = raw.match(/(\d+(?:\.\d+)?)\s*(?:个)?\s*小时/);
+  if (hours) {
+    const value = Number(hours[1]);
+    if (Number.isFinite(value)) return { days: Math.ceil(value / 24), source_text: raw, upper_bound: true };
+  }
+  const days = raw.match(/(\d+(?:\.\d+)?)\s*(?:个)?\s*(?:工作)?\s*(天|日)/);
+  if (days) {
+    const value = Number(days[1]);
+    if (Number.isFinite(value)) return { days: Math.ceil(value), source_text: raw, upper_bound: false };
+  }
+  const weeks = raw.match(/(\d+(?:\.\d+)?)\s*(?:个)?\s*(周|星期)/);
+  if (weeks) {
+    const value = Number(weeks[1]);
+    if (Number.isFinite(value)) return { days: Math.ceil(value * 7), source_text: raw, upper_bound: true };
+  }
+  return { days: null, source_text: raw, upper_bound: false };
+}
+
+/**
+ * 「网购时长」解析（产品负责人 2026-10-31 裁定：拿不到时长一律按 3~5 天，判定取上界 5 天）。
+ *
+ * 不重复计算：页面**同时**给了发货时效与配送时效 ⇒ 两者相加；只给其一 ⇒ 不与默认值相加，
+ * 而是取「观测值」与保守默认下界（3 天）的较大者；两者都没有 ⇒ 用默认上界 5 天。
+ *
+ * ⚠️ 档位规则（补充裁定）：用户可用时长正好落在「3–5 天」这一档（上界 5 天）且网购时长未知时，
+ * 默认快递时长视为**已包含在该档内**，不再额外叠加 ⇒ 判定简化为 `准备 <= 5 - 3 = 2 天`。
+ * `tier_inclusive: true` 会写进数据层，便于追溯。
+ *
+ * @returns {{days:number|null, source:'page_observed'|'default_estimate', detail:object, tier_inclusive:boolean, default:object|null}}
+ */
+export function resolvePurchaseWindow({
+  ships_within_days = null,
+  shipping_days = null,
+  purchase_days = null,
+  is_preorder = null,
+  presale_days = null,
+  available_days = null,
+  default_window = PURCHASE_WINDOW_CONFIG,
+  presale_default_days = PRESALE_CONFIG.defaultDays,
+} = {}) {
+  const known = (value) => typeof value === "number" && Number.isFinite(value) && value >= 0;
+  const base = { tier_inclusive: false, default: null, detail: {} };
+  if (known(purchase_days)) {
+    return { ...base, days: purchase_days, source: "page_observed", detail: { purchase_days } };
+  }
+  const hasShips = known(ships_within_days);
+  const hasShipping = known(shipping_days);
+  // 明确标着预售但页面没给时长：按预售未知的保守值处理（不套 5 天默认，见 config 里的风险说明）。
+  if (is_preorder === true && !hasShips && !hasShipping && !known(presale_days)) {
+    return {
+      ...base,
+      days: presale_default_days,
+      source: "default_estimate",
+      detail: { presale_unknown: true, presale_default_days, reason: "is_preorder_unknown_duration" },
+      default: { ...default_window, used: presale_default_days, day_type: default_window.day_type, basis: "预售未给时长时的保守值" },
+    };
+  }
+  if (known(presale_days) && !hasShips) {
+    return { ...base, days: hasShipping ? presale_days + shipping_days : Math.max(presale_days, default_window.used), source: "page_observed", detail: { presale_days, shipping_days: hasShipping ? shipping_days : null, presale_as_ships_within: true, floor_applied: !hasShipping && Math.max(presale_days, default_window.used) !== presale_days } };
+  }
+  if (hasShips && hasShipping) {
+    return { ...base, days: ships_within_days + shipping_days, source: "page_observed", detail: { ships_within_days, shipping_days, summed: true } };
+  }
+  if (hasShips || hasShipping) {
+    const observed = hasShips ? ships_within_days : shipping_days;
+    return {
+      ...base,
+      days: Math.max(observed, default_window.used),
+      source: "page_observed",
+      detail: { only: hasShips ? "ships_within_days" : "shipping_days", observed, floor_applied: Math.max(observed, default_window.used) !== observed, floor_basis: "页面只给了发货或配送其中一段，另一段未知 ⇒ 不与默认值相加，取「观测值」与整包默认上界(5)的较大者" },
+    };
+  }
+  const tierInclusive = available_days === default_window.max;
+  return {
+    days: tierInclusive ? null : default_window.used,
+    source: "default_estimate",
+    tier_inclusive: tierInclusive,
+    detail: tierInclusive
+      ? { reason: "tier_inclusive_3_5_days", reserved_for_shipping: default_window.min, available_days }
+      : { reason: "no_page_duration", used_upper_bound: default_window.used },
+    default: { ...default_window },
+  };
+}
+
+/**
+ * 交付时间判据（准备 + 网购时长 <= 可用天数）。**纯函数、可单测**。
+ *
+ * 段时长各自「已知 / 未知」独立处理；未知一律按保守默认值参与判定，并在数据层标来源：
+ *   - 网购时长未知 → `SHIPPING_TIME_UNKNOWN`（warning）+ 默认上界 5 天；
+ *     「3–5 天」这一档 ⇒ 默认已含在档内，只留 3 天给快递（`tier_inclusive`）；
+ *   - 预售未知 → `PRESALE_TIME_UNKNOWN`（warning）+ 预售保守值；
+ *   - 商品标记为预售 → `PRESALE_ITEM`（warning）如实显著标注，**不因此排除**；
+ *   - 超时 → `PREPARATION_TOO_LONG`（仅准备就超）/ `DELIVERY_TOO_LONG`（合计超）。
+ */
+export function deliveryDeadline({
+  prep_days = null,
+  presale_days = undefined,
+  ships_within_days = undefined,
+  shipping_days = undefined,
+  purchase_days = undefined,
+  available_days = null,
+  is_preorder = null,
+  fulfillment = 'online',
+  path = "candidates[0]",
+  declared = false,
+  presale_declared = false,
+  default_days = undefined,
+  presale_default_days = PRESALE_CONFIG.defaultDays,
+} = {}) {
+  const errors = [];
+  const warnings = [];
+  const known = (value) => typeof value === "number" && Number.isFinite(value) && value >= 0;
+  if (fulfillment === 'offline' || fulfillment === 'experience') {
+    /* 线下自购 / 体验课程：**不计快递**，只判「准备（含预约）时间 <= 可用天数」。
+       → 「明天」这一档因此可以放行线下可购或可预约的体验类（撤销"必然不通过"）。 */
+    const total = known(prep_days) ? prep_days : null;
+    if (known(prep_days) && known(available_days) && prep_days > available_days) {
+      error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, fulfillment === 'experience' ? "预约/准备所需时间超过可用天数" : "准备时间超过可用天数");
+    }
+    return { errors, warnings, effective_shipping_days: null, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: "not_applicable", shipping_days_source: "not_applicable", fulfillment, fulfillment_confidence: FULFILLMENT_CONFIG.confidence, tier_inclusive: false, total_days: total, purchase_window: null };
+  }
+  const window = resolvePurchaseWindow({
+    ships_within_days: declared === true && known(shipping_days) && ships_within_days === undefined ? null : ships_within_days ?? null,
+    shipping_days: known(shipping_days) ? shipping_days : null,
+    purchase_days: known(purchase_days) ? purchase_days : null,
+    is_preorder,
+    presale_days: known(presale_days) ? presale_days : null,
+    available_days,
+    presale_default_days,
+    ...(default_days === undefined ? {} : { default_window: { ...PURCHASE_WINDOW_CONFIG, used: default_days === null ? PURCHASE_WINDOW_CONFIG.used : default_days, min: PURCHASE_WINDOW_CONFIG.min, max: PURCHASE_WINDOW_CONFIG.max } }),
+  });
+  const effective = window.tier_inclusive ? PURCHASE_WINDOW_CONFIG.min : window.days;
+  const presaleBasis = known(presale_days) ? "collected_field" : window.detail?.presale_unknown ? "conservative_default" : "not_declared";
+  if (window.detail?.presale_unknown) {
+    error(warnings, "PRESALE_TIME_UNKNOWN", `${path}.presale_days`, `页面标为预售但未给出时长，已按预售保守值 ${presale_default_days} 天参与判定（不代表该商品没有预售）`);
+  }
+  if (is_preorder === true) {
+    error(warnings, "PRESALE_ITEM", `${path}.is_preorder`, `该商品为预售：预售/发货时长按 ${effective} 天计入时间判定（已如实标注，不因此排除）`);
+  }
+  if (window.source === "default_estimate") {
+    if (default_days === null && !window.detail?.presale_unknown) {
+      error(errors, "SHIPPING_TIME_UNKNOWN", `${path}.estimated_shipping_days`, "页面没有给出任何时长且不允许使用保守默认值：按如实未知处理，无法判定能否按时送达");
+      return { errors, warnings, effective_shipping_days: null, effective_presale_days: null, shipping_basis: "unknown", shipping_days_source: "unknown", tier_inclusive: false, total_days: null, purchase_window: window };
+    }
+    error(warnings, "SHIPPING_TIME_UNKNOWN", `${path}.estimated_shipping_days`, `页面未给出网购时长，已按保守默认值参与判定（shipping_days_source=default_estimate）`);
+  }
+  if (prep_days === null) {
+    return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: null, purchase_window: window };
+  }
+  const total = prep_days + effective;
+  if (available_days === null) {
+    return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: total, purchase_window: window };
+  }
+  if (prep_days > available_days) {
+    error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, "估算准备时间超过可用天数");
+  } else if (total > available_days) {
+    error(
+      errors,
+      "DELIVERY_TOO_LONG",
+      `${path}.estimated_shipping_days`,
+      `准备 ${prep_days} 天 + 网购时长 ${effective} 天${window.tier_inclusive ? "（3–5 天档位已含默认快递，档内预留 3 天）" : ""} = ${total} 天，超过可用天数 ${available_days} 天（shipping_days_source=${window.source === "page_observed" ? "page_observed" : "default_estimate"}）`,
+    );
+  }
+  return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: total, purchase_window: window };
+}
+
+/** 大众品类黑名单（命中即 warning，不硬错）。 */
+export const GENERIC_CATEGORIES = Object.freeze([
+  { id: "fragrance", zh: "香水/香氛/香薰蜡烛", terms: ["香水", "香氛", "香薰", "蜡烛", "精油", "diffuser"] },
+  { id: "chocolate", zh: "巧克力/糖果", terms: ["巧克力", "糖果", "曲奇", "点心礼盒"] },
+  { id: "drinkware", zh: "保温杯/马克杯/杯具", terms: ["保温杯", "马克杯", "水杯", "杯子", "随行杯"] },
+  { id: "cosmetics", zh: "口红/彩妆/常规护肤礼盒", terms: ["口红", "彩妆", "化妆品", "护肤", "面霜", "面膜", "精华"] },
+  { id: "flowers", zh: "鲜花/花束", terms: ["鲜花", "花束", "玫瑰", "向日葵"] },
+  { id: "plush", zh: "毛绒玩偶/公仔", terms: ["毛绒玩偶", "毛绒玩具", "公仔", "抱枕", "玩偶"] },
+  { id: "speaker", zh: "通用蓝牙音箱", terms: ["蓝牙音箱", "音箱", "蓝牙耳机"] },
+  { id: "desk_plant", zh: "常规桌面绿植", terms: ["桌面绿植", "多肉", "绿植", "盆栽", "发财树", "龟背竹"] },
+  { id: "calendar", zh: "台历/日历/相框", terms: ["台历", "日历", "相框", "摆件"] },
+  { id: "generic_giftbox", zh: "通用礼盒/礼包", terms: ["通用礼盒", "大礼包", "伴手礼盒", "礼品卡", "购物卡"] },
+]);
+
+/** 空洞修饰词：三个候选都靠这些词撑场面，就说明是"按字段填空"。 */
+const VAGUE_CONNECTORS = Object.freeze(["小物", "桌面", "简约", "基础", "常规", "通用", "组合", "礼盒", "套装", "实用小", "小件"]);
+
+function textOfCandidate(item) {
+  const parts = [];
+  for (const field of ["name", "description", "reason", "presentation"]) {
+    if (item && typeof item[field] === "string") parts.push(item[field]);
+  }
+  if (item && Array.isArray(item.inferences)) parts.push(item.inferences.filter((x) => typeof x === "string").join(" "));
+  return parts.join(" ");
+}
+
+/** 单个候选的大众化/接地性 warning。 */
+export function uniquenessWarningsFor(item, index) {
+  const warnings = [];
+  const path = `candidates[${index}]`;
+  const name = norm(typeof item?.name === "string" ? item.name : "");
+  const text = norm(textOfCandidate(item));
+  for (const category of GENERIC_CATEGORIES) {
+    const hit = category.terms.find((term) => text.includes(norm(term)));
+    if (hit) {
+      error(warnings, "TOO_GENERIC", `${path}.name`, `命中大众品类「${category.zh}」（“${hit}”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可`);
+      break;
+    }
+  }
+  /* 要求 2b：必须具体到「东西 + 用法/场景」，不能只给品类名。
+     判据：名字里只有空洞修饰词（小物/桌面/简约/基础/通用/组合/套装…），
+     且全文找不到任何用法或场景标记 ⇒ 视为"按字段填空"式产出。 */
+  const vagueInName = VAGUE_CONNECTORS.filter((word) => name.includes(norm(word)));
+  const scenarioMarkers = ["配合", "搭配", "用于", "场景", "适合", "一起", "场合", "上课", "体验课", "定制", "刻", "手工", "下班", "熬夜", "办公", "通勤", "旅行", "厨房", "阳台", "工位", "周末", "睡前"];
+  if (vagueInName.length > 0 && !scenarioMarkers.some((marker) => text.includes(norm(marker)))) {
+    error(warnings, "TOO_GENERIC", `${path}.name`, `只有「${vagueInName.join("、")}」这类笼统说法，缺少「东西 + 用法/场景」的具体落点`);
+  }
+  const refs = Array.isArray(item?.fact_refs) ? item.fact_refs.filter((x) => typeof x === "string" && x.trim()) : [];
+  const inferences = Array.isArray(item?.inferences) ? item.inferences.filter((x) => typeof x === "string" && x.trim()) : [];
+  if (refs.length === 0 && inferences.length === 0) {
+    error(warnings, "NOT_GROUNDED", `${path}.fact_refs`, "该方案没有指回用户任何一条具体输入（事实引用与推断都为空）⇒ 换一个人也成立，不算独特");
+  }
+  return warnings;
+}
+
+/** 批次级同质性 warning。 */
+export function homogeneousWarning(items) {
+  const list = Array.isArray(items) ? items : [];
+  if (list.length < 2) return [];
+  const signatures = list.map((item) => {
+    const text = norm(textOfCandidate(item));
+    return GENERIC_CATEGORIES.filter((category) => category.terms.some((term) => text.includes(norm(term)))).map((category) => category.id);
+  });
+  const nonEmpty = signatures.filter((entry) => entry.length > 0);
+  if (nonEmpty.length === list.length) {
+    const key = (entry) => [...entry].sort().join(",");
+    if (new Set(nonEmpty.map(key)).size === 1) {
+      return [{ code: "HOMOGENEOUS_CANDIDATES", path: "candidates", message: "三个方案落在同一个大众品类里（同品类换皮），请拉开品类或形态差异" }];
+    }
+  }
+  const vague = list.map((item) => VAGUE_CONNECTORS.filter((word) => norm(textOfCandidate(item)).includes(norm(word))));
+  if (vague.every((entry) => entry.length > 0)) {
+    const common = vague[0].filter((word) => vague.every((entry) => entry.includes(word)));
+    const union = [...new Set(vague.flat())];
+    return [{
+      code: "HOMOGENEOUS_CANDIDATES",
+      path: "candidates",
+      message: common.length > 0
+        ? `三个方案都只停留在「${common.join("、")}」这类空洞修饰上，缺乏可区分的具体形态`
+        : `三个方案都只停留在「${union.join("、")}」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出`,
+    }];
+  }
+  return [];
+}
+
+/**
+ * 把独特性 warning 追加到既有的 candidate_results[].warnings 上（与 BELOW_BUDGET_RANGE 同一机制），
+ * 并在 validation.warnings 里汇总一份便于前端与报告直接读。
+ */
+export function attachUniquenessWarnings(validation, candidates) {
+  if (!validation || !Array.isArray(validation.candidate_results)) return validation;
+  const items = Array.isArray(candidates) ? candidates : [];
+  const all = [];
+  validation.candidate_results.forEach((result, index) => {
+    const found = uniquenessWarningsFor(items[index], index);
+    result.warnings = [...(result.warnings ?? []), ...found];
+    all.push(...found);
+  });
+  const homogeneous = homogeneousWarning(items);
+  if (homogeneous.length) {
+    for (const result of validation.candidate_results) result.warnings = [...(result.warnings ?? []), ...homogeneous];
+    all.push(...homogeneous);
+  }
+  validation.warnings = [...(validation.warnings ?? []), ...all];
+  return validation;
 }
 
 /* ------------------------------------------------------------------ 工具 */
@@ -670,4 +981,56 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
     }
   }
   return { passed: errors.length === 0, errors, warnings: checkedGift.warnings };
+}
+
+/* ------------------------------------------------------------------ 履约方式 */
+
+/**
+ * 履约方式取值与追溯（受控枚举，不接受自由文本）。
+ *
+ * ⚠️ 为什么**不**把「缺失」做成硬错误：mock 数据与既有冻结契约里没有这个字段，
+ * 硬错会让历史用例整体失败。这里按**最保守**的方式处理：缺失 ⇒ 当作 `online`
+ * （一定涉及快递），并记一条 warning 如实说明「按保守值处理」。
+ * 真实链路（llm/dify）的提示词里这个字段是必填。
+ */
+export function fulfillmentOf(item, index = 0) {
+  const errors = [];
+  const warnings = [];
+  const path = `candidates[${index}].fulfillment`;
+  const raw = item?.fulfillment;
+  if (raw === undefined || raw === null || raw === '') {
+    error(warnings, 'FULFILLMENT_MISSING', path, '未标注履约方式，已按最保守的 online（涉及快递）处理；真实链路里该字段应为必填枚举 offline/online/experience');
+    return { value: FULFILLMENT_CONFIG.default, confidence: FULFILLMENT_CONFIG.confidence, missing: true, errors, warnings };
+  }
+  if (typeof raw !== 'string' || !FULFILLMENT_CONFIG.values.includes(raw)) {
+    error(errors, 'FULFILLMENT_INVALID', path, `履约方式只能是 offline / online / experience 三者之一，收到 ${JSON.stringify(raw)}（不接受自由文本）`);
+    return { value: FULFILLMENT_CONFIG.default, confidence: FULFILLMENT_CONFIG.confidence, missing: false, errors, warnings };
+  }
+  return { value: raw, confidence: FULFILLMENT_CONFIG.confidence, missing: false, errors, warnings };
+}
+
+/** 体验/线下类不得暗示已有恋爱关系（追求对象场景尤其明显，例如「情侣手作课」）。 */
+export function relationAssumptionErrors(item, index = 0, { relation_id = null } = {}) {
+  const errors = [];
+  if (relation_id !== 'pursuit') return errors;
+  const text = norm(textOfCandidate(item));
+  const hit = ['情侣', '恋人专属', '情侣款', '夫妻', '我们俩的纪念'].find((word) => text.includes(norm(word)));
+  if (hit) {
+    error(errors, 'RELATION_ASSUMPTION_IN_CANDIDATE', `candidates[${index}].name`, `追求对象场景不得出现「${hit}」这类假定已有恋爱关系的表述`);
+  }
+  return errors;
+}
+
+/**
+ * 履约相关措辞红线：⛔ 不许把「推测可得」说成「已确认」。
+ * 返回 error（不是 warning）：这是**如实性**问题，不允许用措辞蒙混过去。
+ */
+export function fulfillmentWordingErrors(presentation, { path = 'presentation' } = {}) {
+  const errors = [];
+  const text = norm(JSON.stringify(presentation ?? {}));
+  const hit = FULFILLMENT_CONFIG.forbidden_wording.find((word) => text.includes(norm(word)));
+  if (hit) {
+    error(errors, 'FULFILLMENT_WORDING_UNVERIFIED', path, `出现了无法核验的措辞「${hit}」：没有门店库存与排课接口，只能说「可以去商店购买」「需预约 / 可预约体验」`);
+  }
+  return errors;
 }

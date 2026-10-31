@@ -1,6 +1,7 @@
 import { verifyCandidateEvidence } from "./retrieval/evidence.mjs";
 import { RetrievalWorker, unavailableProvider, checkPrice } from "./retrieval/worker.mjs";
 import { mediaProvider } from "./media/provider.mjs";
+import { mintReferenceGrant } from "./media/plan.mjs";
 import { DfrobotPublicProvider } from "./retrieval/dfrobot-provider.mjs";
 import { RETRIEVAL_CONFIG } from "./config.mjs";
 const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrobot-public" && RETRIEVAL_CONFIG.packageRoot ? new DfrobotPublicProvider(RETRIEVAL_CONFIG.packageRoot) : unavailableProvider, RETRIEVAL_CONFIG);
@@ -14,15 +15,32 @@ const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrob
 
 import { strictParse, dump } from "./jsonstrict.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
-import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError } from "./checker.mjs";
+import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents } from "./checker.mjs";
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
 import { GIFT_STYLE_TABLE, CLOSENESS_TABLE } from "./labels.mjs";
-import { requestCandidates, requestPresentation } from "./dify.mjs";
+// Dify 客户端保留（历史与对照），但**不再是默认路径**：默认走 llm（无凭证则 mock）。
+// 这里只改导入别名，dify.mjs 本身未改动。
+import { requestCandidates as difyRequestCandidates, requestPresentation as difyRequestPresentation } from "./dify.mjs";
+// 直连大模型 provider：契约名与调用形状与原 dify.mjs 一致。
+import { llmProvider } from "./llm/provider.mjs";
+// 第 3–4 步：包装风格 + 色彩视觉方向（含「与 intake 一致且可追溯」的硬约束）。
+import { defaultProvider as visualDirectionProviderFactory, directionPromptText, deriveVisualDirection } from "./visual/provider.mjs";
+import { presentationAlignmentErrors } from "./visual/direction.mjs";
+// 阶段二：本地真实商品库匹配（纯读库）+ 缺失才补抓 opencli（单请求最多 1 次）。
+import { provideRealProducts } from "./catalog/provide.mjs";
+import { libraryPreview } from "./catalog/match.mjs";
 import { createRun, getRun, getRunByRecommendationKey, publicReport } from "./store.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
-import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT } from "./config.mjs";
+import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, PRESENTATION_WAIT_MS, LIMITS, INTAKE_PARSE_CONFIG, localDbPath } from "./config.mjs";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** 运行模式收敛：未知值一律按 mock 处理，绝不把未知模式当成真实调用。 */
+const KNOWN_MODES = new Set(["mock", "dify", "llm"]);
+function normalizeMode(value) {
+  const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
+  return KNOWN_MODES.has(raw) ? raw : "mock";
+}
 
 function canonical(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
@@ -46,6 +64,128 @@ function computeSelectable(validation, workflowErrors) {
   return validation.candidate_results.filter((r) => r.passed).map((r) => r.id);
 }
 
+/* --------------------------------------------------- 第 1 步解析出的用户硬约束 gate */
+
+/** 从用户原文里取「有辨识度」的比对片段：连续 2-gram + ASCII 词，去掉通用词。 */
+const LITERAL_STOP_TOKENS = new Set(["喜欢", "比较", "有点", "一点", "特别", "东西", "礼物", "一下", "的话", "而且", "还有", "就是", "可以", "不要", "别的", "其它", "其他"]);
+function literalTokens(text) {
+  const tokens = new Set();
+  if (typeof text !== "string") return [];
+  for (const word of text.toLowerCase().match(/[a-z0-9]{2,}/g) ?? []) tokens.add(word);
+  const cjk = [...text.replace(/[^\u4e00-\u9fff]+/g, " ")].filter((ch) => /[\u4e00-\u9fff]/.test(ch));
+  for (let i = 0; i + 1 < cjk.length; i += 1) {
+    const token = `${cjk[i]}${cjk[i + 1]}`;
+    if (!LITERAL_STOP_TOKENS.has(token)) tokens.add(token);
+  }
+  return [...tokens];
+}
+
+/**
+ * 用户明确给出的确定金额/天数、以及喜好原文的**候选侧 gate**。
+ *
+ * 为什么放在这里而不是 checker.mjs：
+ *   - checker.mjs 是与 Python `validator/rules.py` 逐项对账的共享校验器（parity-check.mjs），
+ *     动它会破坏两端一致性；而 pipeline 里本来就有"在共享校验之上追加工作流 gate"的既有做法
+ *     （fulfillmentOf / relationAssumptionErrors 同样在共享校验之后收紧）。
+ *   - 本 gate 只在**第 1 步解析确实拿到用户确定值/原文**时生效；没有自然语言输入的老路径完全不受影响。
+ *
+ * 口径（产品负责人 2026-10-31 裁定 2/3）：
+ *   - 金额：候选估算总价必须落在 [值−50, 值+50]。上界同时被既有 OVER_BUDGET（≤ 用户所给值）兜住，
+ *     因此**实际生效区间是 [值−50, 值]**；这是"更严"而不是"更松"，不会有绕过。
+ *   - 天数：用户给的「N 天」是**期限**，不是"准备时间必须接近 N 天"。
+ *     ⛔ 曾经把 ±1 天当成候选准备时间的下界，实测把 30 天期限下的 2/7/3 天准备时间全部判失败，
+ *     用户一个方案都选不了 —— 已按下面的口径改正。
+ *     正确口径：N 天是期限，允许 ±1 天容差只可能体现在**到达时间**上界（total ≤ N+1）。
+ *     既有到达规则（prep + 预售/发货 + 运输 ≤ available_days = N）比 N+1 **更严**，
+ *     所以"放宽到 N+1"必须改 checker.mjs（与 Python 校验器逐项对账，动它要产品负责人确认）⇒
+ *     本 gate 只做**警示**：总时长超过 N+1 时明确标注，硬门槛仍由既有到达规则执行。
+ *     天数带宽（N−1, N+1）仍然完整返回给前端用于**展示与追问**（例如提示用户期限取哪一档）。
+ *   - 原文：候选文案里必须能找到原文的落点，否则记为警示（默认 warning，可用
+ *     GIFTWISE_LITERAL_PREFERENCE_GATE=1 升为硬 gate）。
+ */
+export function applyInputParseGates({ inputParse, validation, candidates, delivery = null, notices }) {
+  if (!inputParse || typeof inputParse !== "object") return null;
+  const budgetBand = inputParse.constraints?.budget_band ?? null;
+  const daysBand = inputParse.constraints?.days_band ?? null;
+  const literals = Array.isArray(inputParse.literal_preferences) ? inputParse.literal_preferences.filter((item) => typeof item === "string" && item.trim()) : [];
+  if (!budgetBand && !daysBand && literals.length === 0) return null;
+  const literalGate = INTAKE_PARSE_CONFIG.literalPreferenceGate;
+  const audit = {
+    budget_band: budgetBand ? { ...budgetBand, enforced: "hard_gate" } : null,
+    days_band: daysBand
+      ? {
+          ...daysBand,
+          enforced: "tolerance_warning",
+          enforced_note:
+            "N 天是期限：±1 天容差只体现在到达时间上界（total ≤ N+1）。既有到达规则（total ≤ N）更严，放宽它需要改与 Python 校验器对账的 checker.mjs，因此这里只做警示，硬门槛仍是既有到达规则。",
+        }
+      : null,
+    literal_preferences: literals,
+    literal_preferences_enforced: literalGate ? "hard_gate" : "warning",
+    literal_gate_env: "GIFTWISE_LITERAL_PREFERENCE_GATE=1",
+    findings: [],
+  };
+  const byId = new Map((Array.isArray(candidates) ? candidates : []).map((candidate) => [candidate?.id, candidate]));
+  const deliveryOf = (id) => delivery?.per_candidate?.[id] ?? null;
+  for (const result of validation.candidate_results ?? []) {
+    const candidate = byId.get(result.id);
+    if (!candidate) continue;
+    const total = amountToCents(String(candidate.estimated_total ?? ""));
+    if (budgetBand && total !== null) {
+      const low = amountToCents(String(budgetBand.min ?? ""));
+      const high = amountToCents(String(budgetBand.max ?? ""));
+      if (low !== null && total < low) {
+        pushError(result.errors, "PRICE_OUT_OF_BAND", `${result.id}.estimated_total`, `估算总价 ${candidate.estimated_total} 低于用户所给金额 ${budgetBand.user_amount} 的下界 ${budgetBand.min}（带宽上下不超过 ${budgetBand.band_cny} 元）`);
+        result.passed = false;
+        audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side: "below", estimated_total: candidate.estimated_total, band: [budgetBand.min, budgetBand.max], level: "error" });
+      } else if (high !== null && total > high) {
+        pushError(result.errors, "PRICE_OUT_OF_BAND", `${result.id}.estimated_total`, `估算总价 ${candidate.estimated_total} 超过用户所给金额 ${budgetBand.user_amount} 的上界 ${budgetBand.max}（带宽上下不超过 ${budgetBand.band_cny} 元）`);
+        result.passed = false;
+        audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side: "above", estimated_total: candidate.estimated_total, band: [budgetBand.min, budgetBand.max], level: "error" });
+      }
+    }
+    if (daysBand) {
+      const info = deliveryOf(result.id);
+      const lead = Number.isInteger(info?.total_days) ? info.total_days : null;
+      const tolerance = daysBand.user_days + daysBand.band_days;
+      if (lead !== null && lead > tolerance) {
+        const finding = {
+          candidate_id: result.id,
+          code: "DELIVERY_BEYOND_DAYS_TOLERANCE",
+          total_days: lead,
+          tolerance_days: tolerance,
+          message: `估算总时长 ${lead} 天已超过用户所给 ${daysBand.user_days} 天的 ±${daysBand.band_days} 天容差（${tolerance} 天）——即便按最宽松的解释也赶不上。`,
+          level: "warning",
+        };
+        audit.findings.push(finding);
+        result.warnings = [...(result.warnings ?? []), finding];
+        notices.push(`⚠ 候选 ${result.id} 的估算总时长 ${lead} 天超过用户期限 ${daysBand.user_days} 天 + ${daysBand.band_days} 天容差。`);
+      }
+    }
+    if (literals.length > 0) {
+      const haystack = canonical(candidate).toLowerCase();
+      const reflected = literals.some((literal) => literalTokens(literal).some((token) => haystack.includes(token)));
+      if (!reflected) {
+        const finding = {
+          candidate_id: result.id,
+          code: "LITERAL_PREFERENCE_NOT_REFLECTED",
+          message: `候选文案里找不到用户原文（${literals.join(" / ")}）的落点：用户的原文是硬约束，不接受只用预设类目替代。`,
+          level: literalGate ? "error" : "warning",
+        };
+        audit.findings.push(finding);
+        if (literalGate) {
+          pushError(result.errors, "LITERAL_PREFERENCE_NOT_REFLECTED", result.id, finding.message);
+          result.passed = false;
+        } else {
+          result.warnings = [...(result.warnings ?? []), finding];
+          notices.push(`⚠ 候选 ${result.id} 未能体现用户原文「${literals.join(" / ")}」；已如实记为警示（未阻止选择，避免把用户卡死）。`);
+        }
+      }
+    }
+  }
+  return audit;
+}
+
 /* ------------------------------------------------------------ 推荐阶段 */
 
 /**
@@ -60,6 +200,10 @@ export async function runRecommendation(input, services = {}) {
  try{return await job;}finally{pendingRecommendations.delete(key);}
 }
 async function runRecommendationCore(input, services = {}) {
+  /* 第 1 步自然语言解析的结果（可为 null：没有自由文本，或前端已在 /api/intake/parse 解析过）。
+     它只影响两处：① 候选侧的用户硬约束 gate；② 响应里的 nl_parse 审计块。
+     ⛔ 它**不**影响校验：effectiveIntake 仍旧走 adaptIntakeObject + checker 同一套硬规则。 */
+  const nlParse = input.inputParse && typeof input.inputParse === "object" ? input.inputParse : null;
   let effectiveIntake = input.intake;
   if (input.analysis && input.exclusion_confirmation && Array.isArray(input.exclusion_confirmation.confirmed_ids)) {
     const selected = input.analysis.candidates.filter(c => input.exclusion_confirmation.confirmed_ids.includes(c.id));
@@ -71,9 +215,9 @@ async function runRecommendationCore(input, services = {}) {
     }};
   }
   const demo = typeof input.demo === "string" ? input.demo : null;
-  const mode = input.mode === "dify" ? "dify" : "mock";
-  const notices = [];
-  if (mode === "mock") notices.push(MOCK_MODE_NOTICE);
+  const mode = normalizeMode(input.mode);
+  const notices = [...modeFallbackNotices(), ...modeNotices(mode)];
+  if (Array.isArray(input.parseNotice)) notices.push(...input.parseNotice.filter((item) => typeof item === "string" && item));
 
   const adapterResult = adaptIntakeObject(effectiveIntake, { pursuitReady: input.pursuitReady });
   if (adapterResult.status !== "ready") {
@@ -126,6 +270,8 @@ async function runRecommendationCore(input, services = {}) {
   let repairCount = 0;
 
   const retrievalEnabled = mode === "dify" && (services.retrievalEnabled ?? RETRIEVAL_CONFIG.provider === "dfrobot-public");
+  /* 库优先只在真实模式启用（mock 保持离线、快、可复现）。 */
+  const libraryEnabled = mode !== "mock" && (services.libraryEnabled ?? true);
   if(retrievalEnabled && !(effectiveIntake.interests?.includes('tech_digital') && effectiveIntake.interest_confidence?.tech_digital==='confirmed'))return {kind:'needs_input',status:'needs_input',mode,notices,errors:[{code:'RETRIEVAL_SCOPE_UNSUPPORTED',path:'retrieval',message:'当前公开来源仅覆盖已确认科技兴趣的创客方向，不将其推荐给兴趣未知或不符的用户。'}]};
   const retrieval = retrievalEnabled ? await (services.retrievalWorker ?? retrievalWorker).submit({category:"maker",keywords:[],limit:3},{signal:input.signal}).catch(() => ({status:"unavailable",evidence_id:null,products:[],warnings:["检索队列已满"]})) : {status:"unavailable",evidence_id:null,products:[],warnings:["未启用真实检索；价格为估算"]};
   if (retrievalEnabled && new Set(retrieval.products.filter(p=>checkPrice(p,request.budget_amount)==='within_budget'&&p.stock_status!=='out_of_stock').map(p=>p.name)).size < 3) {
@@ -135,7 +281,7 @@ async function runRecommendationCore(input, services = {}) {
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
-    const call = await (services.requestCandidates ?? requestCandidates)(requestJson, retrievalEnabled ? retrieval : null);
+    const call = await (services.requestCandidates ?? difyRequestCandidates)(requestJson, retrievalEnabled ? retrieval : null);
     callCounts.recommend += 1;
     if (!call.ok) {
       return {
@@ -149,6 +295,38 @@ async function runRecommendationCore(input, services = {}) {
     const raw = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     candidatesJson = raw;
     productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
+  } else if (mode === "llm") {
+    // 直连大模型：一次真实调用（含超时与重试上限）。
+    // 失败一律如实上报为基础设施错误，绝不静默改用模拟候选。
+    const call = await (services.requestCandidates ?? llmProvider.requestCandidates)({
+      requestJson,
+      intakeJson: input.intake === undefined ? null : dump(input.intake),
+      retrieval: retrievalEnabled ? retrieval : null,
+      // 库优先：先把本地库（opencli 采集）里真实、预算内的商品给模型看，避免它凭空想买不到的东西。
+      library: libraryEnabled
+        ? (services.libraryPreview ?? libraryPreview)({
+            dbPath: services.catalogDbPath ?? localDbPath(),
+            budgetAmount: request.budget_amount,
+            limit: 8,
+            forbiddenTerms: request.forbidden_terms,
+            forbiddenTags: request.forbidden_tags,
+            keywords: [...(effectiveIntake.interests ?? []), ...(effectiveIntake.gift_styles ?? [])].filter((k) => typeof k === "string"),
+          })
+        : null,
+      /* 第 1 步解析出来的用户硬约束（原文/带宽/城市）随请求一起给模型（裁定 2/3/4）。 */
+      inputParse: nlParse,
+    });
+    callCounts.recommend += 1;
+    if (!call.ok) {
+      return {
+        kind: "infrastructure_error",
+        status: "error",
+        errors: [{ code: call.code, path: "llm", message: call.message }],
+        mode,
+        notices: [...notices, "直连大模型调用未成功，未生成任何候选，也没有把模拟数据伪装成真实结果。"],
+      };
+    }
+    candidatesJson = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
   } else if (demo === "model_error") {
     const broken = buildBrokenModelOutput();
     callCounts.recommend += 1;
@@ -225,13 +403,184 @@ async function runRecommendationCore(input, services = {}) {
 
   let evidenceBindings = new Map();
   if(retrievalEnabled){try {evidenceBindings = verifyCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates,productReferences,request.budget_amount);}catch {workflowErrors.push({code:"PRODUCT_EVIDENCE_MISMATCH",path:"retrieval",message:"商品规格、引用或价格与服务端证据不一致，候选不可选。"});}}
+
+  /* ---- 追加规则 1：独特性启发式（warning 级，绝不硬错）------------------- */
+  const candidateList = (parseJsonOrNull(candidatesJson) || {}).candidates || [];
+  attachUniquenessWarnings(validation, candidateList);
+  /* 履约方式（受控枚举）+ 关系假定门禁：只影响**那一个**候选，不牵连其他两个。 */
+  const fulfillmentByCandidate = new Map();
+  const relationId = request?.recipient_relation_id ?? request?.recipient_relation ?? null;
+  validation.candidate_results.forEach((result, index) => {
+    const candidate = candidateList[index];
+    const verdict = fulfillmentOf(candidate, index);
+    fulfillmentByCandidate.set(result.id ?? `candidates[${index}]`, verdict);
+    result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
+    const gateErrors = [...verdict.errors, ...relationAssumptionErrors(candidate, index, { relation_id: relationId })];
+    if (gateErrors.length && result.passed) {
+      result.passed = false;
+      result.errors = [...result.errors, ...gateErrors];
+    }
+  });
+
+  /* ---- 阶段二：真实商品数据线（库优先；缺失才补抓 1 次 opencli）-----------
+     必须在时间判定**之前**跑：运输/预售时长来自真实商品页字段，
+     没有绑定商品时这两段只能按保守默认参与判定。 */
+  const catalogEnabled = mode !== "mock" || services.catalogEnabled === true;
+  let catalog = {
+    status: "unavailable",
+    source: "localdb",
+    reason_code: catalogEnabled ? "CATALOG_NOT_RUN" : "CATALOG_SKIPPED_MOCK_MODE",
+    hit_kind: "degraded",
+    results: [],
+    accounting: { candidates: candidateList.length, library_hits: 0, fallback_hits: 0, degraded: candidateList.length, scrape_calls: 0, scrape_total_elapsed_ms: 0, fallback_skipped_reason: catalogEnabled ? null : "SCRAPE_DISABLED", scrape_enabled: false },
+  };
+  if (catalogEnabled) {
+    const passable = candidateList.filter((candidate) => validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
+    const scrapeEnabled = services.catalogScrape !== undefined ? services.catalogScrape === true : process.env.GIFTWISE_CATALOG_SCRAPE !== "0";
+    const scrapeTimeoutMs = Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) > 0 ? Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) : 20000;
+    try {
+      const provided = await (services.provideRealProducts ?? provideRealProducts)({
+        candidates: passable,
+        budgetAmount: request.budget_amount,
+        dbPath: services.catalogDbPath ?? CATALOG_CONFIG.dbPath,
+        maxItems: CATALOG_CONFIG.maxItems,
+        scrapeEnabled,
+        scrapeTimeoutMs,
+        spawnImpl: services.spawnCollect,
+      });
+      catalog = provided.catalog;
+    } catch (error) {
+      catalog = { ...catalog, status: "unavailable", reason_code: "CATALOG_MATCH_FAILED", results: [], note: `匹配层异常：${error?.message ?? "未知"}` };
+    }
+  }
+  const catalogByCandidate = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched").map((entry) => [entry.candidate_id, entry]));
+
+  /* ---- 追加规则 2：时间对齐 = 准备 + 预售/发货 + 运输 <= 可用天数 ----------
+     ⚠ mock 模式下**不适用**：那里没有任何真实商品页，也就没有任何运输/预售信息；
+     给虚构商品套一个"保守物流时长"等于凭空编造物流约束。因此 mock 模式如实标注
+     「不适用」，只有真实数据线（llm/dify）才执行这条判定。 */
+  const deliveryApplicable = mode !== "mock";
+  const delivery = {
+    applicable: deliveryApplicable,
+    reason: deliveryApplicable ? null : "MOCK_MODE_NO_REAL_PRODUCT：模拟模式没有真实商品页与物流信息，运输/预售时长判定不适用（不编造物流约束）",
+    policy: {
+      rule: "preparation_days + presale/shipping_within_days + shipping_days <= available_days 才算通过",
+      shipping: { ...SHIPPING_CONFIG },
+      presale: { ...PRESALE_CONFIG },
+      presale_note: "预售不是排除条件：平台给出的预售/发货时长直接计入判定，并如实显著标注。",
+      purchase_window: { ...PURCHASE_WINDOW_CONFIG },
+      tier_rule: "用户选「3–5 天」档且网购时长未知时，默认快递视为已含在该档内：准备 <= 5-3 = 2 天",
+      not_a_guarantee: PURCHASE_WINDOW_CONFIG.not_a_guarantee,
+    },
+    per_candidate: {},
+  };
+  if (!deliveryApplicable) notices.push("⚠ 模拟模式：没有真实商品页，运输/预售时长判定不适用；已如实标注，不编造物流时长。");
+  validation.candidate_results.forEach((result, index) => {
+    const candidate = candidateList[index];
+    const bound = catalogByCandidate.get(result.id) ?? null;
+    const productShipping = bound?.product?.shipping ?? null;
+    const declaredShipping = candidate && Object.hasOwn(candidate, "estimated_shipping_days") ? candidate.estimated_shipping_days : undefined;
+    const parsedShippingOnly = productShipping ? parseDurationDays(productShipping.shipping_time_text) : { days: null, source_text: null };
+    const parsedShipsWithin = productShipping ? parseDurationDays(productShipping.ships_within_text ?? productShipping.presale_text ?? null) : { days: null, source_text: null };
+    const shippingDays = typeof declaredShipping === "number" && Number.isFinite(declaredShipping) ? declaredShipping : null;
+    const declaredPresale = candidate && Object.hasOwn(candidate, "presale_days") ? candidate.presale_days : undefined;
+    const presaleDays = typeof declaredPresale === "number" && Number.isFinite(declaredPresale) ? declaredPresale : (typeof productShipping?.presale_days === "number" ? productShipping.presale_days : null);
+    const isPreorder = productShipping?.is_preorder === true || (typeof declaredPresale === "number" && Number.isFinite(declaredPresale));
+    const prepDays = typeof result.estimated_preparation_days === "number" ? result.estimated_preparation_days : (candidate && typeof candidate.estimated_preparation_days === "number" ? candidate.estimated_preparation_days : null);
+    const verdict = deliveryApplicable
+      ? deliveryDeadline({
+          prep_days: prepDays,
+          fulfillment: fulfillmentByCandidate.get(result.id ?? `candidates[${index}]`)?.value ?? FULFILLMENT_CONFIG.default,
+          // 分开传：发货时效与配送时效各自可能是页面原文；网购时长由判定层合并（不重复计算）
+          ships_within_days: typeof productShipping?.ships_within_days === "number" ? productShipping.ships_within_days : parsedShipsWithin.days,
+          shipping_days: typeof productShipping?.shipping_days === "number" ? productShipping.shipping_days : parsedShippingOnly.days,
+          presale_days: presaleDays,
+          presale_declared: typeof presaleDays === "number",
+          is_preorder: isPreorder,
+          available_days: typeof request.available_days === "number" ? request.available_days : null,
+          path: `candidates[${index}]`,
+        })
+      : { errors: [], warnings: [], effective_shipping_days: null, effective_presale_days: null, shipping_basis: "not_applicable", shipping_days_source: "not_applicable", tier_inclusive: false, total_days: null, purchase_window: null };
+    delivery.per_candidate[result.id ?? `candidates[${index}]`] = {
+      applicable: deliveryApplicable,
+      product_id: bound?.product?.product_id ?? null,
+      preparation_days: prepDays,
+      declared_shipping_days: typeof declaredShipping === "number" ? declaredShipping : null,
+      effective_shipping_days: verdict.effective_shipping_days,
+      shipping_basis: verdict.shipping_basis,
+      /** 数据层来源标记（界面不显示来源说明，被追问时可追溯）。 */
+      shipping_days_source: verdict.shipping_days_source,
+      shipping_days_default: { ...PURCHASE_WINDOW_CONFIG },
+      purchase_window: verdict.purchase_window,
+      tier_inclusive: verdict.tier_inclusive === true,
+      shipping_time_text: productShipping?.shipping_time_text ?? null,
+      ships_within_text: productShipping?.ships_within_text ?? null,
+      effective_presale_days: verdict.effective_presale_days,
+      presale_source_text: productShipping?.ships_within_text ?? null,
+      is_preorder: isPreorder,
+      shipping_origin: productShipping?.shipping_origin ?? null,
+      seller_location_text: productShipping?.seller_location_text ?? null,
+      total_days: verdict.total_days,
+      available_days: typeof request.available_days === "number" ? request.available_days : null,
+      is_estimate: deliveryApplicable && verdict.shipping_days_source === "default_estimate",
+      fulfillment: verdict.fulfillment ?? FULFILLMENT_CONFIG.default,
+      fulfillment_confidence: FULFILLMENT_CONFIG.confidence,
+      fulfillment_note: FULFILLMENT_CONFIG.confidence_note,
+      fulfillment_hint: FULFILLMENT_CONFIG.hints[verdict.fulfillment ?? FULFILLMENT_CONFIG.default] ?? null,
+      /** 购买方式提示（可显示在主界面；不是"来源说明"）。 */
+      page_url: bound?.product?.page_url ?? null,
+      price_basis: verdict.fulfillment === 'online' || verdict.fulfillment === undefined ? (bound?.product?.price_basis ?? null) : (bound ? 'online_reference' : null),
+      price_basis_note: verdict.fulfillment === 'online' || verdict.fulfillment === undefined ? null : '线下/体验方案的价格取同款或同类商品的**网购参考价**，不是门店实际售价',
+      errors: verdict.errors.map((item) => item.code),
+      warnings: verdict.warnings.map((item) => item.code),
+    };
+    // 只让**这一个**候选不可选，不牵连其他两个。
+    if (verdict.errors.length > 0 && result.passed) {
+      result.passed = false;
+      result.errors = [...result.errors, ...verdict.errors];
+    }
+    result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
+  });
+  /* ---- 追加规则 3：第 1 步解析出来的用户硬约束（确定金额 ±50、确定天数 ±1、喜好原文）----
+     与上面的到达时间/履约 gate 同一位置、同一手法：在共享校验之上**收紧**，绝不放松任何既有规则。 */
+  const inputParseAudit = applyInputParseGates({ inputParse: nlParse, validation, candidates: candidateList, delivery, notices });
+  if (inputParseAudit) {
+    validation.input_parse_gates = inputParseAudit;
+    if (inputParseAudit.findings.length > 0) {
+      notices.push(`第 1 步的硬约束检查共产生 ${inputParseAudit.findings.length} 条候选级结论（见响应 validation.input_parse_gates.findings）。`);
+    }
+  }
+  validation.all_passed = validation.candidate_results.length === LIMITS.candidatesPerBatch && validation.candidate_results.every((item) => item.passed);
+  if (!validation.all_passed && ["passed"].includes(validation.status)) validation.status = "failed";
+
+  /* ---- 追加规则 3：第 3–4 步的包装风格与色彩视觉方向（与 intake 一致、可追溯）----
+     ⚠️ 这一段的 `llm_text` 通道会发起**真实**大模型调用（`services.visualDirectionProvider`
+     可注入替身；测试必须注入，否则会真的出站）。 */
+  let directionOutcome = null;
+  try {
+    const provider = services.visualDirectionProvider ?? visualDirectionProviderFactory({ llm: llmProvider, imageTransport: mediaProvider.transport ?? null });
+    directionOutcome = await deriveVisualDirection({
+      intake: input.intake,
+      request,
+      candidates: candidateList.filter((candidate) => validation.candidate_results.some((result) => result.id === candidate.id && result.passed)),
+      runId: null,
+      provider,
+    });
+  } catch (error) {
+    directionOutcome = { ok: false, code: error?.code ?? "DIRECTION_FAILED", notices: [`⚠ 第 3–4 步的视觉方向未能产出（${error?.message ?? "未知原因"}）；后续步骤不会用模拟方向顶替。`] };
+  }
+  notices.push(...(directionOutcome?.notices ?? []));
+
   let status = validation.status;
   if (workflowErrors.length > 0 && !["error", "needs_input"].includes(status)) status = "failed";
   const selectable = computeSelectable(validation, workflowErrors);
 
   const run = createRun({
     owner_scope:input.ownerScope || "internal",
-    media_generation_authorized:mode === "dify" && (services.enableImageGeneration === true || !services.requestCandidates),
+    // 付费生图必须是**显式**授权（services.enableImageGeneration === true）。
+    // 旧表达式里的 `|| !services.requestCandidates` 在生产入口恒为真（services 不传），
+    // 会让第一次选择就真实扣费，已删除。
+    media_generation_authorized:(mode === "dify" || mode === "llm") && services.enableImageGeneration === true,
     mode,
     request_json: requestJson,
     request,
@@ -239,7 +588,7 @@ async function runRecommendationCore(input, services = {}) {
     initial_candidates_json: initialCandidatesJson,
     initial_validation: initialValidation,
     candidates_json: candidatesJson,
-    candidates: (parseJsonOrNull(candidatesJson) || {}).candidates || [],
+    candidates: candidateList,
     validation,
     workflow_errors: workflowErrors,
     repair_count: repairCount,
@@ -247,12 +596,53 @@ async function runRecommendationCore(input, services = {}) {
     selectable_candidate_ids: selectable,
     notices,
     idempotency_key: key,
+    nl_parse: nlParse,
   });
   run.retrieval = retrieval;
   run.product_bindings = evidenceBindings;
-  run.media = mediaProvider.candidates([...evidenceBindings].map(([candidate_id,p])=>({candidate_id,product_id:p.product_id})));
+  /* 库内真实商品的绑定与媒体：候选图走「来源展示」通道（真实商品图 URL），
+     包装图才走「生成」通道；两条通道不交叉（设计说明「两条通道不越界」）。 */
+  run.catalog = catalog;
+  run.catalog_bindings = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched").map((entry) => [entry.candidate_id, entry]));
+  const mediaBindings = [
+    ...[...evidenceBindings].map(([candidate_id, p]) => ({ candidate_id, product_id: p.product_id })),
+    ...[...run.catalog_bindings.values()].map((entry) => ({
+      candidate_id: entry.candidate_id,
+      product_id: entry.product.product_id,
+      binding_basis: entry.match_basis,
+      match_detail: entry.match_detail,
+      product_url: entry.product.page_url,
+      product_title: entry.product.title,
+      image: entry.product.image_id
+        ? {
+            id: entry.product.image_id,
+            url: `/api/catalog/images/${entry.product.image_id}`,
+            version: entry.product.image_id,
+            kind: "source_photo",
+            alt: `真实商品来源图：${entry.product.title}`,
+            source_url: entry.product.image_urls[0] ?? null,
+            attribution: entry.product.attribution,
+            price_basis: entry.product.price_basis,
+            price_observed_at: entry.product.price_observed_at,
+          }
+        : null,
+    })),
+  ];
+  run.media = mediaProvider.candidates(mediaBindings);
+  run.delivery = delivery;
+  run.uniqueness = { warnings: validation.warnings ?? [], note: "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。" };
+  run.visual_direction = directionOutcome?.ok ? directionOutcome.direction : null;
+  run.visual_direction_error = directionOutcome?.ok ? null : { code: directionOutcome?.code ?? "DIRECTION_FAILED" };
   run.call_counts = callCounts;
   run.demo = demo;
+  /* 第 1 步自然语言解析的审计块（null＝本次没有自由文本/未解析）。
+     账本口径更正（产品负责人 2026-10-31 独立验收）：一次**成功**的完整交互＝
+     recommend 1 次 + style_direction 1 次 + present 1 次（repair_count=0）＝**3 次**模型调用 + 1 次生图；
+     首轮输出不合格触发一次修复时才是 5 次。生图**没有** JSONL 账本（recordRealCall 只在 web/server/llm/），
+     它的硬证据是 media-store 新增 task+asset 与响应里的 generation 块。 */
+  run.nl_parse = nlParse
+    ? { ...nlParse, call_ledger_kind: "intake_parse", note: "解析调用同样写服务端账本（kind=intake_parse），与 recommend/style_direction/present 分别计数。" }
+    : null;
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];
   run.initial_candidate_ids = initialValidation.candidate_results.map((r) => r.id);
 
@@ -331,7 +721,8 @@ function presentationView(run, candidate, presentation, recheck, extras) {
     },
     repair_count: run.repair_count,
     remaining_repairs: Math.max(0, GLOBAL_REPAIR_LIMIT - run.repair_count),
-    notices: [...run.notices, MOCK_PRESENTATION_NOTICE],
+    // 模拟呈现标识只在 mock 模式出现；llm / replay 用各自的如实标识。
+    notices: [...run.notices, ...(run.mode === "mock" ? [MOCK_PRESENTATION_NOTICE] : [])],
     call_counts: run.call_counts,
     ...extras,
   };
@@ -418,8 +809,10 @@ async function runPresentationCore(input, services = {}) {
   const demo = typeof input.demo === "string" ? input.demo : null;
   let presentation = null;
   let generatedBy = "mock";
+  // 直连/回放呈现阶段的附加事实（账单、本地实现标识），只用于如实标注，不参与契约校验。
+  let presentationExtras = {};
   if (run.mode === "dify") {
-    const call = await (services.requestPresentation ?? requestPresentation)(run.request_json, dump(candidate));
+    const call = await (services.requestPresentation ?? difyRequestPresentation)(run.request_json, dump(candidate));
     run.call_counts.presentation += 1;
     if (!call.ok) {
       return {
@@ -438,6 +831,41 @@ async function runPresentationCore(input, services = {}) {
         errors: [{ code: "PRESENTATION_INVALID", path: "presentation_json", message: "Dify 输出的呈现内容不是合法 JSON，已按失败处理。" }],
       };
     }
+  } else if (run.mode === "llm") {
+    // 呈现阶段：Dify 侧从未实现（workflow/dify-setup.md:65），因此在本地实现。
+    // 直连模式走模型；模型失败即如实失败，不用本地实现顶替。
+    const call = await (services.requestPresentation ?? llmProvider.requestPresentation)({
+      requestJson: run.request_json,
+      candidateJson: dump(candidate),
+      request: run.request,
+      candidate,
+      // 第 3–4 步的方向作为**额外系统消息**喂给呈现模型：文案必须与它一致，不许另起一套审美。
+      visualDirectionText: run.visual_direction ? directionPromptText(run.visual_direction) : null,
+    });
+    run.call_counts.presentation += 1;
+    if (!call.ok) {
+      return {
+        kind: "infrastructure_error",
+        status: "error",
+        errors: [{ code: call.code, path: "llm.presentation", message: call.message }],
+      };
+    }
+    try {
+      presentation = strictParse(call.outputs.presentation_json);
+      generatedBy = call.generated_by || "llm_live";
+    } catch (e) {
+      return {
+        kind: "infrastructure_error",
+        status: "error",
+        errors: [{ code: "PRESENTATION_INVALID", path: "presentation_json", message: "直连大模型输出的呈现内容不是合法 JSON，已按失败处理。" }],
+      };
+    }
+    presentationExtras = {
+      presentation_source: call.transport,
+      ...(call.bill ? { bill: call.bill } : {}),
+      ...(call.local ? { presentation_local_implementation: true } : {}),
+    };
+    if (Array.isArray(call.notices)) run.notices.push(...call.notices);
   } else {
     const built = buildMockPresentation(run.request, candidate, {
       attempt: 1,
@@ -448,9 +876,69 @@ async function runPresentationCore(input, services = {}) {
   }
 
   let recheck = checkPresentation(run.request, candidate, presentation);
-  let extras = { generated_by: generatedBy };
+  /* 呈现文字与第 3–4 步方向的对齐：被禁颜色 → 硬错（「不喜欢的东西」绝对禁止）；
+     明示偏好未被体现 → warning（文案措辞自由度高于生图 prompt）。 */
+  const alignment = presentationAlignmentErrors(run.visual_direction, presentation);
+  /* 履约措辞红线：⛔ 不许把"推测可得"说成"已确认有货/保证约到"（如实性问题，按硬错处理）。 */
+  const wordingErrors = fulfillmentWordingErrors(presentation, { path: "presentation" });
+  if (wordingErrors.length) {
+    alignment.errors.push(...wordingErrors);
+    alignment.warnings.push("履约方式只作**购买方式提示**：可以说「可以去商店购买」「需预约 / 可预约体验」，但不能声称已确认有货或保证约到。");
+  }
+  if (alignment.errors.length) {
+    recheck.passed = false;
+    recheck.errors = [...recheck.errors, ...alignment.errors];
+  }
+  if (alignment.warnings.length) {
+    recheck.warnings = [...(recheck.warnings ?? []), ...alignment.warnings];
+  }
+  // 呈现阶段的交付时间复核（准备 + 预售/发货 + 运输 <= 可用天数），与候选阶段同一判据。
+  const boundProduct = run.catalog_bindings?.get(selectedCandidateId)?.product ?? null;
+  const boundShipping = boundProduct?.shipping ?? null;
+  const presentationDeliveryApplicable = run.mode !== "mock";
+  const presentationDelivery = presentationDeliveryApplicable ? deliveryDeadline({
+    prep_days: typeof presentation?.revised_estimated_preparation_days === "number" ? presentation.revised_estimated_preparation_days : null,
+    ships_within_days: typeof boundShipping?.ships_within_days === "number" ? boundShipping.ships_within_days : parseDurationDays(boundShipping?.ships_within_text ?? null).days,
+    shipping_days: typeof boundShipping?.shipping_days === "number" ? boundShipping.shipping_days : parseDurationDays(boundShipping?.shipping_time_text ?? null).days,
+    presale_days: typeof boundShipping?.presale_days === "number" ? boundShipping.presale_days : undefined,
+    presale_declared: typeof boundShipping?.presale_days === "number",
+    is_preorder: boundShipping?.is_preorder === true,
+    available_days: typeof run.request.available_days === "number" ? run.request.available_days : null,
+    fulfillment: run.delivery?.per_candidate?.[selectedCandidateId]?.fulfillment ?? FULFILLMENT_CONFIG.default,
+    path: "presentation",
+  }) : { errors: [], warnings: [], effective_shipping_days: null, effective_presale_days: null, shipping_basis: "not_applicable", shipping_days_source: "not_applicable", tier_inclusive: false, total_days: null, applicable: false };
+  if (presentationDelivery.errors.length) {
+    recheck.passed = false;
+    recheck.errors = [...recheck.errors, ...presentationDelivery.errors];
+  }
+  recheck.warnings = [...(recheck.warnings ?? []), ...presentationDelivery.warnings];
+  let extras = {
+    generated_by: generatedBy,
+    ...presentationExtras,
+    shipping: {
+      applicable: presentationDeliveryApplicable,
+      effective_shipping_days: presentationDelivery.effective_shipping_days,
+      shipping_basis: presentationDelivery.shipping_basis,
+      shipping_days_source: presentationDelivery.shipping_days_source,
+      shipping_days_default: { ...PURCHASE_WINDOW_CONFIG },
+      tier_inclusive: presentationDelivery.tier_inclusive === true,
+      effective_presale_days: presentationDelivery.effective_presale_days,
+      total_days: presentationDelivery.total_days,
+      available_days: typeof run.request.available_days === "number" ? run.request.available_days : null,
+      is_estimate: presentationDelivery.shipping_days_source === "default_estimate",
+      not_a_guarantee: PURCHASE_WINDOW_CONFIG.not_a_guarantee,
+    },
+  };
 
   if (!recheck.passed) {
+    // 直连模式绝不用模拟数据"修复"模型输出：复核没过就如实失败。
+    if (run.mode === "llm") {
+      extras.repair_note =
+        "直连大模型模式不对输出做模拟修订；呈现复核未通过即如实报告失败，未生成替代内容。";
+      pushError(recheck.errors, "REPAIR_NOT_ALLOWED", "repair_count", "该模式不允许用模拟数据修订呈现内容");
+      const view = presentationView(run, candidate, presentation, recheck, extras);
+      return { kind: "presentation_failed", run, view };
+    }
     if (run.repair_count >= GLOBAL_REPAIR_LIMIT) {
       extras.repair_note =
         "全局自动修订额度已用完（推荐阶段已使用 1 次），不再开启第二次自动修订；以下为真实验收失败结果。";
@@ -467,7 +955,7 @@ async function runPresentationCore(input, services = {}) {
     presentation = revised.presentation;
     recheck = revisedCheck;
     extras = {
-      generated_by: generatedBy,
+      ...extras,
       revised_once: true,
       repaired_checks: firstErrors,
       repair_note: "呈现阶段首次复核未通过，已使用全局唯一一次自动修订并重新复核。",
@@ -481,9 +969,92 @@ async function runPresentationCore(input, services = {}) {
 
   run.selected_candidate_id = selectedCandidateId;
   run.presentation = { presentation, recheck };
+  /* 第 5 步：**只对用户选中的那一个**出最终包装图（不批量、不给未选中项出图）。
+     `mediaProvider.packaging(run, selectedCandidateId)` 内部对 `selected_candidate_id`
+     与 `selectable_candidate_ids` 都有校验，传其它 id 会直接抛 INVALID_SELECTION。 */
+  /* 「用户选中这个礼物」这一刻**一次性铸造**参考图许可凭据（只含选中商品）：
+     把选中候选绑定的**真实商品图**作为生图参考图，保证包装与礼物本体一致。
+     ⚠️ 两条约束各管一半：A｜用户偏好（intake）→ 配色/风格（硬约束）；
+     B｜礼物本体（参考图）→ 形态/尺度/材质/结构。冲突时 A 优先
+     ⇒ 参考图只提供形态信息、不提供配色决策（见 media/plan.mjs 的 prompt）。 */
+  run.reference_grant = mintReferenceGrant(run, selectedCandidateId);
   try {run.media = await mediaProvider.packaging(run, selectedCandidateId);} catch {run.media = {...mediaProvider.candidates(),status:"failed",warnings:["图像任务不可用，文字结果仍可查看；不自动重复调用"]};}
+  /* 「等图就绪」方案 A：在返回前等到图就绪或超时（默认 30s，见 config.mjs PRESENTATION_WAIT_MS），
+     这样前端只渲染一次也能拿到图；超时则如实返回 pending + 等待过的时长，不假装成功。 */
+  let waitInfo = { waited: false, timed_out: false, waited_ms: 0, timeout_ms: PRESENTATION_WAIT_MS };
+  const pendingTaskId = run.media?.status === "pending" ? run.media.selected?.task_id ?? null : null;
+  if (pendingTaskId && mediaProvider.wait) {
+    const startedWait = Date.now();
+    let settled = null;
+    /* 超时计时器必须显式清理并 unref：否则一个"等图超时"的定时器会把进程多留 30 秒，
+       也会让测试进程迟迟不退出（这不是业务语义，是资源卫生问题）。 */
+    let waitTimer = null;
+    const timeoutPromise = new Promise((resolve) => {
+      waitTimer = setTimeout(() => resolve("timeout"), PRESENTATION_WAIT_MS);
+      if (typeof waitTimer.unref === "function") waitTimer.unref();
+    });
+    try {
+      settled = await Promise.race([
+        mediaProvider.wait(pendingTaskId).catch(() => null),
+        timeoutPromise,
+      ]);
+    } catch {
+      settled = null;
+    } finally {
+      if (waitTimer) clearTimeout(waitTimer);
+    }
+    waitInfo = { waited: true, timed_out: settled === "timeout", waited_ms: Date.now() - startedWait, timeout_ms: PRESENTATION_WAIT_MS, task_id: pendingTaskId };
+    try {
+      const record = await mediaProvider.task(run, pendingTaskId);
+      if (record?.media) run.media = record.media;
+    } catch {
+      /* 读不到就保持原样：如实 pending */
+    }
+    if (waitInfo.timed_out && run.media?.status === "pending") {
+      run.notices.push(`图片生成在 ${PRESENTATION_WAIT_MS}ms 内未就绪，已如实返回 pending 状态；文字结果不受影响，可稍后按 task_id 取图。`);
+    }
+  }
   run.status = "completed";
-  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media };
+  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media, media_wait: waitInfo, media_reference: referenceReport(run, selectedCandidateId), catalog: run.catalog, visual_direction: run.visual_direction, delivery: run.delivery, uniqueness: run.uniqueness };
   run.selections.set(selectedCandidateId, view);
   return { kind: "presentation", run, view };
+}
+
+/**
+ * 参考图如实报告（⛔ 不许在没拿到参考图时声称用了参考图）。
+ *
+ * `reference_count`：拿到=1（最多 2），没拿到=0；
+ * `actual_reference_count`：供应商**实际**报告的参考图张数（没有就为 null，表示未知而非 0）；
+ * `reason_code`：没拿到时的原因码（REFERENCE_PRODUCT_UNBOUND / REFERENCE_IMAGE_UNAVAILABLE /
+ * IMAGE_GENERATION_NOT_AUTHORIZED / IMAGE_GENERATION_FAILED …）。
+ */
+export function referenceReport(run, candidateId) {
+  const binding = run.catalog_bindings?.get(candidateId) ?? null;
+  const urls = Array.isArray(binding?.product?.image_urls)
+    ? binding.product.image_urls.filter((u) => typeof u === 'string' && u.startsWith('https://'))
+    : [];
+  const generated = run.media?.selected?.generation ?? null;
+  const actual = typeof generated?.reference_count === 'number' ? generated.reference_count : null;
+  const mediaStatus = run.media?.status ?? 'unavailable';
+  const usable = mediaStatus === 'ready';
+  const intended = urls.length ? 1 : 0;
+  let reason_code = null;
+  if (!urls.length) reason_code = binding?.product ? 'REFERENCE_IMAGE_UNAVAILABLE' : 'REFERENCE_PRODUCT_UNBOUND';
+  else if (mediaStatus === 'unavailable') reason_code = 'IMAGE_GENERATION_NOT_AUTHORIZED';
+  else if (mediaStatus === 'failed') reason_code = 'IMAGE_GENERATION_FAILED';
+  else if (usable && actual === 0) reason_code = 'REFERENCE_REJECTED_BY_PROVIDER';
+  else if (!usable) reason_code = 'IMAGE_GENERATION_PENDING';
+  return {
+    reference_count: usable ? (actual ?? intended) : 0,
+    intended_reference_count: intended,
+    actual_reference_count: actual,
+    product_id: binding?.product?.product_id ?? null,
+    url: urls[0] ?? null,
+    reason_code,
+    grant_id: run.reference_grant?.grant_id ?? null,
+    form_basis: intended ? { based_on: 'catalog_reference_image', field: 'catalog.product.image_urls[0]', product_id: binding?.product?.product_id ?? null } : { based_on: 'prompt_text_only', field: null, product_id: null },
+    note: intended
+      ? '参考图只提供形态/尺度/材质信息；配色与风格一律以第 3–4 步方向（来自用户偏好）为准，冲突时以偏好为先。'
+      : '本次没有可用的真实商品参考图，退回纯 prompt 生图（未使用参考图）。',
+  };
 }

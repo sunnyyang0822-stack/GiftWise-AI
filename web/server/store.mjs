@@ -43,6 +43,8 @@ export function createRun(init) {
     validation: init.validation,
     workflow_errors: init.workflow_errors || [],
     repair_count: init.repair_count || 0,
+    /** 第 1 步自然语言解析的审计块（null＝本次没有自由文本）；不参与任何校验。 */
+    nl_parse: init.nl_parse || null,
     status: init.status,
     selectable_candidate_ids: init.selectable_candidate_ids || [],
     selected_candidate_id: null,
@@ -111,6 +113,60 @@ export function publicReport(run) {
     business_data_verification: "not_verified",
     notices: run.notices,
     call_counts: run.call_counts,
-    limits: { currency: "CNY", note: "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。" },
+    /* 阶段二与追加规则的可核对信息（都属于「如实标注」，不改变既有契约字段）：
+       - catalog：真实商品库命中/补抓/降级三分账 + 每次补抓耗时；
+       - delivery：准备 + 预售/发货 + 运输 <= 可用天数的逐候选判定与估算口径；
+       - visual_direction：第 3–4 步的方向及其 based_on 追溯链；
+       - uniqueness：独特性启发式（warning 级，不声明「保证独特」）。 */
+    catalog: run.catalog ? catalogView(run.catalog) : null,
+    delivery: run.delivery ?? null,
+    visual_direction: run.visual_direction ?? null,
+    visual_direction_error: run.visual_direction_error ?? null,
+    uniqueness: run.uniqueness ?? null,
+    /* 第 1 步自然语言解析的如实交代（null＝本次没有自由文本）：
+       识别到哪些字段、哪些是推断、用户原值回显、±带宽与候选级结论。
+       ⛔ 这里只做交代，不参与校验；被降级时 degraded=true 且 reason_code 说明原因。 */
+    nl_parse: run.nl_parse ?? null,
+    limits: { currency: "CNY", note: "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。运输与预售时长为页面原文或保守估算，不构成送达保证。" },
+  };
+}
+
+/** 商品库视图：只带出可追溯字段，去掉内部路径与整库统计的细节。 */
+function catalogView(catalog) {
+  return {
+    status: catalog.status,
+    source: catalog.source,
+    reason_code: catalog.reason_code,
+    hit_kind: catalog.hit_kind,
+    db_path_configured: Boolean(catalog.db_path),
+    products_total: catalog.products_total ?? null,
+    accounting: catalog.accounting,
+    scrapes: (catalog.scrapes ?? []).map((item) => ({ candidate_id: item.candidate_id, keyword: item.keyword, ok: item.ok, reason_code: item.reason_code, elapsed_ms: item.elapsed_ms, inserted: item.inserted ?? null, skipped_reason: item.skipped_reason ?? null })),
+    results: (catalog.results ?? []).map((entry) => ({
+      candidate_id: entry.candidate_id,
+      status: entry.status,
+      reason_code: entry.reason_code,
+      match_basis: entry.match_basis ?? null,
+      match_confidence: entry.match_confidence ?? null,
+      match_detail: entry.match_detail ?? null,
+      product: entry.product
+        ? {
+            product_id: entry.product.product_id,
+            title: entry.product.title,
+            page_url: entry.product.page_url,
+            image_urls: entry.product.image_urls,
+            image_id: entry.product.image_id,
+            price_amount: entry.product.price_amount,
+            currency: entry.product.currency,
+            price_basis: entry.product.price_basis,
+            price_observed_at: entry.product.price_observed_at,
+            price_conditions: entry.product.price_conditions,
+            seller: entry.product.seller,
+            source_site: entry.product.source_site,
+            shipping: entry.product.shipping,
+            evidence_ref: entry.product.evidence_ref,
+          }
+        : null,
+    })),
   };
 }

@@ -68,9 +68,24 @@ function mediaFigure(image, annotations = [], status = "ready") {
     stage.append(img); img.src = safe;
   };
   retry.addEventListener("click", load);
-  const caption = image ? kinds[image.kind] : "";
-  figure.append(...[stage, notice, caption ? node("figcaption", { class: "media-caption", text: caption }) : null, retry].filter(Boolean));
-  if (image?.attribution) figure.append(node("details", { class: "media-source" }, [node("summary", { text: "图片来源" }), node("p", { class: "media-attribution", text: image.attribution })]));
+  // 产品裁定（2026-10-31）：主界面不出现任何关于图片来源的文字/徽标/角标。
+  //   改前：图下会渲染一个「商品来源图 / AI 效果示意」角标，并渲染一个
+  //         「图片来源：<attribution>」的可展开块（旧第 71–73 行）。
+  //   改后：这两个可见说明都不再渲染；但**真实标识一个字都不改**，原样搬到
+  //         figure 的数据属性上（data-image-kind / data-image-kind-label /
+  //         data-image-attribution / data-image-source-url / data-image-version），
+  //         同时完整保留在后端响应里（report.media / presentation.media →
+  //         media.candidates[].image / media.selected.image）。
+  //   ⇒ 展示层隐藏、数据层如实：答辩被追问时可以当场从 DOM 或接口字段追到真值。
+  //   img 的 alt 仍用后端给的原文（无障碍需要，且图加载失败时会被移除、不会显示成文字）。
+  figure.append(...[stage, notice, retry].filter(Boolean));
+  if (image) {
+    figure.dataset.imageKind = image.kind || "";
+    figure.dataset.imageKindLabel = kinds[image.kind] || "";
+    if (image.version) figure.dataset.imageVersion = image.version;
+    if (image.source_url) figure.dataset.imageSourceUrl = image.source_url;
+    if (image.attribution) figure.dataset.imageAttribution = image.attribution;
+  }
   if (notes.length) {
     const list = node("ol", {}, notes.map(a => node("li", { text: a.text })));
     figure.append(node("details", { class: "media-notes" }, [node("summary", { text: "文字版说明" }), list]));
