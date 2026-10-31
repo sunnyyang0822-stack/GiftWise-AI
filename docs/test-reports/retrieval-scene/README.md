@@ -78,3 +78,17 @@ Dify 边界统一为外部 `intake_json`；若可信接入层内部继续使用 
 - `git diff --check`：PASS。
 
 Dify、模型及图片服务均未调用。结构 oracle 通过不代表真实图片、视觉坐标或线上 Dify 已验证。
+
+## 最新后台合并基线对齐（RM-003 follow-up）
+
+本次工作树已合入后台 `f080ad51e0f22ca7384ce3a93f75d0dba91d0508`。v2 夹具进一步包含 `previous_gifts`、`retrieval_json`、`product_references_json` 和 `intake_json` 映射；文档中的旧后台 SHA 已更新。工作流自身未修改前端或后台。
+
+最终离线命令：
+
+- `python workflow/examples/retrieval-media/verify.py`：PASS，49 项。
+- `python workflow/examples/retrieval-media/verify_v2.py`：PASS。
+- `python -m unittest discover -s tests -q`：PASS，337 项。
+- `python workflow/verify_local.py --nov01`：PASS，29 项；脱敏产物保存于 `docs/test-reports/nov01-workflow/`。
+- `git diff --check`：PASS。
+
+PASS 仅表示固定代码和夹具的离线结构/规则行为。SKIP：Dify、模型、OpenCLI、Seedream、视觉定位、前端联调。真实 Dify 仍需统一 SHA 后按 PM 指示做一次最小调用。

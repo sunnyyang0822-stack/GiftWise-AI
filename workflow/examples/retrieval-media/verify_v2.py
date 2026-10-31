@@ -3,7 +3,11 @@ import json, math
 from pathlib import Path
 F=Path(__file__).with_name('v2-cases.json')
 d=json.loads(F.read_text(encoding='utf-8'))
-assert d['backend_contract_commit']=='e0c76cad548ffa371287837a36e0fae2a48f0ecf'
+assert d['backend_contract_commit']=='f080ad51e0f22ca7384ce3a93f75d0dba91d0508'
+assert isinstance(d['previous_gifts'],str) and d['previous_gifts']
+assert isinstance(d['retrieval_json'],str) and isinstance(json.loads(d['retrieval_json']),dict)
+refs=json.loads(d['product_references_json']); assert len(refs)==3 and all(set(x)=={'candidate_id','product_id'} for x in refs)
+assert isinstance(d['intake_json'],str) and json.loads(d['intake_json'])['previous_gifts']==d['previous_gifts']
 plan=d['plan']; assert set(plan)=={'category','keywords','limit'}
 assert plan['category']=='maker' and plan['keywords']==['kit'] and plan['limit']==3
 media=d['media']; assert media['contract_version']=='retrieval-media-v2'

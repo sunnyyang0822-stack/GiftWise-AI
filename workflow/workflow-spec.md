@@ -16,7 +16,7 @@ Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `reque
 
 # 工作流设计规范 v0.2.1
 
-> 最新造景/引用离线增量：按PR61@7204b64的retrieval_json和独立product_references_json（candidate_id/product_id）传递；name按name + " · " + variant，金额原样匹配，严格核心候选不加引用字段。选后场景有光影环境，主体礼物与适形包装，不统一方盒；3–5处手写感短中文及细曲箭头由前端叠加。尺寸未知明示比例未核实或澄清，坐标需最终图复核，不将结构合格冒充定位准确。精确图像provider、计划键名及定位状态仍待后台/PM，不新增共享字段，不真实调用。
+> retrieval-media-v2 离线增量：冻结需求携带 previous_gifts；生成输入为 retrieval_json，输出独立 product_references_json（candidate_id/product_id）。候选名称、规格、金额和来源由服务端证据绑定，模型不能改写。选后场景消费 physical；media.selected 使用 plan_version、execution、annotation_status，图像有 image_version 后才可绑定 curve 标注。3–5处手写感短中文和细曲箭头由前端叠加；尺寸未知明示比例未核实或澄清，坐标需最终图复核，不把结构合格冒充定位准确。
 
 > #59/#60契约更新：后台PR61@27670b6已提交共享契约v1草案，本线sidecar/商品字段、partial/unavailable及图像门禁按其对齐；此前“契约未提交”仅历史检查状态。release尚未合入，计划/模型引用/provider精确JSON键名仍未规定，保持待后台协调，不造字段、不接真实调用。
 

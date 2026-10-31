@@ -8,7 +8,7 @@ scene-drafts.json是本线离线编辑/验证文件，不是provider共享信封
 
 造景围绕同一合格选择，礼物与包装主体、光影环境氛围，不统一套方盒。按已知形状/重量/易碎性与尺寸选纸包/礼袋/圆筒/透明或异形包装；没有依据不猜厘米/承重/材质，不改变型号颜色数量及相对大小。道具不是附送商品。尺寸未知明确比例示意或先澄清。
 
-坐标提案有限0–1只是结构合格，不是定位准确。实际图生成后需核对物体位置/遮挡/标注可读性，当前没有真实图片，不可ready交付；选前 selected=null；选后无图夹具保留 selected 元数据、image=null、annotations=[]、status=unavailable。共享契约暂无最终定位复核信封，建议后台/PM明确未确认说明载体，按 v2 使用 annotation_status、plan_version、execution 和 curve；最终视觉定位仍需真实图像后核对。生图服务选型由产品负责人/PM决定，本轮不查选型、不调用服务。
+坐标提案有限0–1只是结构合格，不是定位准确。实际图生成后需核对物体位置/遮挡/标注可读性，当前没有真实图片，不可ready交付；选前 selected=null；选后无图夹具保留 selected 元数据、image=null、annotations=[]、status=unavailable。按 v2 使用 annotation_status、plan_version、execution 和 curve；最终视觉定位仍需真实图像后核对。生图服务选型由产品负责人/PM决定，本轮不查选型、不调用服务。
 
 ## PR61对齐更新（覆盖下文开工时的未提交状态）
 
