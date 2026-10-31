@@ -125,11 +125,17 @@ export const BUDGET_RANGES = [
   { id: "r5", label: "1000 元以上", min: "1000", max: null },
 ];
 
+/** 新版交互配置；旧 BUDGET_RANGES 仅供旧页面兼容，不作为新模式。 */
+export const budget_slider = Object.freeze({ min: 0, max: 1000, step: 50 });
+export const budget_modes = Object.freeze(["slider", "zero", "other"]);
+
 export const DEADLINE_RANGES = [
-  { id: "d0", label: "明天之前", hint: "需要当天完成", minDays: 0, maxDays: 1 },
-  { id: "d1", label: "3–7 天", hint: "约一周内", minDays: 3, maxDays: 7 },
-  { id: "d2", label: "一周以上", hint: "时间比较充裕", minDays: 7, maxDays: null },
-  { id: "d3", label: "不着急", hint: "没有明确期限，提交前仍需确认天数", minDays: null, maxDays: null },
+  { id: "d0", label: "明天", value: 1, hint: "按 1 天上限检查", minDays: 0, maxDays: 1 },
+  { id: "d1", label: "3–5 天", value: 5, hint: "按 5 天上限检查", minDays: 3, maxDays: 5 },
+  { id: "d2", label: "一周以内", value: 7, hint: "按 7 天上限检查", minDays: 0, maxDays: 7 },
+  { id: "d3", label: "一月以内", value: 30, hint: "按 30 天上限检查", minDays: 0, maxDays: 30 },
+  { id: "d4", label: "一季度以内", value: 90, hint: "按 90 天上限检查", minDays: 0, maxDays: 90 },
+  { id: "d5", label: "一年以内", value: 365, hint: "按 365 天上限检查", minDays: 0, maxDays: 365 },
 ];
 
 export const PORT = Number(process.env.GW_PORT || process.env.PORT || 8787);

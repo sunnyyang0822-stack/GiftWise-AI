@@ -12,10 +12,11 @@
 import { randomUUID } from "node:crypto";
 
 const RUN_LIMIT = 200;
-const RUN_TTL_MS = 6 * 60 * 60 * 1000;
+const RUN_TTL_MS = 10 * 60 * 1000;
 
 /** @type {Map<string, any>} */
 const runs = new Map();
+const recommendationKeys = new Map();
 
 function nowIso() {
   // 统一按 Asia/Shanghai 记录，避免演示现场时区歧义。
@@ -46,12 +47,18 @@ export function createRun(init) {
     presentation: null,
     /** 同一选择的幂等缓存：重复点击返回同一份呈现，不重复消耗额度。 */
     selections: new Map(),
-    call_counts: { recommend: 0, recommend_revision: 0, presentation: 0, presentation_revision: 0 },
+    call_counts: { exclusion_analysis: init.exclusion_analysis || 0, recommend: 0, recommend_revision: 0, presentation: 0, presentation_revision: 0 },
     notices: init.notices || [],
   };
   runs.set(runId, run);
+  if (init.idempotency_key) recommendationKeys.set(init.idempotency_key, runId);
   prune();
   return run;
+}
+
+export function getRunByRecommendationKey(key) {
+  const id = recommendationKeys.get(key);
+  return id ? getRun(id) : null;
 }
 
 export function getRun(runId) {
@@ -77,6 +84,7 @@ export function runCount() {
 
 export function reset() {
   runs.clear();
+  recommendationKeys.clear();
 }
 
 /** 面向浏览器的最小脱敏视图：不含密钥、不含内部提示。 */

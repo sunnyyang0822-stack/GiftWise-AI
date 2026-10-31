@@ -1,0 +1,55 @@
+{
+  "baseline": "ce5fd11af5581a8f10f82dc995ec24bfd1b3e4b1",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "commands": {
+    "build": {
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/build_code_node.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "old-probes": {
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "nov01-probes": {
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py",
+        "--nov01"
+      ],
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "stage-c": {
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-v"
+      ],
+      "exit_code": 1,
+      "status": "FAIL"
+    }
+  },
+  "Dify": "SKIP",
+  "online_model": "SKIP",
+  "model_calls": 0,
+  "tokens": "未执行",
+  "latency": "未执行",
+  "cost": "未执行",
+  "hash_checks": {
+    "passed": 9,
+    "failed": 0
+  },
+  "semantics": "PASS"
+}

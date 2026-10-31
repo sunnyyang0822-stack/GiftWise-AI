@@ -132,6 +132,34 @@ test("预算缺失或写成区间时不静默补默认值", () => {
   assert.ok(rangedResult.errors.some((e) => e.code === "INVALID_AMOUNT"));
 });
 
+test("其他关系与其他场合必须填写自定义文本并冻结到 request", () => {
+  const base = JSON.parse(JSON.stringify(exampleIntake));
+  base.recipient_relation = "other";
+  base.occasion = "other";
+  const missing = adaptIntakeObject(base);
+  assert.ok(missing.errors.some((e) => e.path === "intake.recipient_relation_custom"));
+  assert.ok(missing.errors.some((e) => e.path === "intake.occasion_custom"));
+
+  const valid = { ...base, recipient_relation_custom: "社团伙伴", occasion_custom: "搬家" };
+  const adapted = adaptIntakeObject(valid);
+  assert.equal(adapted.status, "ready");
+  const request = strictParse(adapted.request_json);
+  assert.equal(request.recipient_relation, "社团伙伴");
+  assert.equal(request.recipient_relation_custom, "社团伙伴");
+  assert.equal(request.occasion, "搬家");
+  assert.equal(request.occasion_custom, "搬家");
+
+  for (const bad of [
+    { ...base, recipient_relation_custom: "   ", occasion_custom: "搬家" },
+    { ...base, recipient_relation_custom: "社团伙伴", occasion_custom: "\t" },
+    { ...base, recipient_relation: "friend", recipient_relation_custom: "社团伙伴", occasion_custom: "搬家" },
+    { ...base, occasion: "birthday", recipient_relation_custom: "社团伙伴", occasion_custom: "搬家" },
+    { ...base, recipient_relation_custom: "a".repeat(1001), occasion_custom: "搬家" },
+  ]) {
+    assert.equal(adaptIntakeObject(bad).status, "needs_input");
+  }
+});
+
 test("天数允许 0，但拒绝浮点、布尔与缺失；不静默填 7 天", () => {
   const zero = baseIntake();
   zero.deadline_days = 0;
@@ -430,12 +458,16 @@ test("呈现：复核礼物＋包装＋贺卡＋装饰＋配送的全量费用�
   const { view } = await runPresentation({ runId: run.run_id, selectedCandidateId: "c2" });
   const summary = view.recheck_summary;
   assert.equal(summary.currency, "CNY");
-  const sum = amountToCents(summary.original_total) + amountToCents(summary.additional_cost);
-  assert.equal(amountToCents(summary.revised_estimated_total), sum, "总费用必须等于原价加新增费用");
-  assert.ok(amountToCents(summary.revised_estimated_total) <= amountToCents(summary.budget_amount));
+  if (Object.hasOwn(summary, "gift_estimated_total")) {
+    assert.equal(summary.gift_estimated_total, view.candidate.estimated_total);
+    if (summary.budget_range !== null) assert.deepEqual(summary.budget_range.max, summary.budget_amount);
+    assert.ok(amountToCents(summary.gift_estimated_total) <= amountToCents(summary.budget_amount));
+  } else {
+    const sum = amountToCents(summary.original_total) + amountToCents(summary.additional_cost);
+    assert.equal(amountToCents(summary.revised_estimated_total), sum, "旧版总费用必须等于原价加新增费用");
+    assert.ok(amountToCents(summary.revised_estimated_total) <= amountToCents(summary.budget_amount));
+  }
   assert.ok(summary.revised_estimated_preparation_days <= summary.available_days);
-  assert.deepEqual(summary.forbidden_tags, ["alcohol"]);
-  assert.deepEqual(summary.forbidden_terms, ["酒"]);
   assert.equal(summary.passed, true);
   assert.equal(view.presentation_check.passed, true);
 });

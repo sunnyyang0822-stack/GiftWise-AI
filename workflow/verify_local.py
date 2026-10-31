@@ -210,5 +210,83 @@ def run():
     print(f"run dir: {relative(output)}  (latest 指针 -> {relative(base / 'latest.json')})")
 
 
+def verify_nov01():
+    """只验证本线提示词、夹具和报告逻辑；不构建、不联网、不覆盖历史证据。"""
+    import unicodedata
+    data = json.loads((ROOT / "workflow/examples/nov01/cases.json").read_text(encoding="utf-8"))
+    results = []
+    def expect(name, condition):
+        if not condition:
+            raise AssertionError(name)
+        results.append({"name": name, "passed": True})
+    from decimal import Decimal
+    req = data["request"]
+    expect("区间保留100至300及标量max", req["budget_range"] == {"min": "100", "max": "300"} and Decimal(req["budget_amount"]) == Decimal(req["budget_range"]["max"]))
+    expect("3至5天按5天上限", data["time_choice"]["deadline_days"] == req["available_days"] == 5)
+    expect("零元夹具不新增支出", all(Decimal(c["estimated_total"]) == 0 and c["unknowns"] for c in data["zero"]["candidates"]["candidates"]))
+    expect("零元三方向不同", len({c["name"] for c in data["zero"]["candidates"]["candidates"]}) == 3)
+    item = data["exclusions"][0]["output"]["ai_exclusion_candidates"][0]
+    expect("明确香水建议锚定与白名单", item["source_span"] in data["exclusions"][0]["dislikes"] and item["tag"] == "fragrance" and set(item) == {"id", "kind", "tag", "term", "source_span", "confidence", "why", "evidence"})
+    expect("未知与注入夹具均待澄清", all(c["expected"] == "needs_input" and c["output"]["ai_unmapped_notes"] for c in data["exclusions"][1:]))
+    expect("排除项非法顶层字段待拒绝", "extra" in data["exclusion_validation_cases"][0]["output"] and data["exclusion_validation_cases"][0]["expected_error"] == "AI_OUTPUT_INVALID")
+    term_case = data["exclusion_validation_cases"][1]
+    term_item = term_case["output"]["ai_exclusion_candidates"][0]
+    expect("term 反向锚定失败夹具", term_item["term"] not in term_item["source_span"] and term_case["expected_error"] == "AI_OUTPUT_UNANCHORED")
+    expect("other 标签不进入识别白名单", data["exclusion_validation_cases"][2]["output"]["ai_exclusion_candidates"][0]["tag"] == "other" and data["exclusion_validation_cases"][2]["expected_error"] == "AI_OUTPUT_INVALID")
+    p = data["presentation"]
+    expect("新版呈现严格根字段", set(p) == {"contract_version", "style", "packaging", "card_text", "giving_advice", "unknowns", "currency", "revised_estimated_preparation_days"})
+    expect("新版呈现没有报价材料步骤", set(p["packaging"]) == {"color_palette"} and p["packaging"]["color_palette"] and p["contract_version"] == data["contract_version"])
+    expect("呈现报价字段负例明确拒绝", "additional_cost" in data["presentation_invalid_cases"][0]["output"] and data["presentation_invalid_cases"][0]["expected_error"] == "PRESENTATION_INVALID")
+    expect("呈现材料步骤字段负例明确拒绝", "materials" in data["presentation_invalid_cases"][1]["output"]["packaging"] and data["presentation_invalid_cases"][1]["expected_error"] == "PRESENTATION_INVALID")
+    # 运行现有公开规则与工作流，实证冻结约束和一次修订保护；不声称新规则已集成。
+    raw = dump(req)
+    before = copy.deepcopy(req)
+    state = recheck(raw, dump(data["revision"]["initial"]), dump(data["revision"]["revised"]))
+    expect("一次修订持续超预算停止", state["repair_count"] == 1 and not state["repairable"] and state["validation"]["status"] == "failed")
+    expect("原始约束与事实未改", req == before and state["request_json"] == raw)
+    output = report(state)
+    expect("新版报告仅礼物口径", "礼物本身估价：" in output["report_text"] and "不代表免费" in output["report_text"] and "全量估算：" not in output["report_text"])
+    expect("等待选择且不替选", output["selected_candidate_id"] is None and "c1" not in output["selectable_candidate_ids"])
+    custom_payload = {
+        "contract_version": data["contract_version"], "recipient_relation": "other",
+        "recipient_relation_custom": "社团搭档", "occasion": "other",
+        "occasion_custom": "项目收尾感谢", "budget_mode": "other",
+        "budget_range": {"min": "125.50", "max": "275.75"}, "budget_amount": "275.75",
+        "currency": "CNY", "deadline_days": 5, "dislikes": "",
+        "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}
+    }
+    custom_result = adapt_intake(dump(custom_payload))
+    expect("自定义关系原样传递", custom_result["status"] == "ready" and json.loads(custom_result["request_json"])["recipient_relation"] == "社团搭档")
+    custom_request = json.loads(custom_result["request_json"])
+    expect("自定义场合原样传递", custom_request["occasion"] == "项目收尾感谢" and custom_request["occasion_custom"] == "项目收尾感谢")
+    expect("自定义预算区间和标量一致", custom_request["budget_range"] == {"min": "125.50", "max": "275.75"} and custom_request["budget_amount"] == "275.75")
+    for field, value in (("recipient_relation_custom", " "), ("occasion_custom", ""), ("recipient_relation_custom", "x" * 1001)):
+        invalid = dict(custom_payload)
+        invalid[field] = value
+        invalid_result = adapt_intake(dump(invalid))
+        expect("自定义字段非法值拒绝:" + field, invalid_result["status"] == "needs_input" and any(e["path"] == "intake." + field for e in invalid_result["errors"]))
+    unrelated = dict(custom_payload)
+    unrelated["recipient_relation"] = "friend"
+    unrelated["recipient_relation_custom"] = "社团搭档"
+    unrelated_result = adapt_intake(dump(unrelated))
+    expect("非其他关系拒绝自定义字段", unrelated_result["status"] == "needs_input" and any(e["code"] == "INTAKE_UNKNOWN_FIELD" and e["path"] == "intake.recipient_relation_custom" for e in unrelated_result["errors"]))
+    legacy = dict(req)
+    legacy.pop("contract_version")
+    expect("旧版报告保留原口径", "全量估算：" in report(check(dump(legacy), dump(data["candidates"]))) ["report_text"])
+    for filename in ("generate.md", "repair.md", "exclusions.md", "presentation.md"):
+        text = (ROOT / "workflow/prompts" / filename).read_text(encoding="utf-8")
+        expect("提示词版本 " + filename, "giftwise-20261031-v2" in text)
+    target = ROOT / "docs/test-reports/nov01-workflow" / f"probes-{_stamp_shanghai()}.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"local_verified": True, "cloud_not_verified": True, "online_model_calls": 0, "cost": "未测", "results": results, "scope": "离线固定夹具/提示词结构与报告逻辑；不证明真实识别或新版适配通过"}
+    with open(target, "x", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+    print(f"nov01 local assertions: {len(results)} passed; cloud_not_verified; model_calls=0")
+
+
 if __name__ == "__main__":
-    run()
+    if "--nov01" in sys.argv:
+        verify_nov01()
+    else:
+        run()

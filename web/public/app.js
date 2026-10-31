@@ -32,6 +32,11 @@ const $ = (id) => document.getElementById(id);
 const state = {
   config: null,
   step: 1,
+  inFlow: false,
+  analysis: null,
+  confirmedIds: [],
+  requestVersion: 0,
+  controller: null,
   busy: false,
   error: null,
   timeout: false,
@@ -47,141 +52,98 @@ const state = {
     recipient_relation: null,
     closeness: null,
     occasion: null,
-    budget_range: null,
-    budget_amount: "",
+    budget_mode: "slider",
+    budget_min: "100",
+    budget_max: "300",
     budget_confirmed: false,
-    deadline_range: null,
     deadline_days: "",
-    deadline_confirmed: false,
     interests: [],
     interest_confidence: {},
     interests_unknown: false,
     gift_styles: [],
     styles_unknown: false,
     exclusion_tags: [],
-    exclusion_terms: "",
-    exclusion_unresolved: "",
+    dislikes: "",
     additional_context: "",
   },
 };
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
 
-const demoOptions = [
-  { value: "", label: "关闭（正常路径）" },
-  { value: "model_error", label: "错误：模拟模型输出损坏 JSON" },
-  { value: "partial_fail", label: "部分通过：一个候选修订修不好" },
-  { value: "presentation_over_budget", label: "呈现：首次复核超预算" },
-  { value: "stress", label: "压力：超长文案 + emoji + 不可断行长串" },
-  { value: "slow", label: "超时：服务端延迟 45 秒" },
-];
+const CONTRACT_VERSION = "giftwise-20261031-v2";
+const STEP_TITLES = ["关系场合预算时间", "兴趣风格", "不喜欢和补充"];
+const LOCAL_UI_FIXTURE = new URLSearchParams(location.search).get("ui_fixture") === "nov01";
+const LOCAL_DEADLINES = [
+  ["明天", 1], ["3–5 天", 5], ["一周以内", 7], ["一月以内", 30], ["一季度以内", 90], ["一年以内", 365],
+].map(([label, days]) => ({ id: `fixture-${days}`, label, days }));
+const codePoints = value => [...value].length;
+const moneyCents = value => AMOUNT_RE.test(value) ? Number(value.split(".")[0]) * 100 + Number((value.split(".")[1] || "").padEnd(2, "0")) : null;
+
+function invalidateAnalysis() {
+  state.analysis = null;
+  state.confirmedIds = [];
+}
+function cancelPending() {
+  state.requestVersion++;
+  state.controller?.abort();
+  state.busy = false;
+}
+function moveToStep(step) {
+  state.step = step;
+  state.error = null;
+  render();
+  $("view").scrollIntoView({ block: "start" });
+  $("view").focus({ preventScroll: true });
+}
+function startFlow() {
+  cancelPending();
+  state.inFlow = true;
+  state.report = null;
+  state.presentation = null;
+  state.encourage = false;
+  state.timeout = false;
+  moveToStep(1);
+}
 
 /* ------------------------------------------------------------------ 渲染 */
 
 function renderBadges() {
-  const slot = $("badges");
-  slot.replaceChildren();
+  $("badges").replaceChildren(el("span", { class: "sr-only", text: "流程状态由顶部标识说明。" }));
+  $("badges").hidden = true;
   if (!state.config) return;
   const mock = state.config.mode === "mock";
-  // 吸顶常驻标识：滚动到任何位置、任何窄屏宽度都看得见数据来源
   const flag = $("mode-flag");
-  if (flag) {
-    flag.hidden = false;
-    flag.textContent = mock ? "模拟数据 · 未接真实模型" : "Dify 模式（以服务端返回为准）";
-    flag.classList.toggle("mode-flag--real", !mock);
-    flag.title = mock
-      ? "当前接入层没有接入真实模型（未配置模型凭证），候选与呈现内容来自接入层内置模拟数据，不是模型真实输出。"
-      : "当前由服务端调用真实模型；结果仍以服务端独立规则校验为准。";
-  }
-  const heroFlag = $("hero-flag");
-  if (heroFlag) {
-    heroFlag.hidden = !mock;
-    if (mock) {
-      heroFlag.textContent =
-        "当前为模拟数据演示：接入层还没有接入真实模型（未配置模型凭证），三个方案与四段呈现都不是模型真实输出。" +
-        "独立规则校验、选择门槛与修订计数是真实实现，可以真实拦住不合格的方案。";
-    }
-  }
-  slot.append(
-    el("span", { class: "badge badge--mock", text: state.config.mode === "mock" ? "模拟数据模式" : "Dify 模式" }),
-    el("span", { class: "badge", text: `币种：${state.config.limits.currency}（首版不换汇）` }),
-    el("span", { class: "badge", text: `全局自动修订上限：${state.config.limits.global_repair_limit} 次` }),
-    el("span", {
-      class: `badge ${state.config.pursuit_contract_ready ? "badge--ok" : "badge--err"}`,
-      text: state.config.pursuit_contract_ready ? "追求对象契约：已落地（工作区）" : "追求对象契约：未落地",
-    }),
-    el("span", {
-      class: "badge",
-      text: `真实模型调用：${state.config.dify_configured ? "已配置，未确认发布" : "未配置凭证（模拟）"}`,
-    }),
-  );
+  flag.hidden = false;
+  flag.textContent = mock ? "模拟数据 · 未接真实模型" : "模型生成 · 价格未核实";
+  flag.classList.toggle("mode-flag--real", !mock);
+  flag.title = mock ? "本次候选、识别与呈现为模拟数据，不是真实模型输出。" : "生成内容仍需独立规则检查，价格、库存与送达未核实。";
+  $("hero-flag").hidden = !mock;
+  $("hero-flag").textContent = "当前为模拟数据演示，识别、方案与呈现均非真实模型输出；价格、库存与送达未核实。";
 }
-
 function renderBanners() {
   const slot = $("banner-slot");
   slot.replaceChildren();
-  if (!state.config) return;
-  const banners = [];
-  if (state.config.mode === "mock") {
-    banners.push({ class: "banner", text: state.config.notices.mock_mode });
-  }
-  banners.push({
-    class: "banner banner--neutral",
-    text:
-      "「约 60 秒完成输入」是待测目标，当前没有真实用户测量数据，本项目未宣称已达成。" +
-      "本页所有方案与呈现内容均为演示用途，未核实真实价格、库存或送达。",
-  });
-  banners.push({
-    class: state.config.pursuit_contract_ready ? "banner banner--info" : "banner banner--warn",
-    text: `关系契约：${state.config.pursuit_notice}`,
-  });
-  if (state.restoreNotice) banners.push({ class: "banner banner--warn", text: state.restoreNotice });
-  for (const item of banners) slot.append(el("div", { class: item.class, text: item.text }));
-  // 演示开关随每次重绘一起恢复，避免被 banner-slot 清空后消失
-  renderDemoPanel();
+  const notices = [state.restoreNotice, state.config?.fixture_notice].filter(Boolean);
+  slot.hidden = notices.length === 0 || !state.inFlow;
+  if (!slot.hidden) notices.forEach(text => slot.append(el("p", { class: "banner banner--warn", text })));
+  else slot.append(el("span", { class: "sr-only", text: "暂无流程通知。" }));
 }
-
-/**
- * 进度条按产品口径显示「四步走」：关系 / 场合 / 预算与时间 / 兴趣与禁忌。
- * 注意：这四步是用户真正要提供的四组信息，与表单的三个页面不是一一对应
- * （第一页同时收关系、场合、预算与时间），所以页面数单独标出，不做假映射。
- */
 function renderSteps() {
   const nav = $("steps");
   nav.replaceChildren();
-  const inForm = !state.report && !state.presentation && !state.error && !state.encourage;
+  const inForm = state.inFlow && !state.busy && !state.report && !state.presentation && !state.encourage;
   nav.hidden = !inForm;
   if (!inForm) return;
-  const f = state.form;
-  const topics = [
-    { label: "关系", done: Boolean(f.recipient_relation) },
-    { label: "场合", done: Boolean(f.occasion) },
-    {
-      label: "预算与时间",
-      done: Boolean(f.budget_range && f.budget_confirmed && f.deadline_range && f.deadline_confirmed),
-    },
-    { label: "兴趣与禁忌", done: state.step >= 3 },
-  ];
-  const nextIndex = topics.findIndex((topic) => !topic.done);
-  nav.append(el("span", { class: "step-page", text: `第 ${state.step} / 3 页` }));
-  topics.forEach((topic, index) => {
-    nav.append(
-      el("span", {
-        class: `step-pill ${topic.done ? "step-pill--done" : "step-pill--todo"}`,
-        "aria-current": index === nextIndex ? "true" : "false",
-        text: `第 ${index + 1} 步 · ${topic.label}`,
-      }),
-    );
-  });
+  nav.setAttribute("aria-label", `填写进度：第 ${state.step} 步，共三步`);
+  nav.append(el("p", { class: "step-page", text: `第 ${state.step} 步 / 共三步` }));
+  nav.append(el("progress", { max: "3", value: String(state.step), "aria-label": "需求填写进度" }));
+  nav.append(el("ol", { class: "revision-step-list" }, STEP_TITLES.map((title,i) => el("li", {}, [
+    el("button", { type: "button", class: "step-pill", "aria-current": state.step === i+1 ? "step" : null,
+      disabled: i+1 > state.step, text: `${i+1}. ${title}`, onclick: () => moveToStep(i+1) }),
+  ]))));
 }
-
-/** 首屏六屏只在还没开始填写时出现，避免挤压操作区；进入流程或出错时整组收起。 */
 function renderLandingVisibility() {
-  const inForm = !state.report && !state.presentation && !state.error && !state.busy && !state.encourage;
-  const atStart = inForm && state.step === 1;
-  for (const section of document.querySelectorAll("[data-landing]")) {
-    section.hidden = !atStart;
-  }
+  for (const section of document.querySelectorAll("[data-landing]")) section.hidden = state.inFlow;
 }
 
 function errorBox(errors, title = "需要处理的问题") {
@@ -202,7 +164,7 @@ function errorBox(errors, title = "需要处理的问题") {
 }
 
 function chip(label, selected, onToggle, extra = {}) {
-  const input = el("input", { type: extra.type || "checkbox", checked: selected, "aria-label": label });
+  const input = el("input", { type: "checkbox", checked: selected, "aria-label": label });
   const node = el("label", { class: `chip ${extra.class || ""}`, dataset: { selected: String(selected) } }, [
     input,
     el("span", { text: label }),
@@ -225,15 +187,14 @@ function renderStep1() {
       el("p", {
         class: "card__hint field__hint",
         text:
-          "恋人与追求对象是两个独立选项，不会互相替代。追求对象默认低压力表达，不假定对方已接受或存在双向好感。" +
-          "本产品界面不提供「同事」场景。",
+          "恋人与追求对象是两个独立选项，不会互相替代。追求对象默认低压力表达，不假定对方已接受或存在双向好感。",
       }),
       el(
         "div",
         { class: "chips" },
         cfg.labels.relations.map((item) =>
           chip(item.zh, f.recipient_relation === item.id, () => {
-            f.recipient_relation = item.id;
+            f.recipient_relation = f.recipient_relation === item.id ? null : item.id;
             render();
           }, { class: "chip--radio" }),
         ),
@@ -275,7 +236,7 @@ function renderStep1() {
         { class: "chips" },
         cfg.labels.occasions.map((item) =>
           chip(item.zh, f.occasion === item.id, () => {
-            f.occasion = item.id;
+            f.occasion = f.occasion === item.id ? null : item.id;
             render();
           }, { class: "chip--radio", type: "radio" }),
         ),
@@ -283,159 +244,8 @@ function renderStep1() {
     ]),
   );
 
-  const rangeMax = (() => {
-    const range = cfg.ranges.budget.find((r) => r.id === f.budget_range);
-    return range && range.max ? range.max : null;
-  })();
+  body.push(renderBudget(), renderDeadline());
 
-  body.push(
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "预算（人民币 CNY）" }),
-      el("p", {
-        class: "field__hint",
-        text: "区间只是输入快捷方式；最终以你确认的明确上限提交，系统不会替你补默认值。含礼物、包装、贺卡、装饰和配送的估算总费用。",
-      }),
-      el(
-        "div",
-        { class: "chips" },
-        cfg.ranges.budget.map((range) =>
-          chip(range.label, f.budget_range === range.id, () => {
-            f.budget_range = range.id;
-            f.budget_confirmed = false;
-            render();
-          }, { class: "chip--radio", type: "radio" }),
-        ),
-      ),
-      f.budget_range
-        ? el("div", {}, [
-            el("div", { class: "suggest-row" }, [
-              rangeMax
-                ? el("button", {
-                    class: "suggest",
-                    type: "button",
-                    text: `按此区间的上限填写：${rangeMax} 元`,
-                    onclick: () => {
-                      f.budget_amount = `${rangeMax}.00`;
-                      f.budget_confirmed = false;
-                      render();
-                    },
-                  })
-                : el("span", { class: "field__hint", text: "该区间没有固定上限，请直接填写你确认的金额。" }),
-            ]),
-            el("p", { class: "field__hint", text: "最终确认的全量预算上限（单位：元，最多两位小数）" }),
-            el("input", {
-              type: "text",
-              inputmode: "decimal",
-              placeholder: "例如 200.00",
-              value: f.budget_amount,
-              "aria-label": "预算上限金额",
-              "data-field": "budget_amount",
-              oninput: (event) => {
-                f.budget_amount = event.target.value.trim();
-                f.budget_confirmed = false;
-                render();
-              },
-            }),
-            el("label", { class: "confirm-row" }, [
-              el("input", {
-                type: "checkbox",
-                checked: f.budget_confirmed,
-                onchange: (event) => {
-                  f.budget_confirmed = event.target.checked;
-                  render();
-                },
-              }),
-              el("span", {
-                text:
-                  AMOUNT_RE.test(f.budget_amount)
-                    ? `我确认「${f.budget_amount} 元」就是本次礼物＋包装＋贺卡＋装饰＋配送的全量上限（不再改由模型决定）。`
-                    : "请先填写合法的金额（有限、非负、最多两位小数），再勾选确认。",
-              }),
-            ]),
-          ])
-        : el("p", { class: "field__error", text: "请先选择一个预算区间，再确认明确上限。" }),
-    ]),
-  );
-
-  const daysSuggest = (() => {
-    const map = { d0: [0, 1], d1: [3, 5, 7], d2: [7, 10, 14], d3: [] };
-    return map[f.deadline_range] || [];
-  })();
-
-  body.push(
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "准备时间" }),
-      el("p", {
-        class: "field__hint",
-        text: "时间是可用准备天数，不是送达承诺，按 Asia/Shanghai 计算。0 天表示当天可用。区间只是快捷入口，最终以你确认的天数提交。",
-      }),
-      el(
-        "div",
-        { class: "chips" },
-        cfg.ranges.deadline.map((range) =>
-          chip(`${range.label}（${range.hint}）`, f.deadline_range === range.id, () => {
-            f.deadline_range = range.id;
-            f.deadline_confirmed = false;
-            render();
-          }, { class: "chip--radio", type: "radio" }),
-        ),
-      ),
-      f.deadline_range
-        ? el("div", {}, [
-            daysSuggest.length > 0
-              ? el(
-                  "div",
-                  { class: "suggest-row" },
-                  daysSuggest.map((day) =>
-                    el("button", {
-                      class: "suggest",
-                      type: "button",
-                      text: `使用 ${day} 天`,
-                      onclick: () => {
-                        f.deadline_days = String(day);
-                        f.deadline_confirmed = false;
-                        render();
-                      },
-                    }),
-                  ),
-                )
-              : null,
-            el("p", { class: "field__hint", text: "最终确认的可用准备天数（整数，0 允许）" }),
-            el("input", {
-              type: "number",
-              min: "0",
-              step: "1",
-              inputmode: "numeric",
-              placeholder: "例如 2",
-              value: f.deadline_days,
-              "aria-label": "可用准备天数",
-              "data-field": "deadline_days",
-              oninput: (event) => {
-                f.deadline_days = event.target.value.trim();
-                f.deadline_confirmed = false;
-                render();
-              },
-            }),
-            el("label", { class: "confirm-row" }, [
-              el("input", {
-                type: "checkbox",
-                checked: f.deadline_confirmed,
-                onchange: (event) => {
-                  f.deadline_confirmed = event.target.checked;
-                  render();
-                },
-              }),
-              el("span", {
-                text:
-                  /^[0-9]+$/.test(f.deadline_days)
-                    ? `我确认可用的完整准备时间是 ${f.deadline_days} 天（礼物＋包装＋贺卡＋配送合计），不是模糊期限。`
-                    : "请先填写 0 或正整数天数，再勾选确认。",
-              }),
-            ]),
-          ])
-        : el("p", { class: "field__error", text: "请先选择一个时间区间，再确认最终天数。" }),
-    ]),
-  );
 
   return {
     body,
@@ -462,23 +272,95 @@ function renderStep1() {
   };
 }
 
-function validateStep1() {
-  const f = state.form;
-  const problems = [];
-  if (!f.recipient_relation) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请选择送礼对象的关系。" });
-  if (!f.occasion) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请选择送礼场合。" });
-  if (!f.budget_range) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请选择预算区间。" });
-  if (!AMOUNT_RE.test(f.budget_amount)) {
-    problems.push({ code: "INVALID_AMOUNT", message: "预算上限必须是有限、非负、最多两位小数的金额（如 200.00）。" });
-  }
-  if (!f.budget_confirmed) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请勾选确认预算上限就是全量上限。" });
-  if (!f.deadline_range) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请选择时间区间。" });
-  if (!/^[0-9]+$/.test(f.deadline_days)) {
-    problems.push({ code: "INVALID_TYPE", message: "可用准备天数必须是非负整数（0 表示当天）。" });
-  }
-  if (!f.deadline_confirmed) problems.push({ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请勾选确认最终可用天数。" });
-  return problems.length > 0 ? problems : null;
+function deadlineOptions() {
+  const options = state.config?.deadline_options || state.config?.ranges?.deadline;
+  // Accept numeric config only, never reconstruct the six business mappings in the browser.
+  if (!Array.isArray(options) || options.length !== 6) return null;
+  const normalized = options.map(r => ({ ...r, days: Number.isInteger(r.days) ? r.days : r.available_days }));
+  return normalized.every(r => typeof r.label === "string" && Number.isInteger(r.days) && r.days >= 0 && r.days <= 365)
+    && new Set(normalized.map(r => r.days)).size === 6 ? normalized : null;
 }
+function budgetProblems() {
+  const f = state.form, errors = [];
+  const min = moneyCents(f.budget_min), max = moneyCents(f.budget_max);
+  if (!["slider","zero","other"].includes(f.budget_mode)) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"预算还不确定，请先选定区间或其他金额。"});
+  if (min === null || max === null) errors.push({code:"INVALID_AMOUNT",message:"预算两端都需填写非负金额，最多两位小数，不含空格或前导零。"});
+  else if (min > 1000000 || max > 1000000) errors.push({code:"LIMIT_EXCEEDED",message:"礼物预算最高为 10000 元。"});
+  else if (min > max) errors.push({code:"INVALID_BUDGET_RANGE",message:"预算下限不能高于上限。"});
+  else if (f.budget_mode === "slider" && (max > 100000 || min % 5000 || max % 5000)) errors.push({code:"INVALID_BUDGET_RANGE",message:"滑条区间需在 0–1000 元内，每次调整 50 元。"});
+  else if (f.budget_mode === "zero" && (min !== 0 || max !== 0)) errors.push({code:"INVALID_BUDGET_RANGE",message:"不花钱的心意应为 0–0 元。"});
+  if (!f.budget_confirmed) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请调整滑条或明确确认礼物预算区间。"});
+  return errors;
+}
+function validateStep1() {
+  const f = state.form, errors = budgetProblems();
+  if (!f.recipient_relation) errors.unshift({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择送礼对象的关系。"});
+  if (!f.occasion) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择送礼场合。"});
+  const options = deadlineOptions();
+  if (!options) errors.push({code:"CONFIG_VERSION_UNSUPPORTED",message:"准备时间配置尚未更新为六档，请稍后重试。"});
+  else if (!options.some(r => String(r.days) === f.deadline_days)) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择可用准备时间。"});
+  return errors.length ? errors : null;
+}
+function renderBudget() {
+  const f = state.form;
+  const modes = [["slider","选择预算区间"],["zero","不花钱的心意"],["other","其他金额"],["uncertain","不确定"]];
+  const body = [
+    el("h2", {class:"card__title",text:"这份心意，想花多少？"}),
+    el("p", {class:"field__hint",text:"预算只计算礼物本身。包装、贺卡、装饰和配送未计价，不代表免费。"}),
+    el("div", {class:"chips",role:"group","aria-label":"预算方式"}, modes.map(([mode,label]) => chip(label,f.budget_mode===mode,()=>{
+      f.budget_mode = f.budget_mode === mode ? null : mode;
+      f.budget_confirmed = mode === "zero" && f.budget_mode === "zero";
+      if (f.budget_mode === "zero") { f.budget_min="0";f.budget_max="0"; }
+      if (f.budget_mode === "slider") {f.budget_min="100";f.budget_max="300";}
+      invalidateAnalysis();render();
+    }))),
+  ];
+  if (f.budget_mode === "slider") {
+    const update = (which,event) => {
+      const value = Number(event.target.value);
+      const other = Number(which === "min" ? f.budget_max : f.budget_min);
+      const next = which === "min" ? Math.min(value,other) : Math.max(value,other);
+      f[`budget_${which}`] = String(next);
+      event.target.value = String(next);
+      f.budget_confirmed = true; invalidateAnalysis();
+      const output = $("budget-readout"); output.textContent = `预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`;
+      document.querySelectorAll('[data-budget-value]').forEach(n=>{n.textContent=f[`budget_${n.dataset.budgetValue}`]+" 元"});
+      const confirm = $("budget-confirm"); if(confirm) confirm.checked = true;
+    };
+    body.push(el("p", {id:"budget-readout",class:"budget-readout",role:"status","aria-live":"polite",text:`预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`}),
+      el("div",{class:"budget-sliders"},["min","max"].map(which => el("label",{class:"budget-slider"},[
+        el("span",{text:which === "min" ? "下限" : "上限"}),
+        el("input",{type:"range",id:`budget-${which}`,min:"0",max:"1000",step:"50",value:f[`budget_${which}`],"aria-label":which === "min" ? "礼物预算下限" : "礼物预算上限","data-field":`budget-${which}`,oninput:e=>update(which,e)}),
+        el("strong",{"data-budget-value":which,text:f[`budget_${which}`]+" 元"}),
+      ]))), el("p",{class:"field__hint",text:"0–1000 元，每次 50 元；可用方向键调整，下限不会超过上限。"}));
+  } else if (f.budget_mode === "other") {
+    body.push(el("div",{class:"budget-custom"},["min","max"].map(which=>el("label",{},[
+      el("span",{text:which === "min" ? "预算下限（元）" : "预算上限（元）"}),
+      el("input",{type:"text",inputmode:"decimal",value:f[`budget_${which}`],id:`budget-other-${which}`,"aria-label":which === "min" ? "其他金额下限" : "其他金额上限","data-field":`budget_other_${which}`,oninput:e=>{
+        f[`budget_${which}`]=e.target.value;f.budget_confirmed=false;invalidateAnalysis();
+        const c=$("budget-confirm");if(c)c.checked=false;
+      }}),
+    ]))),el("p",{class:"field__hint",text:"两端必填，0–10000 元，最多两位小数。"}));
+  } else if (f.budget_mode === "zero") {
+    body.push(el("p",{class:"field__selected",text:"礼物预算 0 元：优先已有材料、手写或陪伴；可行性仍需核对，不把新购物品称作免费。"}));
+  } else body.push(el("p",{class:"field__hint",text:"可以先想一想愿意花多少。不确定时会先请你澄清，不直接生成。"}));
+  if (["slider","other"].includes(f.budget_mode)) body.push(el("label",{class:"confirm-row"},[
+    el("input",{id:"budget-confirm",type:"checkbox",checked:f.budget_confirmed,onchange:e=>{f.budget_confirmed=e.target.checked;invalidateAnalysis();}}),
+    el("span",{text:"我确认当前礼物预算区间（初始显示不代表已经确认）"}),
+  ]));
+  return el("section",{class:"card budget-card"},body);
+}
+function renderDeadline() {
+  const options = deadlineOptions();
+  return el("section",{class:"card"},[
+    el("h2",{class:"card__title",text:"能留出多久准备？"}),
+    el("p",{class:"field__hint",text:"按选择的天数上限检查完整准备时间，不承诺实际送达日期。"}),
+    options ? el("div",{class:"chips deadline-options",role:"group","aria-label":"准备时间"},options.map(r=>chip(`${r.label} · 按 ${r.days} 天上限检查`,state.form.deadline_days===String(r.days),()=>{
+      state.form.deadline_days=state.form.deadline_days===String(r.days)?"":String(r.days);invalidateAnalysis();render();
+    }))) : el("p",{class:"field__error",role:"alert",text:"准备时间配置尚未更新为六档，请稍后刷新；暂不能提交。"}),
+  ]);
+}
+
 
 /* --------------------------------------------------------------- 第二步 */
 
@@ -520,7 +402,7 @@ function renderStep2() {
                 delete f.interest_confidence[item.id];
               }
               render();
-            }, { disabled: f.interests_unknown }),
+            }),
             selected && !f.interests_unknown
               ? el("div", { class: "seg", role: "group", "aria-label": `${item.zh}的可信度` }, [
                   el("button", {
@@ -573,7 +455,7 @@ function renderStep2() {
               if (checked && !f.gift_styles.includes(item.id)) f.gift_styles.push(item.id);
               if (!checked) f.gift_styles = f.gift_styles.filter((x) => x !== item.id);
               render();
-            }, { disabled: f.styles_unknown }),
+            }),
           ),
         ],
       ),
@@ -614,7 +496,7 @@ function renderStep2() {
         class: "btn btn--primary",
         type: "button",
         id: "step-next",
-        text: "下一步：排除与补充",
+        text: "下一步：不喜欢和补充",
         onclick: () => {
           state.step = 3;
           state.error = null;
@@ -627,114 +509,68 @@ function renderStep2() {
 
 /* --------------------------------------------------------------- 第三步 */
 
-function parseTerms(raw) {
-  return [...new Set(raw.split(/[、,，;；\s]+/).map((t) => t.trim()).filter((t) => t !== ""))];
-}
-
 function renderStep3() {
   const f = state.form;
-  const cfg = state.config;
-  const terms = parseTerms(f.exclusion_terms);
-  const unresolved = parseTerms(f.exclusion_unresolved);
-
-  const body = [
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "不喜欢或不适合的类型（硬约束）" }),
-      el("p", { class: "field__hint", text: "按固定类别选择；这些类别会被独立代码检查，模型不能绕过。" }),
-      el(
-        "div",
-        { class: "chips" },
-        cfg.labels.exclusions.map((item) =>
-          chip(item.zh, f.exclusion_tags.includes(item.id), (checked) => {
-            if (checked && !f.exclusion_tags.includes(item.id)) f.exclusion_tags.push(item.id);
-            if (!checked) f.exclusion_tags = f.exclusion_tags.filter((x) => x !== item.id);
-            render();
-          }),
-        ),
-      ),
-      el("p", {
-        class: "field__hint",
-        text: "「其他类别」只拦截被标注为该类别的候选，不代表覆盖所有未知禁忌。",
-      }),
-    ]),
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "明确禁忌的字面词" }),
-      el("p", {
-        class: "field__hint",
-        text: "填你确认要按字面拦截的词（例如：酒）。原文会被保留，类别与字面词分别保存、互不推断。",
-      }),
-      el("input", {
-        type: "text",
-        placeholder: "例如：酒、香水（用顿号或逗号分隔）",
-        value: f.exclusion_terms,
-        "aria-label": "明确禁忌的字面词",
-        "data-field": "exclusion_terms",
-        oninput: (event) => {
-          f.exclusion_terms = event.target.value;
-          render();
-        },
-      }),
-      terms.length > 0 ? el("p", { class: "field__hint", text: `将按字面拦截：${terms.join("、")}` }) : null,
-    ]),
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "还不能确定怎么表达的禁忌（可选）" }),
-      el("p", {
-        class: "field__hint",
-        text: "无法可靠转成类别或字面词的硬约束不要静默忽略：填在这里，提交时会被要求先澄清，不会自动当成已覆盖。",
-      }),
-      el("input", {
-        type: "text",
-        placeholder: "例如：不要看起来像在暗示关系（需先确认如何拦截）",
-        value: f.exclusion_unresolved,
-        "aria-label": "待澄清的禁忌",
-        "data-field": "exclusion_unresolved",
-        oninput: (event) => {
-          f.exclusion_unresolved = event.target.value;
-          render();
-        },
-      }),
-      unresolved.length > 0
-        ? el("p", { class: "field__error", text: `这 ${unresolved.length} 项会被服务端要求先澄清（INTAKE_CLARIFICATION_REQUIRED），不会静默忽略。` })
-        : null,
-    ]),
-    el("section", { class: "card" }, [
-      el("h2", { class: "card__title", text: "补充说明（可选，可不填）" }),
-      el("p", { class: "field__hint", text: "这里的内容视为数据，不会被当成指令执行，也不能覆盖上面任何硬约束。" }),
-      el("textarea", {
-        placeholder: "例如：完全虚构的演示请求；希望表达祝福，不造成关系压力。",
-        "aria-label": "补充说明",
-        "data-field": "additional_context",
-        oninput: (event) => {
-          f.additional_context = event.target.value;
-        },
-      }, [document.createTextNode(f.additional_context)]),
-    ]),
-  ];
-
   return {
-    body,
+    body: [
+      el("section",{class:"card"},[
+        el("h2",{class:"card__title",text:"有哪些明确要避开的？"}),
+        el("p",{class:"field__hint",text:"类别可以不选；选中的类别会成为明确限制。"}),
+        el("div",{class:"chips"},state.config.labels.exclusions.map(item=>chip(item.zh,f.exclusion_tags.includes(item.id),checked=>{
+          f.exclusion_tags = checked ? [...f.exclusion_tags,item.id] : f.exclusion_tags.filter(id=>id!==item.id);
+          invalidateAnalysis();render();
+        }))),
+        el("label",{class:"text-field"},[
+          el("span",{text:"不喜欢的东西（可选）"}),
+          el("textarea",{id:"dislikes","aria-label":"不喜欢的东西","data-field":"dislikes",placeholder:"例如：不要香水。请只填写虚构或已脱敏的信息。",oninput:e=>{
+            f.dislikes=e.target.value;invalidateAnalysis();render();
+          }},[f.dislikes]),
+        ]),
+        el("p",{class:"field__hint",text:`${codePoints(f.dislikes)} / 1000 字。非空内容会先识别，再请你逐条确认；不能可靠理解时会先澄清。`}),
+        el("label",{class:"text-field"},[
+          el("span",{text:"补充说明（可选）"}),
+          el("textarea",{id:"additional-context","aria-label":"补充说明","data-field":"additional_context",placeholder:"例如：希望表达感谢，不造成回应压力。",oninput:e=>{
+            f.additional_context=e.target.value;invalidateAnalysis();render();
+          }},[f.additional_context]),
+        ]),
+        el("p",{class:"field__hint",text:"补充说明不能解除上面的限制。无需真实姓名、手机号或邮箱。"}),
+      ]),
+      renderAnalysis(),
+    ],
     actions: [
-      el("button", {
-        class: "btn btn--ghost",
-        type: "button",
-        id: "step-back",
-        text: "上一步",
-        onclick: () => {
-          state.step = 2;
-          state.error = null;
-          render();
-        },
-      }),
-      el("button", {
-        class: "btn btn--primary",
-        type: "button",
-        text: state.busy ? "正在提交…" : "生成三个方案",
-        disabled: state.busy,
-        onclick: () => submitIntake(),
-      }),
+      el("button",{class:"btn",id:"step-back",type:"button",text:"上一步",onclick:()=>moveToStep(2)}),
+      el("button",{class:"btn btn--primary",id:"step-next",type:"button",text:state.analysis?.status === "needs_confirmation" ? "确认并生成三个方案" : "生成三个方案",onclick:submitIntake}),
     ],
   };
 }
+function renderAnalysis() {
+  const a = state.analysis;
+  if (!a) return null;
+  if (a.status !== "needs_confirmation") return el("section",{class:"card card--fail",id:"exclusion-analysis",role:"status"},[
+    el("h2",{class:"card__title",text:"这部分还需要你澄清"}),
+    el("p",{text:"暂时无法可靠理解全部限制，不会先生成礼物。请修改“不喜欢的东西”后重新识别。"}),
+    errorBox(a.errors,"需要澄清"),
+    el("button",{class:"btn",type:"button",text:"修改不喜欢的东西",onclick:()=>$("dislikes").focus()}),
+    el("button",{class:"btn",id:"analyze-again",type:"button",text:"重新识别",onclick:()=>{invalidateAnalysis();submitIntake();}}),
+  ]);
+  return el("section",{class:"card",id:"exclusion-analysis","aria-labelledby":"analysis-title"},[
+    el("h2",{class:"card__title",id:"analysis-title",text:"我理解的是这些，请你确认"}),
+    el("p",{class:"field__hint",text:`${a.mode === "mock" ? "模拟识别结果" : "识别结果"} · 文字来源不代表理解一定正确；没有预先勾选，全部确认后才会推荐。`}),
+    ...a.candidates.map(c=>el("div",{class:"analysis-item"},[
+      el("blockquote",{text:`原文依据：「${c.source_span}」`}),
+      el("p",{text:`理解：${c.kind === "tag" ? (state.config.labels.exclusions.find(x=>x.id===c.tag)?.zh || c.tag) : c.term}`}),
+      el("p",{text:`理由：${c.why}`}),
+      el("p",{class:"field__hint",text:`${state.confirmedIds.includes(c.id)?"已确认":"待确认"} · 识别把握：${({high:"较高",medium:"中等",low:"较低"})[c.confidence] || "未知"}`}),
+      el("label",{class:"confirm-row"},[
+        el("input",{type:"checkbox",id:`exclusion-confirm-${c.id}`,checked:state.confirmedIds.includes(c.id),onchange:e=>{
+          state.confirmedIds=e.target.checked?[...state.confirmedIds,c.id]:state.confirmedIds.filter(id=>id!==c.id);render();
+        }}),el("span",{text:`确认这项限制：${c.source_span}`}),
+      ]),
+    ])),
+    el("button",{class:"btn",type:"button",text:"理解不对，修改原话",onclick:()=>$("dislikes").focus()}),
+  ]);
+}
+
 
 /* ------------------------------------------------------------- 状态页 */
 
@@ -776,10 +612,10 @@ function renderWaiting() {
 function renderGenerating() {  return {
     body: [
       el("section", { class: "state" }, [
-        el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), "正在生成三个不同思路…"]),
-        el("p", { text: "服务端正在做确定性适配 → 生成三候选 → 独立规则校验；如有可修订项，最多自动修订一次并重新校验。" }),
+        el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), state.pending?.kind === "analyze" ? "正在识别你写下的限制…" : "正在生成三个不同思路…"]),
+        el("p", { text: state.pending?.kind === "analyze" ? "先核对原文依据与识别理由；确认前不会生成任何礼物方案。" : "服务端正在做确定性适配 → 生成三候选 → 独立规则校验；如有可修订项，最多自动修订一次并重新校验。" }),
         el("p", { text: "你已经在认真对待这份心意了——先喝口水，剩下的交给服务端。" }),
-        el("p", { class: "field__hint", text: "请不要重复点击；推荐阶段不会生成任何包装、贺卡或赠送话术。" }),
+        el("p", { class: "field__hint", text: "请不要重复点击；选择方案之前不会生成包装、贺卡或赠送方式。" }),
       ]),
     ],
     actions: [],
@@ -811,7 +647,7 @@ function renderRecommendation() {
         el("dt", { text: "关系 / 场合" }),
         el("dd", { text: `${report.request.recipient_relation} · ${report.request.occasion}` }),
         el("dt", { text: "预算 / 天数" }),
-        el("dd", { text: `${report.request.budget_amount} ${report.request.currency} · ${report.request.available_days} 天（仅估算，不是送达承诺）` }),
+        el("dd", { text: `${report.request.budget_range ? `${report.request.budget_range.min}–${report.request.budget_range.max}` : report.request.budget_amount || "未提供"} ${report.request.currency} · ${report.request.available_days} 天（仅估算，不是送达承诺）` }),
         el("dt", { text: "可用自动修订" }),
         el("dd", { text: `已用 ${report.repair_count} / 1，剩余 ${report.remaining_repairs}（由服务端持有，浏览器不能提交）` }),
         el("dt", { text: "当前选择" }),
@@ -879,8 +715,8 @@ function renderRecommendation() {
               ? [el("ul", { class: "list" }, candidate.unknowns.map((x) => el("li", { text: x })))]
               : ["未列出；不代表已经核实"],
           ),
-          el("dt", { text: "全量估算费用" }),
-          el("dd", { text: `${candidate.estimated_total} ${candidate.currency}（含包装、贺卡与配送估算）` }),
+          el("dt", { text: "礼物估价" }),
+          el("dd", { text: `${candidate.estimated_total} ${candidate.currency}（只表示所选礼物本身；业务数据未核实）` }),
           el("dt", { text: "准备时间" }),
           el("dd", { text: `${candidate.estimated_preparation_days} 天` }),
           el("dt", { text: "独立检查结果" }),
@@ -997,14 +833,14 @@ function renderPresentation() {
   const s = view.recheck_summary;
   body.push(
     el("section", { class: `card ${s.passed ? "card--ok" : "card--fail"}` }, [
-      el("h2", { class: "card__title", text: "选择后复核：礼物＋包装＋贺卡＋装饰＋配送" }),
+          el("h2", { class: "card__title", text: "选择后复核：只统计这一份礼物" }),
       el("dl", { class: "kv" }, [
-        el("dt", { text: "原估算" }),
-        el("dd", { text: `${s.original_total} ${s.currency}` }),
-        el("dt", { text: "新增费用" }),
-        el("dd", { text: `${s.additional_cost} ${s.currency}` }),
-        el("dt", { text: "全量总费用" }),
-        el("dd", { text: `${s.revised_estimated_total} ${s.currency}（上限 ${s.budget_amount} ${s.currency}）` }),
+        el("dt", { text: "礼物合计" }),
+        el("dd", { text: s.gift_estimated_total !== undefined ? `${s.gift_estimated_total} ${s.currency}` : "新版账单字段缺失，未捏造金额" }),
+        el("dt", { text: "预算区间" }),
+        el("dd", { text: s.budget_range ? `${s.budget_range.min}–${s.budget_range.max} ${s.currency}` : "新版账单字段缺失" }),
+        el("dt", { text: "包装等附加项" }),
+        el("dd", { text: "只显示风格与色调；未计价，不代表免费" }),
         el("dt", { text: "准备时间" }),
         el("dd", { text: `${s.revised_estimated_preparation_days} 天（可用 ${s.available_days} 天）` }),
         el("dt", { text: "禁忌复核" }),
@@ -1059,7 +895,7 @@ function renderEncourage() {
   return {
     body: [
       el("section", { class: "card" }, [
-        el("p", { class: "encourage__eyebrow", text: "四步走完 · 鼓励页" }),
+        el("p", { class: "encourage__eyebrow", text: "三页走完 · 鼓励页" }),
         el("h2", { class: "encourage__title", text: "心意已经想清楚了。" }),
         el("p", {
           class: "encourage__lead",
@@ -1073,13 +909,13 @@ function renderEncourage() {
           stat(
             "你守住的边界",
             request
-              ? `预算上限 ${request.budget_amount} ${request.currency}；可用 ${request.available_days} 天（估算，不是送达承诺）`
+              ? `礼物预算 ${request.budget_range ? `${request.budget_range.min}–${request.budget_range.max}` : request.budget_amount || "未提供"} ${request.currency}；可用 ${request.available_days} 天（估算，不是送达承诺）`
               : "未记录",
           ),
           stat(
             "你选定的方案",
             view
-              ? `${view.selected_candidate_id}；四段呈现已通过复核，全量估算 ${summary ? summary.revised_estimated_total : "—"} ${
+              ? `${view.selected_candidate_id}；四段呈现已通过复核，礼物合计 ${summary?.gift_estimated_total ?? "未提供"} ${
                   summary ? summary.currency : ""
                 }`
               : "未生成呈现",
@@ -1113,6 +949,8 @@ function renderEncourage() {
 function backToHome() {
   state.encourage = false;
   resetToForm();
+  state.inFlow = false;
+  render();
   window.scrollTo(0, 0);
   const hero = $("hero");
   if (hero) {
@@ -1130,6 +968,7 @@ function resetToForm() {
   state.error = null;
   state.timeout = false;
   state.step = 1;
+  state.inFlow = true;
   render();
 }
 
@@ -1138,21 +977,43 @@ function buildIntake() {
   const intake = {
     recipient_relation: f.recipient_relation,
     occasion: f.occasion,
-    budget_amount: f.budget_amount,
+    contract_version: CONTRACT_VERSION,
+    budget_mode: f.budget_mode,
+    budget_range: { min: f.budget_min, max: f.budget_max },
     currency: "CNY",
     deadline_days: Number(f.deadline_days),
     interests: f.interests_unknown ? [] : [...f.interests],
     interest_confidence: f.interests_unknown ? {} : { ...f.interest_confidence },
     gift_styles: f.styles_unknown ? [] : [...f.gift_styles],
-    hard_exclusions: {
-      tags: [...f.exclusion_tags],
-      terms: parseTerms(f.exclusion_terms),
-      unresolved: parseTerms(f.exclusion_unresolved),
-    },
+    dislikes: f.dislikes || "",
+    hard_exclusions: { tags: [...f.exclusion_tags], terms: [], unresolved: [] },
     additional_context: f.additional_context || "",
   };
   if (f.closeness) intake.closeness = f.closeness;
   return intake;
+}
+
+function localMockAnalysis(dislikes) {
+  const source = dislikes.trim();
+  const candidates = [];
+  const known = [
+    ["香水", "fragrance", "不喜欢香氛类礼物"],
+    ["酒", "alcohol", "不选择酒类礼物"],
+    ["巧克力", "chocolate", "不选择巧克力类礼物"],
+  ];
+  for (const [term, tag, why] of known) {
+    if (source.includes(term)) candidates.push({ id: `xc${candidates.length + 1}`, kind: "tag", tag, term: null, source_span: term, confidence: "high", why, evidence: "user_text" });
+  }
+  return candidates.length
+    ? { status: "needs_confirmation", mode: "mock", analysis_id: `mock-${Date.now()}`, candidates, errors: [] }
+    : { status: "needs_input", mode: "mock", analysis_id: null, candidates: [], errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", message: "这段描述暂时无法可靠映射到明确类别，请换一种说法或删去不确定限制。" }] };
+}
+
+async function analyzeDislikes(intake) {
+  const response = await apiFetch("/api/exclusions/analyze", { intake });
+  if (response.ok && response.data) return response.data;
+  if (state.config?.mode === "mock" && response.status === 404) return localMockAnalysis(intake.dislikes);
+  return response.data || { status: "error", errors: [{ code: "EXCLUSION_ANALYSIS_UNAVAILABLE", message: "暂时无法识别不喜欢的内容，请稍后重试。" }] };
 }
 
 async function apiFetch(path, payload) {
@@ -1173,14 +1034,42 @@ async function apiFetch(path, payload) {
 }
 
 async function submitIntake() {
-  const problems = validateStep1();
+  const problems = state.step === 1 ? validateStep1() : null;
   if (problems) {
     state.step = 1;
     state.error = { kind: "needs_input", errors: problems };
     render();
     return;
   }
+  if (state.step === 2) {
+    state.step = 3;
+    state.error = null;
+    render();
+    return;
+  }
   const intake = buildIntake();
+  if (intake.dislikes && !state.analysis) {
+    state.busy = true;
+    state.pending = { kind: "analyze" };
+    state.error = null;
+    render();
+    try {
+      state.analysis = await analyzeDislikes(intake);
+      state.busy = false;
+      state.pending = null;
+      render();
+    } catch (error) {
+      state.busy = false;
+      state.error = { kind: "error", errors: [{ code: "EXCLUSION_ANALYSIS_UNAVAILABLE", message: "暂时无法识别不喜欢的内容，请稍后重试。" }] };
+      render();
+    }
+    return;
+  }
+  if (intake.dislikes && (!state.analysis || state.analysis.status !== "needs_confirmation" || state.confirmedIds.length !== state.analysis.candidates.length)) {
+    state.error = { kind: "needs_input", errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", message: "请先逐条确认识别到的限制；没有默认全选。" }] };
+    render();
+    return;
+  }
   state.busy = true;
   state.pending = { kind: "recommend" };
   state.error = null;
@@ -1195,7 +1084,9 @@ async function submitIntake() {
       render();
       return;
     }
-    const response = await apiFetch("/api/recommendations", { intake, demo: state.demo || null });
+    const payload = { intake, demo: state.demo || null };
+    if (intake.dislikes) payload.exclusion_confirmation = { analysis_id: state.analysis.analysis_id, confirmed_ids: [...state.confirmedIds] };
+    const response = await apiFetch("/api/recommendations", payload);
     state.busy = false;
     if (!response.data) {
       state.error = { kind: "error", errors: [{ code: "BAD_RESPONSE", message: "服务端返回的内容无法解析，请重试。" }] };
@@ -1319,6 +1210,8 @@ function render() {
   if (!state.config && !(state.error && state.error.kind === "error")) {
     // 接入层配置还没到手：不渲染表单（表单字段全部来自配置，读它会空指针）。
     rendered = renderWaiting();
+  } else if (!state.inFlow) {
+    rendered = { body: [el("p", { class: "sr-only", text: "点击开始挑选礼物进入三页流程。" })], actions: [] };
   } else if (state.busy && !state.report && !state.presentation) {
     rendered = renderGenerating();
   } else if (state.timeout) {
@@ -1378,7 +1271,7 @@ function render() {
   restoreFocus(focused);
 
   $("footer-meta").textContent = state.config
-    ? `模式：${state.config.mode} · 追求对象契约：${state.config.pursuit_contract_ready ? "已落地" : "未落地"} · 演示开关：${state.demo || "关闭"} · 接入层 http://${location.host}`
+    ? `当前为${state.config.mode === "mock" ? "模拟数据演示" : "模型生成"} · 追求对象场景：${state.config.pursuit_contract_ready ? "已支持" : "暂不可用"} · 价格、库存及送达未核实`
     : "";
 }
 
@@ -1389,48 +1282,22 @@ function selectLast() {
   return submitIntake();
 }
 
-function renderDemoPanel() {
-  const slot = $("banner-slot");
-  const details = el("details", { class: "banner banner--info" }, [
-    el("summary", { text: `演示开关（仅用于验证失败与超时路径，当前：${state.demo || "关闭"}）` }),
-    el(
-      "div",
-      { class: "chips", style: "margin-top:8px" },
-      demoOptions.map((option) =>
-        chip(option.label, state.demo === option.value, () => {
-          state.demo = option.value;
-          render();
-        }, { class: "chip--radio", type: "radio" }),
-      ),
-    ),
-    el("p", {
-      class: "field__hint",
-      text: "也可以在地址栏加 ?demo=slow / ?demo=model_error / ?demo=partial_fail / ?demo=presentation_over_budget / ?demo=stress。",
-    }),
-  ]);
-  slot.append(details);
-}
-
 async function bootstrap() {
   // 先绑定入口与读取配置，再渲染：渲染依赖 state.config，
   // 顺序反了会在首帧抛 TypeError 并阻断后面的配置加载。
   for (const id of ["cta-start", "cta-start-2", "cta-start-3"]) {
     const node = $(id);
     if (node) {
-      node.addEventListener("click", () => {
-        state.step = 1;
-        state.error = null;
-        state.encourage = false;
-        render();
-        $("view").scrollIntoView({ block: "start" });
-        $("view").focus({ preventScroll: true });
-      });
+      node.addEventListener("click", startFlow);
     }
   }
   render();
   try {
     const response = await fetch("/api/config");
     state.config = await response.json();
+    if (LOCAL_UI_FIXTURE && state.config.mode === "mock") {
+      state.config = { ...state.config, deadline_options: LOCAL_DEADLINES, fixture_notice: "本地 UI 夹具：未联调新版接入 API" };
+    }
   } catch (err) {
     state.error = { kind: "error", errors: [{ code: "CONFIG_UNAVAILABLE", message: "无法读取接入层配置，请确认服务已启动。" }] };
     render();

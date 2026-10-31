@@ -48,7 +48,8 @@ def build():
     for name in SOURCES:
         raw = (ROOT / name).read_bytes()
         hashes[name] = hashlib.sha256(raw).hexdigest()
-        source = raw.decode("utf-8")
+        # 摘要绑定原始源码字节；代码拼接统一 LF。validator 保持既有 -text。
+        source = raw.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n")
         lines = source.splitlines(keepends=True)
         for node in ast.parse(source).body:
             if isinstance(node, ast.ImportFrom) and node.module in {"validator.rules", "workflow.labels", "workflow.intake"}:
@@ -67,7 +68,7 @@ def build():
         (output / filename).write_text(node_code, encoding="utf-8", newline="\n")
         artifacts[filename] = hashlib.sha256(node_code.encode("utf-8")).hexdigest()
     manifest = {"sources_sha256": hashes, "artifacts_sha256": artifacts, "format": "python-source-not-dsl", "cloud_verified": False}
-    (output / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (output / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps(manifest, ensure_ascii=False))
     return code, manifest
 

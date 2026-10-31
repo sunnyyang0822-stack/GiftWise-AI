@@ -1,0 +1,8 @@
+commit=c74a5142ff42644654e40d903362f52a64ea8565
+branch=line/nov01-rules
+base=release/2026-11-01-submission
+pr=https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/48
+state=OPEN
+changedFiles=12
+additions=642
+deletions=51

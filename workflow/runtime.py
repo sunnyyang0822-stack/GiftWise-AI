@@ -77,6 +77,8 @@ def report(state):
         selectable = [r["id"] for r in validation["candidate_results"] if r["passed"]]
     titles = {"passed": "三个方案均通过代码规则检查，请自行选择。", "failed": "部分或全部方案未通过，失败项不可选。", "needs_input": "请补充或澄清需求后再推荐。", "error": "暂时无法完成检查；未将结果标记为通过。"}
     lines = [titles[status], "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。", "已用自动修订次数：" + str(state["repair_count"]) + " / 1。"]
+    if isinstance(request, dict) and request.get("contract_version") == "giftwise-20261031-v2":
+        lines.insert(1, "新版仅计所选礼物本身；包装、贺卡、装饰和配送不计价，不代表免费。")
     facts = {f["id"]: f["text"] for f in request.get("facts", []) if isinstance(f, dict) and isinstance(f.get("id"), str)} if isinstance(request, dict) else {}
     results = {r["id"]: r for r in validation["candidate_results"] if r["id"] in ("c1", "c2", "c3")}
     for candidate in candidates[:3]:
@@ -95,7 +97,7 @@ def report(state):
                       "用户事实：" + ("；".join(ref + "＝" + facts.get(ref, "无有效事实引用") for ref in string_array("fact_refs")) or "未提供可引用事实"),
                       "推断：" + ("；".join(string_array("inferences")) or "无"),
                       "未知：" + ("；".join(string_array("unknowns")) or "未列出；不代表已经核实"),
-                      "全量估算：" + text_field("estimated_total") + " " + text_field("currency") + "；准备天数：" + str(candidate.get("estimated_preparation_days", "字段无效")),
+                      ("礼物本身估价：" if request.get("contract_version") == "giftwise-20261031-v2" else "全量估算：") + text_field("estimated_total") + " " + text_field("currency") + "；准备天数：" + str(candidate.get("estimated_preparation_days", "字段无效")),
                       "代码检查：" + ("通过，可选择" if cid in selectable else "不可选择")])
         lines.extend(e["code"] + "：" + e["message"] for e in result.get("errors", []))
     lines.extend(e["code"] + "：" + e["message"] for e in validation["errors"] + workflow_errors)

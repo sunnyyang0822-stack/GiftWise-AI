@@ -17,7 +17,8 @@ import { JsonFloat, codePointLength } from "./jsonstrict.mjs";
 import { TAGS } from "./labels.mjs";
 import { LIMITS } from "./config.mjs";
 
-const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
+const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?(?![\s\S])/;
+export const CONTRACT_VERSION = "giftwise-20261031-v2";
 
 export function error(errors, code, path, message) {
   errors.push({ code, path, message });
@@ -123,6 +124,53 @@ function days(value, path, errors) {
   return value;
 }
 
+export function checkBudgetRange(value, path, errors, mode = undefined) {
+  if (value === null || typeof value !== "object" || Array.isArray(value) || value instanceof JsonFloat ||
+      Object.keys(value).some((key) => !["min", "max"].includes(key))) {
+    error(errors, "INVALID_BUDGET_RANGE", path, "预算区间须为仅含 min、max 的对象");
+    return null;
+  }
+  const start = errors.length;
+  const amounts = ["min", "max"].map((key) => {
+    const endpoint = `${path}.${key}`;
+    if (!Object.hasOwn(value, key)) {
+      error(errors, "INVALID_BUDGET_RANGE", endpoint, "预算区间两端均须填写");
+      return null;
+    }
+    if (typeof value[key] === "string" && codePointLength(value[key]) > 1000) {
+      error(errors, "LIMIT_EXCEEDED", endpoint, "字段字符串超过 1000 个 Unicode 码点");
+      return null;
+    }
+    const parsed = amount(value[key], endpoint, errors);
+    if (parsed !== null && parsed > 1000000n) {
+      error(errors, "LIMIT_EXCEEDED", endpoint, "预算区间端点须在 0 至 10000 之间");
+    }
+    return parsed;
+  });
+  if (errors.length !== start) return null;
+  const [low, high] = amounts;
+  if (low > high) {
+    error(errors, "INVALID_BUDGET_RANGE", path, "预算区间下限不能超过上限");
+    return null;
+  }
+  if (mode !== undefined) {
+    const modePath = path.slice(0, path.lastIndexOf(".")) + ".budget_mode";
+    if (typeof mode !== "string" || !["slider", "zero", "other"].includes(mode)) {
+      error(errors, "INVALID_BUDGET_RANGE", modePath, "预算模式须为 slider、zero 或 other");
+      return null;
+    }
+    if (mode === "slider" && (high > 100000n || low % 5000n !== 0n || high % 5000n !== 0n)) {
+      error(errors, "INVALID_BUDGET_RANGE", path, "滑条两端须在 0 至 1000 之间，步长为 50 元");
+      return null;
+    }
+    if (mode === "zero" && (low !== 0n || high !== 0n)) {
+      error(errors, "INVALID_BUDGET_RANGE", path, "不花钱模式的预算两端均须为 0");
+      return null;
+    }
+  }
+  return amounts;
+}
+
 /** 严格 JSON 字符串解析（对齐 validator 的 _parse）。 */
 function parseJson(raw, path, errors, strictParseFn) {
   if (typeof raw !== "string") {
@@ -150,13 +198,19 @@ function request(request, errors) {
     error(errors, "INVALID_REQUEST", "request", "请求根节点必须为对象");
     return null;
   }
-  limits(request, "request", errors);
+  limits(Object.fromEntries(Object.entries(request).filter(([key]) => key !== "budget_range")), "request", errors);
   required(request, ["recipient_relation", "occasion", "budget_amount", "currency", "available_days"], "request", errors);
   for (const field of ["recipient_relation", "occasion", "currency", "notes"]) {
     if (Object.prototype.hasOwnProperty.call(request, field)) {
       text(request[field], `request.${field}`, errors, field === "notes");
     }
   }
+  for (const field of ["recipient_relation_custom", "occasion_custom"]) {
+    if (Object.hasOwn(request, field) && request[field] !== null) {
+      text(request[field], `request.${field}`, errors);
+    }
+  }
+  const interval = Object.hasOwn(request, "budget_range") ? checkBudgetRange(request.budget_range, "request.budget_range", errors) : null;
   const budget = Object.prototype.hasOwnProperty.call(request, "budget_amount")
     ? amount(request.budget_amount, "request.budget_amount", errors)
     : null;
@@ -168,8 +222,10 @@ function request(request, errors) {
   // amount() 返回**分**（BigInt），故区间以分书写：1 元 = 100n，10000 元 = 1000000n。
   // 仅在 amount()/days() 成功（非 null）时判定，与 Python 的 `is not None` 守卫一致；
   // 放在货币检查之前，以保持与 Python 完全相同的错误顺序。
-  if (budget !== null && (budget < 100n || budget > 1000000n)) {
-    error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间");
+  if (budget !== null && budget > 1000000n) {
+    error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 0 至 10000 之间");
+  } else if (interval !== null && budget !== null && budget !== interval[1]) {
+    error(errors, "BUDGET_RANGE_MISMATCH", "request.budget_amount", "预算上限须与区间 max 数值一致");
   }
   if (availableDays !== null && availableDays > 365) {
     error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间");
@@ -215,6 +271,7 @@ function request(request, errors) {
   if (errors.length > 0) return null;
   return {
     budget,
+    budgetMin: interval !== null ? interval[0] : null,
     days: availableDays,
     factIds,
     forbiddenTags: new Set(forbiddenTags.map(tag)),
@@ -295,6 +352,9 @@ function candidate(item, index, context) {
   if (context !== null) {
     if (total !== null && total > context.budget) {
       error(errors, "OVER_BUDGET", `${path}.estimated_total`, "估算总费用超过预算");
+    }
+    if (total !== null && context.budgetMin !== null && total < context.budgetMin) {
+      error(result.warnings, "BELOW_BUDGET_RANGE", `${path}.estimated_total`, "礼物估价低于预算区间下限，仍可选择");
     }
     if (prep !== null && prep > context.days) {
       error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, "估算准备时间超过可用天数");
@@ -446,7 +506,7 @@ export function requestIsValid(requestCheck) {
  * 复核选后呈现内容：必填结构、费用算术、全量总费用、准备时间、禁忌。
  * 不修改任何用户约束，也不因为包装「换简单一点」就放过超支。
  */
-export function checkPresentation(request, candidate, presentation) {
+function checkLegacyPresentation(request, candidate, presentation) {
   const errors = [];
   const ctx = request && typeof request === "object" ? request : {};
   const budget = amountToCents(ctx.budget_amount);
@@ -526,4 +586,88 @@ export function checkPresentation(request, candidate, presentation) {
     }
   }
   return { passed: errors.length === 0, errors };
+}
+
+/** 新版只复核冻结礼物价；呈现不得携带任何报价或旧包装教程。 */
+export function checkPresentation(requestData, selectedCandidate, presentation) {
+  const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v) && !(v instanceof JsonFloat);
+  if (!object(presentation)) {
+    return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation", message: "呈现内容必须为对象" }] };
+  }
+  const v2 = presentation.contract_version === CONTRACT_VERSION;
+  if (!v2) {
+    if (Object.hasOwn(presentation, "contract_version") || Object.hasOwn(presentation, "style") || requestData?.contract_version === CONTRACT_VERSION) {
+      return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation.contract_version", message: "请使用明确的新版呈现契约，不能混读新旧结构" }] };
+    }
+    return checkLegacyPresentation(requestData, selectedCandidate, presentation);
+  }
+  const errors = [];
+  const invalid = (path, message) => error(errors, "PRESENTATION_INVALID", path, message);
+  const shape = (value, path, keys, optional = []) => {
+    if (!object(value)) {
+      invalid(path, "须为符合新版呈现契约的对象");
+      return false;
+    }
+    for (const key of keys) {
+      if (!Object.hasOwn(value, key)) invalid(`${path}.${key}`, "缺少新版呈现必填字段");
+    }
+    for (const key of Object.keys(value)) {
+      if (![...keys, ...optional].includes(key)) invalid(`${path}.${key}`, "新版呈现不接收此字段或任何报价、旧包装教程");
+    }
+    return true;
+  };
+  const string = (value, path) => {
+    if (typeof value !== "string" || !value.trim()) invalid(path, "须为非空呈现文本");
+  };
+  const list = (value, path, nonempty = false) => {
+    if (!Array.isArray(value) || (nonempty && value.length === 0)) {
+      invalid(path, nonempty ? "至少需要一种包装色调" : "须为呈现文本数组，可为空");
+      return;
+    }
+    value.forEach((v, i) => string(v, `${path}[${i}]`));
+  };
+  limits(presentation, "presentation", errors);
+  shape(presentation, "presentation", ["contract_version", "style", "packaging", "card_text", "giving_advice", "unknowns", "currency", "revised_estimated_preparation_days"], ["selected_candidate_id"]);
+  string(presentation.style, "presentation.style");
+  string(presentation.card_text, "presentation.card_text");
+  string(presentation.currency, "presentation.currency");
+  if (shape(presentation.packaging, "presentation.packaging", ["color_palette"])) {
+    list(presentation.packaging.color_palette, "presentation.packaging.color_palette", true);
+  }
+  if (shape(presentation.giving_advice, "presentation.giving_advice", ["timing", "wording", "relationship_cautions"])) {
+    string(presentation.giving_advice.timing, "presentation.giving_advice.timing");
+    string(presentation.giving_advice.wording, "presentation.giving_advice.wording");
+    list(presentation.giving_advice.relationship_cautions, "presentation.giving_advice.relationship_cautions");
+  }
+  list(presentation.unknowns, "presentation.unknowns");
+  if (Object.hasOwn(presentation, "selected_candidate_id") && presentation.selected_candidate_id !== selectedCandidate?.id) {
+    invalid("presentation.selected_candidate_id", "呈现须对应用户选中的冻结候选");
+  }
+  const context = request(requestData, errors);
+  const checkedGift = candidate(selectedCandidate, 0, context);
+  errors.push(...checkedGift.errors);
+  if (typeof presentation.currency === "string" && presentation.currency !== "CNY") {
+    error(errors, "UNSUPPORTED_CURRENCY", "presentation.currency", "首版仅支持 CNY，不执行换汇");
+  }
+  const prepared = days(presentation.revised_estimated_preparation_days, "presentation.revised_estimated_preparation_days", errors);
+  if (context !== null) {
+    if (prepared !== null && prepared > context.days) {
+      error(errors, "PREPARATION_TOO_LONG", "presentation.revised_estimated_preparation_days", "完整方案准备时间超过可用天数");
+    }
+    const texts = Object.fromEntries(Object.entries(presentation).filter(([key]) => !["contract_version", "currency", "selected_candidate_id", "revised_estimated_preparation_days"].includes(key)));
+    const stack = [[texts, "presentation"]];
+    while (stack.length) {
+      const [value, path] = stack.pop();
+      if (typeof value === "string") {
+        if (context.forbiddenTerms.some((term) => norm(value).includes(term))) {
+          error(errors, "FORBIDDEN_TERM", path, "呈现内容触发明令禁止的字面词");
+        }
+      } else if (Array.isArray(value)) {
+        value.forEach((v, i) => stack.push([v, `${path}[${i}]`]));
+      } else if (object(value)) {
+        Object.entries(value).forEach(([key, v]) => stack.push([v, `${path}.${key}`]));
+      }
+    }
+  }
+  return { passed: errors.length === 0, errors, warnings: checkedGift.warnings };
 }
