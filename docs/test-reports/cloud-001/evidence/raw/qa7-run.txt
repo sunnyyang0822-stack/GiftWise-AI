@@ -1,5 +1,0 @@
-=== 启动容器 ===
-a25d6d65ae611d7ce2924dbd58a641dd61b203a1cd7f61f125a8378e5bde52d7
-就绪耗时: 21.831 s
-=== docker ps ===
-gw-qa | Up 21 seconds (health: starting) | 127.0.0.1:18000->8000/tcp

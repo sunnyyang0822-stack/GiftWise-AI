@@ -1,5 +1,0 @@
-HTTP 200
---- container ---
-{"status":"passed","all_passed":true,"errors":[],"candidate_results":[{"id":"c1","passed":true,"errors":[],"warnings":[]},{"id":"c2","passed":true,"errors":[],"warnings":[]},{"id":"c3","passed":true,"errors":[],"warnings":[]}],"business_data_verification":"not_verified"}
---- local ---
-{"status": "passed", "all_passed": true, "errors": [], "candidate_results": [{"id": "c1", "passed": true, "errors": [], "warnings": []}, {"id": "c2", "passed": true, "errors": [], "warnings": []}, {"id": "c3", "passed": true, "errors": [], "warnings": []}], "business_data_verification": "not_verified"}

@@ -1,6 +1,0 @@
-=== PM 基线 (giftwise-validator:latest) /app 内容 ===
-/app/deploy/server.py
-/app/validator/__init__.py
-/app/validator/__pycache__/__init__.cpython-312.pyc
-/app/validator/__pycache__/rules.cpython-312.pyc
-/app/validator/rules.py

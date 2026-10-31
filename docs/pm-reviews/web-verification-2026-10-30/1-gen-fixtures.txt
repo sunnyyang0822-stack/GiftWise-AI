@@ -1,3 +1,0 @@
-已写出 C:\Users\lenovo\Desktop\giftwise\.tmp\web-parity\fixtures.json
-  intake 用例 27 条
-  候选批次 24 批 + 损坏样例 4 条

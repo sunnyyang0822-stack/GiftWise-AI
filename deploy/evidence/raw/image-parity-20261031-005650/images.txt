@@ -1,8 +1,0 @@
-giftwise-validator:latest	8304b047cc71	2026-10-31 00:55:49 +0800 CST	178MB
-giftwise-validator:submission-20261101	8304b047cc71	2026-10-31 00:55:49 +0800 CST	178MB
-giftwise-validator:obs-check	c546b1ef6c48	2026-10-30 23:20:06 +0800 CST	178MB
-giftwise-validator:verify-guide	528b17261860	2026-10-30 23:20:06 +0800 CST	178MB
-giftwise-validator:slowbody-check	e76422244665	2026-10-30 23:20:06 +0800 CST	178MB
-giftwise-validator:prefix-check	0371186facc1	2026-10-30 23:13:07 +0800 CST	178MB
-giftwise-validator:coldbuild-20261030	ed3fbe912571	2026-10-30 22:50:36 +0800 CST	178MB
-giftwise-validator:pm-baseline-20261030	b42f408b4f07	2026-10-30 22:20:54 +0800 CST	178MB

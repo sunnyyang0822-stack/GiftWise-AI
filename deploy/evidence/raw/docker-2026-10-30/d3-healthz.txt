@@ -1,2 +1,0 @@
-HTTP 200
-{"status":"ok","service":"giftwise-validator","rules_source_sha256":"4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3"}

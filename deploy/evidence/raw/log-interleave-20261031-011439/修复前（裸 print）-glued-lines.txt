@@ -1,5 +1,0 @@
-172.17.0.1 - "GET /healthz HTTP/1.1" 200 -172.17.0.1 - "POST /validate HTTP/1.1" 200 -
-172.17.0.1 - "GET /healthz HTTP/1.1" 200 -172.17.0.1 - "GET /nope-2 HTTP/1.1" 404 -
-172.17.0.1 - "GET /nope-23 HTTP/1.1" 404 -172.17.0.1 - "GET /healthz HTTP/1.1" 200 -
-172.17.0.1 - "GET /healthz HTTP/1.1" 200 -172.17.0.1 - "GET /nope-29 HTTP/1.1" 404 -
-172.17.0.1 - "POST /validate HTTP/1.1" 200 -172.17.0.1 - "GET /nope-35 HTTP/1.1" 404 -172.17.0.1 - "GET /healthz HTTP/1.1" 200 -

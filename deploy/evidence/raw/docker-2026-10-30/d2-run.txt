@@ -1,3 +1,0 @@
-3922f5dc0a645aa3b9fc1d793ab0435a459fc7779edd350f3a96b57e4d019060
-
-gw-val | Up Less than a second (health: starting) | 127.0.0.1:8000->8000/tcp

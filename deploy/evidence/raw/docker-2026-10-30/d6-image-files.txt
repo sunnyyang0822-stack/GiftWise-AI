@@ -1,9 +1,0 @@
-/app
-/app/deploy
-/app/deploy/server.py
-/app/validator
-/app/validator/__init__.py
-/app/validator/__pycache__
-/app/validator/__pycache__/__init__.cpython-312.pyc
-/app/validator/__pycache__/rules.cpython-312.pyc
-/app/validator/rules.py

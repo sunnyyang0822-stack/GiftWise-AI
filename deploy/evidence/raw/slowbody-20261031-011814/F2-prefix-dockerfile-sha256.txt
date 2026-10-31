@@ -1,2 +1,0 @@
-93fac948ab1a9d1bdb8d3155e1326ff8ef997e9faf374120086d2daad287cb91  deploy/Dockerfile（修复前字节副本）
-CMD 行：CMD ["python", "-m", "deploy.server"]

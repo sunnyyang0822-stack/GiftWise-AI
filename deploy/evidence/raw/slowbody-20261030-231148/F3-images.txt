@@ -1,6 +1,0 @@
-giftwise-validator:prefix-check adc7f1d4986a 178MB
-giftwise-validator:slowbody-check 400a6039cad7 178MB
-giftwise-validator:latest 23a8c3bed390 178MB
-giftwise-validator:coldbuild-20261030 ed3fbe912571 178MB
-giftwise-validator:obs-check 61bdb8815bd9 178MB
-giftwise-validator:pm-baseline-20261030 b42f408b4f07 178MB

@@ -1,9 +1,0 @@
-=== /tmp 下有什么 ===
-total 8
-drwxrwxrwt 2 root root 4096 Oct 27 00:00 .
-drwxr-xr-x 1 root root 4096 Oct 30 16:57 ..
-=== 全盘找 access*.jsonl ===
-/app/C:/Users/lenovo/AppData/Local/Temp/access.jsonl
-=== 找到就打印最后一行 ===
---- /app/C:/Users/lenovo/AppData/Local/Temp/access.jsonl
-{"ts":"2026-10-31T00:57:58.676+08:00","service":"giftwise-validator","request_id":"73c3883376204f8e","run_id":null,"stage":null,"method":"GET","route":"/healthz","path":"/healthz","http_status":200,"val_status":null,"all_passed":null,"error_codes":[],"payload_sha256":null,"candidates_sha256":null,"duration_ms":0.206,"bytes_in":0,"bytes_out":135,"remote":"172.17.0.1","model_calls":0,"cost":{"unit":"CNY","amount":0.0,"source":"deterministic_rules_only"},"rules_source_sha256":"1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500"}

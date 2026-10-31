@@ -1,5 +1,0 @@
-### 构建后镜像列表（说明：同一份内容每次重建的 manifest list digest 都会变）
-giftwise-validator:coldbuild-20261030 | ed3fbe912571 | 178MB | 2026-10-30 22:50:36 +0800 CST
-giftwise-validator:obs-check | 61bdb8815bd9 | 178MB | 2026-10-30 22:48:28 +0800 CST
-giftwise-validator:latest | b42f408b4f07 | 178MB | 2026-10-30 22:20:54 +0800 CST
-giftwise-validator:pm-baseline-20261030 | b42f408b4f07 | 178MB | 2026-10-30 22:20:54 +0800 CST

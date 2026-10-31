@@ -1,5 +1,0 @@
-修复前容器 gw-slowbody-prefix
-Threads 前=1
-Threads 中(连接后 2s，仍持有)=10
-Threads 后(连接后 12s，仍持有)=10
-Threads 客户端关闭后=1

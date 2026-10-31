@@ -1,6 +1,0 @@
-﻿Elevated = True
-Installer = C:\Users\lenovo\Desktop\giftwise\.tmp\DockerDesktopInstaller.exe
-install exit = 0
-### docker --version
-Docker version 29.9.2, build a82e528
-### done

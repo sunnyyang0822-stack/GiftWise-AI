@@ -1,4 +1,0 @@
-修复后容器 gw-slowbody-fixed
-Threads 前=1
-Threads 中(9 条半开进行中)=10
-Threads 后(全部 408 之后)=1

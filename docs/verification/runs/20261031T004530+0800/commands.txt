@@ -1,3 +1,0 @@
-# 本次实际执行的完整命令（结果表里因排版被截断，这里给全文）
-[PASS] range_contract: (内置纯函数探针：validator.rules.validate)
-[FAIL] i2_local: GIFTWISE_PORT=8799 GIFTWISE_READ_TIMEOUT=3 python -m deploy.server + 原始 socket

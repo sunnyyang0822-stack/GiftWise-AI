@@ -1,1 +1,0 @@
-{"schema_version": 1, "ok": false, "channel": "github", "action": "search", "backend": null, "items": [], "meta": {"elapsed_ms": 0, "attempts": []}, "error": {"code": "RATE_LIMITED", "message": "Platform reported a rate limit", "hint": "Wait 3360 seconds before retrying this channel."}}

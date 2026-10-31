@@ -1,3 +1,0 @@
-=== 0. 保全 PM 基线镜像 ===
-giftwise-validator:latest b42f408b4f07 178MB
-giftwise-validator:pm-baseline-20261030 b42f408b4f07 178MB

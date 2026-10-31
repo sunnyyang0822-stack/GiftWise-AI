@@ -1,5 +1,0 @@
-非法 JSON: OK | HTTP 400 {"error":"INVALID_JSON"}
-载荷类型错误: OK | HTTP 400 {"error":"INVALID_PAYLOAD","message":"request_json 和 candida
-未知路径: OK | HTTP 404 {"error":"NOT_FOUND"}
-无 Content-Length（原始 socket）: OK | HTTP/1.0 413 Request Entity Too Large | {"error":"REQUEST_TOO_LARGE"}
-超长请求体: OK | HTTP 413 {"error":"REQUEST_TOO_LARGE"}

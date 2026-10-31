@@ -1,1 +1,0 @@
-giftwise-validator listening on 127.0.0.1:8000; rules=4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3

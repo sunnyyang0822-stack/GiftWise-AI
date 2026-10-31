@@ -1,1 +1,0 @@
-params=SshHost:Host:mandatory=1,KeyPath::mandatory=1,User::mandatory=0,SshPort::mandatory=0,ServicePort::mandatory=0,RemoteDir::mandatory=0,DryRun::mandatory=0

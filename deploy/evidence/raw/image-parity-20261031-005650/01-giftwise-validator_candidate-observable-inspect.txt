@@ -1,2 +1,0 @@
-
-Error response from daemon: No such image: giftwise-validator:candidate-observable

@@ -1,5 +1,0 @@
-# 这四份交付文件由阶段 B 按原始字节 SHA256 核对，禁止换行自动转换。
-validator/__init__.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
-validator/rules.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
-tests/test_validator.py -text whitespace=trailing-space,space-before-tab,cr-at-eol
-tests/test_cases.json -text whitespace=trailing-space,space-before-tab,cr-at-eol

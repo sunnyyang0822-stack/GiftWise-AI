@@ -1,2 +1,0 @@
-已写出 C:/Users/lenovo/Desktop/giftwise/.tmp/web-parity/python-out.json
-  intake 参考结果 27 条；校验参考结果 28 条
