@@ -1,0 +1,92 @@
+{
+  "scope": "固定草案夹具及oracle/实际validator，非后台编排或真实语义验证",
+  "passed": 20,
+  "results": [
+    {
+      "name": "固定商品ID与可信价绑定",
+      "passed": true
+    },
+    {
+      "name": "实际独立validator执行",
+      "passed": true
+    },
+    {
+      "name": "改价oracle拒绝",
+      "passed": true
+    },
+    {
+      "name": "未知价格不填零",
+      "passed": true
+    },
+    {
+      "name": "不足三件前置拒绝",
+      "passed": true
+    },
+    {
+      "name": "异任务ID引用拒绝",
+      "passed": true
+    },
+    {
+      "name": "同商品不凑数",
+      "passed": true
+    },
+    {
+      "name": "外部文本仅字符串不执行",
+      "passed": true
+    },
+    {
+      "name": "选前selected为空",
+      "passed": true
+    },
+    {
+      "name": "图片缺失无假URL",
+      "passed": true
+    },
+    {
+      "name": "图像失败保留合格文本",
+      "passed": true
+    },
+    {
+      "name": "标注结构",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:-0.1",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:1.01",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:nan",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:inf",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:True",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:0.5",
+      "passed": true
+    },
+    {
+      "name": "合格选择ID",
+      "passed": true
+    },
+    {
+      "name": "错误选择归属",
+      "passed": true
+    }
+  ],
+  "OpenCLI": "未执行",
+  "Dify": "未执行",
+  "image_service": "未执行",
+  "model_calls": 0,
+  "token_latency_cost": "未执行",
+  "shared_contract": "BLOCKED：等待后台唯一契约"
+}

@@ -11,6 +11,7 @@ from decimal import Decimal, InvalidOperation
 TAGS = frozenset({"alcohol", "food", "fragrance", "jewelry", "plant", "other"})
 AMOUNT = re.compile(r"(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?", re.ASCII)
 UNAVAILABLE = object()
+CONTRACT_VERSION = "giftwise-20261031-v2"
 
 
 def _error(errors, code, path, message):
@@ -106,6 +107,47 @@ def _days(value, path, errors):
     return value
 
 
+def check_budget_range(value, path, errors, mode=UNAVAILABLE):
+    """按结构→端点类型/格式/范围→顺序→交互模式检查；不修改输入。"""
+    if not isinstance(value, dict) or set(value) - {"min", "max"}:
+        _error(errors, "INVALID_BUDGET_RANGE", path, "预算区间须为仅含 min、max 的对象")
+        return None
+    start = len(errors)
+    amounts = []
+    for key in ("min", "max"):
+        endpoint = path + "." + key
+        if key not in value:
+            _error(errors, "INVALID_BUDGET_RANGE", endpoint, "预算区间两端均须填写")
+            amounts.append(None)
+            continue
+        if isinstance(value[key], str) and len(value[key]) > 1000:
+            _error(errors, "LIMIT_EXCEEDED", endpoint, "字段字符串超过 1000 个 Unicode 码点")
+            amounts.append(None)
+            continue
+        amount = _amount(value[key], endpoint, errors)
+        if amount is not None and amount > 10000:
+            _error(errors, "LIMIT_EXCEEDED", endpoint, "预算区间端点须在 0 至 10000 之间")
+        amounts.append(amount)
+    if len(errors) != start:
+        return None
+    low, high = amounts
+    if low > high:
+        _error(errors, "INVALID_BUDGET_RANGE", path, "预算区间下限不能超过上限")
+        return None
+    if mode is not UNAVAILABLE:
+        mode_path = path.rsplit(".", 1)[0] + ".budget_mode"
+        if not isinstance(mode, str) or mode not in ("slider", "zero", "other"):
+            _error(errors, "INVALID_BUDGET_RANGE", mode_path, "预算模式须为 slider、zero 或 other")
+            return None
+        if mode == "slider" and (high > 1000 or low % 50 or high % 50):
+            _error(errors, "INVALID_BUDGET_RANGE", path, "滑条两端须在 0 至 1000 之间，步长为 50 元")
+            return None
+        if mode == "zero" and (low != 0 or high != 0):
+            _error(errors, "INVALID_BUDGET_RANGE", path, "不花钱模式的预算两端均须为 0")
+            return None
+    return low, high
+
+
 def _norm(value):
     return unicodedata.normalize("NFKC", value).casefold()
 
@@ -122,16 +164,19 @@ def _request(request, errors):
     if not isinstance(request, dict):
         _error(errors, "INVALID_REQUEST", "request", "请求根节点必须为对象")
         return None
-    _limits(request, "request", errors)
+    _limits({k: v for k, v in request.items() if k != "budget_range"}, "request", errors)
     _required(request, ("recipient_relation", "occasion", "budget_amount", "currency", "available_days"), "request", errors)
     for field in ("recipient_relation", "occasion", "currency", "notes"):
         if field in request:
             _text(request[field], "request." + field, errors, empty=field == "notes")
+    interval = check_budget_range(request["budget_range"], "request.budget_range", errors) if "budget_range" in request else None
     budget = _amount(request["budget_amount"], "request.budget_amount", errors) if "budget_amount" in request else None
     days = _days(request["available_days"], "request.available_days", errors) if "available_days" in request else None
     # 请求侧范围只在调用点检查：_amount/_days 与候选侧共用，范围约束不得进入共用函数。
-    if budget is not None and not (1 <= budget <= 10000):
-        _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间")
+    if budget is not None and budget > 10000:
+        _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 0 至 10000 之间")
+    elif interval is not None and budget is not None and budget != interval[1]:
+        _error(errors, "BUDGET_RANGE_MISMATCH", "request.budget_amount", "预算上限须与区间 max 数值一致")
     if days is not None and days > 365:
         _error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间")
     if isinstance(request.get("currency"), str) and request["currency"] != "CNY":
@@ -159,7 +204,7 @@ def _request(request, errors):
             _error(errors, "UNKNOWN_TAG", f"request.forbidden_tags[{i}]", "未知禁忌标签，请确认禁忌类别")
     if errors:
         return None
-    return {"budget": budget, "days": days, "fact_ids": fact_ids,
+    return {"budget": budget, "budget_min": interval[0] if interval is not None else None, "days": days, "fact_ids": fact_ids,
             "forbidden_tags": {_tag(t) for t in forbidden_tags},
             "forbidden_terms": [_norm(t) for t in forbidden_terms], "currency": request["currency"]}
 
@@ -200,6 +245,8 @@ def _candidate(candidate, index, context):
     if context is not None:
         if total is not None and total > context["budget"]:
             _error(errors, "OVER_BUDGET", path + ".estimated_total", "估算总费用超过预算")
+        if total is not None and context["budget_min"] is not None and total < context["budget_min"]:
+            _error(result["warnings"], "BELOW_BUDGET_RANGE", path + ".estimated_total", "礼物估价低于预算区间下限，仍可选择")
         if prep is not None and prep > context["days"]:
             _error(errors, "PREPARATION_TOO_LONG", path + ".estimated_preparation_days", "估算准备时间超过可用天数")
         if isinstance(candidate.get("currency"), str) and candidate["currency"] != context["currency"]:
@@ -337,12 +384,54 @@ def adapt_intake(intake_json):
     if not isinstance(data, dict):
         return {"status": "needs_input", "errors": [{"code": "INVALID_TYPE", "path": "intake", "message": "输入根节点须为对象"}], "request_json": None}
 
-    fields = {"recipient_relation", "closeness", "occasion", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context"}
-    for key in data.keys() - fields:
+    fields = {"recipient_relation", "recipient_relation_custom", "closeness", "occasion", "occasion_custom", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes", "previous_gifts"}
+    for key in data:
+        if key in fields:
+            continue
         err("INTAKE_UNKNOWN_FIELD", "intake." + key, "未声明的输入字段，请确认契约版本")
-    for key in ("recipient_relation", "occasion", "budget_amount", "currency", "deadline_days"):
+    revised = any(key in data for key in ("contract_version", "budget_mode", "budget_range"))
+    required = ("recipient_relation", "occasion", "currency", "deadline_days") if revised else ("recipient_relation", "occasion", "budget_amount", "currency", "deadline_days")
+    for key in required:
         if key not in data or data[key] is None:
             err("INTAKE_CLARIFICATION_REQUIRED", "intake." + key, "请补充明确的关系、场合、预算上限、币种及可用天数")
+    budget = data.get("budget_amount")
+    budget_errors = []
+    if revised:
+        if "contract_version" not in data:
+            err("INTAKE_CLARIFICATION_REQUIRED", "intake.contract_version", "请提供新版输入契约版本")
+        elif not isinstance(data["contract_version"], str):
+            err("INVALID_TYPE", "intake.contract_version", "契约版本须为字符串")
+        elif data["contract_version"] != CONTRACT_VERSION:
+            err("INTAKE_UNKNOWN_LABEL", "intake.contract_version", "不支持此输入契约版本")
+        interval = check_budget_range(data.get("budget_range"), "intake.budget_range", budget_errors, data.get("budget_mode"))
+        if interval is not None:
+            if "budget_amount" in data:
+                if isinstance(budget, str) and len(budget) > 1000:
+                    budget_errors.append({"code": "LIMIT_EXCEEDED", "path": "intake.budget_amount", "message": "字段字符串超过 1000 个 Unicode 码点"})
+                    scalar = None
+                else:
+                    scalar = _amount(budget, "intake.budget_amount", budget_errors)
+                if scalar is not None and scalar > 10000:
+                    budget_errors.append({"code": "LIMIT_EXCEEDED", "path": "intake.budget_amount", "message": "预算须在 0 至 10000 之间"})
+                elif scalar is not None and scalar != interval[1]:
+                    budget_errors.append({"code": "BUDGET_RANGE_MISMATCH", "path": "intake.budget_amount", "message": "预算上限须与区间 max 数值一致"})
+            else:
+                budget = data["budget_range"]["max"]
+        errors.extend(budget_errors)
+    dislikes = data.get("dislikes", "")
+    if not isinstance(dislikes, str):
+        err("INVALID_TYPE", "intake.dislikes", "需要避免的内容须为字符串，可为空")
+    elif len(dislikes) > 1000:
+        err("LIMIT_EXCEEDED", "intake.dislikes", "需要避免的内容最多 1000 个 Unicode 码点")
+    elif not dislikes.strip():
+        dislikes = ""
+    previous_gifts = data.get("previous_gifts", "")
+    if not isinstance(previous_gifts, str):
+        err("INVALID_TYPE", "intake.previous_gifts", "以前送过什么须为字符串，可为空")
+    elif len(previous_gifts) > 1000:
+        err("LIMIT_EXCEEDED", "intake.previous_gifts", "送礼历史最多 1000 个 Unicode 码点")
+    elif not previous_gifts.strip():
+        previous_gifts = ""
 
     def choice(key, table, default=None):
         value = data.get(key, default)
@@ -353,6 +442,26 @@ def adapt_intake(intake_json):
 
     relation = choice("recipient_relation", RELATIONS)
     occasion = choice("occasion", OCCASIONS)
+    def custom_text(key):
+        if key not in data:
+            return None
+        value = data[key]
+        if not isinstance(value, str) or not value.strip():
+            err("INVALID_TYPE", "intake." + key, "自定义文本必须为非空字符串")
+            return None
+        if len(value) > 1000:
+            err("LIMIT_EXCEEDED", "intake." + key, "自定义文本最多 1000 个 Unicode 码点")
+        return value
+    relation_custom = custom_text("recipient_relation_custom")
+    occasion_custom = custom_text("occasion_custom")
+    if relation == "other" and relation_custom is None:
+        err("INTAKE_CLARIFICATION_REQUIRED", "intake.recipient_relation_custom", "选择其他关系时请填写自定义关系")
+    if relation != "other" and "recipient_relation_custom" in data:
+        err("INTAKE_UNKNOWN_FIELD", "intake.recipient_relation_custom", "只有选择其他关系时才能填写自定义关系")
+    if occasion == "other" and occasion_custom is None:
+        err("INTAKE_CLARIFICATION_REQUIRED", "intake.occasion_custom", "选择其他场合时请填写自定义场合")
+    if occasion != "other" and "occasion_custom" in data:
+        err("INTAKE_UNKNOWN_FIELD", "intake.occasion_custom", "只有选择其他场合时才能填写自定义场合")
     closeness = choice("closeness", CLOSENESS, "unknown")
     for key in ("recipient_relation", "occasion"):
         if data.get(key) == "unknown":
@@ -394,8 +503,9 @@ def adapt_intake(intake_json):
     if not isinstance(exclusions, dict):
         err("INVALID_TYPE", "intake.hard_exclusions", "禁忌须为 tags、terms、unresolved 对象")
         exclusions = {}
-    for key in exclusions.keys() - {"tags", "terms", "unresolved"}:
-        err("INTAKE_UNKNOWN_FIELD", "intake.hard_exclusions." + key, "未知禁忌字段")
+    for key in exclusions:
+        if key not in {"tags", "terms", "unresolved"}:
+            err("INTAKE_UNKNOWN_FIELD", "intake.hard_exclusions." + key, "未知禁忌字段")
     for key in ("tags", "terms", "unresolved"):
         values = exclusions.get(key, [])
         if not isinstance(values, list) or any(not isinstance(v, str) or not v.strip() for v in values):
@@ -414,10 +524,12 @@ def adapt_intake(intake_json):
         # 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
         # recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值。
         # 它只由服务端 intake 产出，不在上面的 fields 输入白名单内，前端不得提交。
-        "recipient_relation": RELATIONS.get(relation, ""),
+        "recipient_relation": relation_custom if relation == "other" and relation_custom is not None else RELATIONS.get(relation, ""),
         "recipient_relation_id": relation if relation in RELATIONS else "",
-        "occasion": OCCASIONS.get(occasion, ""),
-        "budget_amount": data.get("budget_amount"), "currency": data.get("currency"),
+        "recipient_relation_custom": relation_custom if relation == "other" else None,
+        "occasion": occasion_custom if occasion == "other" and occasion_custom is not None else OCCASIONS.get(occasion, ""),
+        "occasion_custom": occasion_custom if occasion == "other" else None,
+        "budget_amount": budget, "currency": data.get("currency"),
         "available_days": data.get("deadline_days"),
         "facts": [{"id": "interest:" + key, "text": "用户明确知道：对方对“" + INTERESTS[key] + "”感兴趣（未确认该组内具体偏好）"} for key in interests if confidence.get(key, "inferred") == "confirmed"],
         "forbidden_tags": tags, "forbidden_terms": exclusions.get("terms", []),
@@ -425,9 +537,18 @@ def adapt_intake(intake_json):
         "preference_inferences": [{"interest_id": key, "text": "用户猜测：对方可能对“" + INTERESTS[key] + "”感兴趣"} for key in interests if confidence.get(key, "inferred") == "inferred"],
         "gift_styles": styles, "hard_exclusions_original": exclusions,
     }
+    # 旧版未提供时仍省略派生字段，避免旧快照被重新解释；读取默认空字符串。
+    if "previous_gifts" in data or revised:
+        request["previous_gifts"] = previous_gifts
+    if revised:
+        request.update(contract_version=CONTRACT_VERSION, budget_range=data.get("budget_range"), dislikes=dislikes)
+    elif "dislikes" in data:
+        request["dislikes"] = dislikes
     # 复用原规则的请求检查；空批次产生的候选错误不会成为输入错误。
     checked = validate(dump(request), '{}')
-    errors.extend(e for e in checked["errors"] if e["path"].startswith("request"))
+    errors.extend(e for e in checked["errors"] if e["path"].startswith("request")
+                  and not (budget_errors and e["path"].startswith(("request.budget_range", "request.budget_amount")))
+                  and not ("dislikes" in e["path"] and any(x["path"] == "intake.dislikes" for x in errors)))
     if checked["status"] == "error":
         err("INTERNAL_ERROR", "intake", "输入检查暂不可用，请稍后重试")
     return {"status": "needs_input" if errors else "ready", "errors": errors, "request_json": None if errors else dump(request)}
@@ -512,6 +633,8 @@ def report(state):
         selectable = [r["id"] for r in validation["candidate_results"] if r["passed"]]
     titles = {"passed": "三个方案均通过代码规则检查，请自行选择。", "failed": "部分或全部方案未通过，失败项不可选。", "needs_input": "请补充或澄清需求后再推荐。", "error": "暂时无法完成检查；未将结果标记为通过。"}
     lines = [titles[status], "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。", "已用自动修订次数：" + str(state["repair_count"]) + " / 1。"]
+    if isinstance(request, dict) and request.get("contract_version") == "giftwise-20261031-v2":
+        lines.insert(1, "新版仅计所选礼物本身；包装、贺卡、装饰和配送不计价，不代表免费。")
     facts = {f["id"]: f["text"] for f in request.get("facts", []) if isinstance(f, dict) and isinstance(f.get("id"), str)} if isinstance(request, dict) else {}
     results = {r["id"]: r for r in validation["candidate_results"] if r["id"] in ("c1", "c2", "c3")}
     for candidate in candidates[:3]:
@@ -530,7 +653,7 @@ def report(state):
                       "用户事实：" + ("；".join(ref + "＝" + facts.get(ref, "无有效事实引用") for ref in string_array("fact_refs")) or "未提供可引用事实"),
                       "推断：" + ("；".join(string_array("inferences")) or "无"),
                       "未知：" + ("；".join(string_array("unknowns")) or "未列出；不代表已经核实"),
-                      "全量估算：" + text_field("estimated_total") + " " + text_field("currency") + "；准备天数：" + str(candidate.get("estimated_preparation_days", "字段无效")),
+                      ("礼物本身估价：" if request.get("contract_version") == "giftwise-20261031-v2" else "全量估算：") + text_field("estimated_total") + " " + text_field("currency") + "；准备天数：" + str(candidate.get("estimated_preparation_days", "字段无效")),
                       "代码检查：" + ("通过，可选择" if cid in selectable else "不可选择")])
         lines.extend(e["code"] + "：" + e["message"] for e in result.get("errors", []))
     lines.extend(e["code"] + "：" + e["message"] for e in validation["errors"] + workflow_errors)

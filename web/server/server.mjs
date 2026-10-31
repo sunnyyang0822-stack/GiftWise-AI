@@ -1,3 +1,4 @@
+import {randomBytes,createHmac,timingSafeEqual} from 'node:crypto';
 /**
  * GiftWise AI · web 接入层 HTTP 服务（零依赖，只用 node: 内置模块）。
  *
@@ -35,6 +36,8 @@ import {
   PORT,
   HOST,
   CLIENT_TIMEOUT_MS,
+  budget_slider,
+  budget_modes,
 } from "./config.mjs";
 import {
   PRODUCT_RELATIONS,
@@ -48,7 +51,18 @@ import {
 import { adaptIntakeObject } from "./intake.mjs";
 import { runRecommendation, runPresentation } from "./pipeline.mjs";
 import { getRun, runCount } from "./store.mjs";
+import {mediaProvider} from "./media/provider.mjs";
+import { recognizeExclusions } from "./exclusion-provider.mjs";
+import { checkAiExclusions } from "./exclusion-checker.mjs";
+import { createAnalysis, getAnalysis } from "./exclusion-store.mjs";
 
+const sessionSecret=randomBytes(32);
+function ownerScope(req,res){
+ const raw=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('gw_task_session='))?.slice(16);
+ if(raw&&/^[a-f0-9]{48}\.[a-f0-9]{64}$/.test(raw)){const [id,mac]=raw.split('.');const expected=createHmac('sha256',sessionSecret).update(id).digest();if(timingSafeEqual(Buffer.from(mac,'hex'),expected))return id;}
+ const id=randomBytes(24).toString('hex');const mac=createHmac('sha256',sessionSecret).update(id).digest('hex');
+ res.setHeader('Set-Cookie',`gw_task_session=${id}.${mac}; Path=/; HttpOnly; SameSite=Strict${req.socket.encrypted?'; Secure':''}`);return id;
+}
 const here = dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = join(here, "..", "public");
 const MAX_BODY_BYTES = 262144;
@@ -161,6 +175,8 @@ function apiConfig() {
       exclusions: EXCLUSIONS,
     },
     ranges: { budget: BUDGET_RANGES, deadline: DEADLINE_RANGES },
+    budget_slider,
+    budget_modes,
     limits: {
       currency: "CNY",
       intake_bytes: LIMITS.intakeBytes,
@@ -175,6 +191,7 @@ function apiConfig() {
 
 async function handleApi(req, res, url) {
   const { pathname } = url;
+  const owner=ownerScope(req,res);
 
   if (req.method === "GET" && pathname === "/api/config") {
     sendJson(res, 200, apiConfig());
@@ -184,9 +201,21 @@ async function handleApi(req, res, url) {
     sendJson(res, 200, { status: "ok", mode: MODE.current, runs: runCount() });
     return true;
   }
+  if(req.method==='GET'&&/^\/api\/media\/(tasks|assets)\/[a-f0-9]{64}$/.test(pathname)){
+    try {
+      const id=pathname.split('/').at(-1);
+      const stored=await mediaProvider.store.read(id);const run=getRun(stored.run_id);
+      if(!run||run.owner_scope!==owner)throw new Error('NOT_FOUND');
+      const record=await mediaProvider.task(run,id);
+      if(pathname.includes('/tasks/')){run.media=record.media;sendJson(res,200,record.media);return true;}
+      if(record.media.status!=='ready')throw new Error('NOT_FOUND');
+      const bytes=await mediaProvider.store.readAsset(record);
+      res.writeHead(200,{'content-type':record.asset.type,'content-length':bytes.length,'cache-control':'private, no-store','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'"});res.end(bytes);return true;
+    }catch{sendJson(res,404,{status:'error',errors:[{code:'MEDIA_NOT_FOUND',message:'图片任务不存在、未就绪或不属于当前会话。'}]});return true;}
+  }
   if (req.method === "GET" && pathname.startsWith("/api/runs/")) {
     const run = getRun(pathname.slice("/api/runs/".length));
-    if (!run) {
+    if (!run || run.owner_scope !== owner) {
       sendJson(res, 404, {
         status: "error",
         errors: [{ code: "RECOMMENDATION_NOT_FOUND", path: "recommendation_run_id", message: "没有找到该推荐记录。" }],
@@ -226,6 +255,10 @@ async function handleApi(req, res, url) {
 
   if (pathname === "/api/intake/validate") {
     const result = adaptIntakeObject(payload.intake);
+    if (result.status === "ready" && typeof payload.intake?.dislikes === "string" && payload.intake.dislikes.trim()) {
+      result.status = "needs_input";
+      result.errors = [...result.errors, { code: "INTAKE_CLARIFICATION_REQUIRED", path: "intake.dislikes", message: "请先完成不喜欢内容的识别与确认。" }];
+    }
     sendJson(res, 200, {
       // 这里**不**回显 request_json：派生请求只留在服务端，避免前端误把派生值当输入。
       status: result.status,
@@ -238,8 +271,36 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  if (pathname === "/api/exclusions/analyze") {
+    const basic = adaptIntakeObject(payload.intake);
+    if (basic.status !== "ready") {
+      sendJson(res, 200, { status: "needs_input", mode: MODE.current, analysis_id: null, candidates: [], errors: basic.errors });
+      return true;
+    }
+    const dislikes = typeof payload.intake?.dislikes === "string" ? payload.intake.dislikes : "";
+    const provider = MODE.current === "dify" ? undefined : undefined;
+    const recognized = await recognizeExclusions({ dislikes, mode: MODE.current, provider });
+    if (!recognized.ok) {
+      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: recognized.errors });
+      return true;
+    }
+    if (recognized.ai_json === null) {
+      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: [] });
+      return true;
+    }
+    const checked = checkAiExclusions(recognized.ai_json, dislikes);
+    const analysisId = createAnalysis({ intake: payload.intake, mode: recognized.mode, candidates: checked.candidates, status: checked.status, errors: checked.errors });
+    getAnalysis(analysisId).owner_scope=owner;
+    sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, errors: checked.errors });
+    return true;
+  }
+
   if (pathname === "/api/recommendations") {
-    const outcome = await runRecommendation({ intake: payload.intake, demo: payload.demo, mode: MODE.current });
+    let analysis = null;
+    if (payload.exclusion_confirmation?.analysis_id) analysis = getAnalysis(payload.exclusion_confirmation.analysis_id);
+    if(analysis?.owner_scope!==owner)analysis=null;
+    const cancellation=new AbortController();res.once("close",()=>{if(!res.writableEnded)cancellation.abort();});
+    const outcome = await runRecommendation({ signal:cancellation.signal, ownerScope:owner, intake: payload.intake, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis });
     if (outcome.kind === "report") {
       sendJson(res, 200, outcome.report);
       return true;
@@ -250,12 +311,14 @@ async function handleApi(req, res, url) {
       errors: outcome.errors,
       mode: outcome.mode,
       notices: outcome.notices || [],
+      ...(outcome.retrieval ? {retrieval:outcome.retrieval,media:outcome.media} : {}),
     });
     return true;
   }
 
   if (pathname === "/api/presentations") {
     const outcome = await runPresentation({
+      ownerScope:owner,
       runId: payload.recommendation_run_id,
       selectedCandidateId: payload.selected_candidate_id,
       demo: payload.demo,

@@ -1,0 +1,47 @@
+{
+  "mode": "real_seedream_controlled_text_not_real_dify",
+  "recorded_at": "2026-10-31T07:03:47.673Z",
+  "initial_status": "pending",
+  "final_status": "ready",
+  "duplicate_request_same_task": true,
+  "actual_image_calls": 1,
+  "dify_calls": 0,
+  "retrieval": {
+    "status": "unavailable",
+    "note": "本次生图测试不执行浏览器检索，不代表检索通过"
+  },
+  "candidate_id": "c1",
+  "task_id": "593544139088c5b100b615172ee414d169f51ab5740b868f14008c5b036ef5c6",
+  "image": {
+    "id": "6e74435354d66ec584d3456da146b0bfa21718499df8769798f7571446c83bbe",
+    "url": "/api/media/assets/593544139088c5b100b615172ee414d169f51ab5740b868f14008c5b036ef5c6",
+    "version": "6e74435354d66ec584d3456da146b0bfa21718499df8769798f7571446c83bbe",
+    "kind": "ai_illustration",
+    "alt": "AI包装效果示意，非商品实拍，外观与尺寸未验证",
+    "source_url": null,
+    "attribution": "ModelVerse Seedream 4.5 AI生成，非商品实拍；场景道具不是赠品",
+    "width": 2304,
+    "height": 1728
+  },
+  "generation": {
+    "requested_model": "doubao-seedream-4.5",
+    "actual_model": "doubao-seedream-4-5-251128",
+    "width": 2304,
+    "height": 1728,
+    "reported_size": "2304x1728",
+    "elapsed_ms": 8230,
+    "usage": {
+      "generated_images": 1,
+      "output_tokens": 15552,
+      "total_tokens": 15552
+    },
+    "cost_status": "not_measured",
+    "reference_count": 0
+  },
+  "annotations": [],
+  "annotation_status": "not_verified",
+  "asset_bytes": 825366,
+  "asset_sha256": "6e74435354d66ec584d3456da146b0bfa21718499df8769798f7571446c83bbe",
+  "unauthorized_asset_status": 404,
+  "visual_acceptance": "not_verified_by_backend"
+}

@@ -12,10 +12,11 @@
 import { randomUUID } from "node:crypto";
 
 const RUN_LIMIT = 200;
-const RUN_TTL_MS = 6 * 60 * 60 * 1000;
+const RUN_TTL_MS = 10 * 60 * 1000;
 
 /** @type {Map<string, any>} */
 const runs = new Map();
+const recommendationKeys = new Map();
 
 function nowIso() {
   // 统一按 Asia/Shanghai 记录，避免演示现场时区歧义。
@@ -28,6 +29,8 @@ export function createRun(init) {
   const runId = `gw-${new Date().getTime().toString(36)}-${randomUUID().slice(0, 8)}`;
   const run = {
     run_id: runId,
+    owner_scope: init.owner_scope || "internal",
+    media_generation_authorized: init.media_generation_authorized === true,
     created_at: nowIso(),
     mode: init.mode,
     request_json: init.request_json,
@@ -46,12 +49,18 @@ export function createRun(init) {
     presentation: null,
     /** 同一选择的幂等缓存：重复点击返回同一份呈现，不重复消耗额度。 */
     selections: new Map(),
-    call_counts: { recommend: 0, recommend_revision: 0, presentation: 0, presentation_revision: 0 },
+    call_counts: { exclusion_analysis: init.exclusion_analysis || 0, recommend: 0, recommend_revision: 0, presentation: 0, presentation_revision: 0 },
     notices: init.notices || [],
   };
   runs.set(runId, run);
+  if (init.idempotency_key) recommendationKeys.set(init.idempotency_key, runId);
   prune();
   return run;
+}
+
+export function getRunByRecommendationKey(key) {
+  const id = recommendationKeys.get(key);
+  return id ? getRun(id) : null;
 }
 
 export function getRun(runId) {
@@ -60,15 +69,17 @@ export function getRun(runId) {
   if (!run) return null;
   if (Date.now() - new Date(run.created_at).getTime() > RUN_TTL_MS) {
     runs.delete(runId);
+    for(const [key,id] of recommendationKeys)if(id===runId)recommendationKeys.delete(key);
     return null;
   }
   return run;
 }
 
 function prune() {
+  for(const [key,id] of recommendationKeys)if(!getRun(id))recommendationKeys.delete(key);
   if (runs.size <= RUN_LIMIT) return;
   const ordered = [...runs.values()].sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
-  for (const run of ordered.slice(0, runs.size - RUN_LIMIT)) runs.delete(run.run_id);
+  for (const run of ordered.slice(0, runs.size - RUN_LIMIT)){runs.delete(run.run_id);for(const [key,id] of recommendationKeys)if(id===run.run_id)recommendationKeys.delete(key);}
 }
 
 export function runCount() {
@@ -77,11 +88,14 @@ export function runCount() {
 
 export function reset() {
   runs.clear();
+  recommendationKeys.clear();
 }
 
 /** 面向浏览器的最小脱敏视图：不含密钥、不含内部提示。 */
 export function publicReport(run) {
   return {
+    retrieval: run.retrieval || { status: "unavailable", evidence_id: null, products: [], warnings: ["未获取实时价格"] },
+    media: run.media || { status: "unavailable", candidates: [], selected: null },
     recommendation_run_id: run.run_id,
     created_at: run.created_at,
     mode: run.mode,

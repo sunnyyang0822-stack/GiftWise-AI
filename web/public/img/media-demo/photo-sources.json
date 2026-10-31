@@ -1,0 +1,55 @@
+[
+  {
+    "file": "notebook-photo.jpg",
+    "author": "PNW Production",
+    "source_url": "https://www.pexels.com/photo/open-notebook-on-white-background-8250925/",
+    "download_url": "https://images.pexels.com/photos/8250925/pexels-photo-8250925.jpeg?auto=compress&cs=tinysrgb&w=1400",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "网站开发样例，非对应SKU或真实生成结果；不作价格证据",
+    "bytes": 96981
+  },
+  {
+    "file": "workshop-photo.jpg",
+    "author": "Chris Flaten",
+    "source_url": "https://www.pexels.com/photo/ceramic-bowls-on-white-studio-background-5514832/",
+    "download_url": "https://images.pexels.com/photos/5514832/pexels-photo-5514832.jpeg?auto=compress&cs=tinysrgb&w=1400",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "网站开发样例，非对应SKU或真实生成结果；不作价格证据",
+    "bytes": 39825
+  },
+  {
+    "file": "art-photo.jpg",
+    "author": "Kaboompics",
+    "source_url": "https://www.pexels.com/photo/a-white-empty-frame-8947628/",
+    "download_url": "https://images.pexels.com/photos/8947628/pexels-photo-8947628.jpeg?auto=compress&cs=tinysrgb&w=1400",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "网站开发样例，非对应SKU或真实生成结果；不作价格证据",
+    "bytes": 138625
+  },
+  {
+    "file": "scene-paper.jpg",
+    "author": "Taryn Elliott",
+    "source_url": "https://www.pexels.com/photo/christmas-gift-on-a-wooden-table-6119116/",
+    "download_url": "https://images.pexels.com/photos/6119116/pexels-photo-6119116.jpeg?auto=compress&cs=tinysrgb&w=1400",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "网站开发样例，非对应SKU或真实生成结果；不作价格证据",
+    "bytes": 518965
+  },
+  {
+    "file": "scene-hexagon.jpg",
+    "author": "Kaboompics",
+    "source_url": "https://www.pexels.com/photo/wrapped-with-ribbon-gift-box-placed-on-table-4397882/",
+    "download_url": "https://images.pexels.com/photos/4397882/pexels-photo-4397882.jpeg?auto=compress&cs=tinysrgb&w=1400",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "网站开发样例，非对应SKU或真实生成结果；不作价格证据",
+    "bytes": 91234
+  },
+  {
+    "file": "scene-light.jpg",
+    "author": "Ivan Vi",
+    "source_url": "https://www.pexels.com/photo/white-gift-box-with-black-ribbon-lying-on-a-table-19791016/",
+    "license": "https://www.pexels.com/license/",
+    "purpose": "包装场景开发夹具，不是所选SKU实物或AI结果",
+    "bytes": 46964
+  }
+]

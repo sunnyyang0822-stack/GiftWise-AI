@@ -1,0 +1,22 @@
+{
+  "scope":"offline_drafts_not_provider_API_or_verified_image",
+  "backend_contract_commit":"7204b64718420da2a737610aefec02fbdba02204",
+  "selected_candidate_id":"c1",
+  "selected_product_id":"demo-p1",
+  "known_product":{"name":"蓝色陶瓷杯","variant":"蓝色示例款","quantity":1},
+  "unknowns":["尺寸、重量和易碎性尚未有独立证据","不能编造厘米或承重信息"],
+  "description":"围绕一只已选蓝色杯子构图，礼物及纸包为主体，安静桌边有侧面柔光与自然阴影，浅米纸材与低饱和细带呼应蓝色。纸包方案仅作比例未核实的示意；若运输防护取决于尺寸和易碎性，先澄清再确认包装。背景道具只营造环境，不是附送商品。干净底图不出现文字、箭头或新品牌，不改型号颜色数量及相对大小。AI效果示意，非商品实拍，比例未核实。",
+  "annotation_drafts":[
+    {"id":"a1","text":"浅米纸衬着蓝色","target":{"x":0.35,"y":0.6},"label":{"x":0.1,"y":0.3}},
+    {"id":"a2","text":"细带收在这里","target":{"x":0.6,"y":0.5},"label":{"x":0.85,"y":0.25}},
+    {"id":"a3","text":"贺卡靠在侧边","target":{"x":0.7,"y":0.75},"label":{"x":0.85,"y":0.88}},
+    {"id":"a4","text":"侧光留一点层次","target":{"x":0.25,"y":0.45},"label":{"x":0.12,"y":0.1}},
+    {"id":"a5","text":"留白让礼物更清楚","target":{"x":0.5,"y":0.85},"label":{"x":0.2,"y":0.92}}
+  ],
+  "delivery_before_visual_review":{"status":"unavailable","candidates":[],"selected":null},
+  "packaging_choices_for_offline_review":[
+    {"trusted_shape":"扁平矩形","trusted_handling":"已知轻便","suggestion":"纸包或礼袋"},
+    {"trusted_shape":"长圆柱","trusted_handling":"保护需求待确认","suggestion":"圆筒方案需核实长度与保护需求"},
+    {"trusted_shape":"异形","trusted_handling":"尺寸未知","suggestion":"澄清或透明展示/异形包装示意，不能猜精确尺寸"}
+  ]
+}

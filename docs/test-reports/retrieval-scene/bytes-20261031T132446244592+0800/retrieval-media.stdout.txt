@@ -1,0 +1,188 @@
+{
+  "scope": "PR61固定契约夹具及oracle/实际validator，非后台编排或真实语义验证；场景标注仅提案未看图",
+  "passed": 44,
+  "results": [
+    {
+      "name": "固定商品ID与可信价绑定",
+      "passed": true
+    },
+    {
+      "name": "PR61独立引用字符串两键信封",
+      "passed": true
+    },
+    {
+      "name": "商品引用与sidecar绑定一致",
+      "passed": true
+    },
+    {
+      "name": "name严格拼接型号",
+      "passed": true
+    },
+    {
+      "name": "去掉型号拒绝",
+      "passed": true
+    },
+    {
+      "name": "PR61固定商品字段与类型",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:0",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:True",
+      "passed": true
+    },
+    {
+      "name": "数量正整数:-1",
+      "passed": true
+    },
+    {
+      "name": "price_conditions不是字符串",
+      "passed": true
+    },
+    {
+      "name": "区间跨预算不合格",
+      "passed": true
+    },
+    {
+      "name": "区间上端点等于预算可检查",
+      "passed": true
+    },
+    {
+      "name": "条件未确认不作为预算合格",
+      "passed": true
+    },
+    {
+      "name": "不足三件按契约partial",
+      "passed": true
+    },
+    {
+      "name": "不可用不假造证据",
+      "passed": true
+    },
+    {
+      "name": "实际独立validator执行",
+      "passed": true
+    },
+    {
+      "name": "改价oracle拒绝",
+      "passed": true
+    },
+    {
+      "name": "未知价格不填零",
+      "passed": true
+    },
+    {
+      "name": "不足三件前置拒绝",
+      "passed": true
+    },
+    {
+      "name": "异任务ID引用拒绝",
+      "passed": true
+    },
+    {
+      "name": "同商品不凑数",
+      "passed": true
+    },
+    {
+      "name": "外部文本仅字符串不执行",
+      "passed": true
+    },
+    {
+      "name": "选前selected为空",
+      "passed": true
+    },
+    {
+      "name": "图片缺失无假URL",
+      "passed": true
+    },
+    {
+      "name": "图像失败保留合格文本",
+      "passed": true
+    },
+    {
+      "name": "标注结构",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:-0.1",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:1.01",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:nan",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:inf",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:True",
+      "passed": true
+    },
+    {
+      "name": "非法坐标拒绝:0.5",
+      "passed": true
+    },
+    {
+      "name": "合格选择ID",
+      "passed": true
+    },
+    {
+      "name": "错误选择归属",
+      "passed": true
+    },
+    {
+      "name": "场景仍关联同一已选礼物",
+      "passed": true
+    },
+    {
+      "name": "默认约3至5处标注:3",
+      "passed": true
+    },
+    {
+      "name": "标注ID唯一:3",
+      "passed": true
+    },
+    {
+      "name": "默认约3至5处标注:4",
+      "passed": true
+    },
+    {
+      "name": "标注ID唯一:4",
+      "passed": true
+    },
+    {
+      "name": "默认约3至5处标注:5",
+      "passed": true
+    },
+    {
+      "name": "标注ID唯一:5",
+      "passed": true
+    },
+    {
+      "name": "定位未经最终图核实不标ready",
+      "passed": true
+    },
+    {
+      "name": "尺寸未知及道具边界明示",
+      "passed": true
+    },
+    {
+      "name": "包装随形而非统一方盒",
+      "passed": true
+    }
+  ],
+  "OpenCLI": "未执行",
+  "Dify": "未执行",
+  "image_service": "未执行",
+  "model_calls": 0,
+  "token_latency_cost": "未执行",
+  "shared_contract": "PR61@7204b64 已有商品引用信封，计划及图像provider精确键名待补充"
+}

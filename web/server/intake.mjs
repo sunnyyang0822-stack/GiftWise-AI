@@ -16,12 +16,14 @@
 import { strictParse, dump, byteLength } from "./jsonstrict.mjs";
 import { RELATIONS_FULL, CLOSENESS_TABLE, OCCASION_TABLE, INTEREST_TABLE, GIFT_STYLE_TABLE, EXCLUSION_TABLE } from "./labels.mjs";
 import { LIMITS, PURSUIT_CONTRACT_READY, PURSUIT_NOT_READY_MESSAGE } from "./config.mjs";
-import { validate } from "./checker.mjs";
+import { validate, checkBudgetRange, CONTRACT_VERSION, amountToCents } from "./checker.mjs";
 
 export const INTAKE_FIELDS = new Set([
   "recipient_relation",
+  "recipient_relation_custom",
   "closeness",
   "occasion",
+  "occasion_custom",
   "budget_amount",
   "currency",
   "deadline_days",
@@ -30,6 +32,7 @@ export const INTAKE_FIELDS = new Set([
   "gift_styles",
   "hard_exclusions",
   "additional_context",
+  "contract_version", "budget_mode", "budget_range", "dislikes", "previous_gifts",
 ]);
 
 /**
@@ -63,10 +66,59 @@ export function adaptIntake(intakeJson, options = {}) {
   for (const key of Object.keys(data)) {
     if (!INTAKE_FIELDS.has(key)) err("INTAKE_UNKNOWN_FIELD", `intake.${key}`, "未声明的输入字段，请确认契约版本");
   }
-  for (const key of ["recipient_relation", "occasion", "budget_amount", "currency", "deadline_days"]) {
+  const revised = ["contract_version", "budget_mode", "budget_range"].some((key) => Object.hasOwn(data, key));
+  const requiredFields = revised ? ["recipient_relation", "occasion", "currency", "deadline_days"] : ["recipient_relation", "occasion", "budget_amount", "currency", "deadline_days"];
+  for (const key of requiredFields) {
     if (!(key in data) || data[key] === null) {
       err("INTAKE_CLARIFICATION_REQUIRED", `intake.${key}`, "请补充明确的关系、场合、预算上限、币种及可用天数");
     }
+  }
+  let budget = Object.hasOwn(data, "budget_amount") ? data.budget_amount : null;
+  const budgetErrors = [];
+  if (revised) {
+    if (!Object.hasOwn(data, "contract_version")) {
+      err("INTAKE_CLARIFICATION_REQUIRED", "intake.contract_version", "请提供新版输入契约版本");
+    } else if (typeof data.contract_version !== "string") {
+      err("INVALID_TYPE", "intake.contract_version", "契约版本须为字符串");
+    } else if (data.contract_version !== CONTRACT_VERSION) {
+      err("INTAKE_UNKNOWN_LABEL", "intake.contract_version", "不支持此输入契约版本");
+    }
+    const interval = checkBudgetRange(Object.hasOwn(data, "budget_range") ? data.budget_range : null,
+      "intake.budget_range", budgetErrors, Object.hasOwn(data, "budget_mode") ? data.budget_mode : null);
+    if (interval !== null) {
+      if (Object.hasOwn(data, "budget_amount")) {
+        const scalar = amountToCents(budget);
+        if (typeof budget !== "string") {
+          budgetErrors.push({ code: "INVALID_TYPE", path: "intake.budget_amount", message: "金额必须为十进制字符串" });
+        } else if (scalar === null) {
+          budgetErrors.push({ code: "INVALID_AMOUNT", path: "intake.budget_amount", message: "金额必须为有限非负、至多两位小数的 ASCII 十进制字符串" });
+        } else if ([...budget].length > 1000) {
+          budgetErrors.push({ code: "LIMIT_EXCEEDED", path: "intake.budget_amount", message: "字段字符串超过 1000 个 Unicode 码点" });
+        } else if (scalar > 1000000n) {
+          budgetErrors.push({ code: "LIMIT_EXCEEDED", path: "intake.budget_amount", message: "预算须在 0 至 10000 之间" });
+        } else if (scalar !== interval[1]) {
+          budgetErrors.push({ code: "BUDGET_RANGE_MISMATCH", path: "intake.budget_amount", message: "预算上限须与区间 max 数值一致" });
+        }
+      } else {
+        budget = data.budget_range.max;
+      }
+    }
+    errors.push(...budgetErrors);
+  }
+  const dislikes = Object.hasOwn(data, "dislikes") ? data.dislikes : "";
+  if (typeof dislikes !== "string") {
+    err("INVALID_TYPE", "intake.dislikes", "不喜欢的东西须为字符串，可为空");
+  } else if ([...dislikes].length > 1000) {
+    err("LIMIT_EXCEEDED", "intake.dislikes", "不喜欢的东西最多 1000 个 Unicode 码点");
+  }
+
+  let previousGifts = Object.hasOwn(data, "previous_gifts") ? data.previous_gifts : "";
+  if (typeof previousGifts !== "string") {
+    err("INVALID_TYPE", "intake.previous_gifts", "以前送过什么须为字符串，可为空");
+  } else if ([...previousGifts].length > 1000) {
+    err("LIMIT_EXCEEDED", "intake.previous_gifts", "送礼历史最多 1000 个 Unicode 码点");
+  } else if (/^[\u0009-\u000d\u001c-\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/u.test(previousGifts)) {
+    previousGifts = "";
   }
 
   const choice = (key, table, fallback = null) => {
@@ -80,6 +132,22 @@ export function adaptIntake(intakeJson, options = {}) {
 
   const relation = choice("recipient_relation", RELATIONS_FULL);
   const occasion = choice("occasion", OCCASION_TABLE);
+  const customText = (key) => {
+    if (!Object.hasOwn(data, key)) return null;
+    const value = data[key];
+    if (typeof value !== "string" || !value.trim()) {
+      err("INVALID_TYPE", `intake.${key}`, "自定义文本必须为非空字符串");
+      return null;
+    }
+    if ([...value].length > 1000) err("LIMIT_EXCEEDED", `intake.${key}`, "自定义文本最多 1000 个 Unicode 码点");
+    return value;
+  };
+  const relationCustom = customText("recipient_relation_custom");
+  const occasionCustom = customText("occasion_custom");
+  if (relation === "other" && relationCustom === null) err("INTAKE_CLARIFICATION_REQUIRED", "intake.recipient_relation_custom", "选择其他关系时请填写自定义关系");
+  if (relation !== "other" && Object.hasOwn(data, "recipient_relation_custom")) err("INTAKE_UNKNOWN_FIELD", "intake.recipient_relation_custom", "只有选择其他关系时才能填写自定义关系");
+  if (occasion === "other" && occasionCustom === null) err("INTAKE_CLARIFICATION_REQUIRED", "intake.occasion_custom", "选择其他场合时请填写自定义场合");
+  if (occasion !== "other" && Object.hasOwn(data, "occasion_custom")) err("INTAKE_UNKNOWN_FIELD", "intake.occasion_custom", "只有选择其他场合时才能填写自定义场合");
   const closeness = choice("closeness", CLOSENESS_TABLE, "unknown");
   for (const key of ["recipient_relation", "occasion"]) {
     if (data[key] === "unknown") {
@@ -170,10 +238,12 @@ export function adaptIntake(intakeJson, options = {}) {
     // 两层契约：recipient_relation 是面向人与提示词的冻结中文显示文本，
     // recipient_relation_id 是供代码分支（关系优先级、追求对象低压力）使用的稳定机器值，
     // 只由服务端产出，不在输入白名单内，前端提交会被 INTAKE_UNKNOWN_FIELD 拒绝。
-    recipient_relation: relation && relation in RELATIONS_FULL ? RELATIONS_FULL[relation] : "",
+    recipient_relation: relation && relation in RELATIONS_FULL ? (relation === "other" ? relationCustom : RELATIONS_FULL[relation]) : "",
     recipient_relation_id: relation && relation in RELATIONS_FULL ? relation : "",
-    occasion: occasion && occasion in OCCASION_TABLE ? OCCASION_TABLE[occasion] : "",
-    budget_amount: "budget_amount" in data ? data.budget_amount : null,
+    recipient_relation_custom: relation === "other" ? relationCustom : null,
+    occasion: occasion && occasion in OCCASION_TABLE ? (occasion === "other" ? occasionCustom : OCCASION_TABLE[occasion]) : "",
+    occasion_custom: occasion === "other" ? occasionCustom : null,
+    budget_amount: budget,
     currency: "currency" in data ? data.currency : null,
     available_days: "deadline_days" in data ? data.deadline_days : null,
     facts: interests
@@ -192,11 +262,19 @@ export function adaptIntake(intakeJson, options = {}) {
     gift_styles: styles,
     hard_exclusions_original: exclusions,
   };
+  if (revised || Object.hasOwn(data, "previous_gifts")) request.previous_gifts = previousGifts;
+  if (revised) {
+    Object.assign(request, { contract_version: CONTRACT_VERSION, budget_range: Object.hasOwn(data, "budget_range") ? data.budget_range : null, dislikes });
+  } else if (Object.hasOwn(data, "dislikes")) {
+    request.dislikes = dislikes;
+  }
 
   // 复用同一套请求检查；空批次产生的候选错误不会成为输入错误。
   const requestJson = dump(request);
   const checked = validate(requestJson, "{}", strictParse);
-  errors.push(...checked.errors.filter((e) => e.path.startsWith("request")));
+  errors.push(...checked.errors.filter((e) => e.path.startsWith("request") &&
+    !(budgetErrors.length && (e.path.startsWith("request.budget_range") || e.path.startsWith("request.budget_amount"))) &&
+    !(e.path.includes("dislikes") && errors.some((x) => x.path === "intake.dislikes"))));
   if (checked.status === "error") {
     err("INTERNAL_ERROR", "intake", "输入检查暂不可用，请稍后重试");
   }

@@ -1,0 +1,182 @@
+{
+  "tested_commit": "e3e5125d0068cc8b987810236c6e05e5c0a58c15",
+  "online_calls": 0,
+  "Dify": "未执行",
+  "tokens": "未执行",
+  "model_latency": "未执行",
+  "cost": "未执行",
+  "committed_before_rebuild": [
+    {
+      "file": "validator/rules.py",
+      "expected": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "actual": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "passed": true
+    },
+    {
+      "file": "workflow/labels.py",
+      "expected": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "actual": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "passed": true
+    },
+    {
+      "file": "workflow/intake.py",
+      "expected": "3f7a9554288b4afc3dbc11987b20fade51ea46c4cb7bb64b4636d9cd8d64da1c",
+      "actual": "3f7a9554288b4afc3dbc11987b20fade51ea46c4cb7bb64b4636d9cd8d64da1c",
+      "passed": true
+    },
+    {
+      "file": "workflow/runtime.py",
+      "expected": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "actual": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "passed": true
+    },
+    {
+      "file": "code_node.py",
+      "expected": "abd4e2a88435ee77f963c41184efd008b7b49de72abb08add6c3969d663001e1",
+      "actual": "abd4e2a88435ee77f963c41184efd008b7b49de72abb08add6c3969d663001e1",
+      "passed": true
+    },
+    {
+      "file": "intake_node.py",
+      "expected": "b6df76af5d3e83f86cd8aab295b4a8e3f2e9e3daacb9f61f3f8fee65b1898b69",
+      "actual": "b6df76af5d3e83f86cd8aab295b4a8e3f2e9e3daacb9f61f3f8fee65b1898b69",
+      "passed": true
+    },
+    {
+      "file": "check_node.py",
+      "expected": "82462ef0cd04b3c86a62b739f1a233b4e3d1d0cbf44e356f416a8e4c04ed1685",
+      "actual": "82462ef0cd04b3c86a62b739f1a233b4e3d1d0cbf44e356f416a8e4c04ed1685",
+      "passed": true
+    },
+    {
+      "file": "recheck_node.py",
+      "expected": "2d1d6340fda9f7170175a9c6d3aa0a7c3d2ccc33076b53dd89b5fafdbbc2f552",
+      "actual": "2d1d6340fda9f7170175a9c6d3aa0a7c3d2ccc33076b53dd89b5fafdbbc2f552",
+      "passed": true
+    },
+    {
+      "file": "report_node.py",
+      "expected": "161b1349907a5e51edbad7e762c10a8a884c1d2b1ca34749c387491a7b76336c",
+      "actual": "161b1349907a5e51edbad7e762c10a8a884c1d2b1ca34749c387491a7b76336c",
+      "passed": true
+    }
+  ],
+  "commands": [
+    {
+      "label": "build",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/build_code_node.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "main",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "legacy",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "nov01",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/verify_local.py",
+        "--nov01"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "stage-c",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/acceptance/stage_c",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    {
+      "label": "context",
+      "command": [
+        "C:\\Users\\lenovo\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "workflow/examples/avoid-history/verify.py"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "after_rebuild": [
+    {
+      "file": "validator/rules.py",
+      "expected": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "actual": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+      "passed": true
+    },
+    {
+      "file": "workflow/labels.py",
+      "expected": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "actual": "e3128d298808fecf900974b2dcb12d33034204701175614cdb43fc4a17f67910",
+      "passed": true
+    },
+    {
+      "file": "workflow/intake.py",
+      "expected": "3f7a9554288b4afc3dbc11987b20fade51ea46c4cb7bb64b4636d9cd8d64da1c",
+      "actual": "3f7a9554288b4afc3dbc11987b20fade51ea46c4cb7bb64b4636d9cd8d64da1c",
+      "passed": true
+    },
+    {
+      "file": "workflow/runtime.py",
+      "expected": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "actual": "32661d60ae1dafb1b7d17a8bb902a408419cbf7b3d2ecaad3aab252a99947683",
+      "passed": true
+    },
+    {
+      "file": "code_node.py",
+      "expected": "abd4e2a88435ee77f963c41184efd008b7b49de72abb08add6c3969d663001e1",
+      "actual": "abd4e2a88435ee77f963c41184efd008b7b49de72abb08add6c3969d663001e1",
+      "passed": true
+    },
+    {
+      "file": "intake_node.py",
+      "expected": "b6df76af5d3e83f86cd8aab295b4a8e3f2e9e3daacb9f61f3f8fee65b1898b69",
+      "actual": "b6df76af5d3e83f86cd8aab295b4a8e3f2e9e3daacb9f61f3f8fee65b1898b69",
+      "passed": true
+    },
+    {
+      "file": "check_node.py",
+      "expected": "82462ef0cd04b3c86a62b739f1a233b4e3d1d0cbf44e356f416a8e4c04ed1685",
+      "actual": "82462ef0cd04b3c86a62b739f1a233b4e3d1d0cbf44e356f416a8e4c04ed1685",
+      "passed": true
+    },
+    {
+      "file": "recheck_node.py",
+      "expected": "2d1d6340fda9f7170175a9c6d3aa0a7c3d2ccc33076b53dd89b5fafdbbc2f552",
+      "actual": "2d1d6340fda9f7170175a9c6d3aa0a7c3d2ccc33076b53dd89b5fafdbbc2f552",
+      "passed": true
+    },
+    {
+      "file": "report_node.py",
+      "expected": "161b1349907a5e51edbad7e762c10a8a884c1d2b1ca34749c387491a7b76336c",
+      "actual": "161b1349907a5e51edbad7e762c10a8a884c1d2b1ca34749c387491a7b76336c",
+      "passed": true
+    }
+  ],
+  "rebuild_byte_identical": true
+}

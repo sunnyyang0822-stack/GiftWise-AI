@@ -1,0 +1,218 @@
+{
+  "mode": "real_browser_controlled_model_not_real_dify",
+  "observed_at": "2026-10-31T06:37:14.533Z",
+  "retrieval": {
+    "status": "ready",
+    "evidence_id": "15d0e0be-b993-43f7-ba6c-97816a1c986a",
+    "products": [
+      {
+        "physical": {
+          "dimensions": {
+            "status": "known",
+            "value": {
+              "length": 180,
+              "width": 153,
+              "height": 120
+            },
+            "unit": "mm",
+            "sources": [
+              {
+                "kind": "browser_observed",
+                "source_url": "https://www.dfrobot.com.cn/goods-1062.html",
+                "evidence_ref": "dfrobot-KIT0090-1793428631821",
+                "observed_at": "2026-10-31T06:37:11.816Z",
+                "value": {
+                  "length": 180,
+                  "width": 153,
+                  "height": 120
+                },
+                "unit": "mm",
+                "context": "组装后尺寸，不代表配送包装尺寸"
+              }
+            ]
+          },
+          "shape": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "weight": {
+            "status": "known",
+            "value": 160,
+            "unit": "g",
+            "sources": [
+              {
+                "kind": "browser_observed",
+                "source_url": "https://www.dfrobot.com.cn/goods-1062.html",
+                "evidence_ref": "dfrobot-KIT0090-1793428631821",
+                "observed_at": "2026-10-31T06:37:11.816Z",
+                "value": 160,
+                "unit": "g",
+                "context": "页面所列商品重量，非运输包装重量"
+              }
+            ]
+          },
+          "fragility": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "materials": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          }
+        },
+        "product_id": "506c1c6f-2b68-4477-a02f-12e6b554abcf",
+        "name": "虫虫机器人六足版 兼容蓝牙4.0",
+        "variant": "KIT0090，单套（详情默认规格）",
+        "quantity": 1,
+        "price_amount": "315.00",
+        "price_range": null,
+        "currency": "CNY",
+        "price_conditions": [],
+        "price_source": "browser_observed",
+        "source_url": "https://www.dfrobot.com.cn/goods-1062.html",
+        "observed_at": "2026-10-31T06:37:11.816Z",
+        "image_id": null,
+        "shipping_status": "unknown",
+        "stock_status": "unknown",
+        "evidence_ref": "dfrobot-KIT0090-1793428631821"
+      },
+      {
+        "physical": {
+          "dimensions": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "shape": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "weight": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "fragility": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "materials": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          }
+        },
+        "product_id": "251c8be9-6846-4f48-a3ba-5e15d33d08aa",
+        "name": "micro:bit Go V2 基础套装（含电池盒与数据线）",
+        "variant": "KIT0130，单套（详情默认规格）",
+        "quantity": 1,
+        "price_amount": "165.00",
+        "price_range": null,
+        "currency": "CNY",
+        "price_conditions": [],
+        "price_source": "browser_observed",
+        "source_url": "https://www.dfrobot.com.cn/goods-1434.html",
+        "observed_at": "2026-10-31T06:37:12.941Z",
+        "image_id": null,
+        "shipping_status": "unknown",
+        "stock_status": "unknown",
+        "evidence_ref": "dfrobot-KIT0130-1793428632941"
+      },
+      {
+        "physical": {
+          "dimensions": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "shape": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "weight": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "fragility": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          },
+          "materials": {
+            "status": "unknown",
+            "value": null,
+            "unit": null,
+            "sources": []
+          }
+        },
+        "product_id": "dfe0f084-541c-418a-a737-ecbb5ea25136",
+        "name": "Arduino自动浇花套件",
+        "variant": "KIT0003，单套（详情默认规格）",
+        "quantity": 1,
+        "price_amount": "335.00",
+        "price_range": null,
+        "currency": "CNY",
+        "price_conditions": [],
+        "price_source": "browser_observed",
+        "source_url": "https://www.dfrobot.com.cn/goods-503.html",
+        "observed_at": "2026-10-31T06:37:13.944Z",
+        "image_id": null,
+        "shipping_status": "unknown",
+        "stock_status": "unknown",
+        "evidence_ref": "dfrobot-KIT0003-1793428633944"
+      }
+    ],
+    "warnings": [
+      "仅适用于确认科技兴趣的创客方向；须确认装配能力、所需设备与准备时间",
+      "页面观察价，非结算/库存/送达保证；图片使用权未核实，未转载"
+    ]
+  },
+  "selectable_candidate_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "media": {
+    "contract_version": "retrieval-media-v2",
+    "status": "unavailable",
+    "candidates": [
+      {
+        "candidate_id": "c1",
+        "product_id": "506c1c6f-2b68-4477-a02f-12e6b554abcf",
+        "image": null
+      },
+      {
+        "candidate_id": "c2",
+        "product_id": "251c8be9-6846-4f48-a3ba-5e15d33d08aa",
+        "image": null
+      },
+      {
+        "candidate_id": "c3",
+        "product_id": "dfe0f084-541c-418a-a737-ecbb5ea25136",
+        "image": null
+      }
+    ],
+    "selected": null
+  },
+  "model_calls": 0,
+  "paid_image_calls": 0
+}

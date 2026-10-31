@@ -1,0 +1,402 @@
+{
+  "total": 99,
+  "passed": 99,
+  "checks": [
+    {
+      "name": "/privacy.html HTTP 200",
+      "passed": true
+    },
+    {
+      "name": "/terms.html HTTP 200",
+      "passed": true
+    },
+    {
+      "name": "/legal.css HTTP 200",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 UTF8",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 mail",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 operator",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 anchors",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 home",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 noExternal",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 anchor click",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "privacy 1440 skip target",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 UTF8",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 mail",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 operator",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 anchors",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 home",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 noExternal",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 anchor click",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "terms 1440 skip target",
+      "passed": true
+    },
+    {
+      "name": "home 1440 footer links",
+      "passed": true
+    },
+    {
+      "name": "form 1440 footer links remain",
+      "passed": true
+    },
+    {
+      "name": "form 1440 step2",
+      "passed": true
+    },
+    {
+      "name": "form 1440 multiple interests per row",
+      "passed": true
+    },
+    {
+      "name": "form 1440 interest no overflow",
+      "passed": true
+    },
+    {
+      "name": "form 1440 back retains relation",
+      "passed": true
+    },
+    {
+      "name": "form 1440 no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "form 1440 policy opens new page",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 UTF8",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 mail",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 operator",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 anchors",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 home",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 noExternal",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 anchor click",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "privacy 390 skip target",
+      "passed": true
+    },
+    {
+      "name": "terms 390 UTF8",
+      "passed": true
+    },
+    {
+      "name": "terms 390 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "terms 390 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "terms 390 mail",
+      "passed": true
+    },
+    {
+      "name": "terms 390 operator",
+      "passed": true
+    },
+    {
+      "name": "terms 390 anchors",
+      "passed": true
+    },
+    {
+      "name": "terms 390 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "terms 390 home",
+      "passed": true
+    },
+    {
+      "name": "terms 390 noExternal",
+      "passed": true
+    },
+    {
+      "name": "terms 390 anchor click",
+      "passed": true
+    },
+    {
+      "name": "terms 390 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "terms 390 skip target",
+      "passed": true
+    },
+    {
+      "name": "home 390 footer links",
+      "passed": true
+    },
+    {
+      "name": "form 390 footer links remain",
+      "passed": true
+    },
+    {
+      "name": "form 390 step2",
+      "passed": true
+    },
+    {
+      "name": "form 390 multiple interests per row",
+      "passed": true
+    },
+    {
+      "name": "form 390 interest no overflow",
+      "passed": true
+    },
+    {
+      "name": "form 390 back retains relation",
+      "passed": true
+    },
+    {
+      "name": "form 390 no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "form 390 policy opens new page",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 UTF8",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 mail",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 operator",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 anchors",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 home",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 noExternal",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 anchor click",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "privacy 320 skip target",
+      "passed": true
+    },
+    {
+      "name": "terms 320 UTF8",
+      "passed": true
+    },
+    {
+      "name": "terms 320 noOverflow",
+      "passed": true
+    },
+    {
+      "name": "terms 320 noReplacement",
+      "passed": true
+    },
+    {
+      "name": "terms 320 mail",
+      "passed": true
+    },
+    {
+      "name": "terms 320 operator",
+      "passed": true
+    },
+    {
+      "name": "terms 320 anchors",
+      "passed": true
+    },
+    {
+      "name": "terms 320 mutualLink",
+      "passed": true
+    },
+    {
+      "name": "terms 320 home",
+      "passed": true
+    },
+    {
+      "name": "terms 320 noExternal",
+      "passed": true
+    },
+    {
+      "name": "terms 320 anchor click",
+      "passed": true
+    },
+    {
+      "name": "terms 320 keyboard skip link",
+      "passed": true
+    },
+    {
+      "name": "terms 320 skip target",
+      "passed": true
+    },
+    {
+      "name": "home 320 footer links",
+      "passed": true
+    },
+    {
+      "name": "form 320 footer links remain",
+      "passed": true
+    },
+    {
+      "name": "form 320 step2",
+      "passed": true
+    },
+    {
+      "name": "form 320 multiple interests per row",
+      "passed": true
+    },
+    {
+      "name": "form 320 interest no overflow",
+      "passed": true
+    },
+    {
+      "name": "form 320 back retains relation",
+      "passed": true
+    },
+    {
+      "name": "form 320 no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "form 320 policy opens new page",
+      "passed": true
+    }
+  ]
+}
