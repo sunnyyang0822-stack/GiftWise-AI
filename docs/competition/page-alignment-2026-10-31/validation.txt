@@ -1,0 +1,80 @@
+PASS Read-only current PPT source hash and size unchanged
+PASS Main-workspace unified document remains untouched
+PASS All 11 spoken sections match actual PPT order and exact titles
+PASS Speech design budget continuous 0 to 300 seconds; not a measurement
+PASS Skeleton contains current slide roster; supersedes 8-page recommendation
+PASS Unified entry includes all seven requested material sections
+PASS Hub Demo, main script and storyboard share identical 3-minute timeline
+PASS Question bank still contains exactly questions 1 through 30
+PASS All active material relative links resolve
+PASS SC01 to SC10 inventory names existing historical assets
+PASS Earlier audit/material bodies preserved; only dated notes appended
+PASS No product, binary or historical test evidence modified
+PASS Earlier main-workspace audit reports unchanged
+PASS git diff --check
+Scope: documentation and OOXML readback only. No product tests, new screenshots, model calls or slide edits.
+
+Reproduce from the material worktree root in PowerShell with Python 3 (source PPT stays at its recorded primary-workspace path):
+@'
+from pathlib import Path
+import subprocess,re,json,hashlib
+base='a705ef76e14c0b8cfff5ca44cad0cc09843725d4'
+folder=Path('docs/competition/page-alignment-2026-10-31')
+(folder/'validation.txt').touch(exist_ok=True)
+checks=[]
+def check(label,ok):
+ checks.append(bool(ok));print(('PASS ' if ok else 'FAIL ')+label)
+source=json.loads((folder/'ppt-page-text.json').read_text(encoding='utf8'))
+ppt=Path(source['source_path'])
+check('Read-only current PPT source hash and size unchanged',hashlib.sha256(ppt.read_bytes()).hexdigest()==source['sha256'] and ppt.stat().st_size==source['bytes'])
+finger=json.loads((folder/'input-fingerprints.json').read_text(encoding='utf8'))
+hubsrc=Path(finger['unified_document_input']['path'])
+check('Main-workspace unified document remains untouched',hashlib.sha256(hubsrc.read_bytes()).hexdigest()==finger['unified_document_input']['sha256'])
+speech=Path('docs/speech/讲稿-5分钟-2026-10-31.md').read_text(encoding='utf8')
+heads=re.findall(r'^## S(\d+)｜第 (\d+) 页｜(.*?)｜(\d+):(\d+)–(\d+):(\d+)（计划）',speech,re.M)
+check('All 11 spoken sections match actual PPT order and exact titles',len(heads)==11 and all(int(a)==i and int(b)==i and title==row['text'][1] for i,((a,b,title,*_),row) in enumerate(zip(heads,source['slides']),1)))
+ranges=[(int(h[3])*60+int(h[4]),int(h[5])*60+int(h[6])) for h in heads]
+check('Speech design budget continuous 0 to 300 seconds; not a measurement',len(ranges)==11 and ranges[0][0]==0 and ranges[-1][1]==300 and all(ranges[i][1]==ranges[i+1][0] for i in range(10)))
+bone=Path('docs/competition/答辩PPT骨架.md').read_text(encoding='utf8')
+check('Skeleton contains current slide roster; supersedes 8-page recommendation','## 主讲八页建议' not in bone and all(r['text'][1] in bone for r in source['slides']))
+hub=Path('docs/competition/赛道B技术交付总文档.md').read_text(encoding='utf8')
+expected=['一、场景与价值分析','二、系统架构设计文档','三、Agent 执行流程','四、异常处理说明','五、Demo 与代码仓库','六、成本与性能分析','七、可观测性证据']
+check('Unified entry includes all seven requested material sections',all('## '+x in hub for x in expected))
+demo=Path('docs/demo-script.md').read_text(encoding='utf8');story=Path('docs/demo/分镜计时表-3min.md').read_text(encoding='utf8')
+def times(t):return re.findall(r'^\| (\d+:\d+–\d+:\d+) \|',t,re.M)
+# Story has D1 column first; gather its distinct planned time cells.
+st=re.findall(r'^\| D\d .*?\| (\d+:\d+–\d+:\d+) \|',story,re.M)
+check('Hub Demo, main script and storyboard share identical 3-minute timeline',times(hub)==times(demo)==st and len(st)==5 and st[0].startswith('0:00') and st[-1].endswith('3:00'))
+qa=Path('docs/qa-prep/30题问答.md').read_text(encoding='utf8')
+check('Question bank still contains exactly questions 1 through 30',list(map(int,re.findall(r'^### (\d+)\.',qa,re.M)))==list(range(1,31)))
+active=['docs/competition/赛道B技术交付总文档.md','docs/competition/PPT页序对齐与截图替换清单-2026-10-31.md','docs/competition/答辩PPT骨架.md','docs/speech/讲稿-5分钟-2026-10-31.md','docs/demo-script.md','docs/demo/分镜计时表-3min.md','docs/qa-prep/30题问答.md','docs/qa-prep/红线话术与兜底动作.md']
+missing=[]
+for f in active:
+ for target in re.findall(r'\]\(([^)]+)\)',Path(f).read_text(encoding='utf8')):
+  if '://' in target or target.startswith('#'):continue
+  if not (Path(f).parent/target.split('#')[0]).exists():missing.append((f,target))
+check('All active material relative links resolve',not missing)
+if missing:print(missing)
+# Check exact old filenames in screenshot inventory, carrying directory within a row.
+inv=Path(active[1]).read_text(encoding='utf8');missing_assets=[];ids=[]
+for row in inv.splitlines():
+ if not re.match(r'^\| SC\d+ \|',row):continue
+ ids.append(row.split('|')[1].strip());oldcell=row.split('|')[2];current=None
+ for target in re.findall(r'`([^`]+)`',oldcell):
+  if target.startswith('docs/'):
+   f=Path(target);current=f.parent
+  else:f=current/target if current else Path(target)
+  if not f.exists():missing_assets.append(str(f))
+check('SC01 to SC10 inventory names existing historical assets',ids==[f'SC{i:02d}' for i in range(1,11)] and not missing_assets)
+if missing_assets:print(missing_assets)
+append=['docs/competition/文案修订与待核实清单-2026-10-31.md','docs/competition/材料清单与自查.md','docs/speech/README.md','docs/demo/README.md','docs/qa-prep/README.md']
+check('Earlier audit/material bodies preserved; only dated notes appended',all(Path(f).read_text(encoding='utf8').startswith(subprocess.check_output(['git','show',base+':'+f]).decode('utf8').replace('\r\n','\n')) for f in append))
+changed=subprocess.check_output(['git','diff','--name-only','-z',base]).decode('utf8').split('\0');changed=[x for x in changed if x]
+check('No product, binary or historical test evidence modified',all((x.endswith('.md') and x.startswith('docs/')) or (x.startswith('docs/competition/page-alignment-2026-10-31/') and x.endswith(('.json','.txt'))) for x in changed))
+oldreports=json.loads(Path('docs/competition/copy-review-2026-10-31/reviewed-sources.json').read_text(encoding='utf8'))
+check('Earlier main-workspace audit reports unchanged',all(hashlib.sha256(Path(x['reviewed_location']).read_bytes()).hexdigest()==x['sha256'] for x in oldreports['primary_workspace_materials_read_only'] if '事实审查' in x['path']))
+check('git diff --check',subprocess.run(['git','diff','--check'],capture_output=True).returncode==0)
+print('Scope: documentation and OOXML readback only. No product tests, new screenshots, model calls or slide edits.')
+raise SystemExit(0 if all(checks) else 1)
+
+'@ | py -
