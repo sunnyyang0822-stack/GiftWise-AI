@@ -119,8 +119,8 @@ function renderBadges() {
   flag.textContent = mock ? "模拟数据 · 未接真实模型" : "模型生成 · 价格未核实";
   flag.classList.toggle("mode-flag--real", !mock);
   flag.title = mock ? "本次候选、识别与呈现为模拟数据，不是真实模型输出。" : "生成内容仍需独立规则检查，价格、库存与送达未核实。";
-  $("hero-flag").hidden = !mock;
-  $("hero-flag").textContent = "当前为模拟数据演示，识别、方案与呈现均非真实模型输出；价格、库存与送达未核实。";
+  $("hero-flag").hidden = true;
+  $("hero-flag").textContent = "";
 }
 function renderBanners() {
   const slot = $("banner-slot");
@@ -226,7 +226,6 @@ function renderStep1() {
   body.push(
     el("section", { class: "card" }, [
       el("h2", { class: "card__title", text: "熟悉程度（可跳过）" }),
-      el("p", { class: "field__hint", text: "不确定可以留空；不会依据关系或职业替你推断对方的喜好。" }),
       el(
         "div",
         { class: "chips" },
@@ -336,9 +335,8 @@ function renderBudget() {
   const modes = [["slider","选择预算区间"],["zero","不花钱的心意"],["other","其他金额"],["uncertain","不确定"]];
   const body = [
     el("h2", {class:"card__title",text:"这份心意，想花多少？"}),
-    el("p", {class:"field__hint",text:"预算只计算礼物本身。包装、贺卡、装饰和配送未计价，不代表免费。"}),
     el("div", {class:"chips",role:"group","aria-label":"预算方式"}, modes.map(([mode,label]) => chip(label,f.budget_mode===mode,()=>{
-      f.budget_mode = f.budget_mode === mode ? null : mode;
+      f.budget_mode = mode;
       f.budget_confirmed = mode === "zero" && f.budget_mode === "zero";
       if (f.budget_mode === "zero") { f.budget_min="0";f.budget_max="0"; }
       if (f.budget_mode === "slider") {f.budget_min="100";f.budget_max="300";}
@@ -375,7 +373,6 @@ function renderBudget() {
           el("strong",{text:"1000 元"}),
         ]),
       ]),
-      el("p",{class:"field__hint",text:"同一条轨道的两端都可拖动；左端是下限，右端是上限。也可用方向键调整，每次 50 元。"})
     );
   } else if (f.budget_mode === "other") {
     body.push(el("div",{class:"budget-custom"},["min","max"].map(which=>el("label",{},[
@@ -386,7 +383,7 @@ function renderBudget() {
       }}),
     ]))),el("p",{class:"field__hint",text:"两端必填，0–10000 元，最多两位小数。"}));
   } else if (f.budget_mode === "zero") {
-    body.push(el("p",{class:"field__selected",text:"礼物预算 0 元：优先已有材料、手写或陪伴；可行性仍需核对，不把新购物品称作免费。"}));
+    body.push(el("p",{class:"field__selected",text:"用已有材料、手写或陪伴，表达不花钱的心意。"}));
   } else body.push(el("p",{class:"field__hint",text:"可以先想一想愿意花多少。不确定时会先请你澄清，不直接生成。"}));
   if (["slider","other"].includes(f.budget_mode)) body.push(el("label",{class:"confirm-row"},[
     el("input",{id:"budget-confirm",type:"checkbox",checked:f.budget_confirmed,onchange:e=>{f.budget_confirmed=e.target.checked;invalidateAnalysis();}}),
@@ -399,7 +396,6 @@ function renderDeadline() {
   const simpleLabel = days => ({ 1: "一天", 5: "3–5天", 7: "一周", 30: "一月", 90: "一季度", 365: "一年" }[days] || "");
   return el("section",{class:"card"},[
     el("h2",{class:"card__title",text:"你有多少时间准备？"}),
-    el("p",{class:"field__hint",text:"选一个最接近的时间，不代表承诺送达日期。"}),
     options ? el("div",{class:"chips deadline-options",role:"group","aria-label":"准备时间"},options.map(r=>chip(simpleLabel(r.days) || r.label,state.form.deadline_days===String(r.days),()=>{
       state.form.deadline_days=state.form.deadline_days===String(r.days)?"":String(r.days);invalidateAnalysis();render();
     }))) : el("p",{class:"field__error",role:"alert",text:"准备时间配置尚未更新为六档，请稍后刷新；暂不能提交。"}),
@@ -571,14 +567,13 @@ function renderStep3() {
             f.dislikes=e.target.value;invalidateAnalysis();render();
           }},[f.dislikes]),
         ]),
-        el("p",{class:"field__hint",text:`${codePoints(f.dislikes)} / 1000 字。非空内容会先识别，再请你逐条确认；不能可靠理解时会先澄清。`}),
+        el("p",{class:"field__hint",text:`${codePoints(f.dislikes)} / 1000 字`}),
         el("label",{class:"text-field"},[
           el("span",{text:"补充说明（可选）"}),
           el("textarea",{id:"additional-context","aria-label":"补充说明","data-field":"additional_context",placeholder:"例如：希望表达感谢，不造成回应压力。",oninput:e=>{
             f.additional_context=e.target.value;invalidateAnalysis();render();
           }},[f.additional_context]),
         ]),
-        el("p",{class:"field__hint",text:"补充说明不能解除上面的限制。无需真实姓名、手机号或邮箱。"}),
       ]),
       renderAnalysis(),
     ],
@@ -647,7 +642,6 @@ function renderWaiting() {
       el("section", { class: "state" }, [
         el("div", { class: "spinner", role: "presentation" }),
         el("h2", { class: "state__title", text: "正在载入接入层配置…" }),
-        el("p", { text: "关系、场合、兴趣、风格与预算区间都由服务端配置下发，载入完成前不显示空表单，也不使用任何前端内置默认值。" }),
       ]),
     ],
     actions: [],
@@ -658,9 +652,7 @@ function renderGenerating() {  return {
     body: [
       el("section", { class: "state" }, [
         el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), state.pending?.kind === "analyze" ? "正在识别你写下的限制…" : "正在生成三个不同思路…"]),
-        el("p", { text: state.pending?.kind === "analyze" ? "先核对原文依据与识别理由；确认前不会生成任何礼物方案。" : "服务端正在做确定性适配 → 生成三候选 → 独立规则校验；如有可修订项，最多自动修订一次并重新校验。" }),
-        el("p", { text: "你已经在认真对待这份心意了——先喝口水，剩下的交给服务端。" }),
-        el("p", { class: "field__hint", text: "请不要重复点击；选择方案之前不会生成包装、贺卡或赠送方式。" }),
+        el("p", { text: "稍等一下，正在为你整理。" }),
       ]),
     ],
     actions: [],
@@ -697,10 +689,7 @@ function renderRecommendation() {
         el("dd", { text: `已用 ${report.repair_count} / 1，剩余 ${report.remaining_repairs}（由服务端持有，浏览器不能提交）` }),
         el("dt", { text: "当前选择" }),
         el("dd", { text: report.selected_candidate_id === null ? "尚未选择（推荐阶段服务端固定返回 null）" : String(report.selected_candidate_id) }),
-        el("dt", { text: "真实业务数据" }),
-        el("dd", { text: "not_verified（价格、库存、送达均未核实）" }),
       ]),
-      el("p", { class: "field__hint", text: "以下校验结果来自独立规则检查（接入层镜像 validator/rules.py），不是模型自述。" }),
       report.workflow_errors && report.workflow_errors.length > 0
         ? errorBox(report.workflow_errors, "工作流层错误（影响可选范围）")
         : null,
@@ -761,7 +750,7 @@ function renderRecommendation() {
               : ["未列出；不代表已经核实"],
           ),
           el("dt", { text: "礼物估价" }),
-          el("dd", { text: `${candidate.estimated_total} ${candidate.currency}（只表示所选礼物本身；业务数据未核实）` }),
+          el("dd", { text: `${candidate.estimated_total} ${candidate.currency}（礼物估价）` }),
           el("dt", { text: "准备时间" }),
           el("dd", { text: `${candidate.estimated_preparation_days} 天` }),
           el("dt", { text: "独立检查结果" }),
@@ -852,8 +841,6 @@ function renderPresentation() {
           : null,
         el("dt", { text: "全局修订" }),
         el("dd", { text: `已用 ${view.repair_count} / 1，剩余 ${view.remaining_repairs}` }),
-        el("dt", { text: "真实业务数据" }),
-        el("dd", { text: "not_verified（价格、库存、送达均未核实，本页费用与天数只是估算）" }),
         view.repair_note ? el("dt", { text: "修订说明" }) : null,
         view.repair_note ? el("dd", { text: view.repair_note }) : null,
       ]),
@@ -885,13 +872,13 @@ function renderPresentation() {
         el("dt", { text: "预算区间" }),
         el("dd", { text: s.budget_range ? `${s.budget_range.min}–${s.budget_range.max} ${s.currency}` : "新版账单字段缺失" }),
         el("dt", { text: "包装等附加项" }),
-        el("dd", { text: "只显示风格与色调；未计价，不代表免费" }),
+        el("dd", { text: "风格与色调" }),
         el("dt", { text: "准备时间" }),
         el("dd", { text: `${s.revised_estimated_preparation_days} 天（可用 ${s.available_days} 天）` }),
         el("dt", { text: "禁忌复核" }),
         el("dd", { text: `类别：${(s.forbidden_tags || []).join("、") || "无"}；字面词：${(s.forbidden_terms || []).join("、") || "无"}` }),
         el("dt", { text: "复核结论" }),
-        el("dd", { text: s.passed ? "通过；但价格、库存与送达仍未核实" : "未通过，未作为可执行方案展示" }),
+        el("dd", { text: s.passed ? "通过" : "未通过，未作为可执行方案展示" }),
       ]),
     ]),
   );
@@ -966,12 +953,6 @@ function renderEncourage() {
               : "未生成呈现",
           ),
         ]),
-        el("p", {
-          class: "encourage__note",
-          text:
-            "提醒：价格、库存与送达仍未核实（not_verified）；准备天数不是送达承诺；对方是否喜欢也不会被承诺。" +
-            "这次查看不消耗、也不重置全局自动修订额度（两个阶段合计最多 1 次，由服务端持有）。",
-        }),
       ]),
     ],
     actions: [
@@ -1253,6 +1234,7 @@ function render() {
   renderSteps();
   renderLandingVisibility();
   const view = $("view");
+  view.hidden = !state.inFlow;
   let rendered;
   if (!state.config && !(state.error && state.error.kind === "error")) {
     // 接入层配置还没到手：不渲染表单（表单字段全部来自配置，读它会空指针）。
@@ -1315,11 +1297,11 @@ function render() {
     return bar;
   })();
   actions.replaceChildren(...[].concat(rendered.actions || []).filter(Boolean));
+  actions.hidden = !state.inFlow;
+  document.querySelector(".app-footer").hidden = true;
   restoreFocus(focused);
 
-  $("footer-meta").textContent = state.config
-    ? `当前为${state.config.mode === "mock" ? "模拟数据演示" : "模型生成"} · 追求对象场景：${state.config.pursuit_contract_ready ? "已支持" : "暂不可用"} · 价格、库存及送达未核实`
-    : "";
+  $("footer-meta").textContent = "";
 }
 
 function selectLast() {
@@ -1332,7 +1314,7 @@ function selectLast() {
 async function bootstrap() {
   // 先绑定入口与读取配置，再渲染：渲染依赖 state.config，
   // 顺序反了会在首帧抛 TypeError 并阻断后面的配置加载。
-  for (const id of ["cta-start", "cta-start-2", "cta-start-3"]) {
+  for (const id of ["cta-start", "cta-start-2", "cta-start-3", "cta-welcome"]) {
     const node = $(id);
     if (node) {
       node.addEventListener("click", startFlow);

@@ -395,7 +395,8 @@ async function open(client, vp, url) {
   const page = new Page(client, sessionId);
   await page.init();
   await page.setViewport(vp.width, vp.height, vp.mobile);
-  await page.goto(url);
+  const fixtureUrl = url.includes("?") ? `${url}&ui_fixture=nov01` : `${url}?ui_fixture=nov01`;
+  await page.goto(fixtureUrl);
   return { page, targetId };
 }
 
@@ -427,7 +428,7 @@ async function main() {
     check(`[${tag}] 首屏无横向溢出`, !landing.horizontalOverflow, JSON.stringify(landing.offenders));
     check(`[${tag}] 吸顶「模拟数据」标识已渲染`, !!landing.modeFlag, "#mode-flag 未渲染或被隐藏");
     check(`[${tag}] 吸顶标识在首屏内可见`, !!landing.modeFlag && landing.modeFlag.inFirstScreen, JSON.stringify(landing.modeFlag));
-    check(`[${tag}] 首屏数据来源说明可见`, !!landing.heroFlag && landing.heroFlag.inFirstScreen, JSON.stringify(landing.heroFlag));
+    check(`[${tag}] 首屏模拟数据标识可见`, !!landing.modeFlag && landing.modeFlag.inFirstScreen, JSON.stringify(landing.modeFlag));
     await page.screenshot(`01-landing-${tag}`);
 
     const bytes = page.requests.reduce((sum, r) => sum + (r.encoded || 0), 0);

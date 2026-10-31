@@ -11,6 +11,8 @@ for (const id of ["badges", "banner-slot", "mode-flag", "hero-flag", "footer-met
   assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id}`);
 }
 assert.match(html, /tokens\.css[\s\S]*styles\.css[\s\S]*landing\.css/, "stylesheet order changed");
+assert.match(html, /id=["']welcome["']/);
+assert.match(html, /id=["']cta-welcome["']/);
 assert.match(app, /STEP_TITLES = \["关系场合预算时间", "兴趣风格", "不喜欢和补充"\]/);
 assert.match(app, /budget_min/);
 assert.match(app, /type:\s*["']range["']/);

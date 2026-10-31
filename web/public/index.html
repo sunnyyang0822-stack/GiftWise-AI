@@ -29,7 +29,7 @@
           <a href="#how">怎么运行</a>
           <a href="#after">选完之后</a>
           <a href="#faq">常见问题</a>
-          <a href="#privacy">隐私</a>
+          <a href="/privacy.html">隐私</a>
         </nav>
         <button class="btn btn--primary btn--sm" type="button" id="cta-start">
           开始挑选礼物
@@ -50,10 +50,7 @@
             <svg width="28" height="24" viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 12h23m-8-8 8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </button>
         </div>
-        <p class="hero__flag" id="hero-flag">当前为模拟数据演示：接入层还没有接入真实模型（未配置模型凭证），方案与呈现内容不是模型真实输出；价格、库存及送达未核实。</p>
-      </div>
-      <div class="gw-hero__bottom">
-        <a class="gw-scroll-link" href="#how" aria-label="下滑了解怎么运行"><svg width="18" height="20" viewBox="0 0 18 20" fill="none" aria-hidden="true" focusable="false"><path d="M9 2v15m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></a>
+        <p class="hero__flag" id="hero-flag" hidden></p>
       </div>
     </section>
 
@@ -87,206 +84,110 @@
             <span class="gw-how__number" aria-label="第三步">03 <span>由你决定</span></span>
             <h3>选定后，再好好表达。</h3>
             <p>你选中通过检查的方案后，再设计<br />配色、包装、贺卡与赠送方式。</p>
-            <p class="gw-how__detail"><span class="gw-how__target">目标设计</span> 尚未接入真实模型。</p>
           </div>
           <div class="gw-how__gift gw-how__gift--card" aria-hidden="true"></div>
         </li>
       </ol>
 
-      <!-- 讲人话的「怎么跑起来」：三页输入，顺序与真实表单一致 -->
-      <div class="gw-how__run">
-        <h3 class="gw-how__run-title">真要用起来，是这样三页。</h3>
-        <ol class="gw-how__run-list">
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">01</span>
-            <p class="gw-how__run-name">关系</p>
-            <p class="gw-how__run-text">先说是谁：恋人、追求对象、朋友、家人或同学。恋人与追求对象是两个独立选项，不会互相替代。</p>
-          </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">02</span>
-            <p class="gw-how__run-name">场合</p>
-            <p class="gw-how__run-text">生日、节日、感谢、纪念日、毕业／升职祝贺，或者其他；选最接近的那个就好，不必替自己找标准答案。</p>
-          </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">03</span>
-            <p class="gw-how__run-name">预算与时间</p>
-            <p class="gw-how__run-text">先选区间，再确认明确的金额上限和可用准备天数。系统不会替你补默认值；“不着急”也会被问成具体天数。</p>
-          </li>
-          <li>
-            <span class="gw-how__run-no" aria-hidden="true">04</span>
-            <p class="gw-how__run-name">兴趣与禁忌</p>
-            <p class="gw-how__run-text">知道多少说多少，不了解就留空。明确不要的类型按类别拦截，你确认过的字面词按原文拦截，含糊的会先要求澄清。</p>
-          </li>
-        </ol>
-        <p class="gw-how__run-foot">不需要注册，也不需要真实姓名；每一步都能返回上一步，已填内容不会丢。大约 60 秒可完成（待测目标，暂无真实用户计时数据）。</p>
-      </div>
-
-      <p class="gw-how__closing">把依据交代清楚，把选择留给你。<span>全局最多一次自动修订；费用与准备时间仅为估算。</span></p>
     </section>
 
     <!-- 第三屏 · 选完方案之后还有四段附加流程 -->
     <section class="gw-band gw-after" id="after" data-landing aria-labelledby="after-title">
+      <div class="after-gift" role="img" aria-label="超大俯视黑色礼盒，系好红色十字缎带与蝴蝶结"></div>
       <div class="gw-band__head">
         <div>
-          <p class="gw-band__kicker">第三屏 · 选完方案之后</p>
-          <h2 id="after-title">选完方案，<br />还有四段要一起做完。</h2>
+
+          <h2 id="after-title">从选礼物，<br />到好好送出去。</h2>
         </div>
-        <p>三条思路只是开始。只有你选定其中一个之后，才会按固定顺序生成下面四段——不会提前生成，也不会自动替你选。</p>
+        <p>说说关系、场合、预算和喜好，选定一个方案，再把表达准备好。</p>
       </div>
       <ol class="gw-after__list">
         <li class="gw-after__item">
           <span class="gw-after__no" aria-hidden="true">①</span>
           <h3>风格与配色</h3>
-          <p>定下整体气质：干净克制、温柔，还是有一点仪式感。颜色会给出具体色号，不只是一句形容词。</p>
+          <p>结合你们的关系与送礼场合，选好整体风格和颜色，让这份心意有自己的气质。</p>
         </li>
         <li class="gw-after__item">
           <span class="gw-after__no" aria-hidden="true">②</span>
-          <h3>包装材料与步骤</h3>
-          <p>用什么纸、什么缎带、怎么折、先放什么后放什么；按步骤做就能完成，不靠手感。</p>
+          <h3>包装风格</h3>
+          <p>让包装与礼物相衬，从简洁自然到适度的仪式感，把握恰到好处的分寸。</p>
         </li>
         <li class="gw-after__item">
           <span class="gw-after__no" aria-hidden="true">③</span>
-          <h3>贺卡正文与装饰</h3>
-          <p>一段可以直接抄下来的话，加上花等小装饰的建议。恋人、追求对象与朋友的话术各自不同。</p>
+          <h3>贺卡</h3>
+          <p>把祝福、感谢或在意写成一段自然的话，贴合你们的关系，也保留你的语气。</p>
         </li>
         <li class="gw-after__item">
           <span class="gw-after__no" aria-hidden="true">④</span>
-          <h3>赠送时机、方式与话术</h3>
-          <p>什么时候给、怎么递出去、开口第一句说什么。追求对象默认低压力表达，不制造回应压力。</p>
+          <h3>赠送方式</h3>
+          <p>想好什么时候送、怎么递出、第一句说什么，让表达轻松自然，不制造回应压力。</p>
         </li>
       </ol>
-      <p class="gw-band__note">
-        <span class="gw-target">目标设计</span>
-        这四段属于「选择之后」的呈现阶段：生成后还会复核所选礼物的估价、准备时间与禁忌；包装与贺卡只描述风格，不报价，也不代表免费。
-        当前接入层没有接入真实模型（未配置模型凭证），所以这四段现在展示的是内置模拟结构，不是模型真实输出。
-      </p>
     </section>
 
-    <!-- 第四屏 · Q&A -->
-    <section class="gw-band gw-faq" id="faq" data-landing aria-labelledby="faq-title">
-      <div class="gw-band__head">
-        <div>
-          <p class="gw-band__kicker">第四屏 · 常见问题</p>
-          <h2 id="faq-title">你可能想问的。</h2>
-        </div>
-        <p>答不上来的问题，我们不会写得像答得上。下面是当前实现里确定的部分，以及还没有做的部分。</p>
-      </div>
-      <div class="gw-faq__list">
-        <details class="gw-faq__item">
-          <summary>这是什么？能帮我做什么？</summary>
-          <div class="gw-faq__body"><p>它是一个送礼决策助手：你说清关系、场合、预算和准备时间，它给出三个方向不同的礼物思路，每个思路都带理由、依据和「仍未知」的部分，再由独立规则检查预算、时间与禁忌。它不是商品搜索，也不替你下单。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>要花钱吗？要注册吗？</summary>
-          <div class="gw-faq__body"><p>不用注册，也不用填真实姓名。当前是演示版本：页面上出现的所有价格都是估算（含礼物、包装、贺卡、装饰与配送），没有真实商品价格、库存或物流数据；一切都只是估算，不是承诺。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>为什么只给三个方案？</summary>
-          <div class="gw-faq__body"><p>三个方向不同的方案比较好比较，也不容易变成一屏挑花眼的清单。就三个，不再追加——避免把「想清楚」变成「再刷一刷」。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>我不知道 TA 喜欢什么，还能用吗？</summary>
-          <div class="gw-faq__body"><p>能。兴趣可以整组跳过，跳过就等于未知；系统不会按性别、年龄或职业替你猜。只有你选「明确知道」的才算事实，「只是猜测」会单独标成推断，和事实分开写。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>选完之后会发生什么？</summary>
-          <div class="gw-faq__body"><p>只有你明确选定某个通过检查的方案之后，才会按固定顺序生成风格配色、包装材料与步骤、贺卡正文与装饰、赠送时机与话术，并复核所选礼物的估价、准备时间和禁忌。这部分当前是目标设计，展示的是模拟结构。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>页面上为什么写着「模拟数据」？</summary>
-          <div class="gw-faq__body"><p>因为接入层还没有接入真实模型（未配置模型凭证）：三个方案与四段呈现都来自内置的固定模拟数据，不是模型真实输出。而独立规则校验、选择门槛和修订计数是真实实现，可以真实拦住不合格的方案。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>我的输入会被怎么处理？</summary>
-          <div class="gw-faq__body"><p>只在本次会话内使用：运行记录留在接入层进程的内存里，服务重启即失效，不写入数据库；记录里不含密钥、令牌或用户原文。页面不加载任何第三方脚本、字体或 CDN。完整说明见第六屏的隐私条款。</p></div>
-        </details>
-        <details class="gw-faq__item">
-          <summary>对方一定会喜欢吗？</summary>
-          <div class="gw-faq__body"><p>不会承诺。我们能做的是让礼物更贴合你们的关系、场合和边界；最后是否合适，仍然由你和对方真实的相处决定。这也是为什么页面上一直写着「未核实」。</p></div>
-        </details>
-      </div>
-    </section>
-
-    <!-- 第五屏 · 重申主题 -->
-    <section class="gw-band gw-theme" id="theme" data-landing aria-labelledby="theme-title">
-      <p class="gw-band__kicker">第五屏 · 说到底</p>
-      <h2 id="theme-title">我们不做替你决定的推荐。<br /><span>我们陪你把心意想清楚。</span></h2>
-      <ul class="gw-theme__list">
-        <li>
-          <strong>依据说清楚</strong>
-          <p>哪一句是你说过的，哪一句是模型猜的，哪一句我们其实不知道——分开写，不混成一句漂亮话。</p>
-        </li>
-        <li>
-          <strong>边界守得住</strong>
-          <p>预算上限、可用天数、明确禁忌是硬约束：模型不能覆盖，也不会被悄悄放宽，更不会替你做主。</p>
-        </li>
-        <li>
-          <strong>选择留给你</strong>
-          <p>三个方向不同的思路，各自经过独立规则检查；选不选、选哪个、要不要改需求，都由你决定。</p>
-        </li>
-      </ul>
-      <p class="gw-theme__closing">让心意，送得刚刚好。</p>
-    </section>
-
-    <!-- 第六屏 · 工作原理 + 隐私条款 -->
-    <section class="gw-band gw-privacy" id="privacy" data-landing aria-labelledby="privacy-title">
-      <div class="gw-band__head">
-        <div>
-          <p class="gw-band__kicker">第六屏 · 工作原理与隐私</p>
-          <h2 id="privacy-title">它是怎么算出来的，<br />你的话去了哪里。</h2>
-        </div>
-        <p>两栏都是可以自己核对的：左边是流程与判定顺序，右边是数据边界。没有写在这里的能力，就是还没有做。</p>
-      </div>
-      <div class="gw-privacy__cols">
-        <div class="gw-privacy__col">
-          <h3>工作原理</h3>
-          <ol class="gw-privacy__steps">
-            <li>
-              <strong>先把需求整理成确定的结构</strong>
-              <p>关系、场合、预算上限、可用天数与硬约束先变成机器能校验的字段；不合法的输入会在提交前就被中文说明拦住，不静默补默认值。</p>
-            </li>
-            <li>
-              <strong>再生成三个不同的思路</strong>
-              <p>三个方案方向不同，各自带理由、事实引用、模型推断与「仍未知」，并且明确标出哪些只是估算。</p>
-            </li>
-            <li>
-              <strong>然后用独立规则检查</strong>
-              <p>预算、准备时间与禁忌由独立代码校验，不是模型自述「我通过了」；没通过的方案会被标成不可选择，也不会被自动替换成别的方案。</p>
-            </li>
-            <li>
-              <strong>需要时只自动修订一次</strong>
-              <p>推荐与呈现两个阶段合计最多一次自动业务修订；额度由服务端持有，浏览器不能提交或篡改，用完后如实报失败。</p>
-            </li>
-            <li>
-              <strong>你选择之后才生成呈现</strong>
-              <p>选定之后才按顺序生成风格配色、包装、贺卡装饰与赠送方式，并复核所选礼物的估价、准备时间与禁忌。</p>
-            </li>
-          </ol>
-        </div>
-        <div class="gw-privacy__col">
-          <h3>隐私条款（当前实现）</h3>
-          <ul class="gw-privacy__points">
-            <li>不收集真实姓名、手机号或邮箱，也不要求注册。唯一的自由文本是「补充说明」，可以不填；页面也不要求上传任何照片或文件。</li>
-            <li>你的输入只在本次会话里、在这个接入层进程内使用。运行记录保存在内存中，服务重启即失效，不写入数据库，也不做长期留存。</li>
-            <li>运行记录里不含密钥、令牌或用户原文；页面与仓库都不保存任何真实凭证，密钥只可能放在可信服务端。</li>
-            <li>页面不加载任何第三方脚本、字体或 CDN：全部资源来自本站，可在浏览器网络面板核对（当前为 0 个外部请求、0 个远程字体）。</li>
-            <li>当前接入层未接入真实模型（没有配置模型凭证），你的输入不会被发送给任何模型服务；页面常驻的「模拟数据」标识说明的就是这件事。</li>
-            <li>价格、库存与送达一律未核实（not_verified）：所有费用与准备时间只能读作估算。准备天数表示可用准备时间，不是送达承诺。</li>
-            <li>公开内容只使用虚构人物与脱敏数据；演示里出现的请求都是构造出来的，不对应任何真实收礼人。</li>
-          </ul>
-          <p class="gw-privacy__caveat">这份说明只描述当前可核对的实现，不构成对未来版本的承诺；未来若接入真实模型，数据边界会随之更新并在此处说明。</p>
-        </div>
-      </div>
-      <div class="gw-final">
-        <div>
-          <h3>准备好了吗？</h3>
-          <p>三页，大约 60 秒（待测目标）。填完会看到三个方向不同的思路，各自带依据、礼物估价与独立检查结果。</p>
-        </div>
-        <button class="gw-button" type="button" id="cta-start-3">
-          开始挑选礼物 · 填写三步需求
-          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" aria-hidden="true" focusable="false"><path d="M2 12h23m-8-8 8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <!-- 欢迎收束屏：放在 Q&A 之前 -->
+    <section class="gw-welcome" id="welcome" data-landing aria-labelledby="welcome-title">
+      <div class="gw-welcome__inner">
+        <h2 id="welcome-title">心意不必昂贵，<br />但值得认真。</h2>
+        <p>你决定想表达什么。<br />我们陪你看清每个选择的依据。</p>
+        <button class="gw-welcome__button" type="button" id="cta-welcome">
+          开始选礼物
+          <svg width="32" height="28" viewBox="0 0 32 28" fill="none" aria-hidden="true"><path d="M2 14h27m-10-10 10 10-10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </button>
       </div>
+    </section>
+
+    <!-- 收尾：常见问题与网站说明 -->
+    <section class="gw-band site-info" id="faq" data-landing aria-labelledby="faq-title">
+      <div class="site-info__questions">
+        <h2 id="faq-title">你可能想问的。</h2>
+        <div class="gw-faq__list">
+          <details class="gw-faq__item">
+            <summary>GiftWise 是怎么工作的？</summary>
+            <div class="gw-faq__body"><p>先用三页简短输入，说清你们的关系、送礼场合、预算、准备时间和已知喜好。如果填写了不喜欢的东西，会先整理出理解到的限制，请你逐条确认，再给出三个方向不同的礼物思路。</p><p>每个思路都有推荐理由，并区分你提供的事实、推断和仍然未知的信息。独立规则检查预算、时间与禁忌，只有合格方案可以选择。你选定后，才进入包装、配色、贺卡和赠送方式；整个任务最多自动修订一次。</p></div>
+          </details>
+          <details class="gw-faq__item">
+            <summary>为什么只给三个方案？</summary>
+            <div class="gw-faq__body"><p>我们希望帮你做决定，而不是再给你一份看不完的清单。三个不同方向，能让你比较它们适合什么场合、为什么推荐、估价和准备时间有什么差别。</p><p>你可以逐一看清取舍，再选择最贴近心意的一个；系统不会自动替你选。</p></div>
+          </details>
+          <details class="gw-faq__item">
+            <summary>不知道 TA 喜欢什么，也能用吗？</summary>
+            <div class="gw-faq__body"><p>可以。兴趣和风格可以跳过，不需要为了填完表格而编一个答案。你明确知道的兴趣会作为事实，只是猜测的会单独标明，未知信息也会如实保留。</p><p>关系和场合仍能帮助确定表达的分寸。尤其是追求对象，建议不会假定对方已经接受或与你互有好感。</p></div>
+          </details>
+          <details class="gw-faq__item">
+            <summary>会超出我的预算吗？</summary>
+            <div class="gw-faq__body"><p>预算只统计最后选中的一份礼物，不会把三个备选加在一起。超过你设定上限的方案不能选择；低于区间下限的方案会提醒你，但仍可由你决定。</p><p>每个方案都能查看估价和检查结果。包装、贺卡及配送不包含在礼物估价中，实际购买前仍需核对商品价格与所需支出。</p></div>
+          </details>
+          <details class="gw-faq__item">
+            <summary>需要注册或填写真实姓名吗？</summary>
+            <div class="gw-faq__body"><p>不需要注册，也不用提供真实姓名、手机号或邮箱。只说与送礼有关的关系、场合和喜好即可；选择“其他”时，简单描述关系或具体场合就好。</p><p>请避免在补充说明中填写敏感个人资料。信息如何处理，可以查看右侧的“隐私”。</p></div>
+          </details>
+          <details class="gw-faq__item">
+            <summary>不满意，可以重新选择吗？</summary>
+            <div class="gw-faq__body"><p>可以返回上一步，已填内容会保留，你可以调整预算、兴趣或不喜欢的东西。修改限制后，需要重新识别并确认，确保新方案按你的最新要求检查。</p><p>如果没有满意的合格方案，可以修改需求后再生成；系统不会擅自替选，也不会把未通过检查的方案当作完成。</p></div>
+          </details>
+        </div>
+      </div>
+      <aside class="site-links" aria-label="关于 GiftWise 与网站链接">
+        <div class="site-links__brand">
+          <a href="#hero">GiftWise AI</a>
+          <p>准备礼物的人，先感到幸福。</p>
+        </div>
+        <div class="site-links__columns">
+          <nav aria-label="了解 GiftWise">
+            <h3>更多</h3>
+            <a href="#how">怎么运行</a>
+            <a href="#after">选完之后</a>
+            <a href="#welcome">开始选礼物</a>
+          </nav>
+          <nav aria-label="政策和支持">
+            <h3>政策和支持</h3>
+            <a href="/terms.html">使用条款</a>
+            <a href="/privacy.html">隐私</a>
+            <a href="https://github.com/sunnyyang0822-stack/GiftWise-AI/issues" target="_blank" rel="noopener noreferrer">问题反馈</a>
+          </nav>
+        </div>
+      </aside>
     </section>
 
     <div class="badges" id="badges" role="status" aria-live="polite"></div>
@@ -299,11 +200,7 @@
     <main id="view" class="view" tabindex="-1"></main>
 
     <footer class="app-footer">
-      <p>
-        费用与准备时间仅为估算；未核实真实价格、库存或实际送达；不承诺对方一定喜欢。
-        全局自动业务修订总额度为 <strong>1 次</strong>，由服务端可信状态持有，浏览器不能提交或篡改。
-        「约 60 秒完成输入」是待测目标，当前没有真实用户测量数据。
-      </p>
+
       <p id="footer-meta" class="app-footer__meta"></p>
     </footer>
 
