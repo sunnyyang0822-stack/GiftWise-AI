@@ -13,6 +13,7 @@ import { PREVIEW_MODE, previewRequest, previewScenarios, setPreviewScenario } fr
 import { createResultViews } from "./js/results-view.js";
 import { setupChat, ensureChat, newChatState, renderChat, chatProblems, chatProgress, reopen, codePoints } from "./js/chat.js";
 import { parseTimeoutMs, composeAdditionalContext, parseEnabled } from "./js/parse-intake.js";
+import { friendlyMessages } from "./js/friendly.js";
 
 const el = (tag, props = {}, children = []) => {
   const node = document.createElement(tag);
@@ -57,11 +58,14 @@ function initialForm() {
     /* 以下键是**前端内部记账**，不是 intake 契约字段（契约字段一个都没新增）：
        · budget_amount / budget_phrase —— 第 1 步解析回显的「用户输入原值」与原话片段；
        · exclusion_terms —— 解析按字面给出的禁忌词，映射到已有的 hard_exclusions.terms；
-       · city_answer —— 体验类「必答追问」的城市答案，映射进已有的 additional_context。 */
+       · city_answer —— 体验类「必答追问」的城市答案，映射进已有的 additional_context；
+       · parsed_context —— 解析时服务端拼的约束说明（如喜好原话），提交时并入已有的 additional_context，
+         不出现在用户的「补充」输入框里。 */
     budget_amount: "",
     budget_phrase: "",
     exclusion_terms: [],
     city_answer: "",
+    parsed_context: "",
   };
 }
 
@@ -202,20 +206,13 @@ function renderLandingVisibility() {
   for (const section of document.querySelectorAll("[data-landing]")) section.hidden = state.inFlow;
 }
 
+/** 面向用户的问题提示：大白话、不显示错误码与字段路径；纯内部条目不展示（见 js/friendly.js）。 */
 function errorBox(errors, title = "需要处理的问题") {
-  if (!errors || errors.length === 0) return null;
+  const lines = friendlyMessages(errors);
+  if (lines.length === 0) return null;
   return el("div", { class: "error-box" }, [
     el("strong", { text: title }),
-    el(
-      "ul",
-      {},
-      errors.map((e) =>
-        el("li", {}, [
-          el("span", { text: e.message || "未知问题" }),
-          e.code ? el("span", { class: "code", text: `（${e.code}${e.path ? " · " + e.path : ""}）` }) : null,
-        ]),
-      ),
-    ),
+    el("ul", {}, lines.map(text => el("li", { text }))),
   ]);
 }
 
@@ -265,9 +262,10 @@ function renderConfigError() {
 function renderWaiting() {
   return {
     body: [
-      el("section", { class: "state" }, [
-        el("div", { class: "spinner", role: "presentation" }),
-        el("h2", { class: "state__title", text: "正在载入接入层配置…" }),
+      // 只显示加载动画，不写说明文字（产品负责人 2026-11-01）；读屏用户仍能听到状态。
+      el("section", { class: "state state--loading", role: "status", "aria-live": "polite" }, [
+        el("span", { class: "spinner", "aria-hidden": "true" }),
+        el("span", { class: "sr-only", text: "加载中" }),
       ]),
     ],
     actions: [],
@@ -276,9 +274,10 @@ function renderWaiting() {
 
 function renderGenerating() {  return {
     body: [
-      el("section", { class: "state" }, [
-        el("h2", { class: "state__title", role: "status", "aria-live": "polite" }, [el("span", { class: "spinner", "aria-hidden": "true" }), state.pending?.kind === "analyze" ? "正在识别你写下的限制…" : state.pending?.kind === "present" ? "正在整理这份礼物的账单与赠送建议…" : "正在生成三个不同思路…"]),
-        el("p", { text: "稍等一下，正在为你整理。" }),
+      // 只显示加载动画，不写说明文字（产品负责人 2026-11-01）；读屏用户仍能听到状态。
+      el("section", { class: "state state--loading", role: "status", "aria-live": "polite" }, [
+        el("span", { class: "spinner", "aria-hidden": "true" }),
+        el("span", { class: "sr-only", text: "加载中" }),
       ]),
     ],
     actions: [],
@@ -375,7 +374,7 @@ export function buildIntake() {
     dislikes: f.dislikes.trim() ? f.dislikes : "",
     previous_gifts: f.previous_gifts || "",
     hard_exclusions: { tags: [...f.exclusion_tags], terms: [...(f.exclusion_terms || [])], unresolved: [] },
-    additional_context: composeAdditionalContext({ base: f.additional_context, city: f.city_answer }),
+    additional_context: composeAdditionalContext({ base: f.additional_context, parsed: f.parsed_context, city: f.city_answer }),
   };
   /* budget_amount 只在「第 1 步解析给过用户原值」且「与契约区间上界数值一致」时下发。
      契约要求 budget_amount === budget_range.max（checker.mjs:BUDGET_RANGE_MISMATCH）；

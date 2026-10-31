@@ -366,6 +366,10 @@ export function checkAiExclusions(aiJson, dislikes) {
     const x = items[i];
     if (!x.source_span.trim() || !dislikes.includes(x.source_span) || (x.kind === 'term' && !fold(x.source_span).includes(fold(x.term)))) return fail('AI_OUTPUT_UNANCHORED', `ai_exclusion_candidates[${i}].source_span`, '依据须为逐字原文，字面词经归一化后须在依据中');
   }
-  if (!dislikes.trim() || !items.length || notes.length) return {status: 'needs_input', candidates: [], errors: [error('INTAKE_CLARIFICATION_REQUIRED', 'dislikes', '请明确未识别或未映射的限制后重新识别')]};
-  return {status: 'needs_confirmation', candidates: items.map(x => ({...x})), errors: []};
+  /* 2026-11-01 产品负责人裁定（用户输入为准）：能读懂的先采纳。
+     识别出了具体候选 ⇒ 照常交给用户逐条确认；同时附带的「未映射备注」不再让整包作废，
+     作为参考提示随结果返回（不自动变成约束；用户的 dislikes 原话本身仍原样进入推荐）。
+     一条候选都没有时才请用户换个说法。 */
+  if (!dislikes.trim() || !items.length) return {status: 'needs_input', candidates: [], unmapped_notes: notes.map(String), errors: [error('INTAKE_CLARIFICATION_REQUIRED', 'dislikes', '请明确未识别或未映射的限制后重新识别')]};
+  return {status: 'needs_confirmation', candidates: items.map(x => ({...x})), unmapped_notes: notes.map(String), errors: []};
 }

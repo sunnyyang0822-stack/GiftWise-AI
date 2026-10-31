@@ -508,7 +508,7 @@ async function handleApi(req, res, url) {
     const checked = checkAiExclusions(recognized.ai_json, dislikes);
     const analysisId = createAnalysis({ intake: payload.intake, mode: recognized.mode, candidates: checked.candidates, status: checked.status, errors: checked.errors });
     getAnalysis(analysisId).owner_scope=owner;
-    sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, errors: checked.errors });
+    sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, unmapped_notes: checked.unmapped_notes || [], errors: checked.errors });
     return true;
   }
 

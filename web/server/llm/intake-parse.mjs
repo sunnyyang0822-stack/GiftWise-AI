@@ -113,8 +113,10 @@ export function fieldCatalogue() {
     /** 解析器**允许**产出的键（比 intake_fields 更窄，由本模块逐条判定）。 */
     parseable_keys: [
       "recipient_relation",
+      "recipient_relation_custom",
       "closeness",
       "occasion",
+      "occasion_custom",
       "budget",
       "deadline",
       "interests",
@@ -282,7 +284,43 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
     patch.occasion = occasion;
     meta.mentioned_text_fields.push("occasion");
   }
-  // 自定义关系/场合：模型不给（它只能选固定 ID）；other 时由前端补充自定义文本。
+  /* 自定义关系/场合（2026-11-01 产品负责人裁定：用户输入为准，选项只是辅助）：
+     用户说的关系/场合不在固定选项里（例：「见面礼」「室友搬家」）时，模型选 other，
+     并把用户原话里的说法写进 *_custom（契约里**既有**的字段，不新增字段）。
+     只有值为 other 时才采用 *_custom（契约 intake.mjs：非 other 不允许带自定义文本）。 */
+  const customField = (customKey, enumKey, chosen) => {
+    const entry = raw[customKey];
+    if (entry === undefined || entry === null) return null;
+    const value = typeof entry === "object" && !Array.isArray(entry) ? entry.value : entry;
+    if (typeof value !== "string" || !value.trim()) {
+      drop(customKey, value, "自定义文本必须是非空字符串");
+      return null;
+    }
+    const cleaned = value.trim();
+    if (codePointLength(cleaned) > 100) {
+      drop(customKey, cleaned, "自定义文本超过 100 码点");
+      return null;
+    }
+    if (chosen && chosen !== "other") {
+      drop(customKey, cleaned, `${enumKey} 已对应到固定选项（${chosen}），不再采用自定义文本`);
+      return null;
+    }
+    return cleaned;
+  };
+  const relationCustom = customField("recipient_relation_custom", "recipient_relation", patch.recipient_relation);
+  if (relationCustom) {
+    patch.recipient_relation = "other";
+    patch.recipient_relation_custom = relationCustom;
+    if (!meta.mentioned_text_fields.includes("recipient_relation")) meta.mentioned_text_fields.push("recipient_relation");
+    meta.mentioned_text_fields.push("recipient_relation_custom");
+  }
+  const occasionCustom = customField("occasion_custom", "occasion", patch.occasion);
+  if (occasionCustom) {
+    patch.occasion = "other";
+    patch.occasion_custom = occasionCustom;
+    if (!meta.mentioned_text_fields.includes("occasion")) meta.mentioned_text_fields.push("occasion");
+    meta.mentioned_text_fields.push("occasion_custom");
+  }
 
   /* ---------- 预算：用户给的**那个值** + 上下 50 的约束带宽 ----------
      🔴 2026-11-01 缺陷 A 修复（独立验收 §1.4「预算金额冲突时 budget_amount 跟随文本」没做到）：

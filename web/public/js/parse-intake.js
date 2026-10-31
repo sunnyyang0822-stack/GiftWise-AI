@@ -104,7 +104,19 @@ export function valueZh(field, value) {
  * 预算相关的若干条（budget_mode / budget_range / budget_amount）合并成一行，并且
  * **只显示用户输入的原值**：契约区间（值−50…值）是服务端约束用的，⛔ 不拿到界面上来。
  */
-export function overriddenRows(parse) {
+/** 表单里原本就没有值：这种情况不算“被覆盖”，不提示。 */
+const isBlank = value => value === null || value === undefined || (typeof value === "string" && !value.trim())
+  || (Array.isArray(value) && value.length === 0) || (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0);
+/** 枚举字段对应的配置标签表（用于把机器值换成中文；不在浏览器重建业务映射）。 */
+const LABEL_LISTS = { recipient_relation: "relations", closeness: "closeness", occasion: "occasions", interests: "interests", gift_styles: "gift_styles" };
+const labelZh = (labels, field, value) => {
+  const list = labels?.[LABEL_LISTS[field]];
+  if (!Array.isArray(list)) return null;
+  const one = id => list.find(x => x.id === id)?.zh || id;
+  return Array.isArray(value) ? (value.length ? value.map(one).join("、") : null) : typeof value === "string" ? one(value) : null;
+};
+
+export function overriddenRows(parse, labels = null) {
   const list = Array.isArray(parse?.overridden_from_form) ? parse.overridden_from_form : [];
   const amount = echoBudgetAmount(parse);
   const rows = [];
@@ -112,7 +124,9 @@ export function overriddenRows(parse) {
   for (const row of list) {
     if (!row || typeof row.field !== "string") continue;
     const isBudget = row.field === "budget_range" || row.field === "budget_amount" || row.field === "budget_mode";
-    if (row.field === "budget_mode") continue;
+    if (row.field === "budget_mode" || row.field === "interest_confidence") continue;
+    // 只有用户之前真的选过/填过，才叫“被你的原话覆盖”。
+    if (isBlank(row.from_form)) continue;
     const label = isBudget ? "预算" : FIELD_ZH[row.field] || row.field;
     if (seen.has(label)) continue;
     seen.add(label);
@@ -120,8 +134,8 @@ export function overriddenRows(parse) {
     rows.push({
       field: row.field,
       label,
-      from: isBudget ? valueZh("budget_amount", fromRaw) : valueZh(row.field, row.from_form),
-      to: isBudget && amount !== null ? `¥${amount}` : valueZh(row.field, row.to_text),
+      from: isBudget ? valueZh("budget_amount", fromRaw) : labelZh(labels, row.field, row.from_form) ?? valueZh(row.field, row.from_form),
+      to: isBudget && amount !== null ? `¥${amount}` : labelZh(labels, row.field, row.to_text) ?? valueZh(row.field, row.to_text),
       rule: typeof row.rule === "string" ? row.rule : "",
     });
   }
@@ -279,6 +293,14 @@ export function applyParsedToForm({ form, config, result }) {
     qids.add("interests");
     qids.add("confidence");
   }
+  /* 用户只说了选项之外的喜好（例：「喜欢某幻君」）：原话就是答案（用户输入为准），这题视为已答；
+     原话由解析结果的 literal_preferences 保留并展示，ID 留空，不拿最接近的类目去替换它。 */
+  if (interestIds.length === 0 && literalPreferences(parse).length > 0) {
+    form.interests_unknown = false;
+    form.interests = [];
+    form.interest_confidence = {};
+    qids.add("interests");
+  }
   const styleIds = Array.isArray(intake.gift_styles) ? intake.gift_styles.filter((id) => hasId(labels.gift_styles, id)) : [];
   if (styleIds.length > 0) {
     form.styles_unknown = false;
@@ -294,20 +316,36 @@ export function applyParsedToForm({ form, config, result }) {
     form.exclusion_terms = [...new Set([...(form.exclusion_terms || []), ...terms])];
     notes.push(`要按字面避开的：${form.exclusion_terms.join("、")}`);
   }
+  /* 用户原话里关于“要避开什么”的那句：写进既有字段 dislikes（之后仍走既有的逐条确认流程）。 */
+  if (typeof intake.dislikes === "string" && intake.dislikes.trim()) {
+    form.dislikes = intake.dislikes.slice(0, 1000);
+    qids.add("avoid");
+  }
+  /* 以前送过：写进既有字段 previous_gifts（独立选填，不拼入 dislikes）。 */
+  if (typeof intake.previous_gifts === "string" && intake.previous_gifts.trim()) {
+    form.previous_gifts = intake.previous_gifts.slice(0, 1000);
+    qids.add("previous");
+  }
 
   /* ---------- 原话与城市：落到**现有**字段 additional_context ---------- */
+  /* 服务端拼进 additional_context 的内容（例：「用户原话（硬约束…）：…」）是给推荐看的约束说明，
+     不是用户写的补充 ⇒ 存进内部键 parsed_context，提交时再与用户自己的补充合并；
+     ⛔ 不写进用户可见、可编辑的「补充」输入框。 */
   if (typeof intake.additional_context === "string" && intake.additional_context.trim()) {
-    form.additional_context = intake.additional_context.slice(0, 1000);
-    if (!qids.has("extra")) notes.push("你的原话已写进「补充说明」，会作为硬约束带给推荐。");
+    const own = String(form.additional_context || "").trim();
+    let parsed = intake.additional_context.trim();
+    if (own && parsed.startsWith(own)) parsed = parsed.slice(own.length).trim();
+    form.parsed_context = parsed.slice(0, 1000);
   }
 
   return { qids: [...qids], notes, dropped };
 }
 
 /** 把「解析结果 + 用户后来改动」合成最终下发的 additional_context（含城市，仍是既有字段）。 */
-export function composeAdditionalContext({ base, city }) {
+export function composeAdditionalContext({ base, parsed, city }) {
   const parts = [];
   if (typeof base === "string" && base.trim()) parts.push(base.trim());
+  if (typeof parsed === "string" && parsed.trim() && !parts.join("\n").includes(parsed.trim())) parts.push(parsed.trim());
   const clean = typeof city === "string" ? city.trim() : "";
   if (clean && !parts.join("\n").includes(`所在城市：${clean}`)) parts.push(`所在城市：${clean}`);
   const merged = parts.join("\n");

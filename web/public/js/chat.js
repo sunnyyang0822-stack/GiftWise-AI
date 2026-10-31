@@ -42,7 +42,10 @@ export function newChatState() {
     /* 第 1 步解析：parsing = 正在等解析响应；parseReport = 最近一次解析的展示信息
        （原话 / 覆盖 / 原文 / 必答追问）；deadlineAlert = 相对时间必须由用户确认的提示。
        都只是前端记账，不下发任何新字段。 */
-    parsing: false, parseReport: null, deadlineAlert: null };
+    parsing: false, parseReport: null, deadlineAlert: null,
+    /* exchanges：用户在输入框说的一整句话 + 小礼的一句回应，插在当时“下一道待答题”之前；
+       viaParse：被这句话直接填好的题——历史里不再重复显示它们的一问一答。 */
+    exchanges: [], viaParse: [], pendingSaid: "", literals: [] };
 }
 export function ensureChat() {
   if (!st().chat) st().chat = newChatState();
@@ -266,6 +269,17 @@ const QUESTIONS = [
       return names.length ? `都对，避开：${names.join("、")}` : "已确认";
     },
   },
+  {
+    /* 体验类礼物需要知道在哪个城市用：只在解析判定需要、且用户还没说过城市时，作为对话里的一道普通题出现。 */
+    id: "city", group: 2, kind: "text",
+    when: () => requiredFollowups(chat().parseReport?.parse).some(item => item.id === "city") && !String(form().city_answer || "").trim() || chat().done.includes("city"),
+    ask: () => ["这个体验打算在哪个城市用呀？"],
+    placeholder: "例如：杭州", aria: "所在城市", field: "city_answer",
+    get: () => form().city_answer || "",
+    set: value => { form().city_answer = value; },
+    answer: () => String(form().city_answer || "").trim(),
+    check: () => String(form().city_answer || "").trim() ? null : "告诉我一个城市就好，比如「杭州」。",
+  },
   { id: "summary", group: 2, kind: "summary", ask: () => ["我把你说的整理成了一张心意清单，看看对不对："] },
 ];
 const byId = id => QUESTIONS.find(q => q.id === id);
@@ -298,7 +312,7 @@ export function chatProblems() {
   }
   const pending = parseFollowups();
   if (pending.length) {
-    return [{ qid: "summary", code: "INTAKE_CLARIFICATION_REQUIRED", message: pending[0].question || "还有一个必答问题需要你确认。" }];
+    return [{ qid: "summary", code: "INTAKE_CLARIFICATION_REQUIRED", message: "还有一题没聊完～" }];
   }
   return [];
 }
@@ -314,6 +328,7 @@ export function chatProgress() {
 function finish(q) {
   const c = chat();
   if (!c.done.includes(q.id)) c.done.push(q.id);
+  c.viaParse = (c.viaParse || []).filter(x => x !== q.id);
   // 任何改动 intake 的回答都会让之前的限制识别失效，需要重新识别并确认。
   if (q.id !== "avoid_confirm" && c.entryKey !== null && intakeKey() !== c.entryKey) {
     api.invalidateAnalysis();
@@ -347,6 +362,7 @@ function attempt(q, userText) {
 export function reopen(qid, message) {
   const c = chat();
   c.done = c.done.filter(x => x !== qid);
+  c.viaParse = (c.viaParse || []).filter(x => x !== qid);
   c.notes = message ? [{ role: "bot", text: message }] : [];
   c.confirmRestart = false;
   api.render();
@@ -362,6 +378,16 @@ async function runAnalysis() {
     if (token !== c.analysisToken) return;
     st().analysis = analysis;
     st().confirmedIds = [];
+    /* 用户亲口说出的避开项，本身就是确认（2026-11-01 产品负责人：不要让用户把同一件事再确认一遍）。
+       识别出的每一项都锚定在用户原话上、且模型有把握（非 low）⇒ 自动确认并继续，这一步不在对话里出现；
+       有低把握项或识别失败时，仍照常请用户逐条确认。 */
+    const items = analysis?.status === "needs_confirmation" && Array.isArray(analysis.candidates) ? analysis.candidates : [];
+    const dislikes = form().dislikes || "";
+    if (items.length && items.every(x => x.confidence !== "low" && typeof x.source_span === "string" && dislikes.includes(x.source_span))) {
+      st().confirmedIds = items.map(x => x.id);
+      if (!c.done.includes("avoid_confirm")) c.done.push("avoid_confirm");
+      c.viaParse = [...new Set([...(c.viaParse || []), "avoid_confirm"])];
+    }
   } catch {
     if (token !== c.analysisToken) return;
     c.analysisError = "刚刚没能读懂这句话，再试一次好吗？";
@@ -526,10 +552,8 @@ function choose(q, id, userText) {
  * 三态都必须让用户能走到三个候选 —— 没有「卡在解析」的分支。
  */
 const PARSE_KINDS = new Set(["single", "multi", "budget", "text", "avoid"]);
-const PARSE_EMPTY_NOTE =
-  "这句我没读出能落到清单上的信息，所以没有替你猜：一个字段都没改。你可以直接点下面的选项，或换一句更具体的说法（例如「女朋友，生日，预算 600，下个月要用」）。";
-const PARSE_DEGRADED_NOTE =
-  "这一次的自然语言解析没有完成，我没有改你填的任何内容；按你原来的填写继续就好。";
+const PARSE_EMPTY_NOTE = "这句我没读出具体信息，就先不替你改了。点下面的选项就好，或者说具体一点，比如「女朋友，生日，预算 600」。";
+const PARSE_DEGRADED_NOTE = "这句我没能完整读懂，先按你点选的继续，我们接着聊。";
 
 function send() {
   const c = chat();
@@ -547,15 +571,18 @@ function send() {
 async function answerWithParse(q, said) {
   const c = chat();
   c.parsing = true;
+  c.pendingSaid = said;
   c.notes = [];
   c.draft = "";
   api.render();
+  revealCurrent();
   let result = null;
   try { result = await api.parseText(said); } catch { result = null; }
   c.parsing = false;
+  c.pendingSaid = "";
   const status = result?.status || "degraded";
   const parse = result?.parse || null;
-  const overrides = overriddenRows(parse);
+  const overrides = overriddenRows(parse, labels());
   const literals = literalPreferences(parse);
   c.parseReport = {
     text: said, status, parse, overrides, literals,
@@ -573,13 +600,6 @@ async function answerWithParse(q, said) {
       // 解析改动了 intake ⇒ 之前的限制识别结果作废，必须重新逐条确认（与 finish() 同口径）。
       api.invalidateAnalysis();
       c.done = c.done.filter(x => x !== "avoid_confirm");
-      const lines = ["我按你这句原话把清单填好了：", ...applied.notes.map(n => `· ${n}`)];
-      if (overrides.length) {
-        lines.push("你填的选项已被你的原话覆盖：", ...overrides.map(r => `· ${r.label}：${r.from} → ${r.to}`));
-      }
-      if (literals.length) {
-        lines.push("你的喜好原话（原样保留，不用预设类目替代）：", ...literals.map(t => `「${t}」`));
-      }
       /* 相对时间（例：「下个月」）模型换算不稳定 ⇒ ⛔ 不静默采用：
          把期限这一题退回去，让用户看着模型算的值与原话的差额**亲自确认一次**。 */
       const confirmItem = requiredFollowups(parse).find(item => item.id === "deadline_confirm");
@@ -593,10 +613,23 @@ async function answerWithParse(q, said) {
         };
         c.parseReport.deadlinePending = true;
         c.done = c.done.filter(x => x !== "deadline");
-        lines.push("还有一件事要你亲自确认：期限是相对时间，模型换算不稳定，下面这题请你点一个要用的准备时间。");
       }
       c.done = [...new Set(c.done)];
-      c.notes = [{ role: "me", text: said }, { role: "bot", texts: lines }];
+      c.viaParse = [...new Set([...(c.viaParse || []), ...applied.qids.filter(qid => c.done.includes(qid))])];
+      if (literals.length) c.literals = [...new Set([...(c.literals || []), ...literals])];
+      /* 一句话回应：用心意清单里的中文值拼出“记下了什么”，不逐条列字段、不出现机器值；
+         然后直接接上下一道还没答的题（带选项卡），由小礼主动往下推进。 */
+      // 回应里只用简短说法；避开项有字面词时说「避开 X、Y」，完整原话留在心意清单里。
+      const shortValue = item => item.qid === "avoid" && form().exclusion_terms?.length ? `避开${form().exclusion_terms.join("、")}` : sheetValue(item);
+      const heard = SHEET.filter(item => item.covers.some(qid => applied.qids.includes(qid))).map(shortValue).filter(Boolean);
+      const changed = overrides.filter(r => r.from && !/^（空）$|^\{\}$|^\[\]$/.test(String(r.from).trim())).map(r => r.label);
+      const ack = [
+        heard.length ? `收到～${heard.join("，")}，我都记下了。` : "收到～我记下了。",
+        changed.length ? `你之前选的「${[...new Set(changed)].join("、")}」，按这句话改过来了。` : "",
+        confirmItem ? "时间是个相对说法，下面帮我点一下确切的准备时间。" : "",
+      ].filter(Boolean).join("");
+      c.exchanges = [...(c.exchanges || []), { asked: q.id, said, ack, before: current().id }];
+      c.notes = [];
       api.render();
       revealCurrent();
       return;
@@ -614,10 +647,7 @@ async function answerWithParse(q, said) {
   /* degraded / disabled / 传输失败：⛔ 不报错，回落到既有表单路径继续。 */
   c.notes = [{ role: "me", text: said }];
   applyText(q, said);
-  const reason = c.parseReport.notices[0] || PARSE_DEGRADED_NOTE;
-  if (!c.notes.some(n => n.role === "bot" && (n.text === reason || (n.texts || []).includes(reason)))) {
-    c.notes.push({ role: "bot", text: reason });
-  }
+  if (!c.notes.some(n => n.role === "bot")) c.notes.push({ role: "bot", text: PARSE_DEGRADED_NOTE });
   api.render();
   revealCurrent();
 }
@@ -668,7 +698,8 @@ const SHEET = [
 /** 承接上一题回答的一句自然回应（第一题由开场白承接）。 */
 function ackFor(q) {
   const list = applicable();
-  const prev = list[list.indexOf(q) - 1];
+  const hidden = chat().viaParse || [];
+  const prev = list.slice(0, list.indexOf(q)).reverse().find(item => !hidden.includes(item.id));
   if (!prev) return null;
   const f = form();
   switch (prev.id) {
@@ -706,7 +737,9 @@ function ackFor(q) {
   }
 }
 /** 当前题的助手消息：承接 + 提问（已答的题沿用当时的问法）。 */
-const botTexts = q => [ackFor(q), ...q.ask()].filter(Boolean);
+/** 紧接在一次自然语言交流之后的题：用那次交流的一句回应替代原本的承接句，和提问放在同一组气泡里。 */
+const exchangeAck = q => (chat().exchanges || []).filter(x => x.before === q.id).at(-1)?.ack || null;
+const botTexts = q => [exchangeAck(q) ?? ackFor(q), ...q.ask()].filter(Boolean);
 
 /* ------------------------------------------------------------ 基础部件 */
 
@@ -940,6 +973,8 @@ function sheetValue(item) {
     case "occasion": return f.occasion === "other" ? f.occasion_other.trim() || "其他" : zh(L.occasions, f.occasion);
     case "interests": {
       const q = byId("interests");
+      // 用户只说了选项之外的喜好：显示他的原话（用户输入为准）。
+      if (!f.interests_unknown && !f.interests.length && chat().literals?.length) return chat().literals.join("；");
       const guessed = !f.interests_unknown && f.interests.length && !f.interests.every(id => f.interest_confidence[id] === "confirmed");
       return `${q.answer()}${guessed && done.includes("confidence") ? "（有些是猜的）" : ""}`;
     }
@@ -952,89 +987,14 @@ function sheetValue(item) {
 function deadlineAlertNode() {
   const a = chat().deadlineAlert;
   if (!a) return null;
-  const said = a.phrase ? `你说的是「${a.phrase}」` : "你的原话是相对时间";
-  const model = a.current === null ? "" : `，模型算成 ${a.current} 天`;
-  const expected = a.expected === null ? "" : `，按原话大约是 ${a.expected} 天`;
-  return el("section", { class: "gw-parse-block gw-parse-block--required", "aria-label": "必答：期限确认" }, [
-    el("h4", { class: "gw-parse-block__title", text: "期限要你亲自确认" }),
-    el("p", { class: "gw-parse-block__ask", text: `${said}${model}${expected}。请点一个你这次要用的准备时间。` }),
-    a.reason ? el("p", { class: "gw-parse-block__why", text: a.reason }) : null,
-  ]);
+  return el("p", { class: "gw-attach__hint gw-deadline-hint" },
+    [a.phrase ? `你说的是「${a.phrase}」，帮我点一个最接近的时间～` : "帮我点一个最接近的时间～"]);
 }
 
-function cityCard(item) {
-  const f = form();
-  const input = el("input", {
-    type: "text", id: "parse-city", class: "gw-parse-block__input", value: f.city_answer || "",
-    placeholder: "例如：杭州", "aria-label": "体验使用的城市", "data-field": "parse-city",
-    oninput: e => { form().city_answer = e.target.value; },
-    onkeydown: e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); confirmCity(); } },
-  });
-  return el("section", { class: "gw-parse-block gw-parse-block--required", "aria-label": "必答：城市" }, [
-    el("h4", { class: "gw-parse-block__title", text: "还差一个必答问题" }),
-    el("p", { class: "gw-parse-block__ask", text: item.question || "这个体验打算在哪个城市使用？" }),
-    el("div", { class: "gw-parse-block__row" }, [
-      input,
-      el("button", { type: "button", class: "gw-send-btn", id: "parse-city-ok", "data-field": "parse-city-ok", onclick: () => confirmCity() }, ["确认城市", icon("arrow-right", { size: 15 })]),
-    ]),
-    item.reason ? el("p", { class: "gw-parse-block__why", text: item.reason }) : null,
-  ]);
-}
-function confirmCity() {
-  const f = form();
-  f.city_answer = String(f.city_answer || "").trim();
-  api.render();
-}
-
-/** 结算卡上的解析区块：原话可见、覆盖提示、原值回显、必答追问 —— 全部来自响应，不造数据。 */
+/** 需求小结只展示心意清单本身：用户的原话已在对话与清单里；
+    原值/区间说明、覆盖说明、服务端说明等内部信息不展示给用户（2026-11-01 产品负责人）。 */
 function summaryExtras() {
-  const c = chat();
-  const report = c.parseReport;
-  const nodes = [];
-  if (!report) return nodes;
-  const parse = report.parse || null;
-  const long = e => [...e].length > 1000 ? [...e].slice(0, 999).join("") + "…" : e;
-
-  // 原文可见：用户说过的那句话始终原样可见。
-  if (report.text) nodes.push(el("p", { class: "gw-parse-block__quote", text: `你刚才说的：「${long(report.text)}」` }));
-
-  // 原值回显：金额/天数显示用户输入的原值，⛔ 界面不显示 ±50 / ±1 的区间。
-  const amount = echoBudgetAmount(parse);
-  const days = echoDeadlineDays(parse);
-  if (amount !== null && form().budget_amount) {
-    nodes.push(el("p", { class: "gw-summary__note gw-summary__note--strong", text: `预算按你输入的原值：${amount} 元（不显示区间）` }));
-  }
-  if (days !== null && String(form().deadline_days) === String(days)) {
-    nodes.push(el("p", { class: "gw-summary__note gw-summary__note--strong", text: `准备时间按你输入的原值：${days} 天（不显示区间）` }));
-  }
-
-  // 覆盖提示：文本优先于选项，逐条如实列出。
-  if (report.overrides.length) {
-    nodes.push(el("section", { class: "gw-parse-block", "aria-label": "覆盖提示" }, [
-      el("h4", { class: "gw-parse-block__title", text: "你填的选项已被你的原话覆盖" }),
-      el("ul", { class: "gw-parse-block__list" }, report.overrides.map(r => el("li", { text: `${r.label}：${r.from} → ${r.to}` }))),
-    ]));
-  }
-
-  // 喜好原文：逐字保留，不用预设类目替代。
-  if (report.literals.length) {
-    nodes.push(el("section", { class: "gw-parse-block", "aria-label": "喜好原文" }, [
-      el("h4", { class: "gw-parse-block__title", text: "你的喜好原话（原样保留）" }),
-      el("ul", { class: "gw-parse-block__list" }, report.literals.map(t => el("li", { text: `「${long(t)}」` }))),
-    ]));
-  }
-
-  // 必答追问（未答完的排在最前）：「体验类」缺城市 ⇒ 在结算卡上直接问。
-  // 相对时间（deadline_confirm）不在这里问：它由 deadlineAlertNode 把那道题退回去让用户亲自点。
-  const pending = new Map(parseFollowups().map(item => [item.id, item]));
-  for (const item of pending.values()) {
-    if (item.id === "city") nodes.push(cityCard(item));
-  }
-
-  // 解析的如实说明（降级/空/未采用项），不是报错态。
-  for (const notice of report.notices) nodes.push(el("p", { class: "gw-summary__note", text: long(notice) }));
-  for (const dropped of report.dropped) nodes.push(el("p", { class: "gw-summary__note", text: `未采用：${dropped}` }));
-  return nodes;
+  return [];
 }
 
 function summaryAttach() {
@@ -1045,7 +1005,7 @@ function summaryAttach() {
   return attach([
     el("article", { class: "greeting-card gw-summary", "aria-label": "需求小结" }, [
       el("p", { class: "greeting-card__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
-      el("h3", { class: "greeting-card__title", text: `送给${relation}的${occasion}礼物` }),
+      el("h3", { class: "greeting-card__title", text: `送给${relation}的${occasion ? (/礼物?$/.test(occasion) ? occasion : `${occasion}礼物`) : "礼物"}` }),
       el("dl", { class: "gw-summary__list" }, SHEET.map(item => el("div", { class: "gw-summary__row" }, [
         el("dt", {}, [el("span", { class: "gw-summary__icon", "aria-hidden": "true" }, [icon(item.qid === "relation" ? OPTION_ICONS[f.recipient_relation] || "user" : item.icon, { size: 14 })]), item.term]),
         el("dd", { text: sheetValue(item) || "—" }),
@@ -1056,7 +1016,7 @@ function summaryAttach() {
         type: "button", class: "gw-cta", id: "step-next", "data-field": "step-next", disabled: blocked,
         onclick: () => api.submit(),
       }, [
-        icon("sparkles", { size: 18 }), blocked ? "先回答上面的必答问题" : "生成三个礼物思路",
+        icon("sparkles", { size: 18 }), blocked ? "还有一题没聊完" : "生成三个礼物思路",
       ]),
     ]),
   ], "gw-attach--summary");
@@ -1091,7 +1051,10 @@ function answeredAttach(q) {
 /** “我”的回答：有已选标签时用一句简短的话，避免与标签重复。 */
 function meText(q) {
   const f = form();
-  if (q.kind === "multi" && q.list().length) return `选好了，${q.list().length} 项`;
+  if (q.kind === "multi" && q.list().length) {
+    const picked = q.options().filter(o => q.list().includes(o.id)).map(o => o.label);
+    return picked.length > 3 ? `${picked.slice(0, 3).join("、")} 等 ${picked.length} 项` : picked.join("、");
+  }
   if (q.kind === "avoid" && f.exclusion_tags.length) return f.dislikes.trim() ? `就这些，还有「${f.dislikes.trim()}」` : "就这些";
   if (q.kind === "confirm") return "都对";
   return q.answer();
@@ -1101,6 +1064,16 @@ function meText(q) {
 
 function introGroup() {
   return el("li", { class: "gw-turn gw-turn--intro" }, [botGroup(["嗨，我是小礼。问你几个小问题，点选项就能答。"])]);
+}
+/** 一次自然语言交流：（当时被问的题若已被填掉，则先显示那句提问）→ 用户原话 → 小礼一句回应。 */
+function exchangeTurn(x) {
+  const c = chat();
+  const asked = byId(x.asked);
+  const showAsk = asked && (c.viaParse || []).includes(asked.id) && asked.id !== x.before;
+  return el("li", { class: "gw-turn gw-turn--past gw-turn--exchange" }, [
+    showAsk ? botGroup(asked.ask()) : null,
+    meGroup(x.said),
+  ]);
 }
 function pastTurn(q, enter) {
   const edit = el("button", { type: "button", class: "gw-edit", "aria-label": `修改这一项：${q.ask().at(-1)}`, "data-field": `edit-${q.id}`, onclick: () => reopen(q.id) }, [
@@ -1112,9 +1085,9 @@ function currentTurn(q, typing, entering) {
   const c = chat();
   const turn = el("li", { class: `gw-turn gw-turn--current${typing ? " is-typing" : ""}${entering ? " is-entering" : ""}`, "data-question": q.id });
   if (c.parsing) {
-    turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
+    turn.append(botGroup(botTexts(q)), meGroup(c.pendingSaid), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
       botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
-        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]), el("span", { class: "gw-typing__text", text: "正在读你这句原话…" }),
+        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]),
       ])]),
     ]));
     return turn;
@@ -1123,7 +1096,7 @@ function currentTurn(q, typing, entering) {
     if (!st().analysis && !c.analyzing) setTimeout(runAnalysis, 0);
     turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
       botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
-        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]), el("span", { class: "gw-typing__text", text: "正在理解你写的话…" }),
+        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]),
       ])]),
     ]));
     return turn;
@@ -1132,8 +1105,10 @@ function currentTurn(q, typing, entering) {
   if (q.kind === "confirm") {
     const a = st().analysis;
     texts = c.analysisError ? [c.analysisError]
-      : a.status !== "needs_confirmation" ? ["这句话我还没完全理解。", ...(a.errors || []).map(e => e.message).filter(Boolean).slice(0, 2)]
-      : [ackFor(q), "关于要避开的，我是这样理解的，帮我逐条确认一下："].filter(Boolean);
+      : a.status !== "needs_confirmation" ? ["要避开的这句，我没能拆出具体的东西。可以直接写几样吗？比如「香水、衣服」。"]
+      : [ackFor(q), "要避开的，我拆成了下面几项，帮我确认一下：",
+        // 没能拆成具体项的那部分（例：「不适合初次见面送的」）不丢：用户的原话会原样带进挑选。
+        ...(a.unmapped_notes?.length ? ["其余的要求，挑的时候我会照着你的原话来。"] : [])].filter(Boolean);
   }
   if (q.kind === "summary") texts = [ackFor(q), "我把你说的整理成了一张心意清单，看看对不对："].filter(Boolean);
   turn.append(typingGroup(), botGroup(texts, currentAttach(q)));
@@ -1298,10 +1273,14 @@ export function renderChat() {
     c.draft = q.kind === "avoid" ? form().dislikes : q.kind === "text" ? q.get() : "";
   }
   const log = el("ol", { class: "gw-log", role: "log", "aria-live": "polite", "aria-label": "和小礼的对话" }, [introGroup()]);
+  const exchangesBefore = id => (c.exchanges || []).filter(x => x.before === id).map(exchangeTurn);
   for (const item of applicable()) {
     if (item === q) break;
+    log.append(...exchangesBefore(item.id));
+    if ((c.viaParse || []).includes(item.id)) continue;
     log.append(pastTurn(item, c.enterMe === item.id));
   }
+  log.append(...exchangesBefore(q.id));
   c.enterMe = null;
   const turn = currentTurn(q, typing, entering);
   log.append(turn);

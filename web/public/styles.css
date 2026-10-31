@@ -339,3 +339,7 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
   .greeting-card { padding: 40px 24px 32px; }
   .greeting-card::after { right: 20px; }
 }
+
+/* 只有加载动画、没有文字的等待态：动画居中；黑色主按钮里的三点用白色。 */
+.state--loading { display: grid; place-items: center; min-height: 220px; }
+.btn--primary .gw-dots i { background: #fff; opacity: .6; }

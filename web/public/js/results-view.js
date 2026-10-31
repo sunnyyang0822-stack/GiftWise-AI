@@ -3,6 +3,7 @@
    所有服务端/用户文本一律以 textContent 渲染。 */
 import { icon } from "./icons.js";
 import { candidateMedia, packagingMedia } from "./media-view.js";
+import { friendlyMessages, cardWarnings } from "./friendly.js";
 
 export function createResultViews(ctx) {
   const { el, state, selectCandidate, resetToForm, backToEncourage, backToHome, errorBox, stateView, render, apiFetch } = ctx;
@@ -142,7 +143,7 @@ export function createResultViews(ctx) {
           el("span", { class: "gift-choice__no", "aria-hidden": "true", text: ["壹", "贰", "叁"][index] || String(index + 1) }),
           el("span", { class: "sr-only", text: `方案 ${index + 1}` }),
         ]),
-        candidateMedia(report, candidate),
+        (() => { const figure = candidateMedia(report, candidate); return figure.dataset.imageId === "missing" ? null : figure; })(),
         el("div", { class: "gift-choice-heading" }, [
           el("h2", { class: "card__title", id: `gift-title-${index}`, text: candidate.name }),
           el("span", { class: "gift-choice-price", text: `参考 ${money(candidate.estimated_total, candidate.currency)}`, "aria-label": `参考价 ${candidate.estimated_total} 元` }),
@@ -150,9 +151,9 @@ export function createResultViews(ctx) {
         el("p", { class: "card__lead", text: candidate.description }),
         el("ul", { class: "gift-facts" }, [
           el("li", {}, [icon("clock", { size: 16 }), `准备约 ${candidate.estimated_preparation_days} 天`]),
-          ...(result.warnings || []).map(w => el("li", {}, [icon("lightbulb", { size: 16 }), w.message])),
+          ...cardWarnings(result.warnings).map(text => el("li", {}, [icon("lightbulb", { size: 16 }), text])),
         ]),
-        el("p", { class: "gift-choice-status" }, canSelect ? [icon("shield", { size: 18 }), "预算、时间、避开项都符合"] : [icon("ban", { size: 18 }), "有条件不符合，暂不可选"]),
+        el("p", { class: "gift-choice-status" }, canSelect ? [icon("shield", { size: 18 }), "预算、时间、避开项都符合"] : [icon("ban", { size: 18 }), friendlyMessages(result.errors)[0] || "有条件不符合，暂不可选"]),
         el("details", { class: "candidate-evidence" }, [
           el("summary", {}, [icon("search", { size: 18 }), "为什么推荐它"]),
           el("dl", { class: "kv" }, [
@@ -161,12 +162,12 @@ export function createResultViews(ctx) {
             el("dd", {}, [evidenceList((candidate.fact_refs || []).map(ref => facts.get(ref)).filter(Boolean), "暂无")]),
             el("dt", { text: "我的推断" }), el("dd", {}, [evidenceList(candidate.inferences, "无")]),
             el("dt", { text: "还不确定的" }), el("dd", {}, [evidenceList(candidate.unknowns, "暂无")]),
-            ...(result.errors && result.errors.length ? [el("dt", { text: "哪里不符合" }), el("dd", {}, [evidenceList(result.errors.map(e => e.message), "")])] : []),
+            ...(result.errors && result.errors.length ? [el("dt", { text: "哪里不符合" }), el("dd", {}, [evidenceList(friendlyMessages(result.errors), "")])] : []),
           ]),
         ]),
         el("div", { class: "suggest-row" }, [
           canSelect
-            ? el("button", { class: "btn btn--primary", type: "button", disabled: state.busy, onclick: () => selectCandidate(candidate.id) }, [icon("gift", { size: 18 }), state.busy ? "正在准备…" : "就选它"])
+            ? el("button", { class: "btn btn--primary", type: "button", disabled: state.busy, onclick: () => selectCandidate(candidate.id) }, state.busy ? [el("span", { class: "gw-dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "sr-only", text: "加载中" })] : [icon("gift", { size: 18 }), "就选它"])
             : el("button", { class: "btn btn--ghost", type: "button", disabled: true, text: "暂不可选" }),
         ]),
       ]);
