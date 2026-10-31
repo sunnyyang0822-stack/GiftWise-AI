@@ -264,21 +264,15 @@ export function applyParsedToForm({ form, config, result }) {
     dropped.push("budget_amount（后端没给出与之匹配的契约区间，为避免预算上下限不自洽，未写回表单）");
   }
 
-  /* ---------- 时间：相对时间未经确认不得静默采用 ---------- */
+  /* ---------- 用户主动提到的时间只作参考；未知不补值、不强制选档 ---------- */
   const days = echoDeadlineDays(parse);
-  if (days !== null) {
-    const options = deadlineDayOptions(config);
-    if (deadlineUnconfirmed(parse)) {
-      notes.push("你说的期限是相对时间，模型换算不稳定，需要你确认后才采用。");
-    } else if (options.length === 0) {
-      dropped.push(`deadline_days（配置里没有可用档位）`);
-    } else if (options.includes(days)) {
-      form.deadline_days = String(days);
-      qids.add("deadline");
-      notes.push(`准备时间：${days} 天`);
-    } else {
-      dropped.push(`deadline_days=${days}（不在界面可选的档位 ${options.join("/")} 里，保留让你亲自选）`);
-    }
+  if (days !== null && days >= 0 && days <= 365 && !deadlineUnconfirmed(parse)) {
+    form.deadline_days = String(days);
+    qids.add("deadline");
+    notes.push(`时间参考：${days} 天`);
+  } else if (echoDeadlinePhrase(parse) || days !== null) {
+    form.deadline_days = "";
+    qids.add("deadline");
   }
 
   /* ---------- 喜好 / 风格：只落配置里真实存在的 ID ---------- */

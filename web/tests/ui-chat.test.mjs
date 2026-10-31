@@ -64,7 +64,7 @@ test("逐题校验：缺关系先回到第一题；预算倒置、超限、非�
   assert.equal(budgetProblems()[0].code, "INVALID_BUDGET_RANGE");
   Object.assign(state.form, { budget_mode: "slider", budget_min: "100", budget_max: "300" });
   assert.deepEqual(budgetProblems(), []);
-  assert.equal(chatProblems()[0].qid, "deadline");
+  assert.deepEqual(chatProblems(), [], "未提供时间也能继续，不强制追问");
   Object.assign(state.form, { deadline_days: "5" });
   assert.deepEqual(chatProblems(), [], "以前送过、补充、需要避免的均为选填");
 });
