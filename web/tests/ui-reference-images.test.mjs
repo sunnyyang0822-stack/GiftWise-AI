@@ -85,3 +85,12 @@ test("同候选商品图和参考图双槽拒绝歧义，来源空项不影响�
   data.media.candidates.push({ candidate_id: "c1", product_id: "sku-1", image: { ...data.media.candidates[0].image, kind: "source_photo" } });
   hidden(data);
 });
+
+test("总体媒体unavailable不阻断独立校验通过的候选参考图", () => {
+  const data = fixture(); data.media.status = "unavailable";
+  const figure = render(data);
+  assert.equal(figure.querySelector("img")?.src, `http://127.0.0.1:8911/api/reference/images/${imageId}`);
+  assert.equal(figure.querySelector(".media-kind").textContent, "参考图片");
+  assert.equal(data.media.status, "unavailable", "不得改写原始服务状态来伪造通过");
+  assert.equal(data.retrieval.products, undefined, "无需添加SKU即可加载");
+});
