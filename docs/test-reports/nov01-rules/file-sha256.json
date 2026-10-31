@@ -1,0 +1,10 @@
+{
+  "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+  "workflow/intake.py": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+  "web/server/intake.mjs": "ce96daea11624f951645a4136e6ab40798025360fd5e44fd79b72c9896003839",
+  "web/server/checker.mjs": "f5ae1a17c3eaeb048fd619494708db902360093b030235770ab6e144c2aefe1a",
+  "web/server/config.mjs": "f2211ecf92568d95dad68ba308b2a5157d807d9facb92ed7b2ac82ba251ca41e",
+  "tests/test_cases.json": "546e9b43ca9766885634d05f94d2729f8e827203e878c943c56aa6a93fc18669",
+  "tests/test_revision_budget.py": "0195c439a00ceeb0f74fac2df6d18c57f242e85014399d20076ccff492fccf9c",
+  "web/tests/revision-rules.test.mjs": "490cfaecb69e35f9187133e5534567cd7e5a56ed35aed267daabc5f3b12c264c"
+}
