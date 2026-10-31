@@ -9,6 +9,8 @@
  *   - 所有文案为简体中文；页面常驻模拟数据标识。
  */
 
+import { PREVIEW_MODE, previewConfig, previewRequest, previewScenarios, setPreviewScenario } from "./js/preview-api.js";
+
 const el = (tag, props = {}, children = []) => {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(props)) {
@@ -57,7 +59,6 @@ const state = {
     budget_mode: "slider",
     budget_min: "100",
     budget_max: "300",
-    budget_confirmed: false,
     deadline_days: "",
     interests: [],
     interest_confidence: {},
@@ -66,6 +67,7 @@ const state = {
     styles_unknown: false,
     exclusion_tags: [],
     dislikes: "",
+    previous_gifts: "",
     additional_context: "",
   },
 };
@@ -73,11 +75,7 @@ const state = {
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
 
 const CONTRACT_VERSION = "giftwise-20261031-v2";
-const STEP_TITLES = ["关系场合预算时间", "兴趣风格", "不喜欢和补充"];
-const LOCAL_UI_FIXTURE = new URLSearchParams(location.search).get("ui_fixture") === "nov01";
-const LOCAL_DEADLINES = [
-  ["一天", 1], ["3–5天", 5], ["一周", 7], ["一月", 30], ["一季度", 90], ["一年", 365],
-].map(([label, days]) => ({ id: `fixture-${days}`, label, days }));
+const STEP_TITLES = ["关系场合预算时间", "兴趣风格", "需要避免的与补充"];
 const codePoints = value => [...value].length;
 const moneyCents = value => AMOUNT_RE.test(value) ? Number(value.split(".")[0]) * 100 + Number((value.split(".")[1] || "").padEnd(2, "0")) : null;
 
@@ -115,8 +113,8 @@ function renderBadges() {
   if (!state.config) return;
   const mock = state.config.mode === "mock";
   const flag = $("mode-flag");
-  flag.hidden = false;
-  flag.textContent = mock ? "模拟数据 · 未接真实模型" : "模型生成 · 价格未核实";
+  flag.hidden = !PREVIEW_MODE;
+  flag.textContent = PREVIEW_MODE ? "界面预览／模拟数据" : "";
   flag.classList.toggle("mode-flag--real", !mock);
   flag.title = mock ? "本次候选、识别与呈现为模拟数据，不是真实模型输出。" : "生成内容仍需独立规则检查，价格、库存与送达未核实。";
   $("hero-flag").hidden = true;
@@ -129,6 +127,16 @@ function renderBanners() {
   slot.hidden = notices.length === 0 || !state.inFlow;
   if (!slot.hidden) notices.forEach(text => slot.append(el("p", { class: "banner banner--warn", text })));
   else slot.append(el("span", { class: "sr-only", text: "暂无流程通知。" }));
+  if (PREVIEW_MODE && state.inFlow) {
+    slot.hidden = false;
+    slot.append(el("label", { class: "preview-scenario" }, [
+      el("span", { text: "预览状态" }),
+      el("select", { id: "preview-scenario", "aria-label": "预览状态", disabled: state.busy, onchange: e => {
+        state.previewScenario = e.target.value;
+        setPreviewScenario(e.target.value);
+      } }, previewScenarios.map(([value, text]) => el("option", { value, selected: value === (state.previewScenario || new URLSearchParams(location.search).get("preview") || "normal"), text }))),
+    ]));
+  }
 }
 function renderSteps() {
   const nav = $("steps");
@@ -316,7 +324,6 @@ function budgetProblems() {
   else if (min > max) errors.push({code:"INVALID_BUDGET_RANGE",message:"预算下限不能高于上限。"});
   else if (f.budget_mode === "slider" && (max > 100000 || min % 5000 || max % 5000)) errors.push({code:"INVALID_BUDGET_RANGE",message:"滑条区间需在 0–1000 元内，每次调整 50 元。"});
   else if (f.budget_mode === "zero" && (min !== 0 || max !== 0)) errors.push({code:"INVALID_BUDGET_RANGE",message:"不花钱的心意应为 0–0 元。"});
-  if (!f.budget_confirmed) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请调整滑条或填写礼物预算区间。"});
   return errors;
 }
 function validateStep1() {
@@ -325,6 +332,7 @@ function validateStep1() {
   if (f.recipient_relation === "other" && !f.recipient_relation_other.trim()) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请填写你与对方的关系。"});
   if (!f.occasion) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择送礼场合。"});
   if (f.occasion === "other" && !f.occasion_other.trim()) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请填写具体送礼场合。"});
+  if (codePoints(f.recipient_relation_other) > 1000 || codePoints(f.occasion_other) > 1000) errors.push({code:"LIMIT_EXCEEDED",message:"自定义关系和场合最多填写 1000 字。"});
   const options = deadlineOptions();
   if (!options) errors.push({code:"CONFIG_VERSION_UNSUPPORTED",message:"准备时间配置尚未更新为六档，请稍后重试。"});
   else if (!options.some(r => String(r.days) === f.deadline_days)) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择可用准备时间。"});
@@ -337,7 +345,6 @@ function renderBudget() {
     el("h2", {class:"card__title",text:"这份心意，想花多少？"}),
     el("div", {class:"chips",role:"group","aria-label":"预算方式"}, modes.map(([mode,label]) => chip(label,f.budget_mode===mode,()=>{
       f.budget_mode = mode;
-      f.budget_confirmed = mode === "zero" && f.budget_mode === "zero";
       if (f.budget_mode === "zero") { f.budget_min="0";f.budget_max="0"; }
       if (f.budget_mode === "slider") {f.budget_min="100";f.budget_max="300";}
       invalidateAnalysis();render();
@@ -350,7 +357,7 @@ function renderBudget() {
       const next = which === "min" ? Math.min(value,other) : Math.max(value,other);
       f[`budget_${which}`] = String(next);
       event.target.value = String(next);
-      f.budget_confirmed = true; invalidateAnalysis();
+      invalidateAnalysis();
       const output = $("budget-readout"); output.textContent = `预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`;
       const dual = document.querySelector(".range-dual");
       if (dual) { dual.style.setProperty("--range-min", `${Number(f.budget_min) / 10}%`); dual.style.setProperty("--range-max", `${Number(f.budget_max) / 10}%`); }
@@ -377,7 +384,7 @@ function renderBudget() {
     body.push(el("div",{class:"budget-custom"},["min","max"].map(which=>el("label",{},[
       el("span",{text:which === "min" ? "预算下限（元）" : "预算上限（元）"}),
       el("input",{type:"text",inputmode:"decimal",value:f[`budget_${which}`],id:`budget-other-${which}`,"aria-label":which === "min" ? "其他金额下限" : "其他金额上限","data-field":`budget_other_${which}`,oninput:e=>{
-        f[`budget_${which}`]=e.target.value;f.budget_confirmed=true;invalidateAnalysis();
+        f[`budget_${which}`]=e.target.value;invalidateAnalysis();
       }}),
     ]))),el("p",{class:"field__hint",text:"两端必填，0–10000 元，最多两位小数。"}));
   } else if (f.budget_mode === "zero") {
@@ -530,7 +537,7 @@ function renderStep2() {
         class: "btn btn--primary",
         type: "button",
         id: "step-next",
-        text: "下一步：不喜欢和补充",
+        text: "下一步：需要避免的与补充",
         onclick: () => {
           state.step = 3;
           state.error = null;
@@ -555,12 +562,19 @@ function renderStep3() {
           invalidateAnalysis();render();
         }))),
         el("label",{class:"text-field"},[
-          el("span",{text:"不喜欢的东西（可选）"}),
-          el("textarea",{id:"dislikes","aria-label":"不喜欢的东西","data-field":"dislikes",placeholder:"例如：不要香水。请只填写虚构或已脱敏的信息。",oninput:e=>{
+          el("span",{text:"需要避免的"}),
+          el("textarea",{id:"dislikes","aria-label":"需要避免的","data-field":"dislikes",placeholder:"讨厌的东西，过敏，衣服尺码未知",oninput:e=>{
             f.dislikes=e.target.value;invalidateAnalysis();render();
           }},[f.dislikes]),
         ]),
         el("p",{class:"field__hint",text:`${codePoints(f.dislikes)} / 1000 字`}),
+        el("label",{class:"text-field"},[
+          el("span",{text:"以前送过什么？"}),
+          el("textarea",{id:"previous-gifts","aria-label":"以前送过什么？","data-field":"previous_gifts",placeholder:"例如：去年送过香水，上次送过一本摄影集",oninput:e=>{
+            f.previous_gifts=e.target.value;invalidateAnalysis();
+          }},[f.previous_gifts]),
+        ]),
+        el("p",{class:"field__hint",text:"选填，帮助参考送礼历史，尽量避免重复。"}),
         el("label",{class:"text-field"},[
           el("span",{text:"补充说明（可选）"}),
           el("textarea",{id:"additional-context","aria-label":"补充说明","data-field":"additional_context",placeholder:"例如：希望表达感谢，不造成回应压力。",oninput:e=>{
@@ -581,9 +595,9 @@ function renderAnalysis() {
   if (!a) return null;
   if (a.status !== "needs_confirmation") return el("section",{class:"card card--fail",id:"exclusion-analysis",role:"status"},[
     el("h2",{class:"card__title",text:"这部分还需要你澄清"}),
-    el("p",{text:"暂时无法可靠理解全部限制，不会先生成礼物。请修改“不喜欢的东西”后重新识别。"}),
+    el("p",{text:"暂时无法可靠理解全部限制，不会先生成礼物。请修改“需要避免的”后重新识别。"}),
     errorBox(a.errors,"需要澄清"),
-    el("button",{class:"btn",type:"button",text:"修改不喜欢的东西",onclick:()=>$("dislikes").focus()}),
+    el("button",{class:"btn",type:"button",text:"修改需要避免的",onclick:()=>$("dislikes").focus()}),
     el("button",{class:"btn",id:"analyze-again",type:"button",text:"重新识别",onclick:()=>{invalidateAnalysis();submitIntake();}}),
   ]);
   return el("section",{class:"card",id:"exclusion-analysis","aria-labelledby":"analysis-title"},[
@@ -644,7 +658,7 @@ function renderWaiting() {
 function renderGenerating() {  return {
     body: [
       el("section", { class: "state" }, [
-        el("h2", { class: "state__title" }, [el("span", { class: "spinner", "aria-hidden": "true" }), state.pending?.kind === "analyze" ? "正在识别你写下的限制…" : "正在生成三个不同思路…"]),
+        el("h2", { class: "state__title", role: "status", "aria-live": "polite" }, [el("span", { class: "spinner", "aria-hidden": "true" }), state.pending?.kind === "analyze" ? "正在识别你写下的限制…" : state.pending?.kind === "present" ? "正在整理这份礼物的账单与赠送建议…" : "正在生成三个不同思路…"]),
         el("p", { text: "稍等一下，正在为你整理。" }),
       ]),
     ],
@@ -670,7 +684,7 @@ function renderRecommendation() {
 
   body.push(
     el("section", { class: `card ${selectable.size > 0 ? "card--ok" : "card--fail"}` }, [
-      el("h2", { class: "card__title", text: `推荐结果：${statusText}` }),
+      el("h2", { class: "card__title", text: `推荐结果${PREVIEW_MODE ? "（模拟）" : ""}：${statusText}` }),
       el("dl", { class: "kv" }, [
         el("dt", { text: "运行编号" }),
         el("dd", { class: "code", text: report.recommendation_run_id }),
@@ -709,7 +723,7 @@ function renderRecommendation() {
 
   report.candidates.forEach((candidate, index) => {
     const result = errorsByCandidate.get(candidate.id) || { passed: false, errors: [{ code: "MISSING_RESULT", message: "缺少校验结果，按不可选处理" }] };
-    const canSelect = selectable.has(candidate.id);
+    const canSelect = selectable.has(candidate.id) && result.passed === true;
     body.push(
       el("section", { class: `card ${canSelect ? "" : "card--fail"}` }, [
         el("p", { class: "how__num", text: `思路 ${String(index + 1).padStart(2, "0")} · ${candidate.id}` }),
@@ -749,6 +763,7 @@ function renderRecommendation() {
           el("dt", { text: "独立检查结果" }),
           el("dd", {}, [
             el("strong", { text: canSelect ? "通过，可选择" : "未通过，不可选择" }),
+            ...(result.warnings || []).map(w => el("p", { class: "field__hint", text: w.message })),
             result.errors && result.errors.length > 0
               ? el("ul", { class: "list" }, result.errors.map((e) => el("li", {}, [el("span", { text: e.message }), el("span", { class: "code", text: `（${e.code}）` })])))
               : null,
@@ -819,7 +834,7 @@ function renderPresentation() {
     el("section", { class: `card ${failed ? "card--fail" : "card--ok"}` }, [
       el("h2", {
         class: "card__title",
-        text: failed ? "呈现阶段复核未通过：不伪装为完成" : "你选择的方案：四段呈现已通过复核",
+        text: failed ? "这份方案尚未完成" : `礼物账单：${view.candidate?.name || "已选礼物"}`,
       }),
       el("dl", { class: "kv" }, [
         el("dt", { text: "运行编号" }),
@@ -866,6 +881,8 @@ function renderPresentation() {
         el("dd", { text: s.budget_range ? `${s.budget_range.min}–${s.budget_range.max} ${s.currency}` : "新版账单字段缺失" }),
         el("dt", { text: "包装等附加项" }),
         el("dd", { text: "风格与色调" }),
+        el("dt", { text: "备注" }),
+        el("dd", { text: "本地模拟估价。包装等未计价，不代表免费；购买前需核对实际价格。" }),
         el("dt", { text: "准备时间" }),
         el("dd", { text: `${s.revised_estimated_preparation_days} 天（可用 ${s.available_days} 天）` }),
         el("dt", { text: "禁忌复核" }),
@@ -991,7 +1008,7 @@ function resetToForm() {
   render();
 }
 
-function buildIntake() {
+export function buildIntake() {
   const f = state.form;
   const intake = {
     recipient_relation: f.recipient_relation,
@@ -1004,58 +1021,31 @@ function buildIntake() {
     interests: f.interests_unknown ? [] : [...f.interests],
     interest_confidence: f.interests_unknown ? {} : { ...f.interest_confidence },
     gift_styles: f.styles_unknown ? [] : [...f.gift_styles],
-    dislikes: f.dislikes || "",
+    dislikes: f.dislikes.trim() ? f.dislikes : "",
+    previous_gifts: f.previous_gifts || "",
     hard_exclusions: { tags: [...f.exclusion_tags], terms: [], unresolved: [] },
     additional_context: f.additional_context || "",
   };
-  if (f.recipient_relation === "other") intake.recipient_relation_other = f.recipient_relation_other.trim();
-  if (f.occasion === "other") intake.occasion_other = f.occasion_other.trim();
+  if (f.recipient_relation === "other") intake.recipient_relation_custom = f.recipient_relation_other.trim();
+  if (f.occasion === "other") intake.occasion_custom = f.occasion_other.trim();
   if (f.closeness) intake.closeness = f.closeness;
   return intake;
 }
 
-function localMockAnalysis(dislikes) {
-  const source = dislikes.trim();
-  const candidates = [];
-  const known = [
-    ["香水", "fragrance", "不喜欢香氛类礼物"],
-    ["酒", "alcohol", "不选择酒类礼物"],
-    ["巧克力", "chocolate", "不选择巧克力类礼物"],
-  ];
-  for (const [term, tag, why] of known) {
-    if (source.includes(term)) candidates.push({ id: `xc${candidates.length + 1}`, kind: "tag", tag, term: null, source_span: term, confidence: "high", why, evidence: "user_text" });
-  }
-  return candidates.length
-    ? { status: "needs_confirmation", mode: "mock", analysis_id: `mock-${Date.now()}`, candidates, errors: [] }
-    : { status: "needs_input", mode: "mock", analysis_id: null, candidates: [], errors: [{ code: "INTAKE_CLARIFICATION_REQUIRED", message: "这段描述暂时无法可靠映射到明确类别，请换一种说法或删去不确定限制。" }] };
-}
-
 async function analyzeDislikes(intake) {
   const response = await apiFetch("/api/exclusions/analyze", { intake });
-  if (response.ok && response.data) return response.data;
-  if (state.config?.mode === "mock" && response.status === 404) return localMockAnalysis(intake.dislikes);
-  return response.data || { status: "error", errors: [{ code: "EXCLUSION_ANALYSIS_UNAVAILABLE", message: "暂时无法识别不喜欢的内容，请稍后重试。" }] };
+  return response.data || { status: "error", errors: [{code:"BAD_RESPONSE",message:"识别暂未完成，请重试。"}] };
 }
 
 async function apiFetch(path, payload) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), state.config ? state.config.client_timeout_ms : 20000);
-  try {
-    const response = await fetch(path, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-    const data = await response.json().catch(() => null);
-    return { ok: response.ok, status: response.status, data };
-  } finally {
-    clearTimeout(timer);
-  }
+  if (PREVIEW_MODE) return previewRequest(path, payload);
+  throw new Error("同版本后端尚未接入，旧服务调用已禁用");
 }
 
 async function submitIntake() {
-  const problems = state.step === 1 ? validateStep1() : null;
+  if (state.busy) return;
+  const version = state.requestVersion;
+  const problems = validateStep1();
   if (problems) {
     state.step = 1;
     state.error = { kind: "needs_input", errors: problems };
@@ -1069,17 +1059,24 @@ async function submitIntake() {
     return;
   }
   const intake = buildIntake();
+  if (codePoints(intake.dislikes) > 1000 || codePoints(intake.previous_gifts) > 1000 || codePoints(intake.additional_context) > 1000) {
+    state.error = {kind:"needs_input",errors:[{code:"LIMIT_EXCEEDED",message:"需要避免的、以前送过的礼物和补充说明，每项最多 1000 字。"}]};
+    render();return;
+  }
   if (intake.dislikes && !state.analysis) {
     state.busy = true;
     state.pending = { kind: "analyze" };
     state.error = null;
     render();
     try {
-      state.analysis = await analyzeDislikes(intake);
+      const analysis = await analyzeDislikes(intake);
+      if (version !== state.requestVersion) return;
+      state.analysis = analysis;
       state.busy = false;
       state.pending = null;
       render();
     } catch (error) {
+      if (version !== state.requestVersion) return;
       state.busy = false;
       state.error = { kind: "error", errors: [{ code: "EXCLUSION_ANALYSIS_UNAVAILABLE", message: "暂时无法识别不喜欢的内容，请稍后重试。" }] };
       render();
@@ -1098,7 +1095,8 @@ async function submitIntake() {
   render();
   try {
     // 先做一次服务端确定性适配，把中文错误在提交前给用户
-    const pre = await apiFetch("/api/intake/validate", { intake });
+    const pre = intake.dislikes ? { ok: true, data: {status: "ready"} } : await apiFetch("/api/intake/validate", { intake });
+    if (version !== state.requestVersion) return;
     if (pre.ok && pre.data && pre.data.status !== "ready") {
       state.busy = false;
       state.error = { kind: "needs_input", errors: pre.data.errors };
@@ -1108,6 +1106,7 @@ async function submitIntake() {
     const payload = { intake, demo: state.demo || null };
     if (intake.dislikes) payload.exclusion_confirmation = { analysis_id: state.analysis.analysis_id, confirmed_ids: [...state.confirmedIds] };
     const response = await apiFetch("/api/recommendations", payload);
+    if (version !== state.requestVersion) return;
     state.busy = false;
     if (!response.data) {
       state.error = { kind: "error", errors: [{ code: "BAD_RESPONSE", message: "服务端返回的内容无法解析，请重试。" }] };
@@ -1115,7 +1114,7 @@ async function submitIntake() {
       return;
     }
     if (!response.ok) {
-      state.error = { kind: response.status === 503 ? "infrastructure_error" : "needs_input", errors: response.data.errors || [] };
+      state.error = { kind: response.status === 422 ? "needs_input" : "error", errors: response.data.errors || [] };
       render();
       return;
     }
@@ -1124,6 +1123,7 @@ async function submitIntake() {
     state.step = 3;
     render();
   } catch (err) {
+    if (version !== state.requestVersion) return;
     state.busy = false;
     if (err && (err.name === "AbortError" || err.code === "ABORT_ERR")) {
       state.timeout = true;
@@ -1136,9 +1136,14 @@ async function submitIntake() {
 }
 
 async function selectCandidate(candidateId) {
+  if (state.busy) return;
+  const version = state.requestVersion;
+  const result=state.report?.validation.candidate_results.find(x=>x.id===candidateId);
+  if (!state.report?.selectable_candidate_ids.includes(candidateId) || result?.passed !== true) return;
   state.busy = true;
   state.pending = { kind: "present", candidateId };
   state.error = null;
+  state.timeout = false;
   render();
   try {
     const response = await apiFetch("/api/presentations", {
@@ -1146,6 +1151,7 @@ async function selectCandidate(candidateId) {
       selected_candidate_id: candidateId,
       demo: state.demo || null,
     });
+    if (version !== state.requestVersion) return;
     state.busy = false;
     if (!response.data) {
       state.error = { kind: "error", errors: [{ code: "BAD_RESPONSE", message: "服务端返回的内容无法解析，请重试。" }] };
@@ -1165,6 +1171,7 @@ async function selectCandidate(candidateId) {
     state.presentation = response.data;
     render();
   } catch (err) {
+    if (version !== state.requestVersion) return;
     state.busy = false;
     if (err && err.name === "AbortError") {
       state.timeout = true;
@@ -1234,7 +1241,7 @@ function render() {
     rendered = renderWaiting();
   } else if (!state.inFlow) {
     rendered = { body: [el("p", { class: "sr-only", text: "点击开始挑选礼物进入三页流程。" })], actions: [] };
-  } else if (state.busy && !state.report && !state.presentation) {
+  } else if (state.busy) {
     rendered = renderGenerating();
   } else if (state.timeout) {
     rendered = stateView(
@@ -1315,28 +1322,8 @@ async function bootstrap() {
     }
   }
   render();
-  try {
-    const response = await fetch("/api/config");
-    state.config = await response.json();
-    if (LOCAL_UI_FIXTURE && state.config.mode === "mock") {
-      state.config = { ...state.config, deadline_options: LOCAL_DEADLINES, fixture_notice: "本地 UI 夹具：未联调新版接入 API" };
-    }
-  } catch (err) {
-    state.error = { kind: "error", errors: [{ code: "CONFIG_UNAVAILABLE", message: "无法读取接入层配置，请确认服务已启动。" }] };
-    render();
-    return;
-  }
-  const previousRun = sessionStorage.getItem("gw_last_run");
-  if (previousRun) {
-    try {
-      const response = await fetch(`/api/runs/${encodeURIComponent(previousRun)}`);
-      if (response.status === 404) {
-        state.restoreNotice = "空状态：上一次的任务记录已不存在（接入层为内存实现，服务重启即失效），请重新填写需求。";
-      }
-    } catch (err) {
-      /* 忽略：不影响主流程 */
-    }
-  }
+  // 当前仅加载本地固定配置，不请求旧服务或第三方模型。
+  state.config = previewConfig;
   render();
 }
 

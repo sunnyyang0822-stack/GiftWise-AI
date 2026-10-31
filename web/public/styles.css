@@ -1169,5 +1169,7 @@ body .gw-band + .gw-band, body .gw-how + .gw-band { border-top: 0; }
 .app-footer { border: 0; padding: 16px 24px 24px; }
 .app-footer__meta:empty { display: none; }
 .legal-footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 28px; }
+.preview-scenario { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 14px; }
+.preview-scenario select { min-height: 44px; max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: white; color: var(--ink); }
 .legal-footer-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-underline-offset: 4px; }
 .gw-flow-active .app-footer { padding-bottom: 190px; }

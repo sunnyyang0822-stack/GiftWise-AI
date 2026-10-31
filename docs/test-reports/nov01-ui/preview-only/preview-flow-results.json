@@ -1,0 +1,538 @@
+{
+  "total": 133,
+  "passed": 133,
+  "checks": [
+    {
+      "name": "1440-normal preview badge",
+      "passed": true
+    },
+    {
+      "name": "1440-normal uncertain budget blocked",
+      "passed": true
+    },
+    {
+      "name": "1440-normal reversed budget blocked",
+      "passed": true
+    },
+    {
+      "name": "1440-normal blank amount blocked",
+      "passed": true
+    },
+    {
+      "name": "1440-normal other decimals accepted",
+      "passed": true
+    },
+    {
+      "name": "1440-normal zero budget accepted",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "1440-normal step2",
+      "passed": true
+    },
+    {
+      "name": "1440-normal retains input",
+      "passed": true
+    },
+    {
+      "name": "1440-normal optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "1440-normal separate history payload",
+      "passed": true
+    },
+    {
+      "name": "1440-normal history retained",
+      "passed": true
+    },
+    {
+      "name": "1440-normal loading visible",
+      "passed": true
+    },
+    {
+      "name": "1440-normal exactly3",
+      "passed": true
+    },
+    {
+      "name": "1440-normal facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "1440-normal presentation loading",
+      "passed": true
+    },
+    {
+      "name": "1440-normal four sections",
+      "passed": true
+    },
+    {
+      "name": "1440-normal only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no overflow",
+      "passed": true
+    },
+    {
+      "name": "1440-normal zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-normal preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-normal uncertain budget blocked",
+      "passed": true
+    },
+    {
+      "name": "390-normal reversed budget blocked",
+      "passed": true
+    },
+    {
+      "name": "390-normal blank amount blocked",
+      "passed": true
+    },
+    {
+      "name": "390-normal other decimals accepted",
+      "passed": true
+    },
+    {
+      "name": "390-normal zero budget accepted",
+      "passed": true
+    },
+    {
+      "name": "390-normal no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-normal step2",
+      "passed": true
+    },
+    {
+      "name": "390-normal retains input",
+      "passed": true
+    },
+    {
+      "name": "390-normal optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-normal separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-normal history retained",
+      "passed": true
+    },
+    {
+      "name": "390-normal loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-normal exactly3",
+      "passed": true
+    },
+    {
+      "name": "390-normal facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "390-normal presentation loading",
+      "passed": true
+    },
+    {
+      "name": "390-normal four sections",
+      "passed": true
+    },
+    {
+      "name": "390-normal only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "390-normal no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-normal zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "320-normal preview badge",
+      "passed": true
+    },
+    {
+      "name": "320-normal uncertain budget blocked",
+      "passed": true
+    },
+    {
+      "name": "320-normal reversed budget blocked",
+      "passed": true
+    },
+    {
+      "name": "320-normal blank amount blocked",
+      "passed": true
+    },
+    {
+      "name": "320-normal other decimals accepted",
+      "passed": true
+    },
+    {
+      "name": "320-normal zero budget accepted",
+      "passed": true
+    },
+    {
+      "name": "320-normal no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "320-normal step2",
+      "passed": true
+    },
+    {
+      "name": "320-normal retains input",
+      "passed": true
+    },
+    {
+      "name": "320-normal optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "320-normal separate history payload",
+      "passed": true
+    },
+    {
+      "name": "320-normal history retained",
+      "passed": true
+    },
+    {
+      "name": "320-normal loading visible",
+      "passed": true
+    },
+    {
+      "name": "320-normal exactly3",
+      "passed": true
+    },
+    {
+      "name": "320-normal facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "320-normal presentation loading",
+      "passed": true
+    },
+    {
+      "name": "320-normal four sections",
+      "passed": true
+    },
+    {
+      "name": "320-normal only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "320-normal no overflow",
+      "passed": true
+    },
+    {
+      "name": "320-normal zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-error preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-error no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-error step2",
+      "passed": true
+    },
+    {
+      "name": "390-error retains input",
+      "passed": true
+    },
+    {
+      "name": "390-error optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-error separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-error history retained",
+      "passed": true
+    },
+    {
+      "name": "390-error loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-error failure recovery",
+      "passed": true
+    },
+    {
+      "name": "390-error exactly3",
+      "passed": true
+    },
+    {
+      "name": "390-error facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "390-error presentation loading",
+      "passed": true
+    },
+    {
+      "name": "390-error four sections",
+      "passed": true
+    },
+    {
+      "name": "390-error only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "390-error no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-error zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-empty preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-empty no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-empty step2",
+      "passed": true
+    },
+    {
+      "name": "390-empty retains input",
+      "passed": true
+    },
+    {
+      "name": "390-empty optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-empty separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-empty history retained",
+      "passed": true
+    },
+    {
+      "name": "390-empty loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-empty empty no auto choice",
+      "passed": true
+    },
+    {
+      "name": "390-empty no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-empty zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-blocked preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-blocked no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-blocked step2",
+      "passed": true
+    },
+    {
+      "name": "390-blocked retains input",
+      "passed": true
+    },
+    {
+      "name": "390-blocked optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-blocked separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-blocked history retained",
+      "passed": true
+    },
+    {
+      "name": "390-blocked loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-blocked exactly3",
+      "passed": true
+    },
+    {
+      "name": "390-blocked facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "390-blocked blocked no choices",
+      "passed": true
+    },
+    {
+      "name": "390-blocked no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-blocked zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error step2",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error retains input",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error history retained",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error exactly3",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error presentation loading",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error four sections",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-presentation_error zero old API calls",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error preview badge",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error no budget checkbox",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error step2",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error retains input",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error optional blank payload",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error separate history payload",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error history retained",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error loading visible",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error analyze failure shown",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error no default confirmation",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error unconfirmed blocked",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error exactly3",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error facts inference unknown",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error presentation loading",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error four sections",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error only selected gift total",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error no overflow",
+      "passed": true
+    },
+    {
+      "name": "390-analyze_error zero old API calls",
+      "passed": true
+    }
+  ]
+}
