@@ -7,5 +7,6 @@
   ]},
   "media":{"status":"unavailable","candidates":[{"candidate_id":"c1","product_id":"demo-p1","image":null},{"candidate_id":"c2","product_id":"demo-p2","image":null},{"candidate_id":"c3","product_id":"demo-p3","image":null}],"selected":null},
   "annotation_sample":{"id":"a1","text":"贺卡位置","target":{"x":0.65,"y":0.7},"label":{"x":0.8,"y":0.3}},
-  "image_failure_sample":{"status":"failed","candidates":[],"selected":null}
+  "image_failure_sample":{"status":"failed","candidates":[],"selected":null},
+  "product_references_json":"[{\"candidate_id\":\"c1\",\"product_id\":\"demo-p1\"},{\"candidate_id\":\"c2\",\"product_id\":\"demo-p2\"},{\"candidate_id\":\"c3\",\"product_id\":\"demo-p3\"}]"
 }

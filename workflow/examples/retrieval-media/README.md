@@ -1,5 +1,15 @@
 # #59/#60 离线接线准备（待后台契约）
 
+## PR61@7204b64商品引用与选后造景（最新，覆盖旧引用待定义说明）
+
+已读后台最新契约原件：生成输入retrieval_json字符串，输出独立product_references_json字符串，解析值仅[{candidate_id,product_id}]，与原candidates_json分开。每个候选一一对应且product_id不重复，候选name必须等于商品name + " · " + variant，estimated_total原样等于price_amount。缺引用/错型号/改价/未核实条件阻止选择；不足三种不同商品返回RETRIEVAL_INSUFFICIENT，不调用生成提供者。cases.json已按精确信封对齐，未另造引用字段。实际name/金额校验由后台执行，本线oracle仅离线检查。
+
+scene-drafts.json是本线离线编辑/验证文件，不是provider共享信封；其description/known_product/unknowns等外层键不提交业务API。annotations提案仅使用后台已有id/text/target/label结构，默认3–5条自然短句。纯底图、手写感字体/细曲箭头由前端叠加，不加字体或曲线参数到共享接口。
+
+造景围绕同一合格选择，礼物与包装主体、光影环境氛围，不统一套方盒。按已知形状/重量/易碎性与尺寸选纸包/礼袋/圆筒/透明或异形包装；没有依据不猜厘米/承重/材质，不改变型号颜色数量及相对大小。道具不是附送商品。尺寸未知明确比例示意或先澄清。
+
+坐标提案有限0–1只是结构合格，不是定位准确。实际图生成后需核对物体位置/遮挡/标注可读性，当前没有真实图片，不可ready交付；夹具selected=null、unavailable。共享契约暂无最终定位复核信封，建议后台/PM明确未确认说明载体，不自造placement_status字段。计划精确键名、图像provider请求和可信尺寸/重量来源字段仍待后台补充。生图服务选型由产品负责人/PM决定，本轮不查选型、不调用服务。
+
 ## PR61对齐更新（覆盖下文开工时的未提交状态）
 
 后台契约已在PR61提交`27670b6fe88b0cffacf0a8fafccdd81f7adc8829`，v1冻结草案，尚未合入release。已通过git show读取原件，不复制或修改后台共享文件。下文“未提交”描述仅为开工时记录。
