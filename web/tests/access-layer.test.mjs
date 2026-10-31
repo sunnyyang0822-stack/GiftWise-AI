@@ -160,24 +160,20 @@ test("其他关系与其他场合必须填写自定义文本并冻结到 request
   }
 });
 
-test("天数允许 0，但拒绝浮点、布尔与缺失；不静默填 7 天", () => {
-  const zero = baseIntake();
-  zero.deadline_days = 0;
-  const zeroResult = adaptIntakeObject(zero);
-  assert.equal(zeroResult.status, "ready");
-  assert.equal(strictParse(zeroResult.request_json).available_days, 0);
-
-  const float = adaptIntake('{"recipient_relation":"pursuit","deadline_days":2.0,"budget_amount":"200.00","currency":"CNY","occasion":"birthday"}');
-  assert.equal(float.status, "needs_input");
-  assert.ok(float.errors.some((e) => e.code === "INVALID_TYPE" && e.path === "request.available_days"));
-
-  const bool = adaptIntake('{"recipient_relation":"pursuit","deadline_days":true,"budget_amount":"200.00","currency":"CNY","occasion":"birthday"}');
-  assert.ok(bool.errors.some((e) => e.code === "INVALID_TYPE"));
-
-  const missing = baseIntake();
-  delete missing.deadline_days;
-  const missingResult = adaptIntakeObject(missing);
-  assert.ok(missingResult.errors.some((e) => e.code === "INTAKE_CLARIFICATION_REQUIRED"));
+test("时间可省略或未知，合法天数只作参考，不伪造默认值", () => {
+  for (const value of [undefined, null, "不确定", "", -1, 366, 1.5, true, {}, []]) {
+    const intake = baseIntake();
+    if (value === undefined) delete intake.deadline_days;
+    else intake.deadline_days = value;
+    const result = adaptIntakeObject(intake);
+    assert.equal(result.status, "ready", JSON.stringify(result.errors));
+    assert.equal(strictParse(result.request_json).available_days, null);
+  }
+  for (const days of [0, 1, 365]) {
+    const result = adaptIntakeObject({ ...baseIntake(), deadline_days: days });
+    assert.equal(result.status, "ready");
+    assert.equal(strictParse(result.request_json).available_days, days);
+  }
 });
 
 test("首版仅 CNY，非 CNY 被拒且不换汇", () => {

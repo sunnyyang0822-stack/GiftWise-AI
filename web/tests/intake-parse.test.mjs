@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseIntakeText, buildIntakeParseMessages } from '../server/llm/intake-parse.mjs';
+import { parseIntakeText, buildIntakeParseMessages, toRecommendConstraints } from '../server/llm/intake-parse.mjs';
 import { adaptIntakeObject } from '../server/intake.mjs';
 import { checkAiExclusions } from '../server/exclusion-checker.mjs';
 
@@ -59,7 +59,7 @@ test('体验枚举不会自动触发城市门禁，模型识别当地体验时�
   assert.equal(a.parse.required_followups.some(x=>x.id==='city'),false);
   const b=await parse({experiential_mentioned:true},'想请朋友参加当地陶艺课');
   assert.equal(b.parse.required_followups.find(x=>x.id==='city').required,false);
-  assert.equal(b.intake_validation.status,'ready'); assert.equal(b.parse.schema_version,'intake-parse-v2'); assert.doesNotMatch(b.parse.region_price.note,/无法|没有/);
+  assert.equal(b.intake_validation.status,'ready'); assert.equal(b.parse.schema_version,'intake-parse-v3'); assert.doesNotMatch(b.parse.region_price.note,/无法|没有/);
   const c=await parse({experiential_mentioned:true,city:{value:'杭州'}},'想请杭州的朋友上陶艺课');
   assert.equal(c.parse.city,'杭州'); assert.equal(c.parse.required_followups.some(x=>x.id==='city'),false);
 });
@@ -67,21 +67,23 @@ test('体验枚举不会自动触发城市门禁，模型识别当地体验时�
 test('下个月不猜成30或1天；保留原话，不生成时间带宽',async()=>{
   for(const days of [undefined,1,30]) {
     const r=await parse({deadline:{days,phrase:'下个月',explicit:false}},'下个月送礼');
-    assert.equal(r.intake.deadline_days,7); assert.equal(r.parse.echo.deadline_days,null);
-    assert.equal(r.parse.constraints.days_band,null); assert.equal(r.parse.deadline_check.expected,null);
-    assert.equal(r.parse.required_followups.find(x=>x.id==='deadline_confirm').required,false);
+    assert.equal(r.intake.deadline_days,null); assert.equal(r.parse.echo.deadline_days,null);
+    assert.equal(r.parse.constraints.days_band,null); assert.equal(r.parse.deadline_check,null);
+    assert.equal(r.parse.required_followups.some(x=>x.id==='deadline_confirm'),false);
     assert.equal(r.intake.additional_context,'下个月');
   }
   const {deadline_days,...prior}=form;
   const missing=await parse({deadline:{phrase:'下个月',explicit:false}},'下个月送礼',prior);
-  assert.equal(missing.intake.deadline_days,undefined);
-  assert.equal(missing.intake_validation.status,'needs_input');
-  assert.ok(missing.intake_validation.errors.some(x=>x.path==='intake.deadline_days'));
+  assert.equal(missing.intake.deadline_days,null);
+  assert.equal(missing.intake_validation.status,'ready');
+  assert.deepEqual(missing.intake_validation.errors,[]);
 });
 
-test('明确3天沿用现有字段，不改候选时间逻辑',async()=>{
+test('明确3天仅作参考，不生成时间带宽或日期追问',async()=>{
   const r=await parse({deadline:{days:3,phrase:'3天后',explicit:true}},'3天后送');
   assert.equal(r.intake.deadline_days,3); assert.equal(r.parse.echo.deadline_days,3);
+  assert.equal(r.parse.constraints.days_band,null); assert.equal(r.parse.candidate_gates.days_band,null);
+  assert.equal(r.parse.required_followups.some(x=>x.id==='deadline_confirm'),false);
 });
 
 test('additional_context保留用户补充和原话，不塞内部约束解释',async()=>{
@@ -127,4 +129,23 @@ test('文本预算非法不能静默沿用旧预算',async()=>{
   const r=await parse({budget:{amount:'10001'}},'预算10001');
   assert.equal(r.intake_validation.status,'needs_input');
   assert.ok(r.intake_validation.errors.some(x=>x.path==='intake.budget_amount'));
+});
+
+test('未提供时间也可ready，旧时间带宽不会进入推荐信封',async()=>{
+  const {deadline_days,...prior}=form;
+  const r=await parse({occasion:'birthday'},'生日',prior);
+  assert.equal(r.intake_validation.status,'ready');
+  assert.equal(r.intake.deadline_days,undefined);
+  assert.deepEqual(r.parse.required_followups,[]);
+  assert.equal(toRecommendConstraints({constraints:{days_band:{min:1,max:1}}}),null);
+});
+
+test('不确定或不合法的可选时间不触发日期确认，也不编造天数',async()=>{
+  for(const deadline of [{phrase:'不确定',explicit:false},{days:-1},{days:366},{days:true},{days:1.5}]) {
+    const r=await parse({deadline},'时间不确定',form);
+    assert.equal(r.intake.deadline_days,null);
+    assert.equal(r.intake_validation.status,'ready');
+    assert.equal(r.parse.constraints.days_band,null);
+    assert.equal(r.parse.required_followups.some(x=>x.id==='deadline_confirm'),false);
+  }
 });

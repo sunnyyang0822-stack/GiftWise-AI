@@ -320,7 +320,7 @@ function apiConfig() {
       method: "POST",
       client_timeout_ms: INTAKE_PARSE_CONFIG.clientTimeoutMs,
       budget_band_cny: INTAKE_PARSE_CONFIG.budgetBandCny,
-      days_band: INTAKE_PARSE_CONFIG.daysBand,
+      days_band: null,
       literal_preference_gate: INTAKE_PARSE_CONFIG.literalPreferenceGate ? "gate" : "warning",
       description:
         "把用户的自然语言输入解析成**现有** intake 字段（字段清单与选项由服务端代码固定，模型只能对应、不能新增）；" +
@@ -515,7 +515,7 @@ async function handleApi(req, res, url) {
   /* 第 1 步：自然语言 ⇒ **现有** intake 字段（唯一职责，不做自由对话）。
      请求体：{ text | natural_language: string, form?: <当前表单对象> }
      响应：intake（可直接提交给 /api/intake/validate 或 /api/recommendations）、
-           parse（未提到的字段 / 推断标记 / 用户原值回显 / ±50 与 ±1 带宽 / 必答追问）、
+           parse（未提到的字段 / 推断标记 / 用户原值回显 / 预算带宽 / 非时间必要确认）、
            llm（真实调用与否、usage、finish_reason）、notices（降级如实说明）。 */
   if (pathname === "/api/intake/parse") {
     const text = typeof payload.text === "string" ? payload.text : typeof payload.natural_language === "string" ? payload.natural_language : "";
@@ -567,7 +567,7 @@ async function handleApi(req, res, url) {
         mentioned_fields: parseResult.parse?.mentioned_text_fields ?? [],
         inferred_fields: parseResult.parse?.inferred_fields ?? [],
         literal_preferences: parseResult.parse?.literal_preferences ?? [],
-        constraints: parseResult.parse?.constraints ?? null,
+        constraints: parseResult.parse?.constraints?.budget_band ? { budget_band: parseResult.parse.constraints.budget_band } : null,
         required_followups: parseResult.parse?.required_followups ?? [],
         untouched_fields: parseResult.parse?.untouched_fields ?? [],
         overridden_from_form: parseResult.parse?.overridden_from_form ?? [],

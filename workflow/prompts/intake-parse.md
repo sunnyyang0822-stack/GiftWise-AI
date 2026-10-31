@@ -23,7 +23,7 @@
 - `occasion`：`{"value": 场合ID, "explicit": true|false, "evidence": "原话片段"}`
 - `occasion_custom`：字符串，仅当场合为 `other` 时给出，取自原话，≤ 1000 字。
 - `budget`：单个金额 `{"amount": "800", "phrase": "预算800吧", "explicit": true}`；或区间 `{"min": "300", "max": "500", "phrase": "三五百", "explicit": true}`。金额是十进制字符串；「不花钱」⇒ `amount: "0"`。
-- `deadline`：明确天数或可确定的日期使用 `{"days": 整数, "phrase": "原话里的时间说法", "explicit": true|false}`。只有“下周／下个月”等没有具体日期的说法时，输出 `{"phrase":"原话","explicit":false}`，省略 days，不猜成 1 天或 30 天。时间估算只供辅助决策，具体日期可自然向用户确认，不因此认定礼物不可选。
+- `deadline`：明确天数或可确定的日期使用 `{"days": 整数, "phrase": "原话里的时间说法", "explicit": true|false}`。只有“下周／下个月”等没有具体日期的说法时，输出 `{"phrase":"原话","explicit":false}`，省略 days，不猜成 1 天或 30 天。时间不纳入推荐筛选、排序、可选性或流程判断。用户主动提到时仅保留简短参考；未提到不追问，不要求补充期限才能继续。
 - `interests`：数组，每项 `{"id": 兴趣ID, "explicit": true|false, "evidence": "原话片段"}`。
 - `gift_styles`：数组，每项 `{"id": 风格ID, "explicit": true|false, "evidence": "原话片段"}`。
 - `exclusion_terms`：数组，每项 `{"text":"原话中的字面东西","confidence":"high"|"medium"|"low"}`。只有确实表达排除且把握高时标 high；不确定的含义保留 dislikes 原话，供用户确认，不补同义词。明确禁忌不得遗漏。

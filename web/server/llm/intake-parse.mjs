@@ -12,7 +12,7 @@ import { loadPromptBody } from "./prompt.mjs";
 import { llmProvider } from "./provider.mjs";
 
 /** 解析结果的结构版本：任何字段语义变化都必须递增（写进响应，便于前端与复核对齐）。 */
-export const INTAKE_PARSE_SCHEMA = "intake-parse-v2";
+export const INTAKE_PARSE_SCHEMA = "intake-parse-v3";
 
 /** 解析结果的状态。⛔ 不使用「成功」以外的模糊词：每种状态都能对应到一句可核验的中文。 */
 export const PARSE_STATUS = Object.freeze({
@@ -33,10 +33,9 @@ export function relationIds() {
   return [...PRODUCT_RELATIONS.map((item) => item.id), "unknown"];
 }
 
-/** 目标金额/天数约束带宽（与 pipeline 的候选侧 gate 共用同一份常量）。 */
+/** 预算带宽；时间不参与推荐判断。 */
 export const BANDS = Object.freeze({
   budgetCny: INTAKE_PARSE_CONFIG.budgetBandCny,
-  days: INTAKE_PARSE_CONFIG.daysBand,
 });
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
@@ -109,8 +108,8 @@ export function fieldCatalogue() {
       gift_styles: Object.keys(GIFT_STYLE_TABLE).map((id) => ({ id, zh: GIFT_STYLE_TABLE[id] })),
       exclusion_tags: Object.keys(EXCLUSION_TABLE).map((id) => ({ id, zh: EXCLUSION_TABLE[id] })),
     },
-    ranges: { budget_amount: "1 至 10000 的十进制字符串（0 仅用于「不花钱」）", deadline_days: "0 至 365 的整数" },
-    bands: { ...BANDS },
+    ranges: { budget_amount: "1 至 10000 的十进制字符串（0 仅用于「不花钱」）", deadline_days: "可省略或未知；明确天数仅为参考，不影响推荐" },
+    bands: { budgetCny: BANDS.budgetCny },
   };
 }
 
@@ -135,7 +134,7 @@ export function buildIntakeParseMessages({ text, now = new Date() }) {
     "- 禁忌类别 ID：" + catalogue.enums.exclusion_tags.map((item) => `${item.id}=${item.zh}`).join("、"),
     `- 金额范围：${catalogue.ranges.budget_amount}；天数范围：${catalogue.ranges.deadline_days}`,
     "",
-    "# 今天（Asia/Shanghai；仅换算明确日期。下周、下个月等没有具体日期时保留原话，不猜天数）",
+    "# 今天（Asia/Shanghai；仅换算明确日期。下周、下个月等没有具体日期时保留原话，不猜天数、不追问期限）",
     `${today.date}（${today.weekday}）`,
   ];
   const system = `${body ?? FALLBACK_BODY}\n\n${lines.join("\n")}`;
@@ -150,7 +149,7 @@ const FALLBACK_BODY =
   "你是 GiftWise AI 第 1 步的输入解析器。只输出一个严格 JSON 对象，把用户原话对应到固定字段清单上；" +
   "用户没提到的字段不要出现；只用现有字段；选项外喜好保留原话，自定义关系和场合用 other 及对应 custom 字段；不确定信息保留原话并标注。";
 
-/* ── 用户原文里的**明确金额区间**（代码级识别，与 deadlineCrossCheck 同一思路）──
+/* ── 用户原文里的**明确金额区间**（以用户原话核对）──
    2026-11-01 缺陷 A 的相关口径：用户写「预算 800–1000」时，**区间本身就是他输入的东西**，
    产品裁定要求"展现给用户的就是他输入的东西"⇒ 该区间必须原样保留（不能压成一个数、
    更不能变成 0–×××）。提示词要求模型只给单个金额（`budget.amount`），模型对区间的处理
@@ -401,39 +400,22 @@ export function normalizeParseOutput(raw, { text = "", form = {}, now = new Date
     }
   }
 
-  /* ---------- 时间：确定天数 + 上下 1 天的约束带宽 ---------- */
+  /* ---------- 时间仅作用户主动提供的参考，不生成推荐约束或追问 ---------- */
   const deadlineEntry = raw.deadline;
-  const deadlinePhrase = snippet(typeof deadlineEntry === "object" && deadlineEntry !== null ? deadlineEntry.phrase : null, 200);
-  const calendarUncertain = deadlinePhrase && ((/下个?月|下月|来月|下周|下个?星期/u.test(deadlinePhrase) && !/\d{1,2}\s*[日号]/u.test(deadlinePhrase)) || deadlineEntry.days === undefined);
-  if (calendarUncertain) {
-    meta.echo.deadline_phrase = deadlinePhrase;
-    meta.deadline_check = { phrase: deadlinePhrase, days: null, expected: null, ok: false, reason: "尚未确定具体日期" };
-    meta.notes.push(`「${deadlinePhrase}」的具体日期待确认。`);
-  } else if (deadlineEntry !== undefined && deadlineEntry !== null) {
-    const daysRaw = typeof deadlineEntry === "object" ? deadlineEntry.days : deadlineEntry;
+  if (deadlineEntry !== undefined && deadlineEntry !== null) {
+    const entry = typeof deadlineEntry === "object" ? deadlineEntry : { days: deadlineEntry };
+    const phrase = snippet(entry.phrase, 200);
+    if (phrase && text.includes(phrase)) meta.echo.deadline_phrase = phrase;
+    const calendarUncertain = phrase && /下个?月|下月|来月|下周|下个?星期/u.test(phrase) && !/\d{1,2}\s*[日号]/u.test(phrase);
+    const daysRaw = entry.days;
     const days = typeof daysRaw === "number" && Number.isInteger(daysRaw) ? daysRaw : typeof daysRaw === "string" && /^\d{1,3}$/.test(daysRaw.trim()) ? Number(daysRaw.trim()) : null;
-    if (days === null || days < 0 || days > 365) {
-      drop("deadline.days", daysRaw, "不是 0–365 的整数");
-    } else {
-      patch.deadline_days = days;
-      meta.mentioned_text_fields.push("deadline_days");
-      if (typeof deadlineEntry === "object" && deadlineEntry.explicit === true) meta.explicit_fields.push("deadline_days");
-      meta.echo.deadline_days = days;
-      meta.echo.deadline_phrase = snippet(typeof deadlineEntry === "object" ? deadlineEntry.phrase : null, 40);
-      // 相对时间词的代码级交叉校验：矛盾时**要求确认**（不静默改写模型给的天数）。
-      meta.deadline_check = deadlineCrossCheck({ phrase: typeof deadlineEntry === "object" ? deadlineEntry.phrase : null, days });
-      if (meta.deadline_check && meta.deadline_check.ok === false) {
-        meta.notes.push(`⚠ 期限需要确认：${meta.deadline_check.reason}`);
-      }
-      meta.constraints.days_band = {
-        min: clamp(days - config.daysBand, 0, 365),
-        max: clamp(days + config.daysBand, 0, 365),
-        user_days: days,
-        band_days: config.daysBand,
-        basis: `用户给出确定天数 ${days} 天 ⇒ 时间约束带宽为上下不超过 ${config.daysBand} 天（产品负责人 2026-10-31 裁定）`,
-        display: `界面显示用户输入的原值：${days} 天（不显示区间）`,
-      };
-    }
+    // 不确定的表达替换旧表单参考值为 null；模型猜出的期限不能冒充用户确定天数。
+    const known = !calendarUncertain && days !== null && days >= 0 && days <= 365;
+    patch.deadline_days = known ? days : null;
+    meta.echo.deadline_days = known ? days : null;
+    meta.mentioned_text_fields.push("deadline_days");
+    if (known && entry.explicit === true) meta.explicit_fields.push("deadline_days");
+    else meta.inferred_fields.push("deadline_days");
   }
 
   /* ---------- 兴趣：ID 只是"便于检索"的附加物，原话才是硬约束 ---------- */
@@ -641,15 +623,6 @@ function safeJson(value) {
   }
 }
 
-/** 只交叉检查可确定的天数，不将模糊月份或星期估成确定期限。 */
-export function deadlineCrossCheck({ phrase, days }) {
-  if (typeof phrase !== "string" || !phrase.trim() || !Number.isInteger(days)) return null;
-  const match = /(\d+)\s*天/u.exec(phrase);
-  const expected = match ? Number(match[1]) : /后天/u.test(phrase) ? 2 : /明天|次日/u.test(phrase) ? 1 : /今天|当天/u.test(phrase) ? 0 : null;
-  if (expected === null) return null;
-  return { phrase, days, unit: "天", expected, ok: days === expected, reason: days === expected ? null : `「${phrase}」的天数需要确认` };
-}
-
 /** additional_context 只保存用户内容；处理规则留在 parse 元数据及提示词里。 */
 export function composeAdditionalContext({ formValue, parsedValue, meta }) {
   const parts = [];
@@ -783,7 +756,7 @@ export async function parseIntakeText(input = {}) {
     const composed = composeAdditionalContext({ formValue: form.additional_context, parsedValue: patch.additional_context, meta: mergedMeta });
     if (composed) patch = { ...patch, additional_context: composed };
     const { intake, overridden } = mergeIntake({ form, patch, meta: mergedMeta });
-    // 体验类必须问城市（裁定 4）：缺城市时给出**必答**追问项。
+    // 仅在城市影响体验推荐时返回可跳过的问题。
     const followups = [];
     const wantsExperience = mergedMeta.experiential_mentioned === true;
     if (wantsExperience && !mergedMeta.city) {
@@ -803,17 +776,6 @@ export async function parseIntakeText(input = {}) {
         required: true,
         endpoint: "POST /api/exclusions/analyze",
         reason: "现有契约要求排除项必须由用户确认",
-      });
-    }
-    if (mergedMeta.deadline_check && mergedMeta.deadline_check.ok === false) {
-      followups.push({
-        id: "deadline_confirm",
-        field: "deadline_days",
-        question: `「${mergedMeta.deadline_check.phrase}」具体是哪一天，或大约还有几天？`,
-        required: false,
-        current_value: mergedMeta.deadline_check.days,
-        suggested_value: mergedMeta.deadline_check.expected,
-        reason: "日期尚不明确，时间估算仅供挑选时参考",
       });
     }
     const regionPrice =
@@ -970,7 +932,7 @@ export async function parseIntakeText(input = {}) {
         meta,
         llm,
         extraNotices: [
-          "请补充送给谁、什么场合、预算或时间。",
+          "请补充送给谁、什么场合或预算。",
         ],
       });
     }
@@ -1011,7 +973,6 @@ export function toRecommendConstraints(parse) {
   if (Array.isArray(parse.literal_preferences) && parse.literal_preferences.length) constraints.literal_preferences = parse.literal_preferences;
   if (parse.city) constraints.city = parse.city;
   if (parse.constraints?.budget_band) constraints.budget_band = parse.constraints.budget_band;
-  if (parse.constraints?.days_band) constraints.days_band = parse.constraints.days_band;
   if (parse.region_price?.applicable) {
     constraints.region_price = { city: parse.region_price.city, tier: parse.region_price.tier, note: parse.region_price.note, is_estimate: true };
   }
