@@ -1,2 +1,4 @@
 # 阅读快照和原始采集记录保留字节，不自动转换换行。
-* -text
+* -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# 子进程原始 stdout 包含 Windows 控制换行，按原始采集文件保存。
+prepare.stdout.txt -diff
