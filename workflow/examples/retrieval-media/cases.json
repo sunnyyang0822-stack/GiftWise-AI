@@ -1,0 +1,11 @@
+{
+  "fixture_mode":"offline_demo_not_real_retrieval_or_images",
+  "retrieval":{"status":"ready","evidence_id":"demo-evidence-1","warnings":["固定虚构证据，非实时"],"products":[
+    {"product_id":"demo-p1","name":"蓝色陶瓷杯","variant":"蓝色示例款","quantity":1,"price_amount":"150.00","currency":"CNY","price_conditions":"虚构参考价","price_source":"seed","source_url":null,"observed_at":null,"image_id":null},
+    {"product_id":"demo-p2","name":"笔记本","variant":"素色示例款","quantity":1,"price_amount":"120.00","currency":"CNY","price_conditions":"虚构参考价","price_source":"seed","source_url":null,"observed_at":null,"image_id":null},
+    {"product_id":"demo-p3","name":"收纳盒","variant":"小号示例款","quantity":1,"price_amount":"80.00","currency":"CNY","price_conditions":"虚构参考价","price_source":"seed","source_url":null,"observed_at":null,"image_id":null}
+  ]},
+  "media":{"status":"unavailable","candidates":[{"candidate_id":"c1","product_id":"demo-p1","image":null},{"candidate_id":"c2","product_id":"demo-p2","image":null},{"candidate_id":"c3","product_id":"demo-p3","image":null}],"selected":null},
+  "annotation_sample":{"id":"a1","text":"贺卡位置","target":{"x":0.65,"y":0.7},"label":{"x":0.8,"y":0.3}},
+  "image_failure_sample":{"status":"failed","candidates":[],"selected":null}
+}
