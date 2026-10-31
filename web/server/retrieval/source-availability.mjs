@@ -1,5 +1,8 @@
 /** 来源暂停状态只在内存中保存。调用者须在每次导航/请求前检查，逐页观察后更新。 */
-const COMMERCE = new Set(['jd', 'taobao']);
+const COMMERCE = new Set([
+  'jd', 'taobao', 'tmall', 'pinduoduo', 'douyin', 'kuaishou', '1688', 'vip',
+  'suning', 'youpin', 'dewu', 'xianyu', 'dangdang', 'yanxuan', 'xiaomi', 'xiaohongshu_shop',
+]);
 const RISK = new Map([
   ['restricted', 'access_restricted'], ['access_restricted', 'access_restricted'],
   ['access_denied', 'access_restricted'], ['captcha', 'captcha'], ['captcha_required', 'captcha'],
@@ -58,7 +61,7 @@ const processState = createSourceAvailabilityState();
 /** 默认所有tracker共享本进程暂停状态；测试可注入独立processState。暂停不自动重试/解封。 */
 export function createSourceAvailabilityTracker({
   now = Date.now, riskWindowMs = 15 * 60 * 1000, repeatThreshold = 2,
-  processState: shared = processState,
+  processState: shared = processState, commerceEnabled = false,
 } = {}) {
   if (!Number.isFinite(riskWindowMs) || riskWindowMs <= 0 || !Number.isInteger(repeatThreshold) || repeatThreshold < 2) throw new TypeError('INVALID_SOURCE_AVAILABILITY_POLICY');
   const sessions = new Map();
@@ -69,6 +72,12 @@ export function createSourceAvailabilityTracker({
   function getAvailability({ sessionId = 'default', source } = {}) {
     source = sourceName(source);
     if (!source) return { source: null, status: 'unknown', allow_request: false, reason_code: 'invalid_source', scope: null };
+    if (COMMERCE.has(source) && commerceEnabled !== true) return {
+      source, status: 'paused_by_product_scope', allow_request: false,
+      reason_code: 'COMMERCE_DISABLED_BY_USER', scope: 'product_scope',
+      observed_status: sessions.get(sessionId)?.get(source)?.observed_status || shared.sources.get(source)?.observed_status || null,
+      paused_at: null,
+    };
     const global = COMMERCE.has(source) ? shared.commercePause : null;
     const processPause = shared.sources.get(source);
     const session = sessions.get(sessionId)?.get(source);
@@ -109,10 +118,10 @@ export function createSourceAvailabilityTracker({
       recommendations_available: true,
       alternatives: paused ? [
         { kind: 'model_suggestion', available: true, hint: '继续结合用户需求给出建议；缺失报价、来源或图片不阻断，不编造商品、价格和库存。' },
+        { kind: 'reference_image_search', source: 'duckduckgo', available: null, hint: '可按实际安装与可用能力使用DuckDuckGo查找相关参考图片；参考图不冒充商品实拍、SKU或购买来源。' },
         { kind: 'content_inspiration', available: null, hint: '尚未明确购买时，可按实际可用能力寻找灵感或相关图片；内容不能充当商品报价或购买来源。' },
-        { kind: 'other_purchase_source', available: null, hint: '仅在实际能力可用且未暂停时考虑已接入的国内购买来源；不得用切换账号、身份或端口继续受限来源请求。' },
       ] : [],
-      ...(paused ? { instruction: '停止向已暂停来源发起搜索、详情、分页或重试；来源可用性仅限制外部请求，不影响最终推荐。' } : {}),
+      ...(paused ? { instruction: '停止向已暂停来源发起搜索、详情、分页或重试；不得用切换账号、身份或端口继续受限来源请求。优先参考图片与内容灵感；来源可用性仅限制外部请求，不影响最终推荐。' } : {}),
     };
   }
   return { observe, getAvailability, toModelContext };

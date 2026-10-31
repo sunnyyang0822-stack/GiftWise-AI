@@ -2,7 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { classifySourceObservation, createSourceAvailabilityState, createSourceAvailabilityTracker } from '../server/retrieval/source-availability.mjs';
 
-const tracker = options => createSourceAvailabilityTracker({ processState: createSourceAvailabilityState(), ...options });
+const tracker = options => createSourceAvailabilityTracker({ processState: createSourceAvailabilityState(), commerceEnabled: true, ...options });
+
+test('默认完整国内电商清单被产品范围停用，无风控也不允许请求；不阻大众点评/内容', () => {
+  const state = createSourceAvailabilityTracker({ processState: createSourceAvailabilityState() });
+  for (const source of ['jd', 'taobao', 'tmall', 'pinduoduo', 'douyin', 'kuaishou', '1688', 'vip', 'suning', 'youpin', 'dewu', 'xianyu', 'dangdang', 'yanxuan', 'xiaomi', 'xiaohongshu_shop']) {
+    for (const result of [state.getAvailability({ source }), state.observe({ source, status: 'ok' })]) {
+      assert.equal(result.status, 'paused_by_product_scope', source);
+      assert.equal(result.reason_code, 'COMMERCE_DISABLED_BY_USER', source);
+      assert.equal(result.allow_request, false, source);
+    }
+  }
+  for (const source of ['dianping', 'duckduckgo', 'xiaohongshu']) assert.equal(state.getAvailability({ source }).allow_request, true);
+  const view = state.toModelContext();
+  assert.equal(view.alternatives.find(item => item.source === 'duckduckgo').available, null);
+  assert.ok(view.alternatives.some(item => item.kind === 'content_inspiration'));
+});
 
 test('真实搜索分页和详情嵌套coverage里的明确风控均暂停来源', () => {
   for (const coverage of [
@@ -19,6 +34,16 @@ test('真实搜索分页和详情嵌套coverage里的明确风控均暂停来源
     assert.equal(state.getAvailability({ sessionId: 'b', source: 'jd' }).allow_request, false);
     assert.equal(state.getAvailability({ sessionId: 'a', source: 'taobao' }).allow_request, true);
   }
+});
+
+test('产品停用期间仍保存风控观察，后续显式启用不能清除既有风险', () => {
+  const shared = createSourceAvailabilityState();
+  const disabled = createSourceAvailabilityTracker({ processState: shared });
+  assert.equal(disabled.observe({ source: 'jd', status: 'restricted' }).reason_code, 'COMMERCE_DISABLED_BY_USER');
+  const enabled = createSourceAvailabilityTracker({ processState: shared, commerceEnabled: true });
+  assert.equal(enabled.getAvailability({ source: 'jd' }).reason_code, 'access_restricted');
+  assert.equal(enabled.getAvailability({ source: 'jd' }).allow_request, false);
+  assert.equal(enabled.getAvailability({ source: 'taobao' }).allow_request, true);
 });
 
 test('只有明确安全提示文本触发，不扫描标题或通用limitations，不回传文本', () => {
@@ -48,8 +73,8 @@ test('未知商品变化、普通失败、空结果和超时均非风控，不�
 
 test('进程状态跨tracker/会话保留；成功观察不能自动解封风控来源', () => {
   const shared = createSourceAvailabilityState();
-  const first = createSourceAvailabilityTracker({ processState: shared });
-  const second = createSourceAvailabilityTracker({ processState: shared });
+  const first = createSourceAvailabilityTracker({ processState: shared, commerceEnabled: true });
+  const second = createSourceAvailabilityTracker({ processState: shared, commerceEnabled: true });
   first.observe({ source: 'jd', sessionId: 'a', status: 'restricted', observation_id: 'risk1' });
   assert.equal(second.getAvailability({ source: 'jd', sessionId: 'b' }).allow_request, false);
   assert.equal(second.observe({ source: 'jd', status: 'ok' }).status, 'paused');
@@ -110,7 +135,7 @@ test('模型上下文保持最终建议可用，替代来源能力未知、不�
   assert.equal(view.alternatives.find(item => item.kind === 'model_suggestion').available, true);
   assert.equal(view.alternatives.find(item => item.kind === 'content_inspiration').available, null);
   assert.match(view.instruction, /停止.*搜索、详情、分页或重试/);
-  assert.match(view.alternatives.at(-1).hint, /不得用切换账号、身份或端口/);
+  assert.match(view.instruction, /不得用切换账号、身份或端口/);
 });
 
 test('非法来源不允许请求，非法阈值不静默放宽', () => {
