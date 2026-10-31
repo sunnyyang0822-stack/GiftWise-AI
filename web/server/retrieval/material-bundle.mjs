@@ -49,7 +49,7 @@ const ALLOWED_FIELDS=new Set(['reference_id','reference_kind','title','summary',
 function safeRecord(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw)||!ID.test(raw.reference_id??'')||raw.reference_kind!=='public_reference')throw fail('RECORD_SCHEMA_INVALID');
  const source=sourceUrl(raw.source_url);if(!source)throw fail('RECORD_SOURCE_NOT_PUBLIC');
- if(typeof raw.observed_at!=='string'||!Number.isFinite(Date.parse(raw.observed_at)))throw fail('RECORD_OBSERVATION_INVALID');
+ if(typeof raw.observed_at!=='string'||(!Number.isFinite(Date.parse(raw.observed_at))||Date.parse(raw.observed_at)>Date.now()+1000))throw fail('RECORD_OBSERVATION_INVALID');
  if(raw.purpose!=null&&!['reference','inspiration'].includes(raw.purpose))throw fail('RECORD_PURPOSE_INVALID');
  // Source bundles contain excerpts, never full articles or application/user state.
  if(raw.is_full_article===true)throw fail('RECORD_FULL_BODY_NOT_ALLOWED');
@@ -72,7 +72,7 @@ export async function importMaterialBundle(bundleDirectory,{cache}={}){
   }catch(cause){result.rejected.push({kind:'record',index,code:/^RECORD_[A-Z_]+$/.test(cause?.code??'')?cause.code:'RECORD_INVALID'});}
  }
  for(const {index,record}of accepted){if(counts.get(record.reference_id)>1)result.rejected.push({kind:'record',index,reference_id:record.reference_id,code:'DUPLICATE_REFERENCE_ID'});else result.records.push(record);}
- if(cache!==undefined&&result.records.length){if(typeof cache?.put!=='function'){result.cache_status='failed';result.rejected.push({kind:'cache',code:'CACHE_PUT_UNAVAILABLE'});}else try{await cache.put(structuredClone(result.records));result.cache_status='saved';}catch{result.cache_status='failed';result.rejected.push({kind:'cache',code:'CACHE_WRITE_FAILED'});}}
+ if(cache!==undefined&&result.records.length){if(typeof cache?.put!=='function'){result.cache_status='failed';result.rejected.push({kind:'cache',code:'CACHE_PUT_UNAVAILABLE'});}else try{const receipt=await cache.put(structuredClone(result.records));if(receipt?.status==='unavailable'||receipt?.status==='failed'||receipt?.accepted===0)throw Error('CACHE_WRITE_FAILED');result.cache_status='saved';}catch{result.cache_status='failed';result.rejected.push({kind:'cache',code:'CACHE_WRITE_FAILED'});}}
  result.records_imported=result.cache_status==='failed'?0:result.records.length;
  result.status=result.cache_status==='failed'?'partial':result.records.length?(result.rejected.length?'partial':'ready'):'unavailable';return result;
 }

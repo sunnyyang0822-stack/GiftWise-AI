@@ -11,7 +11,8 @@ function setup(payloads) {
  const transport=new OpenAiCompatibleTransport({fetchImpl:async(_url,opts)=>{bodies.push(JSON.parse(opts.body));const next=payloads.shift();return {ok:true,status:200,json:async()=>next};},sleepImpl:async()=>{}});
  return {bodies,provider:new LlmProvider({live:transport,config:()=>cfg,hasConfig:()=>true})};
 }
-const input={requestJson:'{}',tools};
+// Protocol-only fixtures explicitly isolate grounding, covered by recommendation-grounding.test.mjs.
+const input={groundingRequired:false,requestJson:'{}',tools};
 test('synthetic OpenAI tool calls execute callback and return role:tool before candidates',async()=>{
  const {provider,bodies}=setup([callReply(),textReply({action:'recommend',candidates:[],product_references:[{candidate_id:'A',product_id:'p1'}]})]);
  let received;

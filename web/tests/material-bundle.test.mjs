@@ -48,3 +48,5 @@ test('cache failures are safe and leave returned text available for caller-contr
  const result=await importMaterialBundle(bundle(),{cache:{put:async()=>{throw Error('cookie=fake-private-error');}}});assert.equal(result.status,'partial');assert.equal(result.cache_status,'failed');assert.equal(result.records_imported,0);assert.equal(result.records.length,1);assert.equal(result.records[0].observed_at,observed);assert.ok(result.rejected.some(r=>r.code==='CACHE_WRITE_FAILED'));assert.ok(!JSON.stringify(result).includes('fake-private-error'));
  let writes=0;const empty=await importMaterialBundle(bundle([]),{cache:{put:()=>{writes++;}}});assert.equal(empty.status,'unavailable');assert.equal(writes,0);
 });
+
+test('a cache failure receipt is not advertised as a saved import',async()=>{const result=await importMaterialBundle(bundle(),{cache:{put:()=>({status:'unavailable',error_code:'MATERIAL_CACHE_WRITE_FAILED'})}});assert.equal(result.cache_status,'failed');assert.equal(result.records_imported,0);assert.equal(result.records.length,1);});

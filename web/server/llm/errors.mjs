@@ -12,6 +12,8 @@
 /** 稳定错误码 → 面向用户的中文说明。 */
 export const LLM_ERROR_MESSAGES = Object.freeze({
   LLM_NOT_CONFIGURED: "服务端尚未配置文本模型，请配置后重试。",
+  RETRIEVAL_NO_MATERIAL: "暂时没找到可用的参考资料，请稍后再试。",
+  RETRIEVAL_BASIS_UNCONFIRMED: "这次推荐的参考依据尚未确认，请重试。",
   LLM_HTTP: "模型服务暂时不可用，请稍后重试。",
   LLM_TIMEOUT: "模型响应超时，请稍后重试。",
   LLM_REQUEST_FAILED: "无法连接模型服务，请稍后重试。",

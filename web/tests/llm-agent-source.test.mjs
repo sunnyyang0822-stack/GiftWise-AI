@@ -15,7 +15,8 @@ function synthetic(sequence){
  const live=new OpenAiCompatibleTransport({fetchImpl:async(_url,options)=>{messages.push(JSON.parse(options.body));return {ok:true,status:200,json:async()=>sequence.shift()};}});
  return {messages,provider:new LlmProvider({live,config:()=>cfg,hasConfig:()=>true})};
 }
-const base={requestJson:JSON.stringify(request),tools};
+// Protocol-only fixtures explicitly isolate grounding, covered by recommendation-grounding.test.mjs.
+const base={groundingRequired:false,requestJson:JSON.stringify(request),tools};
 test('same full exclusion context survives tool messages and empty results still yield model final suggestions',async()=>{
  const {provider,messages}=synthetic([toolCall(),final()]);let executed=0;
  const result=await provider.requestCandidates({...base,executeTool:async()=>{executed++;return {status:'unavailable',products:[],contents:[],images:[],coverage:[{source:'jd',status:'empty_or_selector_changed',observed_count:0}],recommendations_available:true};}});

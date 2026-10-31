@@ -77,7 +77,7 @@ export function createMaterialCache({ directory = join(REPO_ROOT, '.tmp/material
       reference_kind: 'public_reference', reference_id: raw.reference_id, title, summary, source_url,
       source_site: new URL(source_url).hostname,
       source_platform: typeof raw.source_platform === 'string' && /^[a-z][a-z0-9_-]{0,39}$/.test(raw.source_platform) && !secrets.some(s => raw.source_platform.includes(s)) ? raw.source_platform : null,
-      observed_at: observed, cache_observation: 'cached_public_material', is_realtime: false,
+      observed_at: observed, material_kind: ['search_snippet','article_excerpt','case_excerpt','tutorial_excerpt'].includes(raw.material_kind)?raw.material_kind:'public_excerpt', has_summary:true, is_full_article:false, cache_observation: 'cached_public_material', is_realtime: false,
     };
   }
   function prune(records, clock) {

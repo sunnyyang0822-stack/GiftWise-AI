@@ -11,6 +11,7 @@ const code=v=>typeof v==='string'&&/^[a-zA-Z][a-zA-Z0-9_.:-]{0,79}$/.test(v)?v:n
 const identifier=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{1,96}$/.test(v)?v:null;
 const errorCode=v=>typeof v==='string'&&/^[A-Z][A-Z0-9_]{1,79}$/.test(v)&&(/_/.test(v)||['EACCES','ENOENT','ENOTDIR','EEXIST','EPERM'].includes(v))?v:null;
 const count=v=>Number.isSafeInteger(v)&&v>=0?v:null;
+const elapsed=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0?Math.round(v):null;
 const timestamp=v=>typeof v==='string'&&Number.isFinite(Date.parse(v))?new Date(v).toISOString():null;
 const FILE=/^[a-f0-9-]{36}\.(?:json|tmp)$/;
 export function retrievalSensitiveValues(input={}){
@@ -39,7 +40,7 @@ export function createRetrievalAudit({directory=process.env.NODE_TEST_CONTEXT?jo
   }catch{return null;}
  };
  function coverage(c={}){
-  return{source:code(c.source??c.platform),status:code(c.status),error_code:errorCode(c.error_code),execution_mode:code(c.execution_mode),native_executed:c.native_executed===true,pages_completed:count(c.pages_completed),detail_pages_completed:count(c.detail_pages_completed),observed_count:count(c.observed_count),image_candidates:count(c.image_candidates),images_validation_attempted:count(c.images_validation_attempted),image_validation_limit:count(c.image_validation_limit),complete:c.complete===true,blocked_stage:code(c.blocked_stage),pages:(c.pages??[]).slice(0,6).map(p=>({page:count(p.page),status:code(p.status),error_code:errorCode(p.error_code)})),detail_status:code(c.detail?.status)};
+  return{source:code(c.source??c.platform),status:code(c.status),error_code:errorCode(c.error_code),execution_mode:code(c.execution_mode),engine:code(c.engine),engine_source:code(c.engine_source),native_executed:c.native_executed===true,pages_completed:count(c.pages_completed),detail_pages_completed:count(c.detail_pages_completed),observed_count:count(c.observed_count),image_candidates:count(c.image_candidates),images_validation_attempted:count(c.images_validation_attempted),image_validation_limit:count(c.image_validation_limit),discovery_ms:elapsed(c.discovery_ms),image_validation_ms:elapsed(c.image_validation_ms),image_validation_concurrency:count(c.image_validation_concurrency),image_validation_unique_urls:count(c.image_validation_unique_urls),complete:c.complete===true,blocked_stage:code(c.blocked_stage),pages:(c.pages??[]).slice(0,6).map(p=>({page:count(p.page),status:code(p.status),error_code:errorCode(p.error_code)})),detail_status:code(c.detail?.status)};
  }
  function save(){
   let temporary;
@@ -76,11 +77,12 @@ export function createRetrievalAudit({directory=process.env.NODE_TEST_CONTEXT?jo
   return save();
   }catch{receipt={status:'failed',retrieval_session_id:id,code:'AUDIT_SERIALIZATION_FAILED'};try{onDiagnostic(receipt.code);}catch{}return receipt;}
  }
- function finalize({runId=null,status='completed',errorCode:failure=null,errorDetail=null,bindings=[],rejected=[],candidateIds=[],references=[]}={}){
+ function finalize({runId=null,status='completed',errorCode:failure=null,errorDetail=null,bindings=[],rejected=[],candidateIds=[],references=[],materialReferenceIds=[]}={}){
   try{
   data.run_id=identifier(runId);data.status=data.calls_total===0&&status==='completed'?'no_tool_calls':code(status);data.error_code=errorCode(failure);
   data.error_detail=['empty','no-json-body','not-strict-json','not-object','missing-reference_references'].includes(errorDetail)?errorDetail:null;
   const known=new Set([...candidateIds,...bindings.map(b=>b.candidate_id)]);
+  data.material_basis=materialReferenceIds.slice(0,20).map(id=>references.find(r=>r.reference_id===id)).filter(Boolean).map(r=>({reference_id:identifier(r.reference_id),source_url:publicUrl(r.source_url),observed_at:timestamp(r.observed_at),title:redact(r.title,180),summary:redact(r.summary,500),material_kind:code(r.material_kind),cached:r.cache_observation==='cached_public_material'})).filter(r=>r.reference_id&&r.source_url&&r.observed_at&&r.summary);
   data.adopted_references=bindings.filter(b=>b.reference_id||b.product_id).slice(0,12).map(b=>{const r=references.find(r=>r.reference_id===b.reference_id),v=r?.image_validation;return{candidate_id:identifier(b.candidate_id),reference_id:identifier(b.reference_id),product_id:identifier(b.product_id),image_id:identifier(b.image?.id),image_kind:code(b.image?.kind),source_url:publicUrl(r?.source_url??b.image?.source_url),observed_at:timestamp(r?.observed_at),width:count(v?.width),height:count(v?.height),sha256:/^[a-f0-9]{64}$/.test(v?.sha256??'')?v.sha256:null};});
   data.rejected_references=rejected.slice(0,12).map(r=>({candidate_id:known.has(r.candidate_id)?identifier(r.candidate_id):null,code:errorCode(r.code)}));return save();
   }catch{receipt={status:'failed',retrieval_session_id:id,code:'AUDIT_SERIALIZATION_FAILED'};try{onDiagnostic(receipt.code);}catch{}return receipt;}

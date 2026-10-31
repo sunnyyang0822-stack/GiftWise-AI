@@ -2,9 +2,9 @@
 import{createHash}from'node:crypto';
 import{performance}from'node:perf_hooks';
 import{publicReferenceUrl}from'./public-reference.mjs';
-import{decodeHtmlEntities,PUBLIC_IMAGE_HTTP_MAX_BYTES}from'./public-image-http.mjs';
+function decodeHtmlEntities(value){return String(value??'').replace(/&(#x[0-9a-f]+|#\d+|quot|apos|amp|lt|gt|nbsp|ensp|emsp);/gi,(whole,entity)=>{const key=entity.toLowerCase(),named={quot:'"',apos:"'",amp:'&',lt:'<',gt:'>',nbsp:' ',ensp:' ',emsp:' '};if(key[0]!=='#')return named[key];const code=key[1]==='x'?parseInt(key.slice(2),16):Number(key.slice(1));return code>0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)?String.fromCodePoint(code):'\ufffd';});}
 export const PUBLIC_TEXT_HTTP_ENDPOINT='https://cn.bing.com/search';
-export const PUBLIC_TEXT_HTTP_MAX_BYTES=PUBLIC_IMAGE_HTTP_MAX_BYTES;
+export const PUBLIC_TEXT_HTTP_MAX_BYTES=2*1024*1024;
 const fail=code=>Object.assign(new Error(code),{code});
 const safeLimit=value=>Number.isInteger(value)&&value>0?Math.min(value,20):8;
 function attributes(tag){const attrs={};for(const m of tag.matchAll(/\s([a-z_:][\w:.-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi)){const key=m[1].toLowerCase();attrs[key]=Object.hasOwn(attrs,key)?null:decodeHtmlEntities(m[2]??m[3]??m[4]);}return attrs;}

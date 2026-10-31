@@ -11,39 +11,25 @@ import { enrichDomesticDetail,validateSourceImage } from '../collect/domestic-de
 import { cacheSourceImage } from '../catalog/source-image-cache.mjs';
 import{createSourceAvailabilityTracker}from'./source-availability.mjs';
 import{publicReferenceUrl}from'../collect/public-reference.mjs';
-import{mergeReferenceEvidence}from'./reference-evidence.mjs';
 const sourceAvailability=createSourceAvailabilityTracker();
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,32);
 
-async function referenceRecords(records,{source,signal,fetchImpl,imageValidationLimit=6}){
- const result=[],tasks=[],byUrl=new Map();
+async function referenceRecords(page,records,{source,signal,imageValidationLimit=6}){
+ const result=[];let attempted=0;
  for(const record of records){
+  if(signal?.aborted)break;
   const sourceUrl=publicReferenceUrl(record.source_url,'bing');if(!sourceUrl)continue;
   const reference_id='ref_'+digest(`${source}|${record.source_url}`);
-  const r={...structuredClone(record),source_url:sourceUrl,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null,image_validation:null};
-  if(record.image_url){
-   let task=byUrl.get(record.image_url);
-   if(!task&&tasks.length<imageValidationLimit){task={url:record.image_url,records:[]};tasks.push(task);byUrl.set(record.image_url,task);}
-   if(task)task.records.push(r);
-   else r.image_validation={ok:false,error_code:'IMAGE_NOT_FETCHED_LIMIT'};
-  }
+  const r={...record,source_url:sourceUrl,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null};
+  if(record.image_url&&attempted<imageValidationLimit){
+   attempted++;
+   const validation=await validateSourceImage(record.image_url,{role:'reference',fetchImpl:page.fetchImage,signal,includeBytes:true});
+   const{bytes,...metadata}=validation;r.image_validation=metadata;
+   r.image_provenance={...record.image_provenance,validation_status:validation.ok?'validated':'failed',image_observed_at:metadata.observed_at??null};
+   if(validation.ok){r.image_id=digest(`${reference_id}|${record.image_url}`);cacheSourceImage(r.image_id,validation);}
+  }else if(record.image_url)r.image_validation={ok:false,error_code:'IMAGE_NOT_FETCHED_LIMIT'};
   result.push(r);
- }
- // This queue and URL promise scope are local to this source query, never shared across owners/jobs.
- let next=0;
- await Promise.all(Array.from({length:Math.min(3,tasks.length)},async()=>{
-  while(next<tasks.length){
-   const task=tasks[next++];
-   const validation=signal?.aborted?{ok:false,error_code:'IMAGE_ABORTED'}:await validateSourceImage(task.url,{role:'reference',fetchImpl,signal,includeBytes:true});
-   const{bytes,...metadata}=validation;
-   for(const r of task.records){
-    r.image_validation=structuredClone(metadata);
-    r.image_provenance={...r.image_provenance,validation_status:validation.ok?'validated':'failed',image_observed_at:metadata.observed_at??null};
-    if(validation.ok){r.image_id=digest(`${r.reference_id}|${task.url}`);cacheSourceImage(r.image_id,validation);}
-   }
-  }
- }));
- return result;
+ }return result;
 }
 
 function asEvidence(record, source) {
@@ -105,8 +91,7 @@ export class DomesticProvider {
 export async function runDomesticSearch(plan, {
   dbPath, packageRoot, signal, timeoutMs = 90000, port = 19366, headless = process.env.GW_DOMESTIC_HEADLESS === '1',
   profileDir = process.env.GW_DOMESTIC_PROFILE || join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
-  pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
-  referenceSearch, queryFetchImpl, imageFetchImpl,
+  queryFetchImpl, pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
 } = {}) {
   const products = [], references=[], contents = [], images = [], coverage = [], warnings = [];
   let page, db, root, version;
@@ -125,6 +110,7 @@ export async function runDomesticSearch(plan, {
     const { DOMESTIC_PLATFORMS, runDomesticSearch: searchPlatform } = await import('../collect/domestic-platforms.mjs');
     const { DOMESTIC_CONTENT_SOURCES, runDomesticContentSearch: searchContent } = await import('../collect/domestic-content.mjs');
     const {DOMESTIC_EXTRA_PLATFORMS,runExtraPlatformSearch}=await import('../collect/domestic-extra-platforms.mjs');
+    // Browser/OpenCLI is initialized only for a requested purchase source.
     if (dbPath) db = openDb(taskDatabasePath(dbPath)); // Explicit isolated database only; no shared default.
     const tasks = queries.flatMap(query => {
       if (typeof query.keyword !== 'string' || !query.keyword.trim() || query.keyword.length > 200) throw new Error('INVALID_RETRIEVAL_QUERY');
@@ -138,6 +124,8 @@ export async function runDomesticSearch(plan, {
       if(!availability.allow_request){coverage.push({source,keyword:query.keyword,status:availability.reason_code,complete:false,pages_completed:0,observed_count:0});continue;}
       const publicReference=query.purpose==='reference'&&['duckduckgo','bing'].includes(source);
       const inspiration = query.purpose === 'inspiration';
+      const publicText=inspiration&&(source==='web'||Boolean(DOMESTIC_CONTENT_SOURCES[source]));
+      if(publicReference){coverage.push({source,keyword:query.keyword,status:'REFERENCE_IMAGES_DISABLED_BY_USER',complete:false,pages_completed:0,observed_count:0});continue;}
       const useContent = inspiration && Boolean(DOMESTIC_CONTENT_SOURCES[source]);
       const cached=query.purpose==='purchase'?observedQueryCache(db,source,query):[];
       if(cached.length){
@@ -145,24 +133,23 @@ export async function runDomesticSearch(plan, {
         coverage.push({source,keyword:query.keyword,status:'cached_observations',cached:true,pages_completed:0,observed_count:cached.length,complete:false,
           limitations:['复用同一查询的历史公开观察，具体所选规格与价格可继续调用详情工具核实']});continue;
       }
-      if (!['purchase','inspiration','reference'].includes(query.purpose) || (query.purpose === 'reference'&&!publicReference) || (query.purpose === 'purchase' && source !== 'dianping') || (!publicReference&&!useContent && source !== 'dianping')) {
+      if (!['purchase','inspiration','reference'].includes(query.purpose) || (query.purpose === 'reference'&&!publicReference) || (query.purpose === 'purchase' && source !== 'dianping') || (!publicReference&&!publicText&&!useContent && source !== 'dianping')) {
         coverage.push({ source, keyword: query.keyword, status: 'SOURCE_NOT_ALLOWED', complete: false, pages_completed: 0,
           limitations: ['来源尚未接入或不适用于本次用途'] }); continue;
       }
       try {
-        if(publicReference&&source!=='bing'){
-          coverage.push({source,keyword:query.keyword,purpose:'reference',status:'HTTP_SOURCE_UNSUPPORTED',execution_mode:'public_http',native_executed:false,complete:false,pages_completed:0,observed_count:0,
-            limitations:['本来源尚未接入纯HTTP参考图检索；未自动启动浏览器或切换来源']});continue;
-        }
-        if(!publicReference){
-          if(!root){root=opencliPackageRoot(packageRoot);version=opencliVersion(root);}
-          const desiredProfile=['taobao','tmall','1688'].includes(source)&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
-          if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
-          if(!page){page=await pageFactory({ port, headless, profileDir:desiredProfile, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });page.__taskProfile=desiredProfile;}
+        if(!publicText){
+        if(!root){root=opencliPackageRoot(packageRoot);version=opencliVersion(root);}
+        const desiredProfile=['taobao','tmall','1688'].includes(source)&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
+        if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
+        if(!page){page=await pageFactory({ port, headless, profileDir:desiredProfile, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });page.__taskProfile=desiredProfile;}
         }
         const discoveryStart=performance.now();
-        const outcome = publicReference
-          ? await (referenceSearch??(await import('../collect/public-image-http.mjs')).runPublicImageHttpSearch)({source,keyword:query.keyword,maxPages:Math.min(maxPages,1),timeoutMs:Math.min(timeoutMs,8000),signal:controller.signal,fetchImpl:queryFetchImpl})
+        const textDomain=source==='web'?null:DOMESTIC_CONTENT_SOURCES[source]?.source_site;
+        const outcome = publicText
+          ? await (await import('../collect/public-text-http.mjs')).runPublicTextHttpSearch({keyword:textDomain?`site:${textDomain} ${query.keyword}`:query.keyword,timeoutMs:Math.min(timeoutMs,8000),signal:controller.signal,fetchImpl:queryFetchImpl})
+          : publicReference
+          ? await (await import('../collect/public-reference.mjs')).runPublicReferenceSearch(page,{source,keyword:query.keyword,packageRoot:root,maxPages:Math.min(maxPages,1),signal:controller.signal})
           : useContent
           ? await (contentSearch ?? searchContent)(page, { source, keyword: query.keyword, city: query.city ?? null,
             packageRoot: root, maxPages, signal: controller.signal })
@@ -174,6 +161,7 @@ export async function runDomesticSearch(plan, {
             maxPages, signal: controller.signal, onProgress, packageRoot: root });
         const sourceCoverage = { source, keyword: query.keyword, city: query.city ?? null,
           ...(outcome.coverage && typeof outcome.coverage === 'object' ? outcome.coverage : {}) };
+        if(publicText){sourceCoverage.engine_source=sourceCoverage.source;sourceCoverage.source=source;}
         // Some adapter versions expose coverage at the top level; preserve its exact completion statement.
         for (const key of ['pages_completed', 'pages_requested', 'reported_total', 'complete', 'limitations', 'status']) {
           if (sourceCoverage[key] === undefined && outcome[key] !== undefined) sourceCoverage[key] = outcome[key];
@@ -181,19 +169,20 @@ export async function runDomesticSearch(plan, {
         sourceCoverage.complete = sourceCoverage.complete === true;
         sourceCoverage.observed_count = outcome.records?.length ?? 0;
         sourceCoverage.purpose = query.purpose;
-        if(publicReference)sourceCoverage.discovery_ms=performance.now()-discoveryStart;
         sourceAvailability.observe({source,coverage:sourceCoverage,observation_id:`${source}:${sourceCoverage.observed_at??Date.now()}`});
         coverage.push(sourceCoverage);
+        if(publicText){
+          sourceCoverage.discovery_ms=performance.now()-discoveryStart;
+          const records=(outcome.records??[]).filter(r=>!textDomain||new URL(r.source_url).hostname===textDomain||new URL(r.source_url).hostname.endsWith('.'+textDomain));
+          references.push(...records);sourceCoverage.observed_count=records.length;
+          if(db)saveContent(db,records,sourceCoverage,version);onProgress(sourceCoverage);continue;
+        }
         if(publicReference||useContent){
           const records=outcome.records??[];
-          const validationStart=performance.now();
-          const resolved=await referenceRecords(records,{source,signal:controller.signal,fetchImpl:publicReference?imageFetchImpl:(imageFetchImpl??page?.fetchImage)});references.push(...resolved);
-          sourceCoverage.image_validation_ms=performance.now()-validationStart;
+          const resolved=await referenceRecords(page,records,{source,signal:controller.signal});references.push(...resolved);
           sourceCoverage.image_candidates=records.filter(r=>r.image_url).length;
           sourceCoverage.image_validation_limit=6;
-          sourceCoverage.image_validation_concurrency=3;
-          sourceCoverage.image_validation_unique_urls=Math.min(6,new Set(records.filter(r=>r.image_url&&publicReferenceUrl(r.source_url,'bing')).map(r=>r.image_url)).size);
-          sourceCoverage.images_validation_attempted=new Set(resolved.filter(r=>r.image_validation&&!['IMAGE_NOT_FETCHED_LIMIT','IMAGE_ABORTED'].includes(r.image_validation.error_code)).map(r=>r.image_url)).size;
+          sourceCoverage.images_validation_attempted=resolved.filter(r=>r.image_validation&&r.image_validation.error_code!=='IMAGE_NOT_FETCHED_LIMIT').length;
           if(publicReference){if(db)saveContent(db,resolved,sourceCoverage,version);onProgress(sourceCoverage);continue;}
         }
         if (useContent) {
@@ -221,7 +210,7 @@ export async function runDomesticSearch(plan, {
   const unique = [...new Map(products.map(p => [p.product_id, p])).values()];
   return { status: unique.length || contents.length || references.length ? (coverage.every(c => c.complete) ? 'ready' : 'partial') : 'unavailable',
     evidence_id: unique.length ? createHash('sha256').update(unique.map(p => p.product_id).join('|')).digest('hex').slice(0, 32) : null,
-    products: unique, references:mergeReferenceEvidence([],references), contents: [...new Map(contents.map(c => [c.source_url, c])).values()], images,source_availability:sourceAvailability.toModelContext({sources:[...new Set(['jd','taobao',...queries.flatMap(q=>q.sources??[])])]}).source_availability,
+    products: unique, references:[...new Map(references.map(r=>[r.reference_id,r])).values()], contents: [...new Map(contents.map(c => [c.source_url, c])).values()], images,source_availability:sourceAvailability.toModelContext({sources:[...new Set(['jd','taobao',...queries.flatMap(q=>q.sources??[])])]}).source_availability,
     coverage, warnings, recommendations_available: true, enrichment_only: true, opencli_version: version ?? null, audit: plan?.audit ?? null };
 }
 

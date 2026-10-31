@@ -6,8 +6,8 @@ import { DomesticProvider,runDomesticDetails } from "./retrieval/domestic-provid
 import { normalizeRetrievalPlan } from "./retrieval/query-plan.mjs";
 import { createOpencliToolSession } from "./retrieval/agent-tool.mjs";
 import{createRetrievalAudit,retrievalSensitiveValues}from'./retrieval/audit-store.mjs';
-import{startReferenceImages}from'./retrieval/reference-images.mjs';
-import { bindReferenceEvidence } from './retrieval/reference-evidence.mjs';
+import{createMaterialCache}from'./retrieval/material-cache.mjs';
+import { bindReferenceEvidence,mergeReferenceEvidence } from './retrieval/reference-evidence.mjs';
 import { RETRIEVAL_CONFIG } from "./config.mjs";
 const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider !== "unavailable" ? new DomesticProvider({packageRoot:RETRIEVAL_CONFIG.packageRoot || undefined}) : unavailableProvider, RETRIEVAL_CONFIG);
 /**
@@ -259,8 +259,11 @@ async function runRecommendationCore(input, services = {}) {
     ? await (services.retrievalWorker ?? retrievalWorker).submit(searchPlan,{signal:input.signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}).catch(() => ({status:"unavailable",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]}))
     : {status:"skipped",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]};
   const useAgentTools = mode==='llm' && retrievalEnabled;
-  const agentTools = createOpencliToolSession({signal:input.signal,auditStore:useAgentTools?(services.retrievalAuditStore??createRetrievalAudit({sensitiveValues:retrievalSensitiveValues(input)})):null,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}})});
-  let productReferences = null,referenceReferences=null;
+  const materialCache=mode==='llm'?(services.materialCache??(!process.env.NODE_TEST_CONTEXT?createMaterialCache({sensitiveValues:retrievalSensitiveValues(input)}):null)):null;
+  const cachedMaterials=materialCache?.get()?.records??[];
+  if(cachedMaterials.length)retrieval={...retrieval,status:retrieval.status==='skipped'?'partial':retrieval.status,references:mergeReferenceEvidence(cachedMaterials,retrieval.references??[])};
+  const agentTools = createOpencliToolSession({initialRetrieval:retrieval,signal:input.signal,auditStore:useAgentTools?(services.retrievalAuditStore??createRetrievalAudit({sensitiveValues:retrievalSensitiveValues(input)})):null,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}})});
+  let productReferences = null,referenceReferences=null,grounding=null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
@@ -300,9 +303,13 @@ async function runRecommendationCore(input, services = {}) {
         : null,
       /* 第 1 步解析出来的用户硬约束（原文/带宽/城市）随请求一起给模型（裁定 2/3/4）。 */
       inputParse: nlParse,
+      groundingRequired:services.groundingRequired??true,
       ...(useAgentTools?{tools:agentTools.tools,executeTool:agentTools.executeTool,signal:input.signal}:{}),
     });
     callCounts.recommend += call.model_calls ?? 1;
+    grounding=call.grounding??null;
+    if(agentTools.audit.length){retrieval=agentTools.retrieval;searchPlan=agentTools.plan;}
+    materialCache?.put(retrieval.references??[]);
     if (!call.ok) {
       if(useAgentTools)agentTools.finalize({status:input.signal?.aborted?'cancelled':'failed',errorCode:call.code});
       return {
@@ -557,7 +564,7 @@ async function runRecommendationCore(input, services = {}) {
   });
   run.pre_repair_validation = preRepairValidation;
   run.retrieval = retrieval;
-  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,reference_references:referenceReferences,rejected_references:[...optionalEvidence.rejected,...optionalReferences.rejected]};
+  run.retrieval_audit = {grounding,protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,reference_references:referenceReferences,rejected_references:[...optionalEvidence.rejected,...optionalReferences.rejected]};
   run.product_bindings = evidenceBindings;
   run.reference_bindings=optionalReferences.bindings;
   /* 库内真实商品的绑定与媒体：候选图走「来源展示」通道（真实商品图 URL），
@@ -599,7 +606,7 @@ async function runRecommendationCore(input, services = {}) {
     if(existing)Object.assign(existing,observed);else run.retrieval.products.push(observed);
   }
   run.media = mediaProvider.candidates([...new Map(mediaBindings.map(b=>[b.candidate_id,b])).values()]);
-  if(useAgentTools)run.retrieval_audit.persistence=agentTools.finalize({runId:run.run_id,status:batchComplete?'completed':'failed',errorCode:batchComplete?null:'RECOMMENDATION_INCOMPLETE',bindings:run.media.candidates,rejected:run.retrieval_audit.rejected_references,candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
+  if(useAgentTools)run.retrieval_audit.persistence=agentTools.finalize({runId:run.run_id,status:batchComplete?'completed':'failed',errorCode:batchComplete?null:'RECOMMENDATION_INCOMPLETE',bindings:run.media.candidates,rejected:run.retrieval_audit.rejected_references,candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[],materialReferenceIds:grounding?.reference_ids??[]});
   run.delivery = delivery;
   run.uniqueness = { warnings: validation.warnings ?? [], note: "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。" };
   run.visual_direction = directionOutcome?.ok ? directionOutcome.direction : null;
@@ -622,10 +629,7 @@ async function runRecommendationCore(input, services = {}) {
     errors: [{ code: "RECOMMENDATION_INCOMPLETE", path: "candidates", message: "未能完成三个可选方案，请调整需求后重新生成。" }],
     notices,
   };
-  const referenceImagesEnabled=services.referenceImagesEnabled??(useAgentTools&&!process.env.NODE_TEST_CONTEXT);
-  if(!run.recommendation_failure&&batchComplete&&referenceImagesEnabled&&useAgentTools&&run.candidates.length===LIMITS.candidatesPerBatch){
-    startReferenceImages(run,{session:agentTools,requestJson,intakeJson:dump(effectiveIntake),signal:input.signal,isCurrent:()=>getRun(run.run_id)===run,requestImages:services.requestReferenceImages??llmProvider.requestReferenceImages});
-  }
+  // Recommendation sources are text only. Selected-gift AI media remains in the presentation flow.
   return recommendationOutcome(run);
 }
 
