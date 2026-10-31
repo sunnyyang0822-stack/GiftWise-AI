@@ -75,7 +75,7 @@ export class MediaProvider {
   if(!jobs.has(key)){const job=this.begin(run,id);jobs.set(key,job);}
   const result=await jobs.get(key);
   // 已缓存pending不锁死为旧响应；读取同一任务状态，不重新提交。
-  if(result.status==='pending'&&this.store){const record=await this.store.read(result.selected.task_id);return record.media;}
+  if(result.status==='pending'&&this.store){const record=await this.task(run,result.selected.task_id);return record.media;}
   return result;
  }
  async begin(run,id){
@@ -94,6 +94,7 @@ export class MediaProvider {
   const plan=buildImagePlan(run,id,taskId);
   const record={task_id:taskId,run_id:run.run_id,candidate_id:id,owner_hash:fingerprint(run.owner_scope||'internal'),plan_version:IMAGE_PLAN_VERSION,plan_fingerprint:fingerprint(plan.prompt),created_at:new Date().toISOString(),media:{...emptyMedia(),status:'pending',candidates:run.media?.candidates??[],selected:plan.selected}};
   const saved=await this.store.create(record);
+  if(saved.record.run_id!==run.run_id||saved.record.candidate_id!==id||saved.record.owner_hash!==record.owner_hash)throw new Error('MEDIA_TASK_NOT_FOUND');
   if(saved.record.plan_fingerprint!==record.plan_fingerprint)throw new Error('IMAGE_PLAN_VERSION_CONFLICT');
   if(saved.created){const job=this.execute(saved.record,plan);this.active.set(taskId,job);void job.finally(()=>this.active.delete(taskId));}
   return saved.record.media;
