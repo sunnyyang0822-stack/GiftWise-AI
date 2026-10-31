@@ -14,7 +14,7 @@ export class MediaTaskStore {
  async read(id){
   const record=JSON.parse(await readFile(this.taskPath(id),'utf8'));
   if(record.media.status==='pending'&&record.executor_instance!==this.instance){
-   record.media.status=record.media.selected.status='failed';record.media.selected.execution='unknown';record.media.selected.error_code='IMAGE_EXECUTION_UNKNOWN';record.media.selected.unknowns.push('服务进程中断，供应商可能已执行；不会自动重试');await this.save(record);
+   record.media.status=record.media.selected.status='failed';record.media.selected.execution='unknown';record.media.selected.error_code='IMAGE_EXECUTION_UNKNOWN';record.media.selected.unknowns.push('服务进程中断，供应商可能已执行；不会自动重试');
   }
   return record;
  }

@@ -2,7 +2,7 @@
  * 三步输入的确定性适配（JS 侧镜像，对齐 workflow/intake.py 的 adapt_intake）。
  *
  * 职责：把浏览器提交的 intake 字段整理成不可变 request_json，不调用模型、
- * 不推断预算与天数、不生成事实；unknown 只表示「待澄清」，不是推荐输入。
+ * 不推断预算与天数、不生成事实；时间可省略或未知，不影响推荐。
  *
  * 与参考实现的语义一致性由 web/tools/parity-check.mjs 在实际样例上比对。
  * 前端提交的派生字段（facts / available_days / repair_count / passed 等）都会被
@@ -13,10 +13,11 @@
  *     未落地时返回 PURSUIT_CONTRACT_NOT_READY 并拒绝，绝不做关系改写。
  */
 
+import { currentExclusionContext } from "./exclusion-context.mjs";
 import { strictParse, dump, byteLength } from "./jsonstrict.mjs";
 import { RELATIONS_FULL, CLOSENESS_TABLE, OCCASION_TABLE, INTEREST_TABLE, GIFT_STYLE_TABLE, EXCLUSION_TABLE } from "./labels.mjs";
 import { LIMITS, PURSUIT_CONTRACT_READY, PURSUIT_NOT_READY_MESSAGE } from "./config.mjs";
-import { validate, checkBudgetRange, CONTRACT_VERSION, amountToCents } from "./checker.mjs";
+import { validateForDecision, checkBudgetRange, CONTRACT_VERSION, amountToCents } from "./checker.mjs";
 
 export const INTAKE_FIELDS = new Set([
   "recipient_relation",
@@ -67,10 +68,10 @@ export function adaptIntake(intakeJson, options = {}) {
     if (!INTAKE_FIELDS.has(key)) err("INTAKE_UNKNOWN_FIELD", `intake.${key}`, "未声明的输入字段，请确认契约版本");
   }
   const revised = ["contract_version", "budget_mode", "budget_range"].some((key) => Object.hasOwn(data, key));
-  const requiredFields = revised ? ["recipient_relation", "occasion", "currency", "deadline_days"] : ["recipient_relation", "occasion", "budget_amount", "currency", "deadline_days"];
+  const requiredFields = revised ? ["recipient_relation", "occasion", "currency"] : ["recipient_relation", "occasion", "budget_amount", "currency"];
   for (const key of requiredFields) {
     if (!(key in data) || data[key] === null) {
-      err("INTAKE_CLARIFICATION_REQUIRED", `intake.${key}`, "请补充明确的关系、场合、预算上限、币种及可用天数");
+      err("INTAKE_CLARIFICATION_REQUIRED", `intake.${key}`, "请补充明确的关系、场合、预算上限及币种");
     }
   }
   let budget = Object.hasOwn(data, "budget_amount") ? data.budget_amount : null;
@@ -245,7 +246,8 @@ export function adaptIntake(intakeJson, options = {}) {
     occasion_custom: occasion === "other" ? occasionCustom : null,
     budget_amount: budget,
     currency: "currency" in data ? data.currency : null,
-    available_days: "deadline_days" in data ? data.deadline_days : null,
+    // 兼容已有天数作为参考；省略、不确定或非法值均表示未知，不伪造默认天数。
+    available_days: Number.isInteger(data.deadline_days) && data.deadline_days >= 0 && data.deadline_days <= 365 ? data.deadline_days : null,
     facts: interests
       .filter((key) => (key in confidence ? confidence[key] : "inferred") === "confirmed")
       .map((key) => ({
@@ -262,6 +264,8 @@ export function adaptIntake(intakeJson, options = {}) {
     gift_styles: styles,
     hard_exclusions_original: exclusions,
   };
+  const exclusionContext = currentExclusionContext();
+  if (exclusionContext) request.exclusion_context = exclusionContext;
   if (revised || Object.hasOwn(data, "previous_gifts")) request.previous_gifts = previousGifts;
   if (revised) {
     Object.assign(request, { contract_version: CONTRACT_VERSION, budget_range: Object.hasOwn(data, "budget_range") ? data.budget_range : null, dislikes });
@@ -271,7 +275,7 @@ export function adaptIntake(intakeJson, options = {}) {
 
   // 复用同一套请求检查；空批次产生的候选错误不会成为输入错误。
   const requestJson = dump(request);
-  const checked = validate(requestJson, "{}", strictParse);
+  const checked = validateForDecision(requestJson, "{}", strictParse);
   errors.push(...checked.errors.filter((e) => e.path.startsWith("request") &&
     !(budgetErrors.length && (e.path.startsWith("request.budget_range") || e.path.startsWith("request.budget_amount"))) &&
     !(e.path.includes("dislikes") && errors.some((x) => x.path === "intake.dislikes"))));

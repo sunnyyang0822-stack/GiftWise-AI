@@ -1,23 +1,88 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync} from 'node:fs';
-import {freezeEvidence} from '../server/retrieval/evidence.mjs';
-import {RetrievalWorker} from '../server/retrieval/worker.mjs';
-import {DfrobotPublicProvider} from '../server/retrieval/dfrobot-provider.mjs';
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {LlmProvider} from '../server/llm/provider.mjs';
+import {OpenAiCompatibleTransport} from '../server/llm/transport.mjs';
+import {buildMockCandidates,buildMockPresentation} from '../server/mock-model.mjs';
+import {bindOptionalCandidateEvidence} from '../server/retrieval/evidence.mjs';
 import {runRecommendation,runPresentation} from '../server/pipeline.mjs';
 import {reset} from '../server/store.mjs';
+
+// All model/tool responses below are controlled fixtures, never real model/platform/image calls.
+process.env.GIFTWISE_STYLE_DIRECTION_CHANNEL='rules';
+process.env.GW_LOCAL_DB=fileURLToPath(new URL('../../.tmp/issue98-integration/catalog.sqlite',import.meta.url));
+process.env.GW_LLM_LEDGER_FILE=fileURLToPath(new URL('../../.tmp/issue98-integration/ledger.jsonl',import.meta.url));
 const base=JSON.parse(readFileSync(new URL('../../workflow/examples/intake.json',import.meta.url)));
 const intake=()=>({...structuredClone(base),budget_amount:'600',deadline_days:30,interests:['tech_digital'],interest_confidence:{tech_digital:'confirmed'},hard_exclusions:{tags:[],terms:[],unresolved:[]}});
-function controlledModel(requestJson,e){const candidates=e.products.map((p,i)=>({id:'c'+(i+1),name:p.name+' · '+p.variant,description:['互动机器人方向，需要确认组装能力','编程基础套装方向，需要确认配套设备','自动浇花实验方向，需要确认实际使用条件'][i],estimated_total:p.price_amount,currency:'CNY',estimated_preparation_days:5,tags:['other'],reason:'基于已确认科技兴趣提供创客方向；不假定对方喜欢具体型号或已经拥有设备。',fact_refs:['interest:tech_digital'],inferences:['科技方向可能适合，须确认设备与装配能力；追求对象低压力表达。'],unknowns:['材料及易碎性未知','装配时间为估算，非送达保证']}));return {ok:true,outputs:{candidates_json:JSON.stringify({candidates}),product_references_json:JSON.stringify(e.products.map((p,i)=>({candidate_id:'c'+(i+1),product_id:p.product_id})))}};}
-const fixture=()=>freezeEvidence(['机器人套件','编程套件','浇花套件'].map((name,i)=>({name,variant:'虚构SKU'+i,quantity:1,price_amount:['315.00','165.00','335.00'][i],currency:'CNY',price_conditions:[]})),{source:'seed'});
-const fixtureServices=e=>({retrievalEnabled:true,retrievalWorker:{submit:async()=>e},requestCandidates:async(r,e)=>controlledModel(r,e)});
-test('同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型',async()=>{reset();const e=fixture();const services=fixtureServices(e);const outcome=await runRecommendation({intake:intake(),mode:'dify',ownerScope:'A'},services);assert.equal(outcome.kind,'report');assert.deepEqual(outcome.report.selectable_candidate_ids,['c1','c2','c3']);assert.equal(outcome.run.product_bindings.size,3);assert.equal(outcome.report.media.candidates[1].product_id,e.products[1].product_id);assert.equal(outcome.report.media.selected,null);
-const wrong=await runPresentation({runId:outcome.run.run_id,selectedCandidateId:'c1',ownerScope:'B'});assert.equal(wrong.kind,'not_found');
-let count=0;const provider={requestPresentation:async()=>{count++;return {ok:true,outputs:{presentation_json:JSON.stringify({contract_version:'giftwise-20261031-v2',style:'柔和低压力',packaging:{color_palette:['米色']},card_text:'愿你享受探索的小乐趣',giving_advice:{timing:'方便时再收下即可',wording:'想到你对科技感兴趣，希望你玩得轻松',relationship_cautions:['不期待回应，不假定关系已经确定']},unknowns:['尺寸未知，不保证包装适配'],currency:'CNY',revised_estimated_preparation_days:5})}};}};
-const event={runId:outcome.run.run_id,selectedCandidateId:'c1',ownerScope:'A'};const [a,b]=await Promise.all([runPresentation(event,provider),runPresentation(event,provider)]);assert.equal(a.kind,'presentation');assert.equal(count,1);assert.equal(a.view.media.selected.candidate_id,'c1');assert.equal(a.view.media.selected.image,null);assert.equal(a.view.media.selected.physical.dimensions.status,'unknown');assert.equal(a.view.media.selected.task_id,b.view.media.selected.task_id);
-});
-test('受控改价/错规格/跨任务引用均清空可选项',async()=>{for(const mutation of ['price','spec','reference']){reset();const e=fixture();const services=fixtureServices(e);services.requestCandidates=async(r,e)=>{const call=controlledModel(r,e);if(mutation==='reference')call.outputs.product_references_json='[{"candidate_id":"c1","product_id":"other-run"}]';else{const batch=JSON.parse(call.outputs.candidates_json);batch.candidates[0][mutation==='price'?'estimated_total':'name']=mutation==='price'?'1':'另一商品';call.outputs.candidates_json=JSON.stringify(batch);}return call;};const o=await runRecommendation({intake:intake(),mode:'dify'},services);assert.deepEqual(o.report.selectable_candidate_ids,[]);assert.ok(o.report.workflow_errors.some(e=>e.code==='PRODUCT_EVIDENCE_MISMATCH'));}});
-test('证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行',async()=>{reset();let calls=0;const e=fixture();const services=fixtureServices({...e,products:e.products.slice(0,2)});services.requestCandidates=async()=>{calls++;throw Error();};const o=await runRecommendation({intake:intake(),mode:'dify'},services);assert.equal(o.errors[0].code,'RETRIEVAL_INSUFFICIENT');assert.equal(calls,0);const unsupported=await runRecommendation({intake:{...intake(),interests:[],interest_confidence:{}},mode:'dify'},fixtureServices(e));assert.equal(unsupported.errors[0].code,'RETRIEVAL_SCOPE_UNSUPPORTED');const a=await runRecommendation({intake:intake(),mode:'dify',ownerScope:'A'},fixtureServices(e));const b=await runRecommendation({intake:intake(),mode:'dify',ownerScope:'B'},fixtureServices(fixture()));assert.notEqual(a.run.run_id,b.run.run_id);});
-test('真实独立浏览器搜索三种商品→受控模型协议同版接线（无付费模型）',{skip:process.env.GIFTWISE_LIVE_RETRIEVAL_TEST!=='1'},async()=>{reset();const worker=new RetrievalWorker(new DfrobotPublicProvider(process.env.OPENCLI_PACKAGE_ROOT),{timeoutMs:55000});const services={retrievalEnabled:true,retrievalWorker:worker,requestCandidates:async(r,e)=>controlledModel(r,e)};const o=await runRecommendation({intake:intake(),mode:'dify',ownerScope:'live-test'},services);assert.equal(o.kind,'report',JSON.stringify(o.errors));assert.equal(o.report.retrieval.products.length,3);assert.equal(new Set(o.report.retrieval.products.map(p=>p.name)).size,3);assert.equal(o.run.product_bindings.size,3);assert.deepEqual(o.report.selectable_candidate_ids,['c1','c2','c3']);assert.ok(o.report.retrieval.products.every(p=>p.price_source==='browser_observed'));writeFileSync(new URL('../../docs/research/opencli/live-integration-result.json',import.meta.url),JSON.stringify({mode:'real_browser_controlled_model_not_real_dify',observed_at:new Date().toISOString(),retrieval:o.report.retrieval,selectable_candidate_ids:o.report.selectable_candidate_ids,media:o.report.media,model_calls:0,paid_image_calls:0},null,2));});
+const publicReference=()=>({reference_id:'fixture-reference-1',reference_kind:'public_reference',title:'公开创意记录灵感',source_url:'https://example.test/inspiration',image_id:null,image_kind:'reference_image'});
+function controlledServices({useTool=true,references=[publicReference()],citations,mutate,delay=0}={}){
+ const counts={searches:0,models:0,http:0};let request;
+ const transport=new OpenAiCompatibleTransport({fetchImpl:async(_url,{body})=>{
+  counts.http++;const call=JSON.parse(body);const returned=call.messages.some(m=>m.role==='tool');
+  if(useTool&&!returned)return {ok:true,status:200,json:async()=>({choices:[{finish_reason:'tool_calls',message:{role:'assistant',content:null,tool_calls:[{id:'controlled-public-search',type:'function',function:{name:'opencli_search',arguments:JSON.stringify({purpose:'reference',keyword:'创意记录 灵感 图片',sources:['duckduckgo'],reason:'为当前方案获取公开灵感资料'})}}]}}]})};
+  if(returned){const feedback=JSON.parse(call.messages.at(-1).content);assert.equal(feedback.products.length,0);assert.equal(feedback.recommendations_available,true);}
+  const candidates=buildMockCandidates(request).candidates;for(const c of candidates){delete c._mock_source;delete c.presentation;}
+  mutate?.(candidates);
+  const refs=citations??(useTool&&references.length?[{candidate_id:'c1',reference_id:references[0].reference_id}]:undefined);
+  return {ok:true,status:200,json:async()=>({choices:[{finish_reason:'stop',message:{role:'assistant',content:JSON.stringify({candidates,...(refs?{reference_references:refs}:{})})}}]})};
+ }});
+ const provider=new LlmProvider({live:transport,config:()=>({baseUrl:'https://synthetic-model.example.test/v1',apiKey:'synthetic-key',model:'offline-fixture',timeoutMs:1000,maxRetries:0,maxTokens:2048,outputRetries:0}),hasConfig:()=>true});
+ const services={retrievalEnabled:true,libraryEnabled:false,enableImageGeneration:false,
+  retrievalWorker:{submit:async plan=>{counts.searches++;assert.equal(plan.queries[0].purpose,'reference');assert.deepEqual(plan.queries[0].sources,['duckduckgo']);if(delay)await new Promise(r=>setTimeout(r,delay));return {status:references.length?'partial':'unavailable',products:[],references,contents:[],images:[],coverage:[{source:'duckduckgo',status:references.length?'controlled_fixture':'empty',observed_count:references.length,pages_completed:1}],enrichment_only:true};}},
+  requestCandidates:async input=>{counts.models++;request=JSON.parse(input.requestJson);return provider.requestCandidates(input);},
+  provideRealProducts:async()=>({catalog:{status:'unavailable',results:[],accounting:{scrape_calls:0}},scrapes:[]}),
+  visualDirectionProvider:{derive:async()=>({ok:false,code:'CONTROLLED_DIRECTION_NOT_REQUESTED',notices:[]})},
+ };
+ return {services,counts};
+}
+function report(outcome){assert.equal(outcome.kind,'report',JSON.stringify(outcome.errors));return outcome.report;}
 
-test('并发重复推荐共享同一任务，不重复检索或生成',async()=>{reset();let searches=0,models=0;const e=fixture();const services={retrievalEnabled:true,retrievalWorker:{submit:async()=>{searches++;await new Promise(r=>setTimeout(r,5));return e;}},requestCandidates:async(r,e)=>{models++;return controlledModel(r,e);}};const input={intake:intake(),mode:'dify',ownerScope:'repeat'};const [a,b]=await Promise.all([runRecommendation(input,services),runRecommendation(input,services)]);assert.equal(a.run.run_id,b.run.run_id);assert.equal(searches,1);assert.equal(models,1);});
+test('受控非电商tool结果→模型final→可选参考引用；保留归属隔离与选后并发幂等',async()=>{
+ reset();const {services,counts}=controlledServices();const outcome=await runRecommendation({intake:intake(),mode:'llm',ownerScope:'A'},services);
+ const view=report(outcome);assert.deepEqual(view.selectable_candidate_ids,['c1','c2','c3']);assert.equal(counts.searches,1);assert.equal(counts.models,1);assert.equal(counts.http,2);assert.equal(outcome.run.call_counts.recommend,2);
+ assert.equal(outcome.run.retrieval_audit.protocol,'model_tool_calls');assert.equal(outcome.run.product_bindings.size,0);assert.equal(outcome.run.reference_bindings.size,1);assert.equal(outcome.run.reference_bindings.get('c1').reference_id,'fixture-reference-1');assert.equal(view.media.selected,null);
+ assert.ok(view.media.candidates.every(c=>c.image===null)); // No fixture image bytes: never claim three real pictures passed.
+ const wrong=await runPresentation({runId:outcome.run.run_id,selectedCandidateId:'c1',ownerScope:'B'});assert.equal(wrong.kind,'not_found');
+ let presentations=0;
+ const presentationServices={requestPresentation:async({request,candidate})=>{presentations++;const built=buildMockPresentation(request,candidate);return {ok:true,outputs:{presentation_json:built.presentation_json},generated_by:'controlled_fixture',transport:'synthetic'};}};
+ const event={runId:outcome.run.run_id,selectedCandidateId:'c1',ownerScope:'A'};
+ const [a,b]=await Promise.all([runPresentation(event,presentationServices),runPresentation(event,presentationServices)]);
+ assert.equal(a.kind,'presentation',JSON.stringify(a.errors));assert.equal(b.kind,'presentation');assert.equal(presentations,1);assert.equal(a.view.media.selected.candidate_id,'c1');assert.equal(a.view.media.selected.image,null);assert.equal(a.view.media.selected.task_id,b.view.media.selected.task_id);
+ const replay=await runPresentation(event,presentationServices);assert.equal(replay.view.media.selected.task_id,a.view.media.selected.task_id);assert.equal(presentations,1);
+});
+
+test('未知或歧义公开引用只拒绑对应图片，不拒绝整批三方案',async()=>{
+ for(const citations of [[{candidate_id:'c1',reference_id:'other-run-reference'}],[{candidate_id:'c1',reference_id:'fixture-reference-1'},{candidate_id:'c1',reference_id:'second-reference'}]]){
+  reset();const {services}=controlledServices({citations});const outcome=await runRecommendation({intake:intake(),mode:'llm'},services);
+  assert.deepEqual(report(outcome).selectable_candidate_ids,['c1','c2','c3']);assert.equal(outcome.run.reference_bindings.size,0);assert.equal(outcome.run.product_bindings.size,0);
+  assert.ok(outcome.run.retrieval_audit.rejected_references.some(r=>['UNKNOWN_REFERENCE','AMBIGUOUS_REFERENCE'].includes(r.code)));
+ }
+});
+
+test('无资料仍经tool后final；无工具直接final不要求兴趣或三条SKU，会话互相隔离',async()=>{
+ reset();const unknown={...intake(),interests:[],interest_confidence:{}};
+ const empty=controlledServices({references:[]});const a=await runRecommendation({intake:unknown,mode:'llm',ownerScope:'empty-A'},empty.services);
+ assert.deepEqual(report(a).selectable_candidate_ids,['c1','c2','c3']);assert.equal(empty.counts.searches,1);assert.equal(empty.counts.http,2);assert.equal(a.run.product_bindings.size,0);
+ const direct=controlledServices({useTool:false});const b=await runRecommendation({intake:unknown,mode:'llm',ownerScope:'direct-B'},direct.services);
+ assert.deepEqual(report(b).selectable_candidate_ids,['c1','c2','c3']);assert.equal(direct.counts.searches,0);assert.equal(direct.counts.http,1);assert.equal(b.report.retrieval.status,'skipped');assert.notEqual(a.run.run_id,b.run.run_id);
+ assert.equal((await runPresentation({runId:a.run.run_id,selectedCandidateId:'c1',ownerScope:'direct-B'})).kind,'not_found');
+});
+
+test('已知预算越界必须修订或整批失败；历史规格不符或跨任务ID只拒绝来源绑定',async()=>{
+ reset();const over=controlledServices({useTool:false,mutate:candidates=>{candidates[0].estimated_total='601.00';}});
+ over.services.requestCandidateRevision=async()=>({ok:false,code:'CONTROLLED_REPAIR_UNAVAILABLE'});
+ const outcome=await runRecommendation({intake:intake(),mode:'llm'},over.services);assert.equal(outcome.kind,'recommendation_failed');assert.equal(outcome.errors[0].code,'RECOMMENDATION_INCOMPLETE');assert.deepEqual(outcome.run.selectable_candidate_ids,[]);assert.ok(outcome.run.validation.candidate_results[0].errors.some(e=>e.code==='OVER_BUDGET'));assert.ok(outcome.run.validation.candidate_results.slice(1).every(r=>r.passed));assert.equal(outcome.run.repair_count,1);
+ // Pure legacy-evidence fixtures test non-time binding constraints; no commerce adapter is called.
+ const historical={product_id:'legacy-one-item',name:'历史杯具',variant:'四只装',price_amount:'50',price_conditions:[],price_source:'seed',observed_at:null};
+ const candidate={id:'c1',name:'另一件物品',description:'独立方案',estimated_total:'50'};
+ const mismatch=bindOptionalCandidateEvidence({products:[historical]},[candidate],[{candidate_id:'c1',product_id:historical.product_id}],'600');assert.equal(mismatch.bindings.size,0);assert.equal(mismatch.rejected[0].code,'PRODUCT_SPEC_MISMATCH');
+ const foreign=bindOptionalCandidateEvidence({products:[historical]},[candidate],[{candidate_id:'c1',product_id:'other-run'}],'600');assert.equal(foreign.bindings.size,0);assert.equal(foreign.rejected[0].code,'UNKNOWN_PRODUCT');
+ const knownOverBudget=bindOptionalCandidateEvidence({products:[{...historical,price_amount:'601.00',observed_at:new Date().toISOString()}]},[{...candidate,name:'历史杯具 · 四只装'}],[{candidate_id:'c1',product_id:historical.product_id}],'600');assert.deepEqual(knownOverBudget.knownOverBudget,['c1']);
+});
+
+test('并发重复推荐只执行一次受控公开检索与完整模型回路',async()=>{
+ reset();const {services,counts}=controlledServices({delay:5});const input={intake:intake(),mode:'llm',ownerScope:'repeat'};
+ const [a,b]=await Promise.all([runRecommendation(input,services),runRecommendation(input,services)]);
+ assert.deepEqual(report(a).selectable_candidate_ids,['c1','c2','c3']);assert.equal(a.run.run_id,b.run.run_id);assert.equal(counts.searches,1);assert.equal(counts.models,1);assert.equal(counts.http,2);
+});

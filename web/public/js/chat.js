@@ -5,9 +5,14 @@
  *   - 只负责收集与逐题校验 intake 字段；提交、识别接口与结果页仍由 app.js 负责；
  *   - 自由文字理解集中在 interpret(questionId, text)：以后接真实 AI 时只替换这一个函数；
  *   - 用户输入一律以 textContent / value 渲染，不使用 innerHTML；
- *   - 前端不解释“需要避免的”原话里的关键词，原话交给 /api/exclusions/analyze 识别并逐条确认。
+ *   - 前端不解释“需要避免的”原话里的关键词；采用服务端语义理解，只对具体禁品确认，歧义在当前聊天接续。
  */
 import { icon, OPTION_ICONS, DEADLINE_ICONS } from "./icons.js";
+import { exclusionConfirmation, exclusionQuestions } from "./exclusion-flow.js";
+import {
+  applyParsedToForm, budgetDisplayText, deadlineDisplayText, overriddenRows, literalPreferences,
+  requiredFollowups, echoBudgetAmount, echoDeadlineDays, echoDeadlinePhrase,
+} from "./parse-intake.js";
 
 const AMOUNT_RE = /^(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?$/;
 export const codePoints = value => [...value].length;
@@ -34,7 +39,15 @@ const intakeKey = () => JSON.stringify(api.buildIntake());
 
 export function newChatState() {
   return { done: [], shownKey: null, entryKey: null, entryInterests: null, notes: [], draft: "", enterMe: null,
-    analyzing: false, analysisError: null, analysisToken: 0, confirmRestart: false, sheetOpen: false };
+    analyzing: false, analysisError: null, analysisToken: 0, confirmRestart: false, sheetOpen: false,
+    exclusionAnalysisKey: null, exclusionTurns: [], pendingExclusionContinuation: null,
+    /* 第 1 步解析：parsing = 正在等解析响应；parseReport = 最近一次解析的展示信息
+       （原话 / 覆盖 / 原文 / 必答追问）；deadlineAlert = 相对时间必须由用户确认的提示。
+       都只是前端记账，不下发任何新字段。 */
+    parsing: false, parseReport: null, deadlineAlert: null,
+    /* exchanges：用户在输入框说的一整句话 + 小礼的一句回应，插在当时“下一道待答题”之前；
+       viaParse：被这句话直接填好的题——历史里不再重复显示它们的一问一答。 */
+    exchanges: [], viaParse: [], pendingSaid: "", literals: [] };
 }
 export function ensureChat() {
   if (!st().chat) st().chat = newChatState();
@@ -69,10 +82,18 @@ const sliderValues = () => {
   const ok = f.budget_mode === "slider" && !budgetProblems().length;
   return ok ? { min: f.budget_min, max: f.budget_max } : { min: "100", max: "300" };
 };
-const budgetText = () => {
+const budgetText = () => budgetDisplayText(form(), parseBlock());
+/**
+ * 最近一次第 1 步解析的 parse 块；没有解析过就是 null（展示层据此决定是否回显原值）。
+ * 兜底读 chat().parseReport.parse：只要这次对话确实解析过，⛔ 就绝不能退回显示服务端带宽。
+ */
+const parseBlock = () => st().parseintake?.parse || chat().parseReport?.parse || null;
+/** 用户自己改了预算 ⇒ 之前解析回显的原值不再代表当前输入，清掉（避免展示与提交不一致）。 */
+function clearParsedBudget() {
   const f = form();
-  return f.budget_mode === "zero" ? "不花钱的心意" : `¥${f.budget_min} – ¥${f.budget_max}`;
-};
+  f.budget_amount = "";
+  f.budget_phrase = "";
+}
 const textLimit = (value, message) => codePoints(value) > 1000 ? message : null;
 const LONG_TEXT = "需要避免的、以前送过的礼物和补充说明，每项最多 1000 字。";
 
@@ -141,16 +162,17 @@ const QUESTIONS = [
     check: () => budgetProblems()[0]?.message || null,
   },
   {
-    id: "deadline", group: 0, kind: "single",
+    id: "deadline", group: 0, kind: "single", when: f => f.deadline_days !== "" && f.deadline_days != null,
     ask: () => ["大概多久之后送出？"],
     options: () => (deadlineOptions() || []).map(r => opt(String(r.days), DEADLINE_SHORT[r.days] || r.label, DEADLINE_ICONS[r.days])),
     selected: () => form().deadline_days,
     pick: id => { form().deadline_days = id; },
-    answer: () => { const days = Number(form().deadline_days); return DEADLINE_SHORT[days] || (deadlineOptions() || []).find(r => r.days === days)?.label || ""; },
+    // 原值回显优先：解析给过 echo.deadline_days 且仍然是当前取值时，显示用户输入的原值（不显示 ±1 天区间）。
+    answer: () => deadlineDisplayText(form(), parseBlock()) || (deadlineOptions() || []).find(r => String(r.days) === form().deadline_days)?.label || "",
     check: () => {
-      const options = deadlineOptions();
-      if (!options) return "准备时间的选项还没有准备好，请稍后刷新再试。";
-      return options.some(r => String(r.days) === form().deadline_days) ? null : "请选择可用准备时间。";
+      const value = form().deadline_days;
+      if (value === "" || value == null) return null;
+      return /^\d+$/.test(String(value)) && Number(value) <= 365 ? null : "时间参考需为 0–365 天的整数，也可以留空。";
     },
   },
   {
@@ -249,6 +271,17 @@ const QUESTIONS = [
       return names.length ? `都对，避开：${names.join("、")}` : "已确认";
     },
   },
+  {
+    /* 体验类礼物需要知道在哪个城市用：只在解析判定需要、且用户还没说过城市时，作为对话里的一道普通题出现。 */
+    id: "city", group: 2, kind: "text",
+    when: () => requiredFollowups(chat().parseReport?.parse).some(item => item.id === "city") && !String(form().city_answer || "").trim() || chat().done.includes("city"),
+    ask: () => ["这个体验打算在哪个城市用呀？"],
+    placeholder: "例如：杭州", aria: "所在城市", field: "city_answer",
+    get: () => form().city_answer || "",
+    set: value => { form().city_answer = value; },
+    answer: () => String(form().city_answer || "").trim(),
+    check: () => String(form().city_answer || "").trim() ? null : "告诉我一个城市就好，比如「杭州」。",
+  },
   { id: "summary", group: 2, kind: "summary", ask: () => ["我把你说的整理成了一张心意清单，看看对不对："] },
 ];
 const byId = id => QUESTIONS.find(q => q.id === id);
@@ -256,11 +289,31 @@ const applicable = () => QUESTIONS.filter(q => !q.when || q.when(form()));
 const current = () => applicable().find(q => q.kind === "summary" || !chat().done.includes(q.id));
 const understanding = c => c.kind === "tag" ? (zh(labels().exclusions, c.tag) || c.tag) : c.term;
 
+/**
+ * 第 1 步解析留下的**必答**项（`required_followups[].required === true`）。
+ * 已答完时返回 []。城市走 additional_context 这条既有字段；相对时间必须由用户确认，
+ * 因为模型对相对时间不稳定（后端实测：同一句「下个月」一次 30 天、一次 1 天）。
+ * 其余必答项（例如排除项识别）由既有 /api/exclusions/analyze 流程负责，这里不重复拦。
+ */
+export function parseFollowups() {
+  const report = chat().parseReport;
+  if (!report || !report.parse) return [];
+  const f = form();
+  return requiredFollowups(report.parse).filter(item => {
+    if (item.id === "city") return !String(f.city_answer || "").trim();
+    return false;
+  });
+}
+
 /** 提交前整体校验：返回第一个需要回到的题目与提示。 */
 export function chatProblems() {
   for (const q of applicable()) {
     const message = q.check?.();
     if (message) return [{ qid: q.id, code: "INTAKE_CLARIFICATION_REQUIRED", message }];
+  }
+  const pending = parseFollowups();
+  if (pending.length) {
+    return [{ qid: "summary", code: "INTAKE_CLARIFICATION_REQUIRED", message: "还有一题没聊完～" }];
   }
   return [];
 }
@@ -276,6 +329,7 @@ export function chatProgress() {
 function finish(q) {
   const c = chat();
   if (!c.done.includes(q.id)) c.done.push(q.id);
+  c.viaParse = (c.viaParse || []).filter(x => x !== q.id);
   // 任何改动 intake 的回答都会让之前的限制识别失效，需要重新识别并确认。
   if (q.id !== "avoid_confirm" && c.entryKey !== null && intakeKey() !== c.entryKey) {
     api.invalidateAnalysis();
@@ -283,6 +337,11 @@ function finish(q) {
     c.analysisError = null;
   }
   if (q.id === "interests" && c.entryInterests !== JSON.stringify(form().interests)) c.done = c.done.filter(x => x !== "confidence");
+  // 用户亲手选了期限（含「跳过」之外的任何一次选择）就视为完成了相对时间的必答确认。
+  if (q.id === "deadline") {
+    c.deadlineAlert = null;
+    if (c.parseReport) c.parseReport.deadlinePending = false;
+  }
   c.notes = [];
   c.draft = "";
   c.enterMe = q.id;
@@ -304,28 +363,76 @@ function attempt(q, userText) {
 export function reopen(qid, message) {
   const c = chat();
   c.done = c.done.filter(x => x !== qid);
+  c.viaParse = (c.viaParse || []).filter(x => x !== qid);
   c.notes = message ? [{ role: "bot", text: message }] : [];
   c.confirmRestart = false;
   api.render();
 }
-async function runAnalysis() {
+export async function runAnalysis(continuation = null) {
   const c = chat();
+  if (c.analyzing) return;
   const token = ++c.analysisToken;
+  const key = intakeKey();
+  const questions = exclusionQuestions(st().analysis);
   c.analyzing = true;
   c.analysisError = null;
   api.render();
   try {
-    const analysis = await api.analyze(api.buildIntake());
-    if (token !== c.analysisToken) return;
+    const analysis = await api.analyze(api.buildIntake(), continuation);
+    if (chat() !== c || token !== c.analysisToken) return;
+    if (intakeKey() !== key) { c.analyzing = false; api.render(); return; }
+    if (!["ready", "needs_confirmation", "needs_input"].includes(analysis?.status)
+      || typeof analysis?.analysis_id !== "string" || !analysis.analysis_id.trim() || !Array.isArray(analysis.candidates)
+      || analysis.status === "ready" && !exclusionConfirmation(analysis)) {
+      throw new Error("analysis_incomplete");
+    }
+    if (continuation) {
+      c.exclusionTurns.push({ questions, answer: continuation.answer });
+      c.pendingExclusionContinuation = null;
+      c.draft = "";
+      c.notes = [];
+    }
     st().analysis = analysis;
     st().confirmedIds = [];
+    c.exclusionAnalysisKey = key;
+    /* 用户亲口说出的避开项，本身就是确认（2026-11-01 产品负责人：不要让用户把同一件事再确认一遍）。
+       识别出的每一项都锚定在用户原话上、且模型有把握（非 low）⇒ 自动确认并继续，这一步不在对话里出现；
+       有低把握项或识别失败时，仍照常请用户逐条确认。 */
+    const items = analysis?.status === "needs_confirmation" && Array.isArray(analysis.candidates) ? analysis.candidates : [];
+    const source = [form().dislikes || "", ...c.exclusionTurns.map(turn => turn.answer)].join("\n");
+    if (items.length && items.every(x => ["high", "medium"].includes(x.confidence) && typeof x.source_span === "string" && x.source_span && source.includes(x.source_span))) {
+      st().confirmedIds = items.map(x => x.id);
+    }
+    if (exclusionConfirmation(analysis, st().confirmedIds)) {
+      if (!c.done.includes("avoid_confirm")) c.done.push("avoid_confirm");
+      c.viaParse = [...new Set([...(c.viaParse || []), "avoid_confirm"])];
+    }
   } catch {
-    if (token !== c.analysisToken) return;
-    c.analysisError = "刚刚没能读懂这句话，再试一次好吗？";
+    if (chat() !== c || token !== c.analysisToken) return;
+    c.analysisError = "刚刚没能完成识别，可以再试一次。";
   }
   c.analyzing = false;
   api.render();
   revealCurrent();
+}
+
+export async function answerExclusionClarification(answer) {
+  const c = chat();
+  if (c.analyzing || typeof answer !== "string" || !answer.trim()) return;
+  if (codePoints(answer) > 1000) { note("这条补充最多 1000 字。", null); return; }
+  const analysis = st().analysis;
+  if (analysis?.status !== "needs_input" || !analysis.analysis_id) {
+    note("这次识别还没完成，可以点上面的按钮继续。", null);
+    return;
+  }
+  if (c.exclusionAnalysisKey !== null && c.exclusionAnalysisKey !== intakeKey()) {
+    api.invalidateAnalysis();
+    c.analysisError = "需求有了更新，我们按现在的内容再识别一次。";
+    api.render();
+    return;
+  }
+  c.pendingExclusionContinuation = { analysis_id: analysis.analysis_id, answer };
+  await runAnalysis(c.pendingExclusionContinuation);
 }
 
 /* ------------------------------------------------------------ 自由文字 */
@@ -458,6 +565,7 @@ function applyText(q, text) {
     case "unknown": q.unknownAction(); finish(q); return;
     case "budget":
       f.budget_mode = result.mode; f.budget_min = result.min; f.budget_max = result.max;
+      clearParsedBudget();
       attempt(q, said); return;
     case "text":
       if (q.kind === "avoid") { f.dislikes = text; attempt(q, said); return; }
@@ -471,14 +579,107 @@ function choose(q, id, userText) {
   q.pick(id);
   attempt(q, userText);
 }
+
+/* ------------------------------------------------- 第 1 步：自然语言解析 */
+/*
+ * 用户在输入框里写的那句话**就是**要用 `/api/intake/parse` 解析的用户原话。
+ * 这里只做分流，不做任何业务猜测：
+ *   · ready / needs_input → 把服务端合并好的 intake 落到**现有**表单字段上，跳过已被覆盖的题；
+ *   · empty               → ⛔ 不猜：一个字段都不改，只如实说「没读懂」；
+ *   · degraded / disabled / 真实传输失败 → ⛔ 不报错：回落到本地规则（接入大模型之前的既有表单路径）。
+ * 三态都必须让用户能走到三个候选 —— 没有「卡在解析」的分支。
+ */
+const PARSE_KINDS = new Set(["single", "multi", "budget", "text", "avoid"]);
+const PARSE_EMPTY_NOTE = "这句我没读出具体信息，就先不替你改了。点下面的选项就好，或者说具体一点，比如「女朋友，生日，预算 600」。";
+const PARSE_DEGRADED_NOTE = "这句我没能完整读懂，先按你点选的继续，我们接着聊。";
+
 function send() {
   const c = chat();
   const q = current();
+  if (q.kind === "confirm") {
+    if (st().analysis?.status === "needs_input") void answerExclusionClarification(c.draft);
+    else if (!c.analyzing) applyText(q, c.draft);
+    return;
+  }
   if (!c.draft.trim()) {
     if (q.kind === "avoid") commitAvoid(q);
     return;
   }
-  applyText(q, c.draft);
+  const said = c.draft;
+  if (!PARSE_KINDS.has(q.kind) || typeof api.parseText !== "function") { applyText(q, said); return; }
+  void answerWithParse(q, said);
+}
+
+/** 解析在途时先把用户原话留在对话里，并按三态分流。 */
+async function answerWithParse(q, said) {
+  const c = chat();
+  c.parsing = true;
+  c.pendingSaid = said;
+  c.notes = [];
+  c.draft = "";
+  api.render();
+  revealCurrent();
+  let result = null;
+  try { result = await api.parseText(said); } catch { result = null; }
+  c.parsing = false;
+  c.pendingSaid = "";
+  const status = result?.status || "degraded";
+  const parse = result?.parse || null;
+  const overrides = overriddenRows(parse, labels());
+  const literals = literalPreferences(parse);
+  c.parseReport = {
+    text: said, status, parse, overrides, literals,
+    notices: Array.isArray(result?.notices) ? result.notices : [],
+    applied: [], dropped: [], deadlinePending: false,
+  };
+
+  if (status === "ready" || status === "needs_input") {
+    const applied = applyParsedToForm({ form: form(), config: st().config, result });
+    c.parseReport.applied = applied.notes;
+    c.parseReport.dropped = applied.dropped;
+    if (applied.qids.length > 0) {
+      st().parseText = said;
+      for (const qid of applied.qids) if (!c.done.includes(qid)) c.done.push(qid);
+      // 解析改动了 intake ⇒ 之前的限制识别结果作废，必须重新逐条确认（与 finish() 同口径）。
+      api.invalidateAnalysis();
+      c.done = c.done.filter(x => x !== "avoid_confirm");
+      // 时间仅保留用户主动提及的合法参考，不因缺失或旧相对时间提示强制追问。
+      c.deadlineAlert = null;
+      c.done = [...new Set(c.done)];
+      c.viaParse = [...new Set([...(c.viaParse || []), ...applied.qids.filter(qid => c.done.includes(qid))])];
+      if (literals.length) c.literals = [...new Set([...(c.literals || []), ...literals])];
+      /* 一句话回应：用心意清单里的中文值拼出“记下了什么”，不逐条列字段、不出现机器值；
+         然后直接接上下一道还没答的题（带选项卡），由小礼主动往下推进。 */
+      // 回应里只用简短说法；避开项有字面词时说「避开 X、Y」，完整原话留在心意清单里。
+      const shortValue = item => item.qid === "avoid" && form().exclusion_terms?.length ? `避开${form().exclusion_terms.join("、")}` : sheetValue(item);
+      const heard = SHEET.filter(item => item.covers.some(qid => applied.qids.includes(qid))).map(shortValue).filter(Boolean);
+      const changed = overrides.filter(r => r.from && !/^（空）$|^\{\}$|^\[\]$/.test(String(r.from).trim())).map(r => r.label);
+      const ack = [
+        heard.length ? `收到～${heard.join("，")}，我都记下了。` : "收到～我记下了。",
+        changed.length ? `你之前选的「${[...new Set(changed)].join("、")}」，按这句话改过来了。` : "",
+      ].filter(Boolean).join("");
+      c.exchanges = [...(c.exchanges || []), { asked: q.id, said, ack, before: current().id }];
+      c.notes = [];
+      api.render();
+      revealCurrent();
+      return;
+    }
+    // ready 但没有任何字段能落到表单上 ⇒ 等同于没读懂，按 empty 的口径处理（不猜）。
+  }
+
+  if (status === "empty") {
+    c.notes = [{ role: "me", text: said }, { role: "bot", text: PARSE_EMPTY_NOTE }];
+    api.render();
+    revealCurrent();
+    return;
+  }
+
+  /* degraded / disabled / 传输失败：⛔ 不报错，回落到既有表单路径继续。 */
+  c.notes = [{ role: "me", text: said }];
+  applyText(q, said);
+  if (!c.notes.some(n => n.role === "bot")) c.notes.push({ role: "bot", text: PARSE_DEGRADED_NOTE });
+  api.render();
+  revealCurrent();
 }
 function commitAvoid(q) {
   form().dislikes = chat().draft;
@@ -506,7 +707,7 @@ const PLACEHOLDERS = {
   confidence: "比如：很确定，或者是猜的",
   styles: "比如：实用一点、有纪念意义",
   summary: "说“生成”，或点上面的按钮",
-  avoid_confirm: "也可以点上面的按钮确认",
+  avoid_confirm: "直接回答小礼的问题",
 };
 const QUICK = {
   previous: ["去年送过一本书", "送过围巾"],
@@ -516,7 +717,7 @@ const SHEET = [
   { qid: "relation", icon: "user", term: "送给", covers: ["relation", "relation_other", "closeness"] },
   { qid: "occasion", icon: "calendar", term: "场合", covers: ["occasion", "occasion_other"] },
   { qid: "budget", icon: "wallet", term: "预算", covers: ["budget"] },
-  { qid: "deadline", icon: "clock", term: "送出", covers: ["deadline"] },
+  { qid: "deadline", icon: "clock", term: "时间", covers: ["deadline"] },
   { qid: "interests", icon: "sparkles", term: "喜欢", covers: ["interests", "confidence"] },
   { qid: "styles", icon: "wand", term: "感觉", covers: ["styles"] },
   { qid: "avoid", icon: "ban", term: "避开", covers: ["avoid", "avoid_confirm"] },
@@ -527,7 +728,8 @@ const SHEET = [
 /** 承接上一题回答的一句自然回应（第一题由开场白承接）。 */
 function ackFor(q) {
   const list = applicable();
-  const prev = list[list.indexOf(q) - 1];
+  const hidden = chat().viaParse || [];
+  const prev = list.slice(0, list.indexOf(q)).reverse().find(item => !hidden.includes(item.id));
   if (!prev) return null;
   const f = form();
   switch (prev.id) {
@@ -565,7 +767,9 @@ function ackFor(q) {
   }
 }
 /** 当前题的助手消息：承接 + 提问（已答的题沿用当时的问法）。 */
-const botTexts = q => [ackFor(q), ...q.ask()].filter(Boolean);
+/** 紧接在一次自然语言交流之后的题：用那次交流的一句回应替代原本的承接句，和提问放在同一组气泡里。 */
+const exchangeAck = q => (chat().exchanges || []).filter(x => x.before === q.id).at(-1)?.ack || null;
+const botTexts = q => [exchangeAck(q) ?? ackFor(q), ...q.ask()].filter(Boolean);
 
 /* ------------------------------------------------------------ 基础部件 */
 
@@ -631,7 +835,8 @@ function singleAttach(q) {
   // 回到某题重答时，上次的选择以细描边提示；点任意一项即作答。
   const buttons = options.map((o, i) => optionButton(o, false, () => choose(q, o.id, o.label), i, `opt-${q.id}-${o.id}`, selected === o.id ? "gw-opt--was" : ""));
   if (q.skip) buttons.push(optionButton(opt("skip", q.skip, "skip"), false, () => { q.skipAction?.(); finish(q); }, options.length, `opt-${q.id}-skip`, "gw-opt--quiet"));
-  return attach([optionGrid(q.ask().at(-1), buttons, options.length > 4 ? "gw-opts--grid" : "")]);
+  const alert = q.id === "deadline" ? deadlineAlertNode() : null;
+  return attach([alert, optionGrid(q.ask().at(-1), buttons, options.length > 4 ? "gw-opts--grid" : "")].filter(Boolean));
 }
 function multiAttach(q, { confirmLabel = "选好了", none = null } = {}) {
   const list = q.list();
@@ -655,7 +860,7 @@ function budgetAttach(q) {
   const f = form();
   const other = f.budget_mode === "other";
   const chips = optionGrid("其他预算方式", [
-    optionButton(opt("zero", "不花钱的心意", "heart"), false, () => { const f = form(); f.budget_mode = "zero"; f.budget_min = "0"; f.budget_max = "0"; attempt(q, "不花钱的心意"); }, 0, "budget-zero"),
+    optionButton(opt("zero", "不花钱的心意", "heart"), false, () => { const f = form(); f.budget_mode = "zero"; f.budget_min = "0"; f.budget_max = "0"; clearParsedBudget(); attempt(q, "不花钱的心意"); }, 0, "budget-zero"),
     other
       ? optionButton(opt("slider", "用滑条选", "arrow-left"), false, () => { const f = form(); f.budget_mode = "slider"; f.budget_min = "100"; f.budget_max = "300"; api.render(); }, 1, "budget-slider-mode")
       : optionButton(opt("other", "其他金额", "coins"), false, () => { form().budget_mode = "other"; api.render(); }, 1, "budget-other-mode"),
@@ -679,7 +884,7 @@ function budgetAttach(q) {
         el("div", { class: "gw-money-row" }, [field("min"), el("span", { class: "gw-money__dash", "aria-hidden": "true", text: "—" }), field("max")]),
         el("div", { class: "gw-attach__foot" }, [
           el("span", { class: "gw-attach__count", text: "0–10000 元，最多两位小数" }),
-          el("button", { type: "button", class: "gw-send-btn", id: "budget-done", "data-field": "budget-done", onclick: () => attempt(q, budgetText()) }, ["用这个金额", icon("arrow-right", { size: 15 })]),
+          el("button", { type: "button", class: "gw-send-btn", id: "budget-done", "data-field": "budget-done", onclick: () => { clearParsedBudget(); attempt(q, budgetText()); } }, ["用这个金额", icon("arrow-right", { size: 15 })]),
         ]),
       ]),
       chips,
@@ -713,6 +918,7 @@ function budgetAttach(q) {
             f.budget_mode = "slider";
             f.budget_min = range.querySelector("#budget-min").value;
             f.budget_max = range.querySelector("#budget-max").value;
+            clearParsedBudget();
             attempt(q, budgetText());
           },
         }, ["就这个范围", icon("arrow-right", { size: 15 })]),
@@ -729,6 +935,7 @@ function slide(which, event, range, readout) {
   if (which === "max" && max < min) max = min;
   minInput.value = String(min); maxInput.value = String(max);
   f.budget_mode = "slider"; f.budget_min = String(min); f.budget_max = String(max);
+  clearParsedBudget();
   range.style.setProperty("--minf", String(min / 1000));
   range.style.setProperty("--maxf", String(max / 1000));
   range.classList.toggle("is-min-top", min >= 900);
@@ -752,13 +959,10 @@ function confirmAttach(q) {
   const c = chat();
   const a = st().analysis;
   if (c.analysisError) return attach([optionGrid("识别失败", [
-    optionButton(opt("retry", "再试一次", "refresh"), false, () => runAnalysis(), 0, "analysis-retry"),
+    optionButton(opt("retry", c.pendingExclusionContinuation ? "重试这次回答" : "再试一次", "refresh"), false, () => runAnalysis(c.pendingExclusionContinuation), 0, "analysis-retry"),
     optionButton(opt("edit", "改一下原话", "edit"), false, () => reopen("avoid"), 1, "analysis-edit", "gw-opt--quiet"),
   ])]);
-  if (a.status !== "needs_confirmation") return attach([optionGrid("需要澄清", [
-    optionButton(opt("edit", "改一下原话", "edit"), false, () => reopen("avoid"), 0, "analysis-edit"),
-    optionButton(opt("retry", "重新识别", "refresh"), false, () => { api.invalidateAnalysis(); runAnalysis(); }, 1, "analyze-again", "gw-opt--quiet"),
-  ])]);
+  if (a?.status !== "needs_confirmation") return null;
   const confirmed = st().confirmedIds;
   const all = a.candidates.length > 0 && a.candidates.every(item => confirmed.includes(item.id));
   return attach([
@@ -778,7 +982,7 @@ function confirmAttach(q) {
     })),
     el("div", { class: "gw-attach__foot" }, [
       el("button", { type: "button", class: "gw-text-btn", "data-field": "analysis-edit", onclick: () => reopen("avoid") }, [icon("edit", { size: 14 }), "不对，我改一下"]),
-      el("button", { type: "button", class: "gw-send-btn", id: "exclusion-continue", disabled: !all, "data-field": "exclusion-continue", onclick: () => finish(q) }, ["都对，继续", icon("arrow-right", { size: 15 })]),
+      el("button", { type: "button", class: "gw-send-btn", id: "exclusion-continue", disabled: !all, "data-field": "exclusion-continue", onclick: () => { if (exclusionConfirmation(a, st().confirmedIds)) finish(q); } }, ["都对，继续", icon("arrow-right", { size: 15 })]),
     ]),
   ]);
 }
@@ -796,27 +1000,51 @@ function sheetValue(item) {
     case "occasion": return f.occasion === "other" ? f.occasion_other.trim() || "其他" : zh(L.occasions, f.occasion);
     case "interests": {
       const q = byId("interests");
+      // 用户只说了选项之外的喜好：显示他的原话（用户输入为准）。
+      if (!f.interests_unknown && !f.interests.length && chat().literals?.length) return chat().literals.join("；");
       const guessed = !f.interests_unknown && f.interests.length && !f.interests.every(id => f.interest_confidence[id] === "confirmed");
       return `${q.answer()}${guessed && done.includes("confidence") ? "（有些是猜的）" : ""}`;
     }
     default: return byId(item.qid).answer();
   }
 }
+const visibleSheet = () => SHEET.filter(item => item.qid !== "deadline" || sheetValue(item));
+/* --------------------------------- 解析结果在结算卡上的呈现（4 条裁定） */
+
+/** 相对时间的必答确认：模型算出来的天数与原话不符时，把这题的差额摆出来让用户点。 */
+function deadlineAlertNode() {
+  const a = chat().deadlineAlert;
+  if (!a) return null;
+  return el("p", { class: "gw-attach__hint gw-deadline-hint" },
+    [a.phrase ? `你说的是「${a.phrase}」，帮我点一个最接近的时间～` : "帮我点一个最接近的时间～"]);
+}
+
+/** 需求小结只展示心意清单本身：用户的原话已在对话与清单里；
+    原值/区间说明、覆盖说明、服务端说明等内部信息不展示给用户（2026-11-01 产品负责人）。 */
+function summaryExtras() {
+  return [];
+}
+
 function summaryAttach() {
   const f = form();
   const relation = sheetValue(SHEET[0])?.split(" · ")[0] || "TA";
   const occasion = sheetValue(SHEET[1]) || "";
+  const blocked = parseFollowups().length > 0;
   return attach([
     el("article", { class: "greeting-card gw-summary", "aria-label": "需求小结" }, [
       el("p", { class: "greeting-card__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
-      el("h3", { class: "greeting-card__title", text: `送给${relation}的${occasion}礼物` }),
-      el("dl", { class: "gw-summary__list" }, SHEET.map(item => el("div", { class: "gw-summary__row" }, [
+      el("h3", { class: "greeting-card__title", text: `送给${relation}的${occasion ? (/礼物?$/.test(occasion) ? occasion : `${occasion}礼物`) : "礼物"}` }),
+      el("dl", { class: "gw-summary__list" }, visibleSheet().map(item => el("div", { class: "gw-summary__row" }, [
         el("dt", {}, [el("span", { class: "gw-summary__icon", "aria-hidden": "true" }, [icon(item.qid === "relation" ? OPTION_ICONS[f.recipient_relation] || "user" : item.icon, { size: 14 })]), item.term]),
         el("dd", { text: sheetValue(item) || "—" }),
       ]))),
       el("p", { class: "greeting-card__sign", text: "—— 为 TA 准备的心意" }),
-      el("button", { type: "button", class: "gw-cta", id: "step-next", "data-field": "step-next", onclick: () => api.submit() }, [
-        icon("sparkles", { size: 18 }), "生成三个礼物思路",
+      ...summaryExtras(),
+      el("button", {
+        type: "button", class: "gw-cta", id: "step-next", "data-field": "step-next", disabled: blocked,
+        onclick: () => api.submit(),
+      }, [
+        icon("sparkles", { size: 18 }), blocked ? "还有一题没聊完" : "生成三个礼物思路",
       ]),
     ]),
   ], "gw-attach--summary");
@@ -851,7 +1079,10 @@ function answeredAttach(q) {
 /** “我”的回答：有已选标签时用一句简短的话，避免与标签重复。 */
 function meText(q) {
   const f = form();
-  if (q.kind === "multi" && q.list().length) return `选好了，${q.list().length} 项`;
+  if (q.kind === "multi" && q.list().length) {
+    const picked = q.options().filter(o => q.list().includes(o.id)).map(o => o.label);
+    return picked.length > 3 ? `${picked.slice(0, 3).join("、")} 等 ${picked.length} 项` : picked.join("、");
+  }
   if (q.kind === "avoid" && f.exclusion_tags.length) return f.dislikes.trim() ? `就这些，还有「${f.dislikes.trim()}」` : "就这些";
   if (q.kind === "confirm") return "都对";
   return q.answer();
@@ -862,6 +1093,16 @@ function meText(q) {
 function introGroup() {
   return el("li", { class: "gw-turn gw-turn--intro" }, [botGroup(["嗨，我是小礼。问你几个小问题，点选项就能答。"])]);
 }
+/** 一次自然语言交流：（当时被问的题若已被填掉，则先显示那句提问）→ 用户原话 → 小礼一句回应。 */
+function exchangeTurn(x) {
+  const c = chat();
+  const asked = byId(x.asked);
+  const showAsk = asked && (c.viaParse || []).includes(asked.id) && asked.id !== x.before;
+  return el("li", { class: "gw-turn gw-turn--past gw-turn--exchange" }, [
+    showAsk ? botGroup(asked.ask()) : null,
+    meGroup(x.said),
+  ]);
+}
 function pastTurn(q, enter) {
   const edit = el("button", { type: "button", class: "gw-edit", "aria-label": `修改这一项：${q.ask().at(-1)}`, "data-field": `edit-${q.id}`, onclick: () => reopen(q.id) }, [
     icon("edit", { size: 12 }), "改一下",
@@ -871,11 +1112,21 @@ function pastTurn(q, enter) {
 function currentTurn(q, typing, entering) {
   const c = chat();
   const turn = el("li", { class: `gw-turn gw-turn--current${typing ? " is-typing" : ""}${entering ? " is-entering" : ""}`, "data-question": q.id });
+  if (c.parsing) {
+    turn.append(botGroup(botTexts(q)), meGroup(c.pendingSaid), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
+      botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
+        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]),
+      ])]),
+    ]));
+    return turn;
+  }
   if (q.kind === "confirm" && (c.analyzing || (!st().analysis && !c.analysisError))) {
     if (!st().analysis && !c.analyzing) setTimeout(runAnalysis, 0);
-    turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
+    turn.append(botGroup(exclusionQuestions(st().analysis).length ? exclusionQuestions(st().analysis) : [ackFor(q)].filter(Boolean)),
+      ...(c.pendingExclusionContinuation ? [meGroup(c.pendingExclusionContinuation.answer)] : []),
+      el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
       botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
-        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]), el("span", { class: "gw-typing__text", text: "正在理解你写的话…" }),
+        el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]),
       ])]),
     ]));
     return turn;
@@ -883,13 +1134,19 @@ function currentTurn(q, typing, entering) {
   let texts = botTexts(q);
   if (q.kind === "confirm") {
     const a = st().analysis;
-    texts = c.analysisError ? [c.analysisError]
-      : a.status !== "needs_confirmation" ? ["这句话我还没完全理解。", ...(a.errors || []).map(e => e.message).filter(Boolean).slice(0, 2)]
-      : [ackFor(q), "关于要避开的，我是这样理解的，帮我逐条确认一下："].filter(Boolean);
+    texts = a?.status === "needs_input" ? [...(exclusionQuestions(a).length ? exclusionQuestions(a) : ["这条要求里，你最希望我注意的是什么？"]), c.analysisError].filter(Boolean)
+      : c.analysisError ? [c.analysisError]
+      : a?.status !== "needs_confirmation" ? ["这条要求还在整理，请稍后再试。"]
+      : [ackFor(q), "要避开的，我拆成了下面几项，帮我确认一下：",
+        // 没能拆成具体项的那部分（例：「不适合初次见面送的」）不丢：用户的原话会原样带进挑选。
+        ...(a.unmapped_notes?.length ? ["其余的要求，挑的时候我会照着你的原话来。"] : [])].filter(Boolean);
   }
   if (q.kind === "summary") texts = [ackFor(q), "我把你说的整理成了一张心意清单，看看对不对："].filter(Boolean);
   turn.append(typingGroup(), botGroup(texts, currentAttach(q)));
-  for (const n of c.notes) turn.append(n.role === "me" ? meGroup(n.text) : botGroup([n.text], null, "gw-group--note"));
+  // notes 里的 bot 项可以是多行（解析回执），逐条渲染成紧贴的气泡。
+  for (const n of c.notes) {
+    turn.append(n.role === "me" ? meGroup(n.text) : botGroup([].concat(n.texts || n.text).filter(Boolean), null, "gw-group--note"));
+  }
   return turn;
 }
 
@@ -897,11 +1154,12 @@ function currentTurn(q, typing, entering) {
 
 function panelHead() {
   const c = chat();
-  // 进度与右侧心意清单共用同一口径（固定 9 项），不随条件追问题增减。
-  const filled = SHEET.filter(item => sheetValue(item)).length;
+  // 进度与心意清单共用实际显示项；未指定时间不占一项。
+  const items = visibleSheet();
+  const filled = items.filter(item => sheetValue(item)).length;
   const q = current();
-  const at = SHEET.findIndex(item => item.covers.includes(q.id));
-  const p = { done: q.kind === "summary", index: at >= 0 ? at + 1 : Math.min(filled + 1, SHEET.length), total: SHEET.length };
+  const at = items.findIndex(item => item.covers.includes(q.id));
+  const p = { done: q.kind === "summary", index: at >= 0 ? at + 1 : Math.min(filled + 1, items.length), total: items.length };
   return el("header", { class: "gw-chat-head" }, [
     botAvatar("lg"),
     el("div", { class: "gw-chat-head__id" }, [
@@ -915,7 +1173,7 @@ function panelHead() {
     el("button", {
       type: "button", class: "gw-sheet-pill", "aria-expanded": String(Boolean(c.sheetOpen)), "aria-controls": "gw-sheet", "data-field": "sheet-pill",
       onclick: () => { c.sheetOpen = !c.sheetOpen; api.render(); },
-    }, [icon("ribbon", { size: 15 }), `清单 ${filled}/${SHEET.length}`]),
+    }, [icon("ribbon", { size: 15 }), `清单 ${filled}/${items.length}`]),
     el("button", {
       type: "button", class: `gw-icon-btn${c.confirmRestart ? " is-armed" : ""}`, "data-field": "chat-restart",
       "aria-label": c.confirmRestart ? "再点一次清空并重新开始" : "重新开始", title: c.confirmRestart ? "再点一次清空重来" : "重新开始",
@@ -934,19 +1192,20 @@ function sheet(q) {
   const c = chat();
   const opening = Boolean(c.sheetOpen) && !sheetWasOpen;
   sheetWasOpen = Boolean(c.sheetOpen);
-  const active = SHEET.find(item => item.covers.includes(q.id))?.qid;
+  const items = visibleSheet();
+  const active = items.find(item => item.covers.includes(q.id))?.qid;
   const ready = q.kind === "summary";
-  const filled = SHEET.filter(item => sheetValue(item)).length;
+  const filled = items.filter(item => sheetValue(item)).length;
   return el("aside", { class: `gw-sheet${c.sheetOpen ? " is-open" : ""}${opening ? " is-opening" : ""}`, id: "gw-sheet", "aria-label": "心意清单" }, [
     el("button", { type: "button", class: "gw-sheet__scrim", "aria-label": "关闭清单", tabindex: "-1", onclick: () => { c.sheetOpen = false; api.render(); } }),
     el("div", { class: "gw-sheet__card" }, [
       el("div", { class: "gw-sheet__head" }, [
         el("p", { class: "gw-sheet__eyebrow" }, [icon("ribbon", { size: 15 }), "心意清单"]),
-        el("span", { class: "gw-sheet__count", text: `${filled} / ${SHEET.length}` }),
+        el("span", { class: "gw-sheet__count", text: `${filled} / ${items.length}` }),
         el("button", { type: "button", class: "gw-icon-btn gw-sheet__close", "aria-label": "关闭清单", onclick: () => { c.sheetOpen = false; api.render(); } }, [icon("x", { size: 16 })]),
       ]),
       el("p", { class: "gw-sheet__title", text: "边聊边记下来" }),
-      el("ul", { class: "gw-sheet__list" }, SHEET.map(item => {
+      el("ul", { class: "gw-sheet__list" }, items.map(item => {
         const value = sheetValue(item);
         const fresh = Boolean(value) && sheetMemo.has(item.qid) && sheetMemo.get(item.qid) !== value;
         sheetMemo.set(item.qid, value || "");
@@ -979,6 +1238,7 @@ function composer(q) {
     id: q.kind === "avoid" ? "dislikes" : "chat-input", class: "gw-composer__input", rows: "1",
     placeholder: spec?.placeholder || PLACEHOLDERS[q.id] || "直接打字回答也可以",
     "aria-label": spec?.aria || "回答当前问题", "data-field": spec?.field || "chat-input", enterkeyhint: "send",
+    disabled: q.kind === "confirm" && c.analyzing,
     oninput: e => { c.draft = e.target.value; grow(e.target); },
     onkeydown: e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } },
   });
@@ -992,7 +1252,7 @@ function composer(q) {
     }, [text]))) : null,
     el("form", { class: "gw-composer", onsubmit: e => { e.preventDefault(); send(); } }, [
       input,
-      el("button", { type: "submit", class: "gw-composer__send", "aria-label": "发送" }, [icon("send", { size: 18 })]),
+      el("button", { type: "submit", class: "gw-composer__send", "aria-label": "发送", disabled: q.kind === "confirm" && c.analyzing }, [icon("send", { size: 18 })]),
     ]),
   ]);
 }
@@ -1047,10 +1307,17 @@ export function renderChat() {
     c.draft = q.kind === "avoid" ? form().dislikes : q.kind === "text" ? q.get() : "";
   }
   const log = el("ol", { class: "gw-log", role: "log", "aria-live": "polite", "aria-label": "和小礼的对话" }, [introGroup()]);
+  const exchangesBefore = id => (c.exchanges || []).filter(x => x.before === id).map(exchangeTurn);
   for (const item of applicable()) {
+    if (item.kind === "confirm") {
+      for (const turn of c.exclusionTurns) log.append(el("li", { class: "gw-turn gw-turn--past" }, [botGroup(turn.questions), meGroup(turn.answer)]));
+    }
     if (item === q) break;
+    log.append(...exchangesBefore(item.id));
+    if ((c.viaParse || []).includes(item.id)) continue;
     log.append(pastTurn(item, c.enterMe === item.id));
   }
+  log.append(...exchangesBefore(q.id));
   c.enterMe = null;
   const turn = currentTurn(q, typing, entering);
   log.append(turn);

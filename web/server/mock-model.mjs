@@ -211,7 +211,6 @@ export function buildMockCandidates(request) {
  */
 export function buildMockRevision(request, candidates, validation) {
   const budgetCents = centsOf(request.budget_amount);
-  const availableDays = typeof request.available_days === "number" ? request.available_days : null;
   const forbiddenTags = new Set(Array.isArray(request.forbidden_tags) ? request.forbidden_tags : []);
   const forbiddenTerms = (Array.isArray(request.forbidden_terms) ? request.forbidden_terms : []).map((t) => t.normalize("NFKC").toLowerCase());
   const changed = [];
@@ -242,14 +241,6 @@ export function buildMockRevision(request, candidates, validation) {
       revised.name = `${revised.name}（改小规格）`;
       revised.reason = `${revised.reason}（据首次检查反馈改为更小规格以符合预算上限）`;
       notes.push("改为更小规格以符合预算上限");
-    }
-    if (codes.has("PREPARATION_TOO_LONG") || codes.has("INVALID_TYPE")) {
-      if (availableDays !== null) {
-        revised.estimated_preparation_days = availableDays;
-        revised.name = `${revised.name}（改为现货速购）`;
-        revised.reason = `${revised.reason}（据首次检查反馈改为现货速购以符合可用天数）`;
-        notes.push("改为现货速购以符合可用天数");
-      }
     }
     changed.push({ id: candidate.id, notes });
     return revised;
@@ -349,7 +340,7 @@ export function buildMockPresentation(request, candidate, options = {}) {
     const presentation = {
       contract_version: "giftwise-20261031-v2",
       style: isPursuit ? "低压力、简洁" : "简洁实用",
-      packaging: { color_palette: attempt === 2 ? ["原色", "米白"] : ["米白", "浅木色", "雾霾蓝"] },
+      packaging: { color_palette: attempt === 2 ? ["原色", "米白"] : ["米白", "浅木色", "雾霾蓝"], description: `模拟呈现示例：可把${candidate.name}自然交给对方，并附上下面的贺卡说明；本示例不要求采购包装材料。` },
       card_text: flavor.card_text,
       giving_advice: { timing: flavor.timing, wording: flavor.wording, relationship_cautions: flavor.cautions },
       unknowns: ["实际价格、库存、配送时效均未核实"],

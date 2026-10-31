@@ -1,5 +1,8 @@
-/* 自托管手写字体（SIL OFL 1.1，许可见 /fonts/OFL-*.txt）。子集脚本按站内文字 + GB2312 汉字生成，
+/* 自托管手写字体（SIL OFL 1.1，许可见 /fonts/OFL-*.txt）。子集按站内文字 + GB2312 汉字生成，
    缺字时回退系统中文字体。font-display: swap 保证首帧可读。 */
 @font-face { font-family: "GW WenKai"; src: url("/fonts/wenkai-regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "GW WenKai"; src: url("/fonts/wenkai-medium.woff2") format("woff2"); font-weight: 500 900; font-style: normal; font-display: swap; }
+/* 龙藏拆两段（同一 family）：longcang-ext 为站内未用到的 GB2312 汉字，只在页面真正出现这些字时才下载；
+   站内字段放在后面声明，浏览器优先匹配它，缺字再落到 ext，避免动态文字与文楷混排。 */
+@font-face { font-family: "GW LongCang"; src: url("/fonts/longcang-ext.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF; }
 @font-face { font-family: "GW LongCang"; src: url("/fonts/longcang.woff2") format("woff2"); font-weight: 400 900; font-style: normal; font-display: swap; }

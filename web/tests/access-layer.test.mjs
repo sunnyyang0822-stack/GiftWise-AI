@@ -160,24 +160,20 @@ test("其他关系与其他场合必须填写自定义文本并冻结到 request
   }
 });
 
-test("天数允许 0，但拒绝浮点、布尔与缺失；不静默填 7 天", () => {
-  const zero = baseIntake();
-  zero.deadline_days = 0;
-  const zeroResult = adaptIntakeObject(zero);
-  assert.equal(zeroResult.status, "ready");
-  assert.equal(strictParse(zeroResult.request_json).available_days, 0);
-
-  const float = adaptIntake('{"recipient_relation":"pursuit","deadline_days":2.0,"budget_amount":"200.00","currency":"CNY","occasion":"birthday"}');
-  assert.equal(float.status, "needs_input");
-  assert.ok(float.errors.some((e) => e.code === "INVALID_TYPE" && e.path === "request.available_days"));
-
-  const bool = adaptIntake('{"recipient_relation":"pursuit","deadline_days":true,"budget_amount":"200.00","currency":"CNY","occasion":"birthday"}');
-  assert.ok(bool.errors.some((e) => e.code === "INVALID_TYPE"));
-
-  const missing = baseIntake();
-  delete missing.deadline_days;
-  const missingResult = adaptIntakeObject(missing);
-  assert.ok(missingResult.errors.some((e) => e.code === "INTAKE_CLARIFICATION_REQUIRED"));
+test("时间可省略或未知，合法天数只作参考，不伪造默认值", () => {
+  for (const value of [undefined, null, "不确定", "", -1, 366, 1.5, true, {}, []]) {
+    const intake = baseIntake();
+    if (value === undefined) delete intake.deadline_days;
+    else intake.deadline_days = value;
+    const result = adaptIntakeObject(intake);
+    assert.equal(result.status, "ready", JSON.stringify(result.errors));
+    assert.equal(strictParse(result.request_json).available_days, null);
+  }
+  for (const days of [0, 1, 365]) {
+    const result = adaptIntakeObject({ ...baseIntake(), deadline_days: days });
+    assert.equal(result.status, "ready");
+    assert.equal(strictParse(result.request_json).available_days, days);
+  }
 });
 
 test("首版仅 CNY，非 CNY 被拒且不换汇", () => {
@@ -376,28 +372,32 @@ test("推荐：预算过小时先自动修订一次，仍失败则无可选方�
 test("推荐：全部候选触犯禁忌且无替代时，无可选方案，失败如实报告", async () => {
   const intake = baseIntake();
   intake.hard_exclusions = { tags: ["alcohol", "food", "fragrance", "jewelry", "plant", "other"], terms: [], unresolved: [] };
-  const { report } = await runRecommendation({ intake });
-  assert.deepEqual(report.selectable_candidate_ids, []);
-  assert.equal(report.status, "failed");
-  assert.equal(report.repair_count, 1);
-  assert.ok(report.candidates.every((c) => c.tags.some((t) => intake.hard_exclusions.tags.includes(t)) === false || true));
+  const outcome = await runRecommendation({ intake });
+  assert.equal(outcome.kind, "recommendation_failed");
+  assert.equal(outcome.report, undefined);
+  assert.deepEqual(outcome.run.selectable_candidate_ids, []);
+  assert.equal(outcome.run.status, "failed");
+  assert.equal(outcome.run.repair_count, 1);
+  assert.ok(outcome.run.validation.candidate_results.some(r => !r.passed && r.errors.length > 0));
 });
 
 test("推荐：模拟模型输出损坏 JSON 时不伪装为完成", async () => {
-  const { report } = await runRecommendation({ intake: baseIntake(), demo: "model_error" });
-  assert.equal(report.status, "error");
-  assert.deepEqual(report.selectable_candidate_ids, []);
-  assert.equal(report.all_passed, undefined);
-  assert.ok(report.validation.errors.some((e) => e.code === "INVALID_JSON" || e.code === "INVALID_CANDIDATE_COUNT"));
+  const outcome = await runRecommendation({ intake: baseIntake(), demo: "model_error" });
+  assert.equal(outcome.kind, "recommendation_failed");
+  assert.equal(outcome.report, undefined);
+  assert.equal(outcome.run.status, "error");
+  assert.deepEqual(outcome.run.selectable_candidate_ids, []);
+  assert.ok(outcome.run.validation.errors.some((e) => e.code === "INVALID_JSON" || e.code === "INVALID_CANDIDATE_COUNT"));
 });
 
-test("推荐：部分通过时失败项不可选，系统不自动替选", async () => {
-  const { report } = await runRecommendation({ intake: baseIntake(), demo: "partial_fail" });
-  assert.equal(report.status, "failed");
-  assert.equal(report.repair_count, 1);
-  const failed = report.candidates.filter((c) => !report.selectable_candidate_ids.includes(c.id));
-  assert.ok(failed.length >= 1, "应至少有一个失败候选");
-  assert.ok(!report.selectable_candidate_ids.includes(failed[0].id));
+test("推荐：部分通过时整批不作为最终结果，保留真实校验", async () => {
+  const outcome = await runRecommendation({ intake: baseIntake(), demo: "partial_fail" });
+  assert.equal(outcome.kind, "recommendation_failed");
+  assert.equal(outcome.report, undefined);
+  assert.equal(outcome.run.repair_count, 1);
+  assert.deepEqual(outcome.run.selectable_candidate_ids, []);
+  assert.ok(outcome.run.validation.candidate_results.some(r => !r.passed));
+  assert.ok(outcome.errors.some(e => e.code === "RECOMMENDATION_INCOMPLETE"));
 });
 
 test("推荐：输入不完整时返回 needs_input 且不生成候选", async () => {
@@ -425,7 +425,9 @@ async function readyRun(extra = {}) {
 }
 
 test("选择：未通过项、伪造 ID、空选择都被拒绝，并给出中文原因", async () => {
-  const run = await readyRun({ demo: "partial_fail" });
+  const outcome = await runRecommendation({ intake: baseIntake(), demo: "partial_fail" });
+  assert.equal(outcome.kind, "recommendation_failed");
+  const run = outcome.run;
   const failedId = run.candidates.map((c) => c.id).find((id) => !run.selectable_candidate_ids.includes(id));
 
   const notPassed = await runPresentation({ runId: run.run_id, selectedCandidateId: failedId });

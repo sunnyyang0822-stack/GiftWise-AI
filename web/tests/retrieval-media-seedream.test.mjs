@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm,mkdir} from 'node:fs/promises';
-import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {MediaProvider} from '../server/media/provider.mjs';
+import {mintReferenceGrant} from '../server/media/plan.mjs';
 import {MediaTaskStore} from '../server/media/task-store.mjs';
 import {SeedreamProvider,ImageProviderError} from '../server/media/seedream.mjs';
 const png=()=>{const bytes=Buffer.alloc(33);Buffer.from([137,80,78,71,13,10,26,10]).copy(bytes);bytes.write('IHDR',12);bytes.writeUInt32BE(32,16);bytes.writeUInt32BE(24,20);return bytes;};
@@ -11,8 +11,48 @@ const run=()=>({run_id:'fixture-run',owner_scope:'owner-A',mode:'dify',media_gen
 async function withStore(fn){const root=new URL('../../.tmp/',import.meta.url);await mkdir(root,{recursive:true});const dir=await mkdtemp(join((await import('node:url')).fileURLToPath(root),'giftwise-media-test-'));try{return await fn(new MediaTaskStore(dir),dir);}finally{await rm(dir,{recursive:true,force:true});}}
 const response=()=>new Response(JSON.stringify({model:'doubao-seedream-4-5-251128',data:[{b64_json:png().toString('base64'),size:'32x24'}],usage:{generated_images:1,output_tokens:3,total_tokens:3}}),{headers:{'content-type':'application/json'}});
 const provider=overrides=>new SeedreamProvider({apiKey:()=> 'fixture-key-not-secret',fetchImpl:async()=>response(),...overrides});
-test('平台请求字段、images为安全读取后的data URL，不使用image参数',async()=>{let body;const product={product_id:'p',variant:'蓝色'};const p=provider({referenceHosts:['example.com'],imageReader:async()=>({bytes:png(),type:'image/png'}),fetchImpl:async(url,opts)=>{assert.equal(url,'https://api.modelverse.cn/v1/images/generations');assert.equal(opts.redirect,'error');body=JSON.parse(opts.body);return response();}});const result=await p.generate({prompt:'受控测试',product,references:[{product_id:'p',variant:'蓝色',url:'https://example.com/i.png',permission:{status:'approved',usage_basis:'fixture only',evidence_ref:'permission-fixture'}}]});assert.ok(body.images[0].startsWith('data:image/png;base64,'));assert.equal(body.image,undefined);assert.equal(body.size,'2K');assert.equal(body.watermark,true);assert.equal(body.stream,false);assert.equal(body.response_format,'b64_json');assert.equal(body.sequential_image_generation,'disabled');assert.equal(result.actual_model,'doubao-seedream-4-5-251128');assert.equal(result.width,32);assert.equal(result.usage.generated_images,1);});
-test('无参考图许可、错SKU、危险URL不调用供应商',async()=>{let calls=0;const p=provider({fetchImpl:async()=>{calls++;return response();}});for(const ref of [{product_id:'p',variant:'蓝色',url:'https://127.0.0.1/i'},{product_id:'p',variant:'蓝色',url:'https://127.0.0.1/i',permission:{status:'approved',usage_basis:'test',evidence_ref:'x'}},{product_id:'other',variant:'蓝色',url:'https://example.com/i',permission:{status:'approved',usage_basis:'test',evidence_ref:'x'}}])await assert.rejects(p.generate({prompt:'fixture',product:{product_id:'p',variant:'蓝色'},references:[ref]}));assert.equal(calls,0);});
+// Server-side authorized fixture, scoped to this synthetic selected product only.
+const reference=(extra={},permission={})=>({product_id:'p',variant:'蓝色',url:'https://example.com/i.png',kind:'source_photo',usable_as_generation_reference:true,...extra,
+  permission:{...mintReferenceGrant(run(),'c1'),status:'approved',scope:'selected_product',product_id:'p',variant:'蓝色',usage_basis:'controlled fixture only',evidence_ref:'permission-fixture',...permission}});
+
+test('平台请求字段、images为安全读取后的data URL，不使用image参数',async()=>{
+  let body;
+  const product={product_id:'p',variant:'蓝色'};
+  const p=provider({referenceHosts:['example.com'],imageReader:async()=>({bytes:png(),type:'image/png'}),fetchImpl:async(url,opts)=>{assert.equal(url,'https://api.modelverse.cn/v1/images/generations');assert.equal(opts.redirect,'error');body=JSON.parse(opts.body);return response();}});
+  const result=await p.generate({prompt:'受控测试',product,references:[reference()]});
+  assert.ok(body.images[0].startsWith('data:image/png;base64,'));
+  assert.equal(body.image,undefined);assert.equal(body.size,'2K');assert.equal(body.watermark,false);assert.equal(body.stream,false);assert.equal(body.response_format,'b64_json');assert.equal(body.sequential_image_generation,'disabled');
+  assert.equal(result.actual_model,'doubao-seedream-4-5-251128');assert.equal(result.width,32);assert.equal(result.usage.generated_images,1);
+});
+
+test('无参考图许可、非来源图、错SKU、错误凭据和危险URL均不调用供应商',async()=>{
+  let calls=0;
+  const p=provider({fetchImpl:async()=>{calls++;return response();}});
+  const cases=[
+    [{...reference(),permission:null},'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({kind:'page_capture'}),'IMAGE_REFERENCE_NOT_USABLE'],
+    [reference({usable_as_generation_reference:false}),'IMAGE_REFERENCE_NOT_USABLE'],
+    [reference({product_id:'other'}),'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({}, {scope:'all_products'}),'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({}, {variant:'红色'}),'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({}, {grant_id:''}),'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({}, {granted_at:'invalid'}),'IMAGE_REFERENCE_NOT_AUTHORIZED'],
+    [reference({url:'https://127.0.0.1/i.png'}),'IMAGE_REFERENCE_BLOCKED'],
+  ];
+  for(const [ref,code] of cases) await assert.rejects(p.generate({prompt:'fixture',product:{product_id:'p',variant:'蓝色'},references:[ref]}),error=>error.code===code&&error.execution==='not_submitted');
+  assert.equal(calls,0);
+});
+
+test('合法凭据一次消费，重复使用不再次读图或提交供应商',async()=>{
+  let calls=0,reads=0;
+  const p=provider({imageReader:async()=>{reads++;return {bytes:png()};},fetchImpl:async()=>{calls++;return response();}});
+  const ref=reference();
+  const input={prompt:'fixture',product:{product_id:'p',variant:'蓝色'},references:[ref]};
+  await p.generate(input);
+  await assert.rejects(p.generate(input),error=>error.code==='IMAGE_REFERENCE_CREDENTIAL_REUSED');
+  assert.equal(calls,1);assert.equal(reads,1);
+});
+
 test('超时为执行未知且无自动重试、返回错误不泄露原文',async()=>{let calls=0;const p=provider({timeoutMs:5,fetchImpl:async(url,opts)=>{calls++;return new Promise((resolve,reject)=>opts.signal.addEventListener('abort',()=>reject(new Error('sensitive vendor text'))));}});await assert.rejects(p.generate({prompt:'fixture'}),e=>e.code==='IMAGE_EXECUTION_UNKNOWN'&&e.execution==='unknown'&&!e.message.includes('sensitive'));assert.equal(calls,1);});
 test('供应商异常、多图、错误base64及尺寸不符均拒绝',async()=>{for(const payload of [{error:{message:'secret'}},{data:[{},{}]},{data:[{b64_json:'<html>'}]},{model:'doubao-seedream-4-5-251128',data:[{b64_json:png().toString('base64'),size:'99x99'}],usage:{generated_images:1}}])await assert.rejects(provider({fetchImpl:async()=>new Response(JSON.stringify(payload))}).generate({prompt:'fixture'}));});
 test('未选/不合格/模拟运行/呈现未通过均不能计费',async()=>withStore(async store=>{let calls=0;const transport={available:()=>true,generate:async()=>{calls++;throw Error();}};const p=new MediaProvider({store,transport});for(const change of [r=>r.selected_candidate_id=null,r=>r.selectable_candidate_ids=[]]){const r=run();change(r);await assert.rejects(p.packaging(r,'c1'));}const r=run();r.media_generation_authorized=false;assert.equal((await p.packaging(r,'c1')).status,'unavailable');const failed=run();failed.presentation.recheck.passed=false;await assert.rejects(p.packaging(failed,'c1'));assert.equal(calls,0);}));

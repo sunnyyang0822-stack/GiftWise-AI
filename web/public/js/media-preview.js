@@ -1,65 +1,87 @@
-// Issue #60 sidecar 草案夹具。仅供界面预览，不是检索证据或图像服务响应。
-const variant = new URLSearchParams(globalThis.location?.search || "").get("media");
-const names = ["notebook", "workshop", "art", "letter", "walk", "memories"];
-const photos = {
-  notebook: ["notebook-photo", "PNW Production", "open-notebook-on-white-background-8250925"],
-  workshop: ["workshop-photo", "Chris Flaten", "ceramic-bowls-on-white-studio-background-5514832"],
-  art: ["art-photo", "Kaboompics", "a-white-empty-frame-8947628"],
-};
-const scenes = {
-  notebook: ["scene-light", "Ivan Vi", "white-gift-box-with-black-ribbon-lying-on-a-table-19791016", [
-    ["暖白纸面，干净就很好", .23, .76, .23, .23],
-    ["深色缎带，轻轻点睛", .37, .58, .72, .35],
-    ["折角收得利落些", .12, .89, .73, .9],
-  ]],
-  workshop: ["scene-hexagon", "Kaboompics", "wrapped-with-ribbon-gift-box-placed-on-table-4397882", [
-    ["跟着轮廓，不必套方盒", .43, .68, .26, .32],
-    ["缎带留一点自然弧度", .61, .66, .76, .46],
-    ["柔和的粉，衬一抹深蓝", .63, .8, .26, .91],
-  ]],
-  art: ["scene-paper", "Taryn Elliott", "christmas-gift-on-a-wooden-table-6119116", [
-    ["牛皮纸，朴素也温柔", .24, .35, .25, .1],
-    ["细绳打个轻巧的结", .35, .32, .76, .19],
-    ["把祝福放在一旁", .59, .53, .78, .68],
-  ]],
-};
-const photoImage = (id, file, author, slug, alt) => ({ id, version: `preview-${file}-20261031`, url: `/img/media-demo/${file}.jpg`, kind: "demo", alt,
-  source_url: `https://www.pexels.com/photo/${slug}/`,
-  attribution: `摄影：${author} / Pexels`,
-});
-const image = (name, alt, wrapped = false) => ({
-  id: `demo-${wrapped ? "wrap-" : ""}${name}`,
-  url: `/img/media-demo/${wrapped ? "wrap-" : ""}${name}.svg`, kind: "demo", alt,
-  source_url: null, attribution: "插画：GiftWise AI",
-});
+// Issue #60 sidecar 草案夹具。仅供界面预览（?preview=1），不是检索证据或图像服务响应。
+//
+// 2026-10-31 调整（前端真实接入 · 答辩风险处置）：
+//   这里原来用 Pexels 素材伪造商品图（kind:"demo"，url 指向 /img/media-demo/*.jpg）
+//   并配一组 SVG 占位插画。media-view.js 的 kind 表里 demo 的标注是空字符串，
+//   所以这些图**没有任何标注**，在页面上会被读成"已经联通真实商品图"。
+//   现在删除全部伪造图，预览模式如实返回"没有图片"：
+//   候选卡片只显示方案文字与「暂无图片，文字结果仍可查看。」。
+//   正式链路的图片只能来自后端响应，且只有两种被允许的形态：
+//     · kind:"source_photo"  真实抓取到的商品图（带真实 source_url 与来源署名）
+//     · kind:"ai_illustration" 明确标注「AI 效果示意」的生成图（带"非商品实拍"声明）
+//   前端不再自己造任何一张图。
+
+const unknown = () => ({ status: "unknown", value: null, unit: null, sources: [] });
+
+/**
+ * 预览夹具：候选侧的检索/媒体绑定。
+ * 不生成任何图片：image_id 与 image 恒为 null，与后端
+ * retrieval/evidence.mjs（image_id:null）在未启用真实检索时的表现一致。
+ * @param {Array<{id:string,name:string,estimated_total:string}>} candidates
+ * @param {boolean} zero 是否为零预算路径（保留入参以兼容调用方；不再影响图片）
+ */
 export function recommendationMedia(candidates, zero = false) {
-  const products = candidates.map((c, i) => ({ product_id: `demo-product-${names[i + (zero ? 3 : 0)]}`, name: c.name,
-    variant: null, quantity: 1, price_amount: c.estimated_total, currency: "CNY",
-    price_conditions: [], price_source: "seed",
-    source_url: null, observed_at: null, image_id: variant === "missing" ? null : `demo-${names[i + (zero ? 3 : 0)]}`,
-    price_range: null, shipping_status: "unknown", stock_status: "unknown", evidence_ref: null,
+  const list = Array.isArray(candidates) ? candidates : [];
+  const products = list.map((c, i) => ({
+    product_id: `preview-product-${i + 1}`,
+    name: c.name,
+    variant: null,
+    quantity: 1,
+    price_amount: c.estimated_total,
+    currency: "CNY",
+    price_conditions: [],
+    price_source: "seed",
+    source_url: null,
+    observed_at: null,
+    image_id: null,
+    price_range: null,
+    shipping_status: "unknown",
+    stock_status: "unknown",
+    evidence_ref: null,
   }));
   return {
-    retrieval: { status: "unavailable", evidence_id: null, products, warnings: [] },
-    media: { status: variant === "pending" ? "pending" : "ready", candidates: candidates.map((c, i) => ({
-      candidate_id: c.id, product_id: products[i].product_id,
-      image: variant === "missing" ? null : !zero ? photoImage(`demo-${names[i]}`, ...photos[names[i]], `${c.name}`) : image(names[i + 3], `${c.name}`),
-    })), selected: null },
+    retrieval: {
+      status: "unavailable",
+      evidence_id: null,
+      products,
+      warnings: ["预览模式不提供真实商品图与真实来源；这些标签只用于检查页面接线。"],
+    },
+    media: {
+      contract_version: "retrieval-media-v2",
+      status: "unavailable",
+      candidates: list.map((c, i) => ({ candidate_id: c.id, product_id: products[i].product_id, image: null })),
+      selected: null,
+    },
   };
 }
+
+/**
+ * 预览夹具：选定后的媒体视图。
+ * image 恒为 null、annotations 恒为空 —— 预览模式不画任何包装效果图。
+ * packaging.description 只是文本演示，且明确写了「不生成效果图」，不冒充图像服务输出。
+ */
 export function selectedMedia(report, candidate) {
-  const binding = report.media.candidates.find(item => item.candidate_id === candidate.id);
-  const name = binding?.product_id.replace("demo-product-", "");
-  const scene = scenes[name] || scenes[{ letter: "notebook", walk: "workshop", memories: "art" }[name]];
-  const selectedImage = scene && variant !== "missing" ? photoImage(`demo-wrap-${name}`, ...scene.slice(0, 3), `${candidate.name}的包装与赠礼场景`) : null;
-  const unknown = () => ({ status: "unknown", value: null, unit: null, sources: [] });
-  return { contract_version: "retrieval-media-v2", status: selectedImage ? "ready" : "unavailable", candidates: report.media.candidates, selected: { candidate_id: candidate.id,
-    task_id: `preview-media-${report.recommendation_run_id}-${candidate.id}`, product_id: binding?.product_id || null, status: selectedImage ? "ready" : "unavailable",
-    image: selectedImage,
-    physical: { dimensions: unknown(), shape: unknown(), weight: unknown(), fragility: unknown(), materials: unknown() },
-    packaging: { form: name === "workshop" || name === "walk" ? "irregular" : name === "art" || name === "memories" ? "paper_wrap" : "combination", description: "顺着礼物的形状包，不硬套方盒；留一点缎带的自然弧度。", scale: { status: "illustrative", note: null } },
-    scene: { description: "礼物为主体，保留完整造景、自然光影与背景。", props: ["背景植物、桌面和摄影道具"], props_are_included: false, text_baked_in: false },
-    unknowns: [],
-    annotations: selectedImage ? (scene?.[3] || []).map(([text, x, y, lx, ly], i) => ({ id: `detail-${i + 1}`, image_version: selectedImage.version, text_style: "handwritten", curve: null, text, target: { x, y }, label: { x: lx, y: ly } })) : [],
-  } };
+  const binding = (report.media?.candidates || []).find(item => item.candidate_id === candidate.id);
+  return {
+    contract_version: "retrieval-media-v2",
+    status: "unavailable",
+    candidates: report.media?.candidates || [],
+    selected: {
+      candidate_id: candidate.id,
+      // 预览模式没有真实生图任务，因此没有可轮询的 64 位十六进制 task_id。
+      task_id: null,
+      product_id: binding?.product_id || null,
+      status: "unavailable",
+      image: null,
+      physical: { dimensions: unknown(), shape: unknown(), weight: unknown(), fragility: unknown(), materials: unknown() },
+      packaging: {
+        form: "undetermined",
+        description: "预览模式不生成包装效果图；正式链路会基于所选礼物给出包装与配色建议。",
+        scale: { status: "illustrative", note: null },
+      },
+      scene: { description: null, props: [], props_are_included: false, text_baked_in: false },
+      unknowns: ["预览模式没有图像服务；本屏图片位留空，文字仅用于检查页面接线"],
+      annotations: [],
+    },
+  };
 }

@@ -231,6 +231,22 @@ body.gw-chat-active .actions { display: none !important; }
 .gw-attach--summary .greeting-card__sign { margin: 8px 0 16px; font-size: 26px; }
 .gw-attach--summary .gw-cta { position: relative; z-index: 1; }
 
+/* ------------------------------ 第 1 步解析在结算卡上的区块（原话 / 覆盖 / 必答） */
+.gw-summary__note { margin: 0 0 10px; font-size: 13px; line-height: 1.6; color: var(--gw-color-text-secondary); overflow-wrap: anywhere; }
+.gw-summary__note--strong { padding: 8px 12px; border-radius: 12px; background: rgb(33 67 122 / 6%); color: var(--gw-color-text); font-size: 14px; }
+.gw-parse-block { display: grid; gap: 6px; margin: 0 0 12px; padding: 12px 14px; border: 1px solid rgb(16 16 17 / 10%); border-radius: 12px; background: rgb(255 255 255 / 70%); }
+.gw-parse-block--required { border-color: rgb(160 28 35 / 28%); background: rgb(160 28 35 / 4%); }
+.gw-parse-block__title { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: .02em; }
+.gw-parse-block__list { display: grid; gap: 4px; margin: 0; padding-left: 18px; font-size: 15px; line-height: 1.55; }
+.gw-parse-block__list li { overflow-wrap: anywhere; }
+.gw-parse-block__ask { margin: 0; font-size: 15px; line-height: 1.55; color: var(--gw-color-text); overflow-wrap: anywhere; }
+.gw-parse-block__why { margin: 0; font-size: 13px; line-height: 1.55; color: var(--gw-color-text-secondary); overflow-wrap: anywhere; }
+.gw-parse-block__quote { margin: 0 0 10px; font-family: var(--gw-font-hand); font-size: 19px; line-height: 1.4; color: var(--gw-color-accent-blue); overflow-wrap: anywhere; }
+.gw-parse-block__row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.gw-parse-block__input { flex: 1 1 160px; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(16 16 17 / 14%); border-radius: var(--gw-radius-pill); background: #fff; color: var(--gw-color-text); font: inherit; font-size: 15px; }
+.gw-parse-block__input:focus-visible { outline: 2px solid var(--gw-color-accent-blue); outline-offset: 1px; }
+.gw-parse-block .gw-opt { justify-self: start; }
+
 /* ---------------------------------------------------------------- 输入区 */
 .gw-chat-input { flex: none; padding: 8px 14px 14px; border-top: 1px solid rgb(16 16 17 / 6%); background: rgb(255 255 255 / 60%); }
 .gw-quick { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: none; }
