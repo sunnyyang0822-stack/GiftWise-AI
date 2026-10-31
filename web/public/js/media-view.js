@@ -7,7 +7,7 @@ const node = (tag, attrs = {}, children = []) => {
   }
   n.append(...children.filter(Boolean)); return n;
 };
-const kinds = { source_photo: "商品来源图", ai_illustration: "AI 效果示意", demo: "" };
+const kinds = { source_photo: "商品来源图", reference_image: "参考图片", ai_illustration: "AI 效果示意", demo: "" };
 // 媒体必须经本站托管；拒绝远程直连、data、脚本URL、调试端口。外部SVG绝不内联。
 export function localMediaUrl(value) {
   if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || /[\\\u0000-\u0020]/.test(value)) return null;
@@ -23,6 +23,17 @@ export function candidateMedia(report, candidate) {
   const bindings = (report.media?.candidates || []).filter(x => x.candidate_id === candidate.id);
   if (bindings.length !== 1) return mediaFigure(null);
   const binding = bindings[0];
+  if (binding.image?.kind === "reference_image") {
+    const references = Array.isArray(report.retrieval?.references) ? report.retrieval.references : [];
+    const matches = typeof binding.reference_id === "string" && binding.reference_id.trim()
+      ? references.filter(reference => reference?.reference_id === binding.reference_id) : [];
+    const reference = matches.length === 1 ? matches[0] : null;
+    if (!reference || reference.image_kind !== "reference_image" || typeof binding.image.id !== "string" || !binding.image.id.trim() || reference.image_id !== binding.image.id
+      || reference.image_validation?.ok !== true || !localMediaUrl(binding.image.url)) return mediaFigure(null);
+    // 公开资料引用独立绑定；不为参考图片制造商品/SKU，也不借用商品价格说明。
+    return mediaFigure({ ...binding.image, reference_id: reference.reference_id, reference_kind: reference.reference_kind,
+      source_url: binding.image.source_url || reference.source_url, observed_at: reference.observed_at ?? binding.image.price_observed_at }, [], report.media?.status);
+  }
   const products = (report.retrieval?.products || []).filter(p => p.product_id === binding.product_id);
   const product = products.length === 1 ? products[0] : null;
   const boundImage = product && product.image_id === binding.image?.id ? binding.image : null;
@@ -80,6 +91,8 @@ function mediaFigure(image, annotations = [], status = "ready", options = {}) {
   //   ⇒ 展示层隐藏、数据层如实：答辩被追问时可以当场从 DOM 或接口字段追到真值。
   //   img 的 alt 仍用后端给的原文（无障碍需要，且图加载失败时会被移除、不会显示成文字）。
   figure.append(...[stage, notice, retry].filter(Boolean));
+  // 新公开参考图显式标注用途，商品图/生成图继续沿用既有展示规则。
+  if (image?.kind === "reference_image") figure.append(node("span", { class: "media-kind", text: kinds.reference_image }));
   if (options.onRefresh) figure.append(node("button", { type: "button", class: "btn media-retry", text: options.refreshing ? "正在更新图片状态" : "刷新图片状态", ...(options.refreshing ? { disabled: "" } : {}), onclick: options.onRefresh }));
   if (image) {
     figure.dataset.imageKind = image.kind || "";
@@ -87,6 +100,9 @@ function mediaFigure(image, annotations = [], status = "ready", options = {}) {
     if (image.version) figure.dataset.imageVersion = image.version;
     if (image.source_url) figure.dataset.imageSourceUrl = image.source_url;
     if (image.attribution) figure.dataset.imageAttribution = image.attribution;
+    if (image.reference_id) figure.dataset.imageReferenceId = image.reference_id;
+    if (image.reference_kind) figure.dataset.imageReferenceKind = image.reference_kind;
+    if (image.observed_at) figure.dataset.imageObservedAt = image.observed_at;
   }
   if (notes.length) {
     const list = node("ol", {}, notes.map(a => node("li", { text: a.text })));
