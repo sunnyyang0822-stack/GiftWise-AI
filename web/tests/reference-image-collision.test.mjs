@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createOpencliToolSession } from '../server/retrieval/agent-tool.mjs';
 import { startReferenceImages } from '../server/retrieval/reference-images.mjs';
+import { LlmProvider } from '../server/llm/provider.mjs';
 
 // Controlled offline metadata only: no image GET, model, browser or fixture presented as live evidence.
 const candidates = ['c1', 'c2', 'c3'].map(id => ({ id, name: `离线方案${id}`, description: `已确认文字${id}` }));
@@ -135,4 +136,25 @@ test('工具回调对象返回后被修改，不能事后污染session与job持�
   assert.deepEqual(run.retrieval.references.find(record => record.reference_id === 'ref_c1'), original);
   assert.deepEqual(run.reference_image_slots.map(slot => slot.status), ['ready', 'ready', 'ready']);
   preservedText(run);
+});
+
+test('同ID后续失败不能移除格式修复清单里的已验证引用，不新增检索', async () => {
+  const good = records(), session = createOpencliToolSession({search: async () => result(++searches === 1 ? good : [failed(good[0])])});
+  let searches = 0, invocations = 0;
+  const provider = new LlmProvider({hasConfig: () => true});
+  provider.invoke = async input => {
+    const round = ++invocations;
+    if(round <= 2) return {ok: true, tool_calls: [{id: `offline-${round}`, type: 'function', function: {name: 'opencli_search', arguments: JSON.stringify(call('unused').arguments)}}]};
+    if(round === 3) return {ok: true, text: 'invalid json', finish_reason: 'stop'};
+    assert.equal(input.kind, 'reference_images_format');
+    assert.equal(input.tool_choice, 'none');
+    const manifest = JSON.parse(input.messages.at(-1).content).allowed_references;
+    assert.deepEqual(manifest, good.map(({reference_id,title,source_url}) => ({reference_id,title,source_url})));
+    return {ok: true, text: JSON.stringify({reference_references: citations(['c1','c2','c3'])}), finish_reason: 'stop'};
+  };
+  const output = await provider.requestReferenceImages({requestJson: '{}', candidates, references: [], missingCandidateIds: ['c1','c2','c3'], tools: session.tools, executeTool: session.executeTool});
+  assert.equal(output.ok, true);
+  assert.equal(output.format_repair_used, true);
+  assert.equal(invocations, 4);
+  assert.equal(searches, 2);
 });

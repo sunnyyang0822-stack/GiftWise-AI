@@ -28,6 +28,9 @@ function validImageUrl(value, role) {
   } catch { return null; }
 }
 
+/** Reuse the reference GET allowlist when retaining previously verified evidence. */
+export function isAllowedReferenceImageUrl(value) { return validImageUrl(value, 'reference') !== null; }
+
 function detailUrl(value, platform) {
   const cfg = DETAILS[platform];
   if (!cfg) return null;

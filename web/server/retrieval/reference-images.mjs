@@ -1,4 +1,4 @@
-import{bindReferenceEvidence}from'./reference-evidence.mjs';
+import{bindReferenceEvidence,isVerifiedReference,mergeReferenceEvidence}from'./reference-evidence.mjs';
 import{publicReferenceUrl}from'../collect/public-reference.mjs';
 
 export function referenceImageSlots(candidates,retrieval,bindings=[],pending=false){
@@ -8,7 +8,7 @@ export function referenceImageSlots(candidates,retrieval,bindings=[],pending=fal
   const b=matches.length===1?matches[0]:null;
   const records=(retrieval.references??[]).filter(r=>r.reference_id===b?.reference_id);
   const r=records.length===1?records[0]:null,key=r?.image_validation?.sha256??r?.image_id;
-  if(b&&r?.reference_kind==='public_reference'&&publicReferenceUrl(r.source_url,'bing')&&r.image_kind==='reference_image'&&r.image_validation?.ok===true&&r.image_validation.width>0&&r.image_validation.height>0&&/^[a-f0-9]{32,64}$/.test(r.image_id??'')&&r.image_id===b.image.id&&b.image.url===`/api/reference/images/${r.image_id}`&&!used.has(key)){used.add(key);return{...b,status:'ready'};}
+  if(b&&isVerifiedReference(r)&&r.image_id===b.image.id&&b.image.url===`/api/reference/images/${r.image_id}`&&!used.has(key)){used.add(key);return{...b,status:'ready'};}
   return{candidate_id:c.id,reference_id:null,image:null,status:pending?'pending':'unavailable'};
  });
 }
@@ -22,6 +22,7 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
  const frozen=JSON.stringify(run.candidates),owner=run.owner_scope,controller=new AbortController();
  const current=()=>isCurrent()&&run.owner_scope===owner&&JSON.stringify(run.candidates)===frozen;
  const initial=referenceImageSlots(run.candidates,run.retrieval,run.media?.candidates??[],true);
+ let retainedReferences=mergeReferenceEvidence([],run.retrieval.references??[]);
  const missing=initial.filter(s=>s.status!=='ready').map(s=>s.candidate_id);
  const job=run.reference_image_job={status:missing.length?'pending':'ready',missing_candidate_ids:missing};
  run.reference_image_slots=initial;run.media={...run.media,candidates:initial};
@@ -43,7 +44,9 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
     if(++attempted>6)return{status:'unavailable',error_code:'REFERENCE_QUERY_LIMIT',references:[]};
     const args=typeof call.arguments==='string'?JSON.parse(call.arguments):call.arguments;
     if(!['reference','inspiration'].includes(args?.purpose)||args?.sources?.includes('dianping'))return{status:'unavailable',error_code:'REFERENCE_SOURCE_ONLY',references:[]};
-    return session.executeTool({...call,arguments:args});
+    const observation=await session.executeTool({...call,arguments:args});
+    retainedReferences=mergeReferenceEvidence(retainedReferences,observation.references??[]);
+    return observation;
    }});
    const cancelled=new Promise((_,reject)=>{if(controller.signal.aborted)reject(Error('REFERENCE_CANCELLED'));else controller.signal.addEventListener('abort',()=>reject(Error('REFERENCE_CANCELLED')),{once:true});});
    const result=await Promise.race([request,cancelled]);
@@ -51,7 +54,7 @@ export function startReferenceImages(run,{requestImages,session,requestJson,inta
    if(!current()||controller.signal.aborted)throw Error('REFERENCE_CANCELLED');
    const previous=run.retrieval,latest=session.retrieval;
    const merge=(key,field)=>[...new Map([...(previous[key]??[]),...(latest[key]??[])].map(r=>[r[field],r])).values()];
-   run.retrieval={...previous,...latest,products:merge('products','product_id'),references:merge('references','reference_id'),contents:merge('contents','source_url'),images:merge('images','url')};
+   run.retrieval={...previous,...latest,products:merge('products','product_id'),references:mergeReferenceEvidence(retainedReferences,latest.references??[]),contents:merge('contents','source_url'),images:merge('images','url')};
    if(latest.status==='skipped'&&(run.retrieval.references.length||run.retrieval.products.length))run.retrieval.status='partial';
    const citations=(Array.isArray(result.reference_references)?result.reference_references:[]).filter(r=>r&&typeof r==='object'&&missing.includes(r.candidate_id));
    const selected=bindingsFromReferences(run.retrieval.references??[],run.candidates,citations);

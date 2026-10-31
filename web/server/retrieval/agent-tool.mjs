@@ -2,6 +2,7 @@ import { normalizeRetrievalPlan } from './query-plan.mjs';
 import { DOMESTIC_CONTENT_SOURCES } from '../collect/domestic-content.mjs';
 import { retrievalView } from '../store.mjs';
 import {createSourceAvailabilityTracker}from'./source-availability.mjs';
+import {mergeReferenceEvidence}from'./reference-evidence.mjs';
 
 /** The model chooses whether to call; the server only validates and executes this fixed tool. */
 export function createOpencliToolSession({ search, signal, auditStore=null } = {}) {
@@ -16,7 +17,7 @@ export function createOpencliToolSession({ search, signal, auditStore=null } = {
   function merge(result){
     const dedup=(records,key)=>[...new Map(records.map(r=>[r[key],r])).values()];
     aggregate={...aggregate,status:result.status,evidence_id:result.evidence_id??aggregate.evidence_id,
-      products:dedup([...aggregate.products,...(result.products??[])],'product_id'),references:dedup([...aggregate.references,...(result.references??[])],'reference_id'),contents:dedup([...aggregate.contents,...(result.contents??[])],'source_url'),source_availability:result.source_availability??aggregate.source_availability,
+      products:dedup([...aggregate.products,...(result.products??[])],'product_id'),references:mergeReferenceEvidence(aggregate.references,result.references??[]),contents:dedup([...aggregate.contents,...(result.contents??[])],'source_url'),source_availability:result.source_availability??aggregate.source_availability,
       images:dedup([...aggregate.images,...(result.images??[])],'url'),coverage:[...aggregate.coverage,...(result.coverage??[])]};
   }
   async function executeTool(call) {

@@ -1,3 +1,24 @@
+import {publicReferenceUrl} from '../collect/public-reference.mjs';
+import {isAllowedReferenceImageUrl} from '../collect/domestic-detail.mjs';
+
+/** A retained image must still satisfy the source and image URL boundaries. */
+export function isVerifiedReference(record) {
+ return record?.reference_kind==='public_reference'&&!!publicReferenceUrl(record.source_url,'bing')&&
+  record.image_kind==='reference_image'&&record.image_validation?.ok===true&&
+  record.image_validation.width>0&&record.image_validation.height>0&&/^[a-f0-9]{32,64}$/.test(record.image_id??'')&&
+  [record.image_url,record.image_validation.final_url].every(url=>url==null||isAllowedReferenceImageUrl(url));
+}
+
+/** Keep the entire first verified observation, never splice new URLs into old validation. */
+export function mergeReferenceEvidence(previous=[],observations=[]) {
+ const records=new Map();
+ for(const record of [...previous,...observations]){
+  if(!record||typeof record.reference_id!=='string')continue;
+  if(!isVerifiedReference(records.get(record.reference_id)))records.set(record.reference_id,structuredClone(record));
+ }
+ return [...records.values()];
+}
+
 /** Explicit model citations bind public inspiration, never SKU evidence. */
 export function bindReferenceEvidence(records=[],candidates=[],references=[]) {
  const bindings=new Map(),rejected=[],seen=new Set();
