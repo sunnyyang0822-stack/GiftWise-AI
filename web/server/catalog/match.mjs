@@ -258,6 +258,8 @@ export function matchCandidates(candidates, { dbPath, budgetAmount = null, maxIt
             source: 'localdb.product_page',
           },
           evidence_ref: `localdb:${chosen.product.product_id}`,
+          specifications:chosen.product.specifications??null,
+          image_validation:chosen.product.image_validation??null,
           attribution: `真实商品来源：${chosen.product.source_site}${chosen.product.seller ? ` / ${chosen.product.seller}` : ''}（页面观察价，非结算价）`,
         },
       });

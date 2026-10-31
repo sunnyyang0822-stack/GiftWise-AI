@@ -55,7 +55,7 @@ export function normalizeDomesticRecord(id, record, ctx = {}) {
   if (!product_url || !clean(record.title)) return null;
   const price_text = clean(record.price_text || record.price) || null;
   // 保留区间、起批、券后等原文；区间或条件价不能静默变为确定报价。
-  const amount = price_text?.match(/^(?:[¥￥]\s*|人民币\s*)?(\d[\d,]*(?:\.\d+)?)\s*(?:元)?$/);
+  const amount = price_text?.replace(/\s+/g,'').match(/^(?:[¥￥]|人民币)?(\d[\d,]*(?:\.\d+)?)(?:元)?$/);
   const observed = ctx.scrapedAt || ctx.observedAt;
   const scraped_at = observed && Number.isFinite(Date.parse(observed)) ? observed : null;
   return {
@@ -64,13 +64,13 @@ export function normalizeDomesticRecord(id, record, ctx = {}) {
     title: clean(record.title), price_text, price_amount: amount ? amount[1].replace(/,/g, '') : null,
     currency: price_text ? 'CNY' : null,
     price_unit: clean(record.price_unit) || price_text?.match(/(?:元|[¥￥])\s*\/\s*([^\s，,;；]+)/)?.[1] || null,
-    price_conditions: [...new Set([...(Array.isArray(record.price_conditions) ? record.price_conditions.filter(v => typeof v === 'string') : []), ...(price_text?.match(/券后|补贴后|起批|起|预售|定金|会员价/g) || []), ...(clean(record.moq_text) ? [clean(record.moq_text)] : [])])],
+    price_conditions: [...new Set([...(Array.isArray(record.price_conditions) ? record.price_conditions.filter(v => typeof v === 'string') : []), ...(price_text?.match(/券后|补贴后|起批|起|预售|定金|会员价/g) || []), ...((record.raw_card_text||record.native_record?.title||'').match(/首单到手价|新人专享福利|新客专享|券后价|会员专享/g)||[]), ...(clean(record.moq_text) ? [clean(record.moq_text)] : [])])],
     seller: clean(record.seller || record.seller_name || record.shop) || null,
     location: clean(record.location) || null, specifications: clean(record.specifications || record.condition) || null,
     product_url, image_url: allowedUrl(record.image_url, ['alicdn.com', '360buyimg.com', 'jd.com', 'pddpic.com', 'pinduoduo.com', 'byteimg.com', 'douyinpic.com', 'kwaicdn.com', 'kwimgs.com', 'vipstatic.com', 'suning.cn', 'suning.com', 'xiaomiyoupin.com', 'youpin.mi-img.com', 'mi-img.com', 'dewu.com', 'poizon.com', 'geilicdn.com', 'dangdang.com'], product_url),
     scraped_at, price_observed_at: scraped_at,
     query_params: { keyword: ctx.keyword ?? null, city: ctx.city ?? null, page: ctx.page ?? 1 },
-    raw_excerpt: { price: price_text, moq_text: clean(record.moq_text) || null },
+    raw_excerpt: { price: price_text, moq_text: clean(record.moq_text) || null,original_title:record.native_record?.title??record.title,raw_card_text:record.raw_card_text??null,native_record:record.native_record??null },
   };
 }
 
@@ -78,7 +78,7 @@ export function normalizeDomesticRecord(id, record, ctx = {}) {
 export function buildDomesticReadScript(id) {
   const p = DOMESTIC_PLATFORMS[id];
   if (!p) throw new TypeError('不支持的国内来源');
-  return `(${readDomesticDom.toString()})(${JSON.stringify({ domains: [...p.domains, p.source_site, ...(id === 'tmall' ? ['taobao.com'] : [])], links: p.links, cards: p.cards })})`;
+  return `(${readDomesticDom.toString()})(${JSON.stringify({ id, domains: [...p.domains, p.source_site, ...(id === 'tmall' ? ['taobao.com'] : [])], links: p.links, cards: p.cards })})`;
 }
 
 function readDomesticDom(config) {
@@ -103,23 +103,43 @@ function readDomesticDom(config) {
     seen.add(url);
     records.push({ title, url, price_text: priceText, image_url: img?.currentSrc || img?.getAttribute('data-src') || img?.src || null, shop: text(card.querySelector('[class*="shop"], [class*="Shop"]')) || null, location: text(card.querySelector('[class*="location"], [class*="procity"]')) || null });
   }
-  return { status: blocked ? 'restricted' : records.length ? 'ok' : loginPage ? 'login_required' : !sameSite ? 'redirected' : 'empty_or_selector_changed', url: location.origin + location.pathname, title: document.title, records, total_text: text(document.querySelector('.search-total, .total, [class*="totalCount"]')) || null, next_available: Boolean(document.querySelector('a[rel="next"], a.next:not(.disabled), .page-next:not(.disabled)')) };
+  // Installed OpenCLI jd/search reads the newer result DOM by data-sku rather than anchors.
+  if(config.id==='jd'&&sameSite&&!blocked&&records.length===0)for(const card of document.querySelectorAll('div[data-sku]')){
+    const sku=card.getAttribute('data-sku');if(!/^\d+$/.test(sku||''))continue;
+    const raw=text(card);if(raw.length<10)continue;
+    const image=card.querySelector('img');
+    const price=raw.match(/[¥￥]\s*([\d,.]+)/);
+    const title=text(card.querySelector('.p-name, [class*="title"], [class*="Title"]'))||image?.alt|| (price?raw.slice(0,raw.indexOf(price[0])).trim():'');
+    if(!title)continue;
+    records.push({sku,title,price_text:text(card.querySelector('.p-price, [class*="price"]'))||(price?price[0]:null),
+      url:'https://item.jd.com/'+sku+'.html',image_url:image?.getAttribute('data-lazy-img')||image?.getAttribute('data-src')||image?.currentSrc||image?.src||null,
+      shop:text(card.querySelector('[class*="shop"], [class*="Shop"]'))||null,raw_card_text:raw.slice(0,2000)});
+  }
+  return { status: blocked ? 'restricted' : records.length ? 'ok' : loginPage ? 'login_required' : !sameSite ? 'redirected' : 'empty_or_selector_changed', url: location.origin + location.pathname, title: document.title, records, total_text: text(document.querySelector('.search-total, .total, [class*="totalCount"]')) || null, pagination_observed:Boolean(document.querySelector('.p-wrap, .page, [class*="pagination"], [class*="Pagination"]')), next_available: Boolean(document.querySelector('a[rel="next"], a.next:not(.disabled), .page-next:not(.disabled)')) };
 }
 
 /** 有界查询覆盖报告。失败为增强信息，不应被上层当作阻止模型建议的业务条件。 */
-export async function runDomesticSearch(page, { platform: id, keyword, city, pages, maxPages = 50, waitMs = 2500, signal, onProgress = () => {} } = {}) {
+export async function runDomesticSearch(page, { platform: id, keyword, city, pages, maxPages = 50, waitMs = 2500, signal, onProgress = () => {}, packageRoot } = {}) {
   const platform = DOMESTIC_PLATFORMS[id];
   if (!platform) throw new TypeError('不支持的国内来源');
   const requested = Math.min(pages == null ? pageNumber(maxPages) : pageNumber(pages), pageNumber(maxPages));
   const report = { platform: id, capability: platform.capability, status: 'empty_or_selector_changed', records: [], pages_requested: pages ?? null, safety_page_limit: requested, pages_completed: 0, pages: [], limitations: [], observed_at: new Date().toISOString(), complete: false, reported_total: null };
   const seen = new Set();
   let exhausted = false;
+  let nativeRecords=[];
   for (let n = 1; n <= requested; n++) {
     if (signal?.aborted) { report.status = 'cancelled'; report.limitations.push('本次检索已取消'); break; }
     if (n > 1 && platform.pagination === 'first_page_only') { report.limitations.push('该Web入口尚未核实分页，仅访问首屏'); break; }
     const url = platform.searchUrl(keyword, city, n);
     try {
-      await page.goto(url);
+      if(id==='jd'&&n===1&&packageRoot){
+        const {importOpencli}=await import('./domestic-browser.mjs');
+        await importOpencli(packageRoot,'clis/jd/search.js');
+        const {getRegistry}=await importOpencli(packageRoot,'dist/src/registry-api.js');
+        const native=await getRegistry().get('jd/search').func(page,{query:keyword,limit:30});
+        nativeRecords=native;
+        report.native_capability='opencli jd/search';report.native_returned=native.length;report.native_limit=30;
+      }else await page.goto(url);
       if (page.wait) await page.wait(Math.min(10000, Math.max(0, Number(waitMs) || 0)) / 1000);
       const result = await page.evaluate(buildDomesticReadScript(id));
       const entry = { page: n, requested_url: url, observed_at: new Date().toISOString(), ...result };
@@ -131,13 +151,13 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
       report.pages_completed++;
       const previousCount = report.records.length;
       for (const raw of result.records || []) {
-        const record = platform.normalize(raw, { keyword, city, page: n, scrapedAt: entry.observed_at });
+        const record = platform.normalize({...raw,native_record:nativeRecords.find(r=>r.sku===raw.sku)??null}, { keyword, city, page: n, scrapedAt: entry.observed_at });
         if (record && !seen.has(record.product_url)) { seen.add(record.product_url); report.records.push(record); }
       }
       onProgress({ ...report, records: undefined });
       if (platform.pagination === 'first_page_only') { report.limitations.push('仅已加载首屏，尚未核实滚动/分页覆盖，不声明查询全量'); break; }
       if (n > 1 && report.records.length === previousCount) { report.limitations.push('分页返回重复条目，已停止且不声明全量'); break; }
-      if (result.next_available === false) { exhausted = true; break; }
+      if (result.next_available === false) { exhausted = result.pagination_observed === true; if(!exhausted)report.limitations.push('未观察到可核实分页控件，结果完整性未知'); break; }
     } catch (error) {
       report.status = 'failed';
       report.pages.push({ page: n, requested_url: url, status: 'failed', error_code: error.code || 'PAGE_READ_FAILED' });

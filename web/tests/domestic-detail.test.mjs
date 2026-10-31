@@ -62,14 +62,15 @@ function detailDom({ price = '¥39.90', currency = '¥', specifications = [], im
   const node = (value, recommended = false) => ({ innerText: value, closest: () => recommended ? {} : null });
   const gallery = (url, recommended = false) => ({ closest: () => recommended ? {} : null, getAttribute: name => name === 'data-origin' ? url : null });
   const root = { querySelectorAll: selector => {
-    if (selector === '.sku-name') return [node('推荐区错误商品', true), node('当前商品名称')];
+    if (selector.startsWith('.sku-name')) return [node('推荐区错误商品', true), node('当前商品名称')];
     if (selector.startsWith('.summary-price .')) return price ? [node(price)] : [];
-    if (selector === '.summary-price') return [node(currency)];
+    if (selector.startsWith('.summary-price,')) return [node(currency)];
+    if(selector==='.specification-item-sku-text')return [];
     if (selector.startsWith('#choose-attrs')) return specifications.map(s => node(s));
     if (selector.startsWith('#spec-n1')) return [gallery('https://img10.360buyimg.com/recommended.png', true), gallery(image)];
     throw new Error('不应读取全页或非固定商品区域');
   } };
-  return vm.runInNewContext(buildDomesticDetailReadScript('jd'), { location: new URL('https://item.jd.com/123.html'), document: { body: { innerText: '' }, querySelector: selector => { assert.equal(selector, '.product-intro'); return root; } } });
+  return vm.runInNewContext(buildDomesticDetailReadScript('jd'), { location: new URL('https://item.jd.com/123.html'), document: { body: { innerText: '' }, querySelector: selector => { assert.match(selector,/^\.product-intro/); return root; } } });
 }
 
 test('仅当前商品gallery/标题/已选SKU；原图GET完成才输出绑定图片', async () => {

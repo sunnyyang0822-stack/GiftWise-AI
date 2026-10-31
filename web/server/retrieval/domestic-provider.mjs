@@ -3,18 +3,21 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { createDomesticPage, opencliPackageRoot, opencliVersion } from '../collect/domestic-browser.mjs';
 import { searchDianping } from '../collect/dianping.mjs';
-import { openDb, startRun, finishRun, upsertProduct, addProductImages, REPO_ROOT } from '../localdb/db.mjs';
+import { openDb, startRun, finishRun, upsertProduct, addProductImages, productId, REPO_ROOT } from '../localdb/db.mjs';
 import { taskDatabasePath } from '../collect/task-paths.mjs';
-import { isDomesticProduct } from '../catalog/db.mjs';
+import { isDomesticProduct,imageIdOf } from '../catalog/db.mjs';
+import { unknownPhysical } from '../media/scene.mjs';
+import { enrichDomesticDetail } from '../collect/domestic-detail.mjs';
+import { cacheSourceImage } from '../catalog/source-image-cache.mjs';
 
 function asEvidence(record, source) {
-  const id = createHash('sha256').update(`${source}|${record.product_url}`).digest('hex').slice(0, 32);
+  const id = productId(record);
   return { ...record, product_id: id, name: record.name || record.title,
     variant: record.variant || '', quantity: record.quantity ?? 1,
     price_source: 'browser_observed', source_url: record.product_url,
     observed_at: record.observed_at || record.scraped_at || new Date().toISOString(),
     evidence_ref: `${source}:${id}`, stock_status: 'unknown', shipping_status: 'unknown',
-    image_id: null, source_platform: source };
+    image_id: record.image_validation?.ok&&record.image_url?imageIdOf(id,record.image_url):null, physical: unknownPhysical(), source_platform: source };
 }
 function saveRecords(db, records, coverage, version) {
   const runId = startRun(db, { source_site: records[0]?.source_site || coverage.source,
@@ -25,12 +28,13 @@ function saveRecords(db, records, coverage, version) {
     db.exec('BEGIN');
     for (const record of records) {
       if (!record.title || !record.product_url) continue;
-      const row = { ...record, run_id: runId, scraped_at: record.scraped_at || new Date().toISOString(),
+      const row = { ...record,image_url:record.image_validation?.ok?record.image_url:null, run_id: runId, scraped_at: record.scraped_at || new Date().toISOString(),
         raw_excerpt: { ...record.raw_excerpt, record_kind: record.record_kind, price_unit: record.price_unit ?? null,
           variant: record.variant ?? null, city: record.city ?? null, address: record.address ?? null,
-          packages: record.packages ?? [], page_kind: record.page_kind ?? 'search', coverage } };
+          packages: record.packages ?? [], specifications:record.specifications??null,image_validation:record.image_validation??null,
+          image_provenance:record.image_provenance??null,detail_observation:record.detail_observation??null,page_kind: record.page_kind ?? 'search', coverage } };
       const { product_id } = upsertProduct(db, row);
-      if (record.image_url) addProductImages(db, product_id, [{ url: record.image_url, kind: 'main', position: 0, alt: record.title }],
+      if (record.image_url&&record.image_validation?.ok) addProductImages(db, product_id, [{ url: record.image_url, kind: 'main', position: 0, alt: record.title }],
         { capability: record.capability, scraped_at: row.scraped_at, run_id: runId });
       count++;
     }
@@ -52,10 +56,11 @@ function saveContent(db, records, coverage, version) {
 export class DomesticProvider {
   constructor(options = {}) { this.options = options; }
   async search(plan, options = {}) { return runDomesticSearch(plan, { ...this.options, ...options }); }
+  async details(records,options={}){return runDomesticDetails(records,{...this.options,...options});}
 }
 export async function runDomesticSearch(plan, {
   dbPath, packageRoot, signal, timeoutMs = 90000, port = 19366, headless = true,
-  profileDir = join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
+  profileDir = process.env.GW_DOMESTIC_PROFILE || join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
   pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
 } = {}) {
   const products = [], contents = [], images = [], coverage = [], warnings = [];
@@ -98,7 +103,7 @@ export async function runDomesticSearch(plan, {
           : source === 'dianping'
           ? await dianpingSearch(page, { ...query, packageRoot: root, maxPages, signal: controller.signal, onProgress })
           : await (platformSearch ?? searchPlatform)(page, { platform: source, keyword: query.keyword, city: query.city ?? null,
-            maxPages, signal: controller.signal, onProgress });
+            maxPages, signal: controller.signal, onProgress, packageRoot: root });
         const sourceCoverage = { source, keyword: query.keyword, city: query.city ?? null,
           ...(outcome.coverage && typeof outcome.coverage === 'object' ? outcome.coverage : {}) };
         // Some adapter versions expose coverage at the top level; preserve its exact completion statement.
@@ -136,4 +141,31 @@ export async function runDomesticSearch(plan, {
     evidence_id: unique.length ? createHash('sha256').update(unique.map(p => p.product_id).join('|')).digest('hex').slice(0, 32) : null,
     products: unique, contents: [...new Map(contents.map(c => [c.source_url, c])).values()], images,
     coverage, warnings, recommendations_available: true, enrichment_only: true, opencli_version: version ?? null, audit: plan?.audit ?? null };
+}
+
+/** Detail URLs must come from this task's observed product records, never from model URLs. */
+export async function runDomesticDetails(records,{
+ dbPath,signal,port=19366,profileDir=process.env.GW_DOMESTIC_PROFILE||join(REPO_ROOT,'.tmp/domestic-profile'),
+ headless=true,pageFactory=createDomesticPage,
+}={}){
+ const products=[],coverage=[];let page,db;
+ try{
+  if(dbPath)db=openDb(taskDatabasePath(dbPath));
+  page=await pageFactory({port,profileDir,headless,signal});
+  for(const record of records){
+   if(signal?.aborted)break;
+   if(!isDomesticProduct(record))continue;
+   const source=record.source_platform;
+   const detail=await enrichDomesticDetail(page,record,{platform:source,signal,fetchImpl:page.fetchImage,includeImageBytes:true});
+   const validation=detail.image_validation;
+   const evidence=asEvidence({...detail,name:detail.title||record.name,variant:detail.specifications||'',capability:record.capability},source);
+   if(validation?.bytes&&validation.ok&&evidence.image_id)cacheSourceImage(evidence.image_id,validation);
+   if(validation){const {bytes,...metadata}=validation;detail.image_validation=metadata;evidence.image_validation=metadata;}
+   const observed={source,keyword:record.query_params?.keyword??null,status:detail.detail_observation?.status??'unavailable',pages_completed:1,complete:true,
+    observed_count:1,image_status:validation?.ok?'validated':validation?.error_code??'missing',detail:detail.detail_observation};
+   coverage.push(observed);products.push(evidence);
+   if(db)saveRecords(db,[{...detail,name:evidence.name,variant:evidence.variant}],observed,null);
+  }
+ }finally{await page?.close?.();db?.close();}
+ return{status:products.length?'partial':'unavailable',products,contents:[],images:[],coverage,warnings:[],enrichment_only:true};
 }

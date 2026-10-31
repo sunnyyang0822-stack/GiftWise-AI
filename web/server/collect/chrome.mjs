@@ -14,7 +14,7 @@
  *   - 不执行任何登录动作。
  */
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, appendFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { REPO_ROOT } from '../localdb/db.mjs';
 import { taskPath, taskDirectory, taskProcessEnv } from './task-paths.mjs';
@@ -90,7 +90,9 @@ export async function ensureChrome({ port = 19360, profileDir, headless = true, 
     'about:blank',
   ];
   log(`启动项目专用浏览器：${exe}（profile=${profile}，端口 ${port}，仅本机，${headless ? '后台' : '可见登录窗口'}）`);
-  const child = spawn(exe, args, { env: childEnv, cwd: REPO_ROOT, stdio: 'ignore', windowsHide: headless, detached: false, shell: false });
+  const startupLog = taskPath(join(runtimeDir, 'chrome-startup.txt'));
+  const child = spawn(exe, args, { env: childEnv, cwd: REPO_ROOT, stdio: ['ignore','ignore','pipe'], windowsHide: headless, detached: false, shell: false });
+  child.stderr.on('data', data => appendFileSync(startupLog, data));
   let spawnError;
   child.on('error', error => { spawnError = error; });
   child.unref?.();

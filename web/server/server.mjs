@@ -23,6 +23,8 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, extname } from "node:path";
+import {readSourceImage,cacheSourceImage,SOURCE_IMAGE_TYPES} from './catalog/source-image-cache.mjs';
+import {validateSourceImage} from './collect/domestic-detail.mjs';
 
 import {
   MODE,
@@ -180,7 +182,7 @@ const CATALOG_IMAGE_HOSTS = new Set([
   "img30.360buyimg.com",
   "img.alicdn.com",
 ]);
-const IMAGE_EXT_BY_TYPE = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" };
+const IMAGE_EXT_BY_TYPE = SOURCE_IMAGE_TYPES;
 
 /**
  * 读取（必要时抓取并缓存）本地库里登记的商品图，然后**原样**回给浏览器。
@@ -210,13 +212,10 @@ async function serveCatalogImage(imageId, res) {
       return false;
     }
     if (parsed.protocol !== "https:" || !CATALOG_IMAGE_HOSTS.has(parsed.hostname)) return false;
-    const response = await fetch(parsed, { redirect: "error", signal: AbortSignal.timeout(8000) });
-    if (!response.ok) return false;
-    const type = (response.headers.get("content-type") || "").split(";")[0].trim();
-    if (!IMAGE_EXT_BY_TYPE[type]) return false;
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (bytes.length === 0 || bytes.length > 8 * 1024 * 1024) return false;
-    await writeImageCache(imageId, IMAGE_EXT_BY_TYPE[type], bytes).catch(() => {});
+    const validated=await validateSourceImage(parsed.href,{signal:AbortSignal.timeout(8000),includeBytes:true});
+    if(!validated.ok)return false;
+    const {bytes,mime:type}=validated;
+    cacheSourceImage(imageId,validated);
     res.writeHead(200, { "content-type": type, "content-length": bytes.length, "cache-control": "private, max-age=86400", "x-content-type-options": "nosniff", "content-security-policy": "default-src 'none'" });
     res.end(bytes);
     return true;
@@ -230,16 +229,7 @@ async function serveCatalogImage(imageId, res) {
 }
 
 async function readImageCache(imageId) {
-  for (const [type, ext] of Object.entries(IMAGE_EXT_BY_TYPE)) {
-    const file = join(CATALOG_IMAGE_CACHE, `${imageId}.${ext}`);
-    if (existsSync(file)) return { bytes: await readFile(file), type };
-  }
-  return null;
-}
-
-async function writeImageCache(imageId, ext, bytes) {
-  await mkdir(CATALOG_IMAGE_CACHE, { recursive: true });
-  await writeFile(join(CATALOG_IMAGE_CACHE, `${imageId}.${ext}`), bytes);
+  try{return readSourceImage(imageId);}catch{return null;}
 }
 
 async function readStyleBoard(file) {

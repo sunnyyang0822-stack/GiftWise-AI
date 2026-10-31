@@ -83,6 +83,17 @@ export async function createDomesticPage({ port = 19366, profileDir = join(REPO_
           await new Promise(r => setTimeout(r, delayMs));
         }
       },
+      async fetchImage(url) {
+        // Only the fixed image validator calls this; credentials are explicitly omitted.
+        const tree=await send('Page.getFrameTree');
+        const {resource}=await send('Network.loadNetworkResource',{frameId:tree.frameTree.frame.id,url:String(url),options:{disableCache:false,includeCredentials:false}});
+        if(!resource?.success||!resource.stream)return new Response(null,{status:resource?.httpStatusCode||502});
+        const chunks=[];let length=0;
+        try{while(true){const part=await send('IO.read',{handle:resource.stream,size:65536});const bytes=Buffer.from(part.data,part.base64Encoded?'base64':'utf8');length+=bytes.length;if(length>8*1024*1024)throw new Error('IMAGE_TOO_LARGE');chunks.push(bytes);if(part.eof)break;}}
+        finally{await send('IO.close',{handle:resource.stream});}
+        const headers={};for(const [key,value] of Object.entries(resource.headers??{}))if(['content-type','content-length'].includes(key.toLowerCase()))headers[key]=String(value);
+        return new Response(Buffer.concat(chunks),{status:resource.httpStatusCode||200,headers});
+      },
       async wait(seconds) { await new Promise((r, reject) => { const t = setTimeout(r, seconds * 1000); if (signal?.aborted) { clearTimeout(t); reject(new Error('RETRIEVAL_CANCELLED')); } }); },
       async close() { signal?.removeEventListener('abort', abort); rejectPending('CDP_CLOSED'); ws.close(); await browser.stop(); },
     };

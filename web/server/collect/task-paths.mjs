@@ -41,9 +41,13 @@ export function taskDatabasePath(value) {
 export function taskProcessEnv(base = process.env, runtimeDir = join(REPO_ROOT, '.tmp/domestic-runtime')) {
   const root = taskDirectory(runtimeDir);
   const paths = Object.fromEntries(['temp', 'cache', 'npm-cache', 'opencli-cache', 'home', 'appdata', 'localappdata', 'downloads'].map(name => [name, taskDirectory(join(root, name))]));
+  // Windows known-folder resolution expands USERPROFILE\AppData, even when APPDATA is set.
+  const roaming=taskDirectory(join(paths.home,'AppData','Roaming'));
+  const local=taskDirectory(join(paths.home,'AppData','Local'));
+  for(const folder of ['Desktop','Downloads','Documents'])taskDirectory(join(paths.home,folder));
   return { ...base, TEMP: paths.temp, TMP: paths.temp, TMPDIR: paths.temp,
-    XDG_CACHE_HOME: paths.cache, XDG_CONFIG_HOME: paths.appdata, XDG_DATA_HOME: paths.localappdata,
+    XDG_CACHE_HOME: paths.cache, XDG_CONFIG_HOME: roaming, XDG_DATA_HOME: local,
     npm_config_cache: paths['npm-cache'], OPENCLI_CACHE_DIR: paths['opencli-cache'],
     CHROME_LOG_FILE: taskPath(join(root, 'chrome.log')),
-    USERPROFILE: paths.home, APPDATA: paths.appdata, LOCALAPPDATA: paths.localappdata };
+    USERPROFILE: paths.home, APPDATA: roaming, LOCALAPPDATA: local };
 }

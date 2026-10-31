@@ -96,7 +96,7 @@ export function reset() {
 /** 面向浏览器的最小脱敏视图：不含密钥、不含内部提示。 */
 export function publicReport(run) {
   return {
-    retrieval: run.retrieval || { status: "unavailable", evidence_id: null, products: [], warnings: ["未获取实时价格"] },
+    retrieval: retrievalView(run.retrieval),
     media: run.media || { status: "unavailable", candidates: [], selected: null },
     recommendation_run_id: run.run_id,
     created_at: run.created_at,
@@ -129,6 +129,16 @@ export function publicReport(run) {
     nl_parse: run.nl_parse ?? null,
     limits: { currency: "CNY", note: "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。运输与预售时长为页面原文或保守估算，不构成送达保证。" },
   };
+}
+
+/** Tool choices/failures stay in run.retrieval_audit; source observations remain reviewable. */
+export function retrievalView(retrieval) {
+  if(!retrieval)return {status:'skipped',evidence_id:null,products:[],contents:[],images:[],warnings:[]};
+  const productKeys=['product_id','name','title','variant','quantity','price_amount','price_range','currency','price_unit','price_text','price_conditions','price_source','source_url','product_url','source_site','source_platform','page_kind','observed_at','price_observed_at','image_url','image_id','stock_status','shipping_status','evidence_ref','record_kind','city','address','physical'];
+  const contentKeys=['record_kind','purpose','title','source_url','source_site','source_platform','image_url','image_role','summary','author','location','source_time_text','observed_at'];
+  const pick=(value,keys)=>Object.fromEntries(keys.filter(k=>value[k]!==undefined).map(k=>[k,value[k]]));
+  return {status:retrieval.status,evidence_id:retrieval.evidence_id??null,products:(retrieval.products??[]).map(p=>pick(p,productKeys)),
+    contents:(retrieval.contents??[]).map(c=>pick(c,contentKeys)),images:retrieval.images??[],warnings:[],enrichment_only:true};
 }
 
 /** 商品库视图：只带出可追溯字段，去掉内部路径与整库统计的细节。 */

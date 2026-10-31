@@ -177,6 +177,9 @@ function hydrate(db, row, optional = []) {
   try { const raw = JSON.parse(row.raw_excerpt ?? '{}'); if (raw && typeof raw === 'object' && !Array.isArray(raw)) metadata = raw; } catch {}
   return {
     record_kind: row.record_kind,
+    specifications:metadata.specifications??metadata.detail_specifications??null,
+    image_validation:metadata.image_validation??null,
+    image_provenance:metadata.image_provenance??null,
     price_unit: row.price_unit ?? metadata.price_unit ?? null,
     city: row.city ?? metadata.city ?? null,
     address: row.address ?? metadata.address ?? null,

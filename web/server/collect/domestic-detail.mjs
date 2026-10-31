@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 
 const CDN = ['alicdn.com', '360buyimg.com', 'pddpic.com', 'byteimg.com', 'douyinpic.com', 'kwaicdn.com', 'kwimgs.com', 'vipstatic.com', 'suning.cn', 'mi-img.com', 'youpin.mi-img.com', 'geilicdn.com', 'dangdang.com'];
 const DETAILS = {
-  jd: { host: 'item.jd.com', path: '^/[0-9]+\\.html$', root: '.product-intro', title: '.sku-name', price: '.summary-price .p-price, .summary-price .price', sku: '#choose-attrs .selected, #choose-attrs .item.selected', gallery: '#spec-n1 img, #spec-list img', currency: '.summary-price' },
+  jd: { host: 'item.jd.com', path: '^/[0-9]+\\.html$', root: '.product-intro, .page-content-main', title: '.sku-name, .sku-title-text', price: '.summary-price .p-price, .summary-price .price, .product-price--main', sku: '#choose-attrs .selected, #choose-attrs .item.selected, .specification-item-sku.selected, .specification-item-sku.active, .specification-item-sku[aria-checked="true"]', gallery: '#spec-n1 img, #spec-list img', currency: '.summary-price, .product-price-panel' },
   taobao: { host: 'item.taobao.com', path: '^/item\\.htm$', id: 'id', root: '#detail, [class*="ItemDetail--"]', title: '.tb-main-title, [class*="mainTitle--"]', price: '.tb-property .tb-rmb-num, [class*="Price--priceText"], [class*="priceText--"]', sku: '.tb-sku .tb-selected, [class*="skuItem--"][class*="selected"]', gallery: '#J_ImgBooth, #J_UlThumb img, [class*="mainPic--"] img', currency: '.tb-property, [class*="Price--"], [class*="price--"]' },
   tmall: { host: 'detail.tmall.com', path: '^/item\\.htm$', id: 'id', root: '#detail, [class*="ItemDetail--"]', title: '.tb-detail-hd h1, [class*="mainTitle--"]', price: '.tm-price-panel .tm-price, [class*="Price--priceText"], [class*="priceText--"]', sku: '.tb-sku .tb-selected, [class*="skuItem--"][class*="selected"]', gallery: '#J_ImgBooth, #J_UlThumb img, [class*="mainPic--"] img', currency: '.tm-price-panel, [class*="Price--"], [class*="price--"]' },
   '1688': { host: 'detail.1688.com', path: '^/offer/[0-9]+\\.html$', root: '#mod-detail, .detail-main, #detail', title: '.d-title, .title-text, [class*="title-text"]', price: '.price-component, .price-container, .price-now', sku: '.sku-selector .selected, .sku-item.selected', gallery: '.detail-gallery img, .detail-gallery-preview img, .detail-image-view img', currency: '.price-component, .price-container, .price-now' },
@@ -164,8 +164,26 @@ function webpDimensions(b) {
   return dimensions;
 }
 
-function inspectImage(bytes, mime) {
-  const parsers = { 'image/png': pngDimensions, 'image/jpeg': jpegDimensions, 'image/gif': gifDimensions, 'image/webp': webpDimensions };
+function avifDimensions(b) {
+  if(b.length<32||b.toString('ascii',4,8)!=='ftyp')throw new Error('AVIF');
+  const brandEnd=b.readUInt32BE(0);
+  if(brandEnd>b.length||!/(avif|avis)/.test(b.toString('ascii',8,brandEnd)))throw new Error('AVIF brand');
+  let dimensions=null,media=false;
+  function boxes(start,end,depth=0){
+    if(depth>8)throw new Error('AVIF nesting');
+    for(let p=start;p<end;){if(p+8>end)throw new Error('AVIF box');let size=b.readUInt32BE(p),header=8;const type=b.toString('ascii',p+4,p+8);
+      if(size===1){if(p+16>end)throw new Error('AVIF length');const n=b.readBigUInt64BE(p+8);if(n>BigInt(Number.MAX_SAFE_INTEGER))throw new Error('AVIF length');size=Number(n);header=16;}else if(size===0)size=end-p;
+      if(size<header||p+size>end)throw new Error('AVIF truncated');
+      if(type==='ispe'){if(size<20)throw new Error('AVIF ispe');const width=b.readUInt32BE(p+12),height=b.readUInt32BE(p+16);if(!dimensions)dimensions={width,height};}
+      if(type==='mdat'&&size>header)media=true;
+      if(['meta','iprp','ipco'].includes(type))boxes(p+header+(type==='meta'?4:0),p+size,depth+1);
+      p+=size;
+    }
+  }
+  boxes(0,b.length);if(!dimensions||!media)throw new Error('AVIF incomplete');return dimensions;
+}
+export function inspectImage(bytes, mime) {
+  const parsers = { 'image/png': pngDimensions, 'image/jpeg': jpegDimensions, 'image/gif': gifDimensions, 'image/webp': webpDimensions, 'image/avif': avifDimensions };
   const parser = parsers[mime];
   if (!parser) throw new Error('MIME');
   const dimensions = parser(bytes);
@@ -173,7 +191,7 @@ function inspectImage(bytes, mime) {
   return dimensions;
 }
 
-export async function validateSourceImage(value, { fetchImpl, signal, maxBytes = 8 * 1024 * 1024 } = {}) {
+export async function validateSourceImage(value, { fetchImpl, signal, maxBytes = 8 * 1024 * 1024, includeBytes = false } = {}) {
   const limit = Math.min(20 * 1024 * 1024, Math.max(1, Number(maxBytes) || 8 * 1024 * 1024));
   let url = validImageUrl(value);
   if (!url) return fail('IMAGE_URL_NOT_ALLOWED');
@@ -193,7 +211,7 @@ export async function validateSourceImage(value, { fetchImpl, signal, maxBytes =
       }
       if (!response.ok) { await response.body?.cancel?.(); return fail('IMAGE_HTTP_STATUS', { http_status: response.status }); }
       const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-      if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(mime)) { await response.body?.cancel?.(); return fail('IMAGE_MIME_NOT_ALLOWED', { mime: mime || null }); }
+      if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp','image/avif'].includes(mime)) { await response.body?.cancel?.(); return fail('IMAGE_MIME_NOT_ALLOWED', { mime: mime || null }); }
       const length = Number(response.headers.get('content-length'));
       if (Number.isFinite(length) && length > limit) { await response.body?.cancel?.(); return fail('IMAGE_TOO_LARGE', { mime }); }
       if (!response.body?.getReader) return fail('IMAGE_NO_BODY', { mime });
@@ -211,7 +229,7 @@ export async function validateSourceImage(value, { fetchImpl, signal, maxBytes =
       try {
         const bytes = Buffer.concat(chunks);
         const dimensions = inspectImage(bytes, mime);
-        return { ok: true, mime, ...dimensions, byte_length: size, sha256: createHash('sha256').update(bytes).digest('hex'), error_code: null, final_url: url.href, validation_level: 'signature_structure_dimensions', observed_at: new Date().toISOString() };
+        return { ok: true, mime, ...dimensions, byte_length: size, sha256: createHash('sha256').update(bytes).digest('hex'), error_code: null, final_url: url.href, validation_level: 'signature_structure_dimensions', observed_at: new Date().toISOString(),...(includeBytes?{bytes}:{}) };
       } catch { return fail('IMAGE_INVALID_BYTES', { mime, byte_length: size }); }
     }
   } catch (error) { await reader?.cancel?.().catch(() => {}); return fail(signal?.aborted ? 'IMAGE_ABORTED' : error?.code === 'IMAGE_PRIVATE_ADDRESS' ? error.code : 'IMAGE_GET_FAILED'); }
@@ -238,16 +256,21 @@ function readDetail(cfg) {
   result.price_text = text(first(cfg.price)) || null;
   const currency = text(first(cfg.currency));
   result.currency_evidence = currency.match(/[¥￥]|人民币|CNY|元/)?.[0] || null;
-  result.price_conditions = currency.match(/券后|补贴后|会员价|预售价|定金|起批|起/g) || [];
+  result.price_conditions = currency.match(/首单到手价|新人专享|新客专享|券后|补贴后|会员价|预售价|定金|起批|起/g) || [];
+  result.price_context_text=currency||null;
   result.price_unit = (result.price_text || currency).match(/(?:元|[¥￥])\s*\/\s*([^\s，,;；]+)/)?.[1] || null;
   const specs = Array.from(root.querySelectorAll(cfg.sku)).filter(usable).map(text).filter(Boolean);
+  if(!specs.length&&cfg.host==='item.jd.com'){
+    const exact=Array.from(root.querySelectorAll('.specification-item-sku-text')).map(text).filter(value=>value&&result.title?.endsWith(value)).sort((a,b)=>b.length-a.length);
+    if(exact.length){specs.push(exact[0]);result.specifications_basis='same_sku_detail_title_exact_option';}
+  }
   result.specifications = specs.length ? [...new Set(specs)].join('；') : null;
   const image = first(cfg.gallery);
   result.image_url = image?.getAttribute('data-origin') || image?.getAttribute('jqimg') || image?.getAttribute('data-src') || image?.currentSrc || image?.src || null;
   return { ...result, status: result.title ? 'ok' : 'detail_title_missing' };
 }
 
-export async function enrichDomesticDetail(page, record, { platform, signal, fetchImpl } = {}) {
+export async function enrichDomesticDetail(page, record, { platform, signal, fetchImpl, includeImageBytes = false } = {}) {
   const observation = { platform, page_kind: 'detail', status: 'not_observed', observed_at: new Date().toISOString(), verification_status: 'not_live_verified' };
   const output = { ...record, image_url: null, image_validation: null, image_provenance: null, detail_observation: observation };
   const requested = detailUrl(record?.product_url, platform);
@@ -263,16 +286,21 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
     observation.status = sameProduct ? raw.status : 'detail_product_changed';
     observation.observed_at = new Date().toISOString();
     if (sameProduct && raw.status === 'ok') {
+      observation.verification_status='page_observed';
+      output.page_kind='detail';
       output.title = clean(raw.title) || null;
       output.specifications = clean(raw.specifications) || null;
+      output.specifications_basis=raw.specifications_basis??(output.specifications?'selected_option':null);
       output.price_text = clean(raw.price_text) || null;
       output.currency = output.price_text && raw.currency_evidence ? 'CNY' : null;
-      const price = output.currency ? output.price_text?.match(/^(?:[¥￥]\s*|人民币\s*|CNY\s*)?(\d[\d,]*(?:\.\d+)?)\s*(?:元)?$/) : null;
+      const price = output.currency ? output.price_text?.replace(/\s+/g,'').match(/^(?:[¥￥]|人民币|CNY)?(\d[\d,]*(?:\.\d+)?)(?:元)?$/) : null;
       output.price_amount = price ? price[1].replace(/,/g, '') : null;
       output.price_conditions = [...new Set([...(Array.isArray(raw.price_conditions) ? raw.price_conditions.filter(c => typeof c === 'string') : []), ...(output.price_text?.match(/券后|补贴后|会员价|预售价|定金|起批|起/g) || [])])];
       output.price_unit = clean(raw.price_unit) || null;
       output.price_observed_at = observation.observed_at;
       output.scraped_at = observation.observed_at;
+      output.observed_at=observation.observed_at;
+      output.raw_excerpt={...record.raw_excerpt,detail_price_context:raw.price_context_text??null,detail_specifications:output.specifications,detail_title:output.title};
     }
     if (signal?.aborted) { observation.status = 'aborted'; return output; }
     const detailImage = sameProduct && raw.status === 'ok' && clean(raw.image_url);
@@ -280,7 +308,7 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
     if (candidate) {
       let imageUrl;
       try { imageUrl = new URL(candidate, requested).href; } catch { imageUrl = candidate; }
-      output.image_validation = await validateSourceImage(imageUrl, { fetchImpl, signal });
+      output.image_validation = await validateSourceImage(imageUrl, { fetchImpl, signal,includeBytes:includeImageBytes });
       output.image_provenance = { page_kind: detailImage ? 'detail' : 'search', product_url: requested.href, observed_at: observation.observed_at };
       if (output.image_validation.ok) output.image_url = imageUrl;
     }

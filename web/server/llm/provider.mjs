@@ -196,6 +196,7 @@ export class LlmProvider {
     }
     const envelope = buildRecommendEnvelope({requestJson,intakeJson,retrieval:retrieval && retrieval.status !== 'unavailable' ? retrieval : null,library,inputParse});
     const messages = buildRecommendMessages(envelope);
+    if(registered.size)messages[0].content+='\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部信息时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。采用具体商品时可在最终JSON根对象另附product_references:[{candidate_id,product_id}]，只引用本次结果；对应name写为商品name + " · " + variant，观察价及条件原样尊重，不把新人/首单价当普通结算价。未采用商品的候选无需引用；该sidecar由服务端剥离，不进入严格候选对象。';
     const toolAudit = [];
     const cfg = this.config();
     const redact = (value, depth = 0) => {
