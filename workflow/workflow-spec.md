@@ -1,6 +1,6 @@
 ## 当前增量：retrieval-media-v2（2026-10-31）
 
-本节覆盖旧 v1 的媒体字段、selected=null 降级与曲线暂缺说明；v2 新增 plan_version、execution、annotation_status；其余历史规范仅按各自版本阅读。共享契约唯一写者为后台，基准 PR61@e0c76cad548ffa371287837a36e0fae2a48f0ecf。
+本节采用后台已合入 release 的 retrieval-media-v2；历史 v1 文字仅作兼容背景，不覆盖当前字段。v2 使用 plan_version、execution、annotation_status、physical、image_version 和 curve。共享契约唯一写者为后台，固定基线 f080ad51e0f22ca7384ce3a93f75d0dba91d0508。
 
 - 先“需要避免的”识别/用户确认或澄清，再冻结预算/天数/事实；previous_gifts 独立软历史。合法预算输入不再增加确认框。
 - 受限检索计划仅 category/keywords/limit，当前只支持 confirmed tech_digital → maker/kit。预算在冻结 request，不让模型改写。足三种有据商品后再生成解释；不足前置澄清。
@@ -18,7 +18,7 @@ Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `reque
 
 > retrieval-media-v2 离线增量：冻结需求携带 previous_gifts；生成输入为 retrieval_json，输出独立 product_references_json（candidate_id/product_id）。候选名称、规格、金额和来源由服务端证据绑定，模型不能改写。选后场景消费 physical；media.selected 使用 plan_version、execution、annotation_status，图像有 image_version 后才可绑定 curve 标注。3–5处手写感短中文和细曲箭头由前端叠加；尺寸未知明示比例未核实或澄清，坐标需最终图复核，不把结构合格冒充定位准确。
 
-> #59/#60契约更新：后台PR61@27670b6已提交共享契约v1草案，本线sidecar/商品字段、partial/unavailable及图像门禁按其对齐；此前“契约未提交”仅历史检查状态。release尚未合入，计划/模型引用/provider精确JSON键名仍未规定，保持待后台协调，不造字段、不接真实调用。
+> #59/#60 当前状态：后台 PR #61 已合入 release。工作流按 retrieval-media-v2 消费 sidecar、商品引用和媒体状态；本线不修改共享契约，不把离线夹具当真实 provider 结果。
 
 > Issue #59/#60 离线扩展：冻结需求→受限结构化检索计划→后台专用OpenCLI worker→标准化商品证据→三个商品解释及可信服务端价格绑定→同版独立规则→用户选择→同一礼物包装效果图及中文叠加标注。参见examples/retrieval-media/README.md。后台契约文件未进入基线前仅草案夹具，不调用真实工具。核心严格三候选不变：不足三件有效有据商品走前置不足/澄清，不伪造三项、不把两项送validator。图片失败不阻塞文本报告，选前无包装图任务。来源价非结算保证，图像示意非实拍或安全证据。
 
@@ -26,7 +26,7 @@ Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `reque
 
 VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格式与正式长度限制，已由 PM 在[契约决定](../docs/validator-contract-decisions.md)中锁定。以下涉及这六项的概述以该决定为准；开发与独立测试均应先读取，不能继续视为未决。
 
-更新日期：2026-10-29。状态：设计规范（**2026-10-30 已配置并真实运行，已发布 v1/v2、累计 13 次调用 / 38,326 tokens**）。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。
+更新日期：2026-10-29。状态：设计规范；历史线上运行记录保存在 evidence 文件中，本轮回归不重跑 Dify，不以历史调用替代当前统一 SHA 验证。所有 Agent 应先阅读[统一产品定位](../docs/product-positioning.md)。已检查的本地导出仅含「用户输入 → LLM → 输出」及连接测试提示词，不能据此声称礼赠流程已实现。本轮不生成可导入 DSL；后续必须依据实际 Dify 版本与真实导出格式制作、脱敏并验证。
 
 ## 产品流程与语言
 

@@ -105,3 +105,21 @@ PASS 仅表示固定代码和夹具的离线结构/规则行为。SKIP：Dify、
 - `git diff --check`：PASS。
 
 本轮只改 workflow/prompts 与 workflow/workflow-spec.md；未修改 web/server、web/public 或共享契约。
+
+## RM-003 previous_gifts 生成物回归（本轮）
+
+固定后台合并基线 `f080ad51e0f22ca7384ce3a93f75d0dba91d0508`。复核 `workflow/intake.py` 与 `workflow/generated/intake_node.py`：previous_gifts 已在白名单中，非字符串返回 `INVALID_TYPE`，超过1000 Unicode码点返回 `LIMIT_EXCEEDED`，有效值随 request_json 原样传递；不会写入 hard_exclusions 或 dislikes。Dify 外部变量为 intake_json，request_json 仅由适配层生成。
+
+实际命令与结果：
+
+- `python workflow/build_code_node.py`：PASS，manifest 源码/生成物指纹重建完成，cloud_verified=false。
+- 原始适配器虚构 intake_json 断言：PASS，status=ready，previous_gifts 原样保留，hard_exclusions 未变，dislikes 为空。
+- 生成 `workflow/generated/intake_node.py` 同样断言：PASS。
+- `python workflow/verify_local.py --nov01`：PASS，29 项，cloud_not_verified，model_calls=0。
+- `python workflow/examples/avoid-history/verify.py`：PASS，26 项；历史明确排除门禁仍 BLOCKED（按契约待 PM/接入线）。
+- `python workflow/examples/retrieval-media/verify.py`：PASS，49 项。
+- `python workflow/examples/retrieval-media/verify_v2.py`：PASS；provider/image/visual-coordinate verification SKIP。
+- `python -m unittest discover -s tests -q`：PASS，337 项。
+- `git diff --check`：PASS。
+
+本轮没有 Dify、模型或 provider 调用，model_calls=0，token/延迟/成本未测。历史失败证据未删除。
