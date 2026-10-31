@@ -1,3 +1,6 @@
+import { RetrievalWorker, unavailableProvider } from "./retrieval/worker.mjs";
+import { mediaProvider } from "./media/provider.mjs";
+const retrievalWorker = new RetrievalWorker(unavailableProvider);
 /**
  * 接入层主流程：适配 → （真实/模拟）生成三候选 → 独立规则校验 → 最多一次自动修订 →
  * 等待用户选择 → 选择校验 → 呈现四段 → 呈现复核（含全局修订额度）。
@@ -222,6 +225,8 @@ export async function runRecommendation(input) {
     notices,
     idempotency_key: key,
   });
+  run.retrieval = await retrievalWorker.submit({ category: "home", keywords: [], limit: 3 });
+  run.media = mediaProvider.candidates();
   run.call_counts = callCounts;
   run.demo = demo;
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];
@@ -439,8 +444,9 @@ export async function runPresentation(input) {
 
   run.selected_candidate_id = selectedCandidateId;
   run.presentation = { presentation, recheck };
+  run.media = await mediaProvider.packaging(run, selectedCandidateId);
   run.status = "completed";
-  const view = presentationView(run, candidate, presentation, recheck, extras);
+  const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: run.retrieval, media: run.media };
   run.selections.set(selectedCandidateId, view);
   return { kind: "presentation", run, view };
 }

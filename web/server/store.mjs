@@ -90,6 +90,8 @@ export function reset() {
 /** 面向浏览器的最小脱敏视图：不含密钥、不含内部提示。 */
 export function publicReport(run) {
   return {
+    retrieval: run.retrieval || { status: "unavailable", evidence_id: null, products: [], warnings: ["未获取实时价格"] },
+    media: run.media || { status: "unavailable", candidates: [], selected: null },
     recommendation_run_id: run.run_id,
     created_at: run.created_at,
     mode: run.mode,
