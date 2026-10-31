@@ -1,3 +1,7 @@
+# 当前对齐状态
+
+以后台 PR #61 @ e0c76cad548ffa371287837a36e0fae2a48f0ecf 的 retrieval-media-v2 为准，覆盖下文 v1 历史基准。retrieval_json / product_references_json 两信封不变。product 新增 physical；按来源/status处理，unknown/conflicting 不推成确定事实。媒体字段不进入严格 candidates_json。页面观察价并非结算保证，价格最终由服务端绑定核查；预算只计礼物本体。当前来源仅 confirmed tech_digital 的 maker，其他方向不可假称已有真实检索支持。
+
 # 有来源的三个礼物方案：候选解释阶段
 
 PR61@7204b64718420da2a737610aefec02fbdba02204已明确生成提供者增量（覆盖下文未定义引用形状的历史说明）：真实检索模式增加retrieval_json字符串输入；输出candidates_json仍为原严格三候选JSON，另输出独立product_references_json字符串，其解析值恰为[{candidate_id,product_id}]，每个对象仅这两键。c1/c2/c3一一对应且product_id不重复。候选name严格等于证据name + " · " + variant，estimated_total原样匹配证据price_amount，不裁剪/格式化/降价；这是复制可信证据，不是模型估价。价格最终仍由服务端核对，不能因模型复制就认为可信。

@@ -1,0 +1,204 @@
+{
+  "scope": "offline_v2_contract_fixture_not_provider_request_or_real_image",
+  "backend_contract_commit": "e0c76cad548ffa371287837a36e0fae2a48f0ecf",
+  "plan": {
+    "category": "maker",
+    "keywords": [
+      "kit"
+    ],
+    "limit": 3
+  },
+  "media": {
+    "contract_version": "retrieval-media-v2",
+    "status": "unavailable",
+    "candidates": [],
+    "selected": {
+      "task_id": "offline-task-c1",
+      "status": "unavailable",
+      "candidate_id": "c1",
+      "product_id": "demo-p1",
+      "image": null,
+      "physical": {
+        "dimensions": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "shape": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "weight": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "fragility": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        },
+        "materials": {
+          "status": "unknown",
+          "value": null,
+          "unit": null,
+          "sources": []
+        }
+      },
+      "packaging": {
+        "form": "undetermined",
+        "description": null,
+        "scale": {
+          "status": "illustrative",
+          "note": "尺寸未知，仅示意；不保证容纳或运输安全"
+        }
+      },
+      "scene": {
+        "description": null,
+        "props": [],
+        "props_are_included": false,
+        "text_baked_in": false
+      },
+      "annotations": [],
+      "unknowns": [
+        "尚无最终图，无法核对外观和标注定位",
+        "图像服务未接线；本夹具未调用服务"
+      ]
+    }
+  },
+  "scene_proposal": {
+    "packaging": {
+      "form": "paper_wrap",
+      "description": "浅米纸与细带衬托已选蓝色杯子；仅示意比例",
+      "scale": {
+        "status": "illustrative",
+        "note": "尺寸未知，需核实容纳与防护"
+      }
+    },
+    "scene": {
+      "description": "围绕一只已选蓝色杯子构图，礼物及纸包为主体，安静桌边有侧面柔光与自然阴影，浅米纸材与低饱和细带呼应蓝色。纸包方案仅作比例未核实的示意；若运输防护取决于尺寸和易碎性，先澄清再确认包装。背景道具只营造环境，不是附送商品。干净底图不出现文字、箭头或新品牌，不改型号颜色数量及相对大小。AI效果示意，非商品实拍，比例未核实。",
+      "props": [
+        "桌面背景"
+      ],
+      "props_are_included": false,
+      "text_baked_in": false
+    }
+  },
+  "annotation_proposals": [
+    {
+      "id": "a1",
+      "text": "浅米纸衬着蓝色",
+      "target": {
+        "x": 0.35,
+        "y": 0.6
+      },
+      "label": {
+        "x": 0.1,
+        "y": 0.3
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.2,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a2",
+      "text": "细带收在这里",
+      "target": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "label": {
+        "x": 0.85,
+        "y": 0.25
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.30000000000000004,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a3",
+      "text": "贺卡靠在侧边",
+      "target": {
+        "x": 0.7,
+        "y": 0.75
+      },
+      "label": {
+        "x": 0.85,
+        "y": 0.88
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.4,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a4",
+      "text": "侧光留一点层次",
+      "target": {
+        "x": 0.25,
+        "y": 0.45
+      },
+      "label": {
+        "x": 0.12,
+        "y": 0.1
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.5,
+            "y": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "a5",
+      "text": "留白让礼物更清楚",
+      "target": {
+        "x": 0.5,
+        "y": 0.85
+      },
+      "label": {
+        "x": 0.2,
+        "y": 0.92
+      },
+      "image_version": "offline-proposal-v1",
+      "text_style": "handwritten",
+      "curve": {
+        "control_points": [
+          {
+            "x": 0.6000000000000001,
+            "y": 0.4
+          }
+        ]
+      }
+    }
+  ]
+}

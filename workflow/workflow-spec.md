@@ -1,3 +1,17 @@
+## 当前增量：retrieval-media-v2（2026-10-31）
+
+本节覆盖旧 v1 的媒体字段、selected=null 降级与曲线暂缺说明；其余历史规范仅按各自版本阅读。共享契约唯一写者为后台，基准 PR61@e0c76cad548ffa371287837a36e0fae2a48f0ecf。
+
+- 先“需要避免的”识别/用户确认或澄清，再冻结预算/天数/事实；previous_gifts 独立软历史。合法预算输入不再增加确认框。
+- 受限检索计划仅 category/keywords/limit，当前只支持 confirmed tech_digital → maker/kit。预算在冻结 request，不让模型改写。足三种有据商品后再生成解释；不足前置澄清。
+- 推荐输入 retrieval_json，输出严格 candidates_json 及独立 product_references_json（每项仅 candidate_id/product_id）。名称严格 name + " · " + variant，金额原始字符串匹配；服务端再绑定核查并执行独立 validator。主线为三个礼物、选择理由、比较及用户选择；最多一次业务修订只作失败兜底。
+- physical 五项按 known/unknown/conflicting/suggested 保留来源、单位和 context；不得把组装尺寸当寄送尺寸，模型建议不是实测。
+- media.contract_version=retrieval-media-v2。选前 selected=null；选后无图也保留 task/candidate/product/physical/packaging/scene/unknowns，image=null、annotations=[]。无图不会丢失选择，不伪造生成成功。
+- 有图由服务端赋不可变 image.version。默认3–5处短中文标注，每项 id/text/target/label/image_version/text_style/curve；handwritten、最多30码点，曲线1或2个控制点。image_version必须匹配，换图重校准。数值验证不是视觉定位验证。
+- 完整光影造景、按物理证据适形包装、干净无字底图、道具非附送、包装不报价。完整宽高比，不裁主体；详见 prompts/packaging-image.md。
+
+本批为离线准备；Seedream验证已授权但未执行，接线与账号配置交后台/PM；Dify仍未授权。没有真实图像、token、调用延迟或费用结果。离线示例/坐标不是实际图像证明，不生成DSL。
+
 # 工作流设计规范 v0.2.1
 
 > 最新造景/引用离线增量：按PR61@7204b64的retrieval_json和独立product_references_json（candidate_id/product_id）传递；name按name + " · " + variant，金额原样匹配，严格核心候选不加引用字段。选后场景有光影环境，主体礼物与适形包装，不统一方盒；3–5处手写感短中文及细曲箭头由前端叠加。尺寸未知明示比例未核实或澄清，坐标需最终图复核，不将结构合格冒充定位准确。精确图像provider、计划键名及定位状态仍待后台/PM，不新增共享字段，不真实调用。

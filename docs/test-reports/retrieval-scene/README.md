@@ -49,3 +49,16 @@ PR61共享契约已明确商品引用信封。本轮不把后台worker内部cate
 - BLOCKED：上述共享接口补充及后台/前端同版接线。固定夹具不代表真实检索或图像生成通过；旧线上证据不能用作本版能力证明。
 
 待PM审查，不自行合并。此前输入和检索工作报告保留于avoid-history、retrieval-media目录；本报告覆盖本轮最终差异，不拼接历史通过数为端到端结论。
+
+## 2026-10-31 v2 对齐小批（本 PR 后续提交）
+
+依据后台 PR #61 最新提交 `e0c76cad548ffa371287837a36e0fae2a48f0ecf` 的 `retrieval-media-v2`：更新了受限计划、商品证据说明、选后造景与曲线标注提示词，并新增 `workflow/examples/retrieval-media/v2-cases.json` 与 `verify_v2.py`。夹具明确是离线结构数据，不是 provider 请求或真实图片结果。
+
+实际命令（Python 3.12.10）：
+
+- `python workflow/examples/retrieval-media/verify.py`：PASS，44 项；旧商品引用、独立 validator、注入字符串不执行、选前无图和旧标注边界。
+- `python workflow/examples/retrieval-media/verify_v2.py`：PASS；计划三键白名单、physical 五项 unknown、选后无图仍保留 selected 元数据、包装/场景布尔边界、image_version/handwritten/curve 坐标结构。
+- `python -m unittest discover -s tests -q`：PASS，337 项。
+- Dify、模型、Seedream/任何图片服务、OpenCLI：未执行；token、延迟、费用：未测。
+
+仍需后台/PM 接线与独立 QA：真实 provider 的 image.version、最终图像目标点核对、换图重新校准、字体与窄屏显示、物理来源真实性。结构通过不代表真实生图或视觉定位通过。
