@@ -1,0 +1,64 @@
+[
+  {
+    "path": "/",
+    "http_status": 200,
+    "bytes": 17146
+  },
+  {
+    "path": "/healthz",
+    "http_status": 200,
+    "bytes": 252,
+    "status": "ok",
+    "mode": "llm",
+    "attestation": {
+      "pid": 8301,
+      "code_revision": "6250864c45afe42c",
+      "started_at": "2026-10-31T21:31:23.423Z",
+      "uptime_ms": 753485,
+      "revision_source": "sha256(web/server/** 内容) 前 16 位",
+      "stale": false,
+      "stale_reason": null
+    }
+  },
+  {
+    "path": "/api/config",
+    "http_status": 200,
+    "bytes": 7094,
+    "mode": "llm",
+    "llm_configured": true,
+    "attestation": {
+      "pid": 8301,
+      "code_revision": "6250864c45afe42c",
+      "started_at": "2026-10-31T21:31:23.423Z",
+      "uptime_ms": 753565,
+      "revision_source": "sha256(web/server/** 内容) 前 16 位",
+      "stale": false,
+      "stale_reason": null
+    },
+    "services": {
+      "mock": {
+        "active": false
+      },
+      "llm": {
+        "active": true,
+        "configured": true
+      },
+      "dify": {
+        "active": false,
+        "configured": false
+      },
+      "seedream": {
+        "active": true,
+        "configured": true,
+        "enabled": true
+      },
+      "retrieval": {
+        "active": true,
+        "provider": "domestic"
+      },
+      "catalog": {
+        "active": true
+      }
+    }
+  }
+]

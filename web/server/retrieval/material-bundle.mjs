@@ -3,9 +3,10 @@ import{constants,lstatSync,realpathSync,openSync,closeSync,fstatSync,readSync}fr
 import{resolve,relative,isAbsolute,sep,join}from'node:path';
 import{strictParse}from'../jsonstrict.mjs';
 import{publicReferenceUrl}from'../collect/public-reference.mjs';
+import{REPO_ROOT}from'../localdb/db.mjs';
 export const MATERIAL_BUNDLE_MAX_BYTES=256*1024;
 export const MATERIAL_BUNDLE_MAX_RECORDS=80;
-const PROJECT_ROOT=resolve('E:/黑客松');
+const PROJECT_ROOT=REPO_ROOT;
 const ID=/^[A-Za-z0-9_-]{1,96}$/;
 const fail=code=>Object.assign(new Error(code),{code});
 const inside=(root,path)=>{const r=relative(root,path);return r!=='..'&&!r.startsWith('..'+sep)&&!isAbsolute(r);};

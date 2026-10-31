@@ -1,0 +1,26 @@
+✔ anonymous text bundles import through an injected cache while preserving source and original observation time (13.4981ms)
+✔ import can return safe records without a cache and retains honest title-only material (8.0834ms)
+✔ only safe fields reach cache: user/query/auth/body/image payloads are omitted rather than exported (7.0811ms)
+✔ commerce/private/authentication sources and unsafe text cannot enter accepted material (10.0388ms)
+✔ manifest schema, byte/record limits and strict JSON reject before any cache write (34.8796ms)
+✔ outside-project paths and simulated junction markers are rejected before reading contents (4.2438ms)
+✔ ambiguous duplicate references and invalid observation dates do not overwrite good material (8.5844ms)
+✔ cache failures are safe and leave returned text available for caller-controlled retry (14.5999ms)
+✔ a cache failure receipt is not advertised as a saved import (8.2038ms)
+✔ the source-tree import boundary is independent of the process working directory (8.5575ms)
+✔ 有真实文本即缓存，无图无价可用，安全字段白名单且get返回clone (32.3867ms)
+✔ web_/ref_a通用server ID兼容，商家页/无日期/未来/空摘要不伪造素材 (47.0315ms)
+✔ 脱敏用户姓名地址及公开文本认证残片，不持久化查询/身份URL (29.0239ms)
+✔ 近20条/总80条/最长7天有界并报告截断，过期不改观察时刻续期 (42.4394ms)
+✔ 同一公开来源/ID去重保留较新原观察，不按语义关键词选礼 (28.8062ms)
+✔ 损坏/超大文件读失败非阻塞，合法新观察可原子恢复 (21.3905ms)
+✔ 只允许自己工作树.tmp缓存，写入失败不影响调用方且无原子临时文件残留 (13.2064ms)
+✔ 拒绝符号链接或junction缓存目录 (6.3525ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 393.7732

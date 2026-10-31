@@ -4,6 +4,8 @@ import fs,{mkdirSync,writeFileSync}from'node:fs';
 import{syncBuiltinESMExports}from'node:module';
 import{fileURLToPath}from'node:url';
 import{join,resolve}from'node:path';
+import{tmpdir}from'node:os';
+import{REPO_ROOT}from'../server/localdb/db.mjs';
 import{importMaterialBundle,MATERIAL_BUNDLE_MAX_BYTES}from'../server/retrieval/material-bundle.mjs';
 const root=fileURLToPath(new URL('../../.tmp/material-bundle-tests/'+process.pid+'/',import.meta.url));mkdirSync(root,{recursive:true});let sequence=0;
 const observed='2026-10-31T19:03:17.355Z';
@@ -34,7 +36,7 @@ test('manifest schema, byte/record limits and strict JSON reject before any cach
  const duplicate=bundle();writeFileSync(join(duplicate,'manifest.json'),'{"version":1,"version":1,"records":[]}');assert.equal((await importMaterialBundle(duplicate,{cache})).rejected[0].code,'BUNDLE_JSON_INVALID');assert.equal(writes,0);
 });
 test('outside-project paths and simulated junction markers are rejected before reading contents',async()=>{
- let writes=0;const outside=await importMaterialBundle(resolve('E:/outside-material-bundle'),{cache:{put:()=>{writes++;}}});assert.equal(outside.rejected[0].code,'BUNDLE_PATH_OUTSIDE_PROJECT');
+ let writes=0;const outside=await importMaterialBundle(resolve(REPO_ROOT,'..','outside-material-bundle'),{cache:{put:()=>{writes++;}}});assert.equal(outside.rejected[0].code,'BUNDLE_PATH_OUTSIDE_PROJECT');
  // This host cannot create a physical Windows junction (EISDIR); drive the fs marker branch explicitly.
  const link=bundle(),original=fs.lstatSync;
  try{fs.lstatSync=(path,...args)=>resolve(path)===resolve(link)?{isSymbolicLink:()=>true}:original(path,...args);syncBuiltinESMExports();const linked=await importMaterialBundle(link,{cache:{put:()=>{writes++;}}});assert.equal(linked.rejected[0].code,'BUNDLE_LINK_NOT_ALLOWED');}
@@ -50,3 +52,9 @@ test('cache failures are safe and leave returned text available for caller-contr
 });
 
 test('a cache failure receipt is not advertised as a saved import',async()=>{const result=await importMaterialBundle(bundle(),{cache:{put:()=>({status:'unavailable',error_code:'MATERIAL_CACHE_WRITE_FAILED'})}});assert.equal(result.cache_status,'failed');assert.equal(result.records_imported,0);assert.equal(result.records.length,1);});
+
+test('the source-tree import boundary is independent of the process working directory',async()=>{
+ const directory=bundle(),previous=process.cwd();
+ try{process.chdir(tmpdir());const result=await importMaterialBundle(directory);assert.equal(result.status,'ready');assert.equal(result.records_imported,1);assert.equal(result.records[0].observed_at,observed);}
+ finally{process.chdir(previous);}
+});
