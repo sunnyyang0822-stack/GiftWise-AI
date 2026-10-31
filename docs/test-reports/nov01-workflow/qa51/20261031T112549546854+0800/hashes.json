@@ -1,0 +1,65 @@
+[
+  {
+    "group": "sources_sha256",
+    "file": "validator/rules.py",
+    "expected": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+    "actual": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
+    "passed": true
+  },
+  {
+    "group": "sources_sha256",
+    "file": "workflow/labels.py",
+    "expected": "f339d171872cbb88a4132071d69d9f9778bf54f117fa94c10b2d47a4d576e37d",
+    "actual": "f339d171872cbb88a4132071d69d9f9778bf54f117fa94c10b2d47a4d576e37d",
+    "passed": true
+  },
+  {
+    "group": "sources_sha256",
+    "file": "workflow/intake.py",
+    "expected": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+    "actual": "776fea6bf6269d554cd66b666be7115cdaa0b11b90dbd5bcf62adf6b7cacb381",
+    "passed": true
+  },
+  {
+    "group": "sources_sha256",
+    "file": "workflow/runtime.py",
+    "expected": "89a9bb22b52ba3c20c0f7b55914d1c64608dafc78090170be8505542d6802373",
+    "actual": "89a9bb22b52ba3c20c0f7b55914d1c64608dafc78090170be8505542d6802373",
+    "passed": true
+  },
+  {
+    "group": "artifacts_sha256",
+    "file": "code_node.py",
+    "expected": "0984db6b4f7022378c43afbfeb69d811d4c60c27392662eeee20f91203e3d4b3",
+    "actual": "0984db6b4f7022378c43afbfeb69d811d4c60c27392662eeee20f91203e3d4b3",
+    "passed": true
+  },
+  {
+    "group": "artifacts_sha256",
+    "file": "intake_node.py",
+    "expected": "2c1e2926d2e82a8872089b17b5ec0b6be23d512cb7fb6536d4f9689e58dcdfce",
+    "actual": "2c1e2926d2e82a8872089b17b5ec0b6be23d512cb7fb6536d4f9689e58dcdfce",
+    "passed": true
+  },
+  {
+    "group": "artifacts_sha256",
+    "file": "check_node.py",
+    "expected": "fcdedcf7a842b0514ee948fe3956106af674ae12944fa269a9c6263268c669c1",
+    "actual": "fcdedcf7a842b0514ee948fe3956106af674ae12944fa269a9c6263268c669c1",
+    "passed": true
+  },
+  {
+    "group": "artifacts_sha256",
+    "file": "recheck_node.py",
+    "expected": "424dc74286b88c363b4976c85e79cccf35e16aa137e49f19ed26825871baf5e9",
+    "actual": "424dc74286b88c363b4976c85e79cccf35e16aa137e49f19ed26825871baf5e9",
+    "passed": true
+  },
+  {
+    "group": "artifacts_sha256",
+    "file": "report_node.py",
+    "expected": "2461afe13e39b9fbdc69d28dd021e381500781ae600c2a994e1403eff9f5d2de",
+    "actual": "2461afe13e39b9fbdc69d28dd021e381500781ae600c2a994e1403eff9f5d2de",
+    "passed": true
+  }
+]
