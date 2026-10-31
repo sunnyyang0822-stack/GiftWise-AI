@@ -1,0 +1,14 @@
+======================================================================
+FAIL: test_c5_02_manifest_matches_generated_artifacts (test_stage_c_workflow.C5GeneratedNodes.test_c5_02_manifest_matches_generated_artifacts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_c\test_stage_c_workflow.py", line 655, in test_c5_02_manifest_matches_generated_artifacts
+    self.observe("C5-02", "�������� manifest ��ϣһ�£��� STALE��", {}, expected, actual, ok)
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_c\test_stage_c_workflow.py", line 141, in observe
+    self.assertTrue(ok, f"{case_id} {title}: expected={expected!r} actual={actual!r}")
+AssertionError: False is not true : C5-02 �������� manifest ��ϣһ�£��� STALE��: expected='manifest.format=python-source-not-dsl��5 ��������ժҪ�� manifest ��¼һ�£�������������ͬһԴ���ֽ���̬����������� LF ��һ�������ֽ���ͬ' actual={'format': 'python-source-not-dsl', 'entries': {}, 'mismatches': ['manifest:sources_sha256']}
+
+----------------------------------------------------------------------
+Ran 39 tests in 0.216s
+
+FAILED (failures=1)

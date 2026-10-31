@@ -1,0 +1,70 @@
+{
+  "layer": "offline-mock-integration",
+  "clock": "test-process Date.now injection",
+  "results": [
+    {
+      "id": "ttl-exact-10min-present",
+      "status": "PASS"
+    },
+    {
+      "id": "ttl-over-10min-removed",
+      "status": "PASS"
+    },
+    {
+      "id": "expired-blocks-recommendation",
+      "status": "PASS",
+      "actual": {
+        "kind": "needs_input",
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "EXCLUSION_ANALYSIS_STALE",
+            "path": "exclusion_confirmation.analysis_id",
+            "message": "排除项识别已过期或不存在，请重新识别。"
+          }
+        ],
+        "mode": "mock",
+        "notices": [
+          "⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。"
+        ]
+      }
+    },
+    {
+      "id": "unknown-blocks-recommendation",
+      "status": "PASS",
+      "actual": {
+        "kind": "needs_input",
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "EXCLUSION_ANALYSIS_STALE",
+            "path": "exclusion_confirmation.analysis_id",
+            "message": "排除项识别已过期或不存在，请重新识别。"
+          }
+        ],
+        "mode": "mock",
+        "notices": [
+          "⚠ 模拟数据模式：接入层未配置真实模型凭证，从未成功调用过一次，本页面所有候选方案与呈现内容都是接入层内置的固定模拟数据，不是模型真实输出，也没有联通 Dify。"
+        ]
+      }
+    },
+    {
+      "id": "parallel-mock-confirm-idempotent",
+      "status": "PASS",
+      "actual": {
+        "a": "gw-mvvttsuo-d3f99b0f",
+        "b": "gw-mvvttsuo-d3f99b0f",
+        "calls": {
+          "recommend": 1,
+          "recommend_revision": 1,
+          "presentation": 0,
+          "presentation_revision": 0
+        }
+      }
+    },
+    {
+      "id": "bounded-200-oldest-pruned",
+      "status": "PASS"
+    }
+  ]
+}

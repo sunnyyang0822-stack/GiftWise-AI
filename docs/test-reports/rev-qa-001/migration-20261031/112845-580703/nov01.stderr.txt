@@ -1,0 +1,36 @@
+test_R01_three_prices_not_summed (test_revision_rules.RevisionRules.test_R01_three_prices_not_summed) ... ok
+test_R02_zero_free (test_revision_rules.RevisionRules.test_R02_zero_free) ... ok
+test_R03_zero_paid (test_revision_rules.RevisionRules.test_R03_zero_paid) ... ok
+test_R04_fraction (test_revision_rules.RevisionRules.test_R04_fraction) ... ok
+test_R05_thousand (test_revision_rules.RevisionRules.test_R05_thousand) ... ok
+test_R06_ten_thousand (test_revision_rules.RevisionRules.test_R06_ten_thousand) ... ok
+test_R07_min_equal (test_revision_rules.RevisionRules.test_R07_min_equal) ... ok
+test_R08_max_equal (test_revision_rules.RevisionRules.test_R08_max_equal) ... ok
+test_R09_below_min_selectable (test_revision_rules.RevisionRules.test_R09_below_min_selectable) ... ok
+test_R10_over_max (test_revision_rules.RevisionRules.test_R10_over_max) ... ok
+test_R_days_0 (test_revision_rules.RevisionRules.test_R_days_0) ... ok
+test_R_days_1 (test_revision_rules.RevisionRules.test_R_days_1) ... ok
+test_R_days_30 (test_revision_rules.RevisionRules.test_R_days_30) ... ok
+test_R_days_365 (test_revision_rules.RevisionRules.test_R_days_365) ... ok
+test_R_days_5 (test_revision_rules.RevisionRules.test_R_days_5) ... ok
+test_R_days_7 (test_revision_rules.RevisionRules.test_R_days_7) ... ok
+test_R_days_90 (test_revision_rules.RevisionRules.test_R_days_90) ... ok
+test_R_invalid_bool (test_revision_rules.RevisionRules.test_R_invalid_bool) ... ok
+test_R_invalid_exponent (test_revision_rules.RevisionRules.test_R_invalid_exponent) ... ok
+test_R_invalid_leading_zero (test_revision_rules.RevisionRules.test_R_invalid_leading_zero) ... ok
+test_R_invalid_mismatch (test_revision_rules.RevisionRules.test_R_invalid_mismatch) ... ok
+test_R_invalid_missing_max (test_revision_rules.RevisionRules.test_R_invalid_missing_max) ... ok
+test_R_invalid_missing_min (test_revision_rules.RevisionRules.test_R_invalid_missing_min) ... ok
+test_R_invalid_null (test_revision_rules.RevisionRules.test_R_invalid_null) ... ok
+test_R_invalid_null_min (test_revision_rules.RevisionRules.test_R_invalid_null_min) ... ok
+test_R_invalid_over_limit (test_revision_rules.RevisionRules.test_R_invalid_over_limit) ... ok
+test_R_invalid_reversed (test_revision_rules.RevisionRules.test_R_invalid_reversed) ... ok
+test_R_legacy_0 (test_revision_rules.RevisionRules.test_R_legacy_0) ... ok
+test_R_legacy_0_99 (test_revision_rules.RevisionRules.test_R_legacy_0_99) ... ok
+test_R_legacy_150 (test_revision_rules.RevisionRules.test_R_legacy_150) ... ok
+test_R_zero_plus_366_still_reject (test_revision_rules.RevisionRules.test_R_zero_plus_366_still_reject) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.007s
+
+OK

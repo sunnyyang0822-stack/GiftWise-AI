@@ -1,0 +1,86 @@
+======================================================================
+FAIL: test_case_008_money_range_reject_request_0 (test_validator_acceptance.Acceptance.test_case_008_money_range_reject_request_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 94, in test
+    self.assertEqual(case["expected"]["status"], output["status"])
+AssertionError: 'needs_input' != 'passed'
+- needs_input
++ passed
+
+
+======================================================================
+FAIL: test_case_009_money_range_reject_request_1 (test_validator_acceptance.Acceptance.test_case_009_money_range_reject_request_1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 94, in test
+    self.assertEqual(case["expected"]["status"], output["status"])
+AssertionError: 'needs_input' != 'passed'
+- needs_input
++ passed
+
+
+======================================================================
+FAIL: test_case_010_money_range_reject_request_2 (test_validator_acceptance.Acceptance.test_case_010_money_range_reject_request_2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 94, in test
+    self.assertEqual(case["expected"]["status"], output["status"])
+AssertionError: 'needs_input' != 'passed'
+- needs_input
++ passed
+
+
+======================================================================
+FAIL: test_case_011_money_range_reject_request_3 (test_validator_acceptance.Acceptance.test_case_011_money_range_reject_request_3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 94, in test
+    self.assertEqual(case["expected"]["status"], output["status"])
+AssertionError: 'needs_input' != 'passed'
+- needs_input
++ passed
+
+
+======================================================================
+FAIL: test_case_012_money_range_reject_request_4 (test_validator_acceptance.Acceptance.test_case_012_money_range_reject_request_4)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 114, in test
+    self.assertIn(expected["message"], [e["message"] for e in matching])
+AssertionError: 'Ԥ������ 1 �� 10000 ֮��' not found in ['Ԥ������ 0 �� 10000 ֮��']
+
+======================================================================
+FAIL: test_case_013_money_range_reject_request_5 (test_validator_acceptance.Acceptance.test_case_013_money_range_reject_request_5)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 114, in test
+    self.assertIn(expected["message"], [e["message"] for e in matching])
+AssertionError: 'Ԥ������ 1 �� 10000 ֮��' not found in ['Ԥ������ 0 �� 10000 ֮��']
+
+======================================================================
+FAIL: test_hash_1 (test_validator_acceptance.Acceptance.test_hash_1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 78, in test
+    self.assertEqual(expected, actual)
+AssertionError: '1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500' != 'f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258'
+- 1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500
++ f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258
+
+
+======================================================================
+FAIL: test_hash_3 (test_validator_acceptance.Acceptance.test_hash_3)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\lenovo\Desktop\giftwise-final-qa\tests\acceptance\stage_b\test_validator_acceptance.py", line 78, in test
+    self.assertEqual(expected, actual)
+AssertionError: '07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db' != '546e9b43ca9766885634d05f94d2729f8e827203e878c943c56aa6a93fc18669'
+- 07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db
++ 546e9b43ca9766885634d05f94d2729f8e827203e878c943c56aa6a93fc18669
+
+
+----------------------------------------------------------------------
+Ran 275 tests in 0.215s
+
+FAILED (failures=8)

@@ -1,0 +1,23 @@
+diff --git a/web/tools/browser-check.mjs b/web/tools/browser-check.mjs
+index 790e7d5..d01cc8b 100644
+--- a/web/tools/browser-check.mjs
++++ b/web/tools/browser-check.mjs
+@@ -30,6 +30,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
+ import { join } from "node:path";
+ 
+ import { ensureLocalServer, stopOwnServer } from "./server-identity.mjs";
++import { runRevision } from "../../tests/acceptance/nov01_revision/browser-revision.mjs";
+ 
+ // 注意：未显式指定 GW_BASE 时，下面的 resolveTarget() 可能把 BASE 改指向自起的独占服务，
+ // 因此这里必须用 let。默认端口仅供「先探一下」使用，绝不复用他人工作区的服务。
+@@ -663,7 +664,9 @@ async function main() {
+   process.stdout.write("", () => process.exit(failed === 0 ? 0 : 1));
+ }
+ 
+-main().catch((err) => {
++(process.env.GW_REVISION_QA === '1'
++  ? runRevision({ Client, open, close, ensureLocalServer, stopOwnServer, base: BASE, cdp: CDP, out: OUT_DIR, viewports: VIEWPORTS })
++  : main()).catch((err) => {
+   process.stderr.write(`浏览器自查异常：${err && err.stack ? err.stack : String(err)}\n`);
+   process.stderr.write("", () => process.exit(2));
+ });
