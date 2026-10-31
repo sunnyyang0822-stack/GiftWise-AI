@@ -23,4 +23,4 @@ dislikes和previous_gifts语义不变：明确排除先确认；过敏不是普�
 修订只允许调整失败候选，已通过项和商品绑定不动；只能选本任务已有且有效的其他证据，不改价、不放宽约束。证据不足是澄清/不足，不靠第二次搜索或生成虚构商品掩盖失败。服务端重检证据归属、价格绑定及同版规则后才报告可选；不自动选第一项。
 
 
-Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，模型和 Code 节点不得因缺少 `intake_json` 返回 400。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。
+Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，映射后的冻结值同时供模型和 Code 节点使用。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。

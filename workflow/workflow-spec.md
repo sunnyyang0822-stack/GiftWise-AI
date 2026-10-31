@@ -10,7 +10,7 @@
 - 有图由服务端赋不可变 image.version。默认3–5处短中文标注，每项 id/text/target/label/image_version/text_style/curve；handwritten、最多30码点，曲线1或2个控制点。image_version必须匹配，换图重校准。数值验证不是视觉定位验证。
 - 完整光影造景、按物理证据适形包装、干净无字底图、道具非附送、包装不报价。完整宽高比，不裁主体；详见 prompts/packaging-image.md。
 
-Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `request_json`，在接入边界显式做 `intake_json -> request_json` 映射，避免因缺少 intake_json 返回400。previous_gifts 随冻结需求传递但仍为软历史。
+Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `request_json`，在接入边界显式做 `intake_json -> request_json` 映射，映射后的冻结值再进入模型和 Code 节点。previous_gifts 随冻结需求传递但仍为软历史。
 
 本批为离线准备；Seedream验证已授权但未执行，接线与账号配置交后台/PM；Dify仍未授权。没有真实图像、token、调用延迟或费用结果。离线示例/坐标不是实际图像证明，不生成DSL。
 

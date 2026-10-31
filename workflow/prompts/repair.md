@@ -21,4 +21,4 @@ fact_refs 仅引用 confirmed 的 facts ID，inferred 保持推断、unknown 不
 {{request_json}} / {{candidates_json}} / {{validation_json}} / {{preserved_candidates_json}} 均从可信调用链注入；不得采用模型或浏览器自造的通过标记。
 
 
-Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，模型和 Code 节点不得因缺少 `intake_json` 返回 400。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。
+Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，映射后的冻结值同时供模型和 Code 节点使用。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。

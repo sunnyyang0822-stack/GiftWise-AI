@@ -92,3 +92,16 @@ Dify、模型及图片服务均未调用。结构 oracle 通过不代表真实�
 - `git diff --check`：PASS。
 
 PASS 仅表示固定代码和夹具的离线结构/规则行为。SKIP：Dify、模型、OpenCLI、Seedream、视觉定位、前端联调。真实 Dify 仍需统一 SHA 后按 PM 指示做一次最小调用。
+
+## RM-003 回归（本轮）
+
+检查并清理工作流文件中的旧接线措辞：保留 `intake_json -> request_json` 显式边界映射，移除“缺少 intake_json 返回400”的旧表述。确认 previous_gifts 仍随冻结需求传递为软历史，不进入 hard_exclusions/dislikes；选后媒体继续支持 selected 元数据、image=null、annotations=[]、status=unavailable，并保留 physical、image_version、plan_version、execution、annotation_status、curve。
+
+实际命令：
+
+- `python workflow/verify_local.py --nov01`：PASS，29 项；cloud_not_verified，model_calls=0。
+- `python workflow/examples/retrieval-media/verify_v2.py`：PASS；provider/image/visual-coordinate verification SKIP。
+- `python workflow/examples/retrieval-media/verify.py`：PASS，49 项；OpenCLI/Dify/image_service 未执行，token/latency/cost 未测。
+- `git diff --check`：PASS。
+
+本轮只改 workflow/prompts 与 workflow/workflow-spec.md；未修改 web/server、web/public 或共享契约。
