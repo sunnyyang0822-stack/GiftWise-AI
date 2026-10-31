@@ -7,7 +7,7 @@ import { friendlyMessage, friendlyMessages } from "../public/js/friendly.js";
 
 // 只提供视图用到的 DOM 操作；布局、真实按钮交互另外以 Chrome 固定响应夹具验证。
 class Element {
-  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.dataset = {}; this.events = {}; }
+  constructor(tag) { this.tagName = tag; this.children = []; this.attrs = {}; this.dataset = {}; this.events = {}; this.style = { setProperty() {} }; }
   setAttribute(key, value) {
     this.attrs[key] = String(value);
     if (key === "class") this.className = String(value);
@@ -15,6 +15,7 @@ class Element {
   }
   addEventListener(type, fn) { this.events[type] = fn; }
   append(...children) { this.children.push(...children.filter(x => x != null && x !== false)); }
+  replaceChildren(...children) { this.children = []; this.append(...children); }
   set textContent(value) { this.children = [String(value)]; }
   get textContent() { return this.children.map(x => typeof x === "string" ? x : x.textContent).join(""); }
   querySelectorAll(selector) {
@@ -151,3 +152,102 @@ test("app真实选择入口仍拒绝非selectable或未passed，只提交选中I
     }
   }
 });
+
+// 受控协议夹具，不是抓图证据；真实解码及相关性另复用C的最终原图验收。
+function threeReferences() {
+  const data = report();
+  data.recommendation_run_id = "three-reference-fixture";
+  data.media = { status: "unavailable", selected: null, candidates: [] };
+  data.retrieval = { products: [], references: [] };
+  data.candidates.forEach((candidate, index) => {
+    const imageId = String(index + 1).repeat(32), referenceId = `ref_${imageId}`;
+    const source = `https://content.example/controlled/${candidate.id}`;
+    const observed = `2026-10-31T12:00:0${index}Z`;
+    data.media.candidates.push({ candidate_id: candidate.id, reference_id: referenceId,
+      image: { id: imageId, version: imageId, kind: "reference_image", url: `/api/reference/images/${imageId}`, alt: `${candidate.name}受控参考图`, source_url: source } });
+    data.retrieval.references.push({ reference_id: referenceId, reference_kind: "public_reference", source_url: source,
+      observed_at: observed, image_id: imageId, image_kind: "reference_image", image_validation: { ok: true } });
+  });
+  return data;
+}
+
+function withImageOrigin(fn) {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "location");
+  globalThis.location = { origin: "http://127.0.0.1:8911" };
+  try { fn(); } finally {
+    if (previous) Object.defineProperty(globalThis, "location", previous);
+    else delete globalThis.location;
+  }
+}
+
+test("三卡参考图：每个可选候选仅显示各自一图及真实引用元数据，无SKU前置", () => withImageOrigin(() => {
+  const data = threeReferences(), before = JSON.stringify(data), v = view(data);
+  const cards = v.root.querySelectorAll(".gift-choice");
+  assert.equal(cards.length, 3);
+  assert.equal(v.root.querySelectorAll("img").length, 3);
+  cards.forEach((card, index) => {
+    const binding = data.media.candidates[index], reference = data.retrieval.references[index];
+    assert.equal(card.dataset.candidateId, binding.candidate_id);
+    assert.equal(card.querySelectorAll("img").length, 1);
+    assert.equal(card.querySelector("img").src, `${location.origin}${binding.image.url}`);
+    const figure = card.querySelector("figure");
+    assert.equal(figure.dataset.imageReferenceId, reference.reference_id);
+    assert.equal(figure.dataset.imageSourceUrl, reference.source_url);
+    assert.equal(figure.dataset.imageObservedAt, reference.observed_at);
+    assert.equal(figure.dataset.imageKind, "reference_image");
+    assert.equal(card.querySelector(".media-kind").textContent, "参考图片");
+    card.querySelector(".suggest-row").querySelector("button").events.click();
+  });
+  assert.equal(new Set(v.root.querySelectorAll("img").map(img => img.src)).size, 3);
+  assert.deepEqual(v.selected, ["c1", "c2", "c3"]);
+  assert.equal(JSON.stringify(data), before, "不改写原状态、推荐或创建商品记录");
+}));
+
+test("三卡参考图：图片尚在加载时文字和选择先可用，load仅更新原图片位", () => withImageOrigin(() => {
+  const v = view(threeReferences()), cards = v.root.querySelectorAll(".gift-choice");
+  const headings = cards.map(card => card.querySelector(".card__title"));
+  cards.forEach((card, index) => {
+    assert.equal(headings[index].textContent, `测试建议c${index + 1}`);
+    const button = card.querySelector(".suggest-row").querySelector("button");
+    assert.ok(!("disabled" in button.attrs));
+    const img = card.querySelector("img");
+    img.naturalWidth = 640; img.naturalHeight = 480; img.events.load();
+    assert.equal(card.querySelector("img"), img);
+    assert.equal(card.querySelector(".card__title"), headings[index]);
+    assert.equal(card.querySelector(".media-status").hidden, true);
+  });
+}));
+
+test("三卡参考图：单图加载失败不隐藏候选或禁选，也不影响其他两图", () => withImageOrigin(() => {
+  const v = view(threeReferences()), cards = v.root.querySelectorAll(".gift-choice");
+  cards[1].querySelector("img").events.error();
+  assert.equal(v.root.querySelectorAll(".gift-choice").length, 3);
+  assert.equal(v.root.querySelectorAll("img").length, 2, "失败图片不能冒充三图完成");
+  assert.match(cards[1].querySelector(".media-status").textContent, /图片加载失败/);
+  cards.forEach(card => {
+    const button = card.querySelector(".suggest-row").querySelector("button");
+    assert.ok(!("disabled" in button.attrs)); button.events.click();
+  });
+  assert.deepEqual(v.selected, ["c1", "c2", "c3"]);
+}));
+
+test("三卡参考图：缺失或无效引用只留下对应缺图，不用另一候选图片补齐", () => withImageOrigin(() => {
+  for (const alter of [data => { data.media.candidates.splice(1, 1); }, data => { data.retrieval.references[1].image_validation.ok = false; }, data => { data.media.candidates.push(structuredClone(data.media.candidates[1])); }]) {
+    const data = threeReferences(); alter(data);
+    const v = view(data), cards = v.root.querySelectorAll(".gift-choice");
+    assert.equal(cards.length, 3);
+    assert.equal(cards[1].querySelector("img"), null);
+    assert.equal(v.root.querySelectorAll("img").length, 2);
+    assert.ok(cards.every(card => !("disabled" in card.querySelector(".suggest-row").querySelector("button").attrs)));
+  }
+}));
+
+test("三卡参考图：新运行无来源时不会复用旧运行图片", () => withImageOrigin(() => {
+  const first = view(threeReferences());
+  assert.equal(first.root.querySelectorAll("img").length, 3);
+  const next = report(); next.recommendation_run_id = "another-owner-run";
+  const second = view(next);
+  assert.equal(second.root.querySelectorAll(".gift-choice").length, 3);
+  assert.equal(second.root.querySelectorAll("img").length, 0);
+  assert.deepEqual(next.retrieval, undefined);
+}));
