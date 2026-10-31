@@ -425,5 +425,11 @@
   "presentation_invalid_cases": [
     {"name": "forbidden_price_fields", "output": {"contract_version": "giftwise-20261031-v2", "style": "简洁低压力", "packaging": {"color_palette": ["米白"]}, "card_text": "愿你顺利。", "giving_advice": {"timing": "方便时", "wording": "一点心意。", "relationship_cautions": []}, "unknowns": [], "currency": "CNY", "revised_estimated_preparation_days": 5, "additional_cost": "0.00"}, "expected_error": "PRESENTATION_INVALID"},
     {"name": "materials_steps_forbidden", "output": {"contract_version": "giftwise-20261031-v2", "style": "简洁低压力", "packaging": {"color_palette": ["米白"], "materials": ["纸"]}, "card_text": "愿你顺利。", "giving_advice": {"timing": "方便时", "wording": "一点心意。", "relationship_cautions": []}, "unknowns": [], "currency": "CNY", "revised_estimated_preparation_days": 5}, "expected_error": "PRESENTATION_INVALID"}
+  ],
+  "custom_inputs": [
+    {"name": "custom_relation_occasion_budget", "request": {"contract_version": "giftwise-20261031-v2", "recipient_relation_id": "custom", "recipient_relation_custom": "社团搭档", "occasion_id": "custom", "occasion_custom": "项目收尾感谢", "budget_mode": "other", "budget_range": {"min": "125.50", "max": "275.75"}, "budget_amount": "275.75", "currency": "CNY", "deadline_days": 5, "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}, "facts": [], "notes": "用户明确提供的自定义值。"}, "expected": "原样保留 custom 字段，不能改成标准关系/场合或补预算"},
+    {"name": "custom_missing_value", "request": {"contract_version": "giftwise-20261031-v2", "recipient_relation_id": "custom", "recipient_relation_custom": "", "occasion_id": "custom", "occasion_custom": "", "budget_mode": "other", "budget_range": {"min": "100", "max": "300"}, "budget_amount": "300", "currency": "CNY", "deadline_days": 5, "dislikes": "", "hard_exclusions": {"tags": [], "terms": [], "unresolved": []}}, "expected": "needs_input"},
+    {"name": "normal_path_no_repair", "request": {"contract_version": "giftwise-20261031-v2"}, "candidate_status": "passed", "expected_repair_count": 0},
+    {"name": "hard_constraint_repair_only", "request": {"contract_version": "giftwise-20261031-v2"}, "candidate_status": "over_budget", "expected_repair_count": 1}
   ]
 }

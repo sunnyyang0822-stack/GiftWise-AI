@@ -247,6 +247,14 @@ def verify_nov01():
     output = report(state)
     expect("新版报告仅礼物口径", "礼物本身估价：" in output["report_text"] and "不代表免费" in output["report_text"] and "全量估算：" not in output["report_text"])
     expect("等待选择且不替选", output["selected_candidate_id"] is None and "c1" not in output["selectable_candidate_ids"])
+    custom = data["custom_inputs"][0]["request"]
+    expect("自定义关系原样保留", custom["recipient_relation_id"] == "custom" and custom["recipient_relation_custom"] == "社团搭档")
+    expect("自定义场合原样保留", custom["occasion_id"] == "custom" and custom["occasion_custom"] == "项目收尾感谢")
+    expect("自定义预算原样保留", custom["budget_mode"] == "other" and custom["budget_range"] == {"min": "125.50", "max": "275.75"} and custom["budget_amount"] == "275.75")
+    missing = data["custom_inputs"][1]["request"]
+    expect("自定义值缺失需澄清", not missing["recipient_relation_custom"] and not missing["occasion_custom"])
+    expect("正常路径修订次数为零", data["custom_inputs"][2]["candidate_status"] == "passed" and data["custom_inputs"][2]["expected_repair_count"] == 0)
+    expect("修订仅用于硬约束异常", data["custom_inputs"][3]["candidate_status"] == "over_budget" and data["custom_inputs"][3]["expected_repair_count"] == 1)
     legacy = dict(req)
     legacy.pop("contract_version")
     expect("旧版报告保留原口径", "全量估算：" in report(check(dump(legacy), dump(data["candidates"]))) ["report_text"])
