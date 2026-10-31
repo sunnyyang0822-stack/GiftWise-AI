@@ -99,12 +99,12 @@ export function createResultViews(ctx) {
 
   function requestChips(request) {
     if (!request) return null;
-    const range = request.budget_range ? (request.budget_range.max === "0" ? "不花钱的心意" : `${request.budget_range.min}–${request.budget_range.max} 元`) : null;
+    const range = request.budget_range ? (String(request.budget_range.max) === "0" ? "预算 0 元" : `${request.budget_range.min}–${request.budget_range.max} 元`) : null;
     return el("div", { class: "result-chips", "aria-label": "你的需求" }, [
       request.recipient_relation ? el("span", { class: "result-chip" }, [icon("heart", { size: 16 }), request.recipient_relation]) : null,
       request.occasion ? el("span", { class: "result-chip" }, [icon("calendar", { size: 16 }), request.occasion]) : null,
       range ? el("span", { class: "result-chip" }, [icon("wallet", { size: 16 }), range]) : null,
-      Number.isFinite(request.available_days) ? el("span", { class: "result-chip" }, [icon("clock", { size: 16 }), `${request.available_days} 天内`]) : null,
+      Number.isFinite(request.available_days) ? el("span", { class: "result-chip" }, [icon("clock", { size: 16 }), `时间参考：${request.available_days} 天`]) : null,
     ]);
   }
 
@@ -116,29 +116,34 @@ export function createResultViews(ctx) {
   function renderRecommendation() {
     const report = state.report;
     const body = [];
-    const facts = new Map((report.request.facts || []).map(f => [f.id, f.text]));
-    const results = new Map((report.validation.candidate_results || []).map(r => [r.id, r]));
+    const facts = new Map((report.request?.facts || []).map(f => [f.id, f.text]));
+    const results = new Map((report.validation?.candidate_results || []).map(r => [r.id, r]));
     const selectable = new Set(report.selectable_candidate_ids || []);
+    // 只交付服务端真正允许继续的建议，不把失败卡当最终结果，也不改写校验或补候选。
+    const candidates = (report.candidates || []).filter(candidate => selectable.has(candidate.id) && results.get(candidate.id)?.passed === true);
 
-    if ((report.candidates || []).length === 0) {
-      return stateView("这次没有找到合适的思路", ["换个说法或放宽一点条件，我们再试一次。"], [
-        el("button", { class: "btn btn--primary", type: "button", onclick: () => resetToForm() }, [icon("refresh", { size: 18 }), "重新聊一次"]),
+    if (candidates.length === 0) {
+      return stateView("这次还没生成合适的建议", ["可以返回需求小结，再试一次。"], [
+        el("button", { class: "btn btn--primary", type: "button", onclick: () => resetToForm() }, [icon("refresh", { size: 18 }), "返回需求并重试"]),
       ]);
     }
 
     body.push(el("header", { class: "result-head" }, [
       el("div", {}, [
-        el("h1", { text: "三个思路，挑一个最像你们的。" }),
+        el("h1", { text: candidates.length === 3 ? "三个思路，挑一个最像你们的。" : candidates.length === 2 ? "两个思路，看看更喜欢哪个。" : "这个思路，看看喜不喜欢。" }),
         requestChips(report.request),
       ]),
       el("p", { class: "hand-note", "aria-hidden": "true", text: "慢慢看，不着急～" }),
     ]));
 
-    const grid = el("div", { class: "candidate-grid", "aria-label": "三个礼物思路" });
-    report.candidates.forEach((candidate, index) => {
-      const result = results.get(candidate.id) || { passed: false, errors: [{ code: "MISSING_RESULT", message: "缺少检查结果，暂不可选" }] };
-      const canSelect = selectable.has(candidate.id) && result.passed === true;
-      const card = el("article", { class: `card gift-choice ${canSelect ? "" : "card--fail"}`, "data-candidate-id": candidate.id, "aria-labelledby": `gift-title-${index}` }, [
+    const grid = el("div", { class: "candidate-grid", "aria-label": `${candidates.length} 个礼物思路` });
+    candidates.forEach((candidate, index) => {
+      const result = results.get(candidate.id);
+      const messages = friendlyMessages(result.errors);
+      const hasPrice = (typeof candidate.estimated_total === "string" && /^\d+(?:\.\d{1,2})?$/.test(candidate.estimated_total))
+        || (typeof candidate.estimated_total === "number" && Number.isFinite(candidate.estimated_total) && candidate.estimated_total >= 0);
+      const price = hasPrice ? `参考 ${money(candidate.estimated_total, candidate.currency)}` : "价格待了解";
+      const card = el("article", { class: "card gift-choice", "data-candidate-id": candidate.id, "aria-labelledby": `gift-title-${index}` }, [
         el("div", { class: "gift-choice__index" }, [
           el("span", { class: "gift-choice__no", "aria-hidden": "true", text: ["壹", "贰", "叁"][index] || String(index + 1) }),
           el("span", { class: "sr-only", text: `方案 ${index + 1}` }),
@@ -146,14 +151,13 @@ export function createResultViews(ctx) {
         (() => { const figure = candidateMedia(report, candidate); return figure.dataset.imageId === "missing" ? null : figure; })(),
         el("div", { class: "gift-choice-heading" }, [
           el("h2", { class: "card__title", id: `gift-title-${index}`, text: candidate.name }),
-          el("span", { class: "gift-choice-price", text: `参考 ${money(candidate.estimated_total, candidate.currency)}`, "aria-label": `参考价 ${candidate.estimated_total} 元` }),
+          el("span", { class: "gift-choice-price", text: price }),
         ]),
         el("p", { class: "card__lead", text: candidate.description }),
         el("ul", { class: "gift-facts" }, [
-          el("li", {}, [icon("clock", { size: 16 }), `准备约 ${candidate.estimated_preparation_days} 天`]),
+          Number.isFinite(candidate.estimated_preparation_days) ? el("li", {}, [icon("clock", { size: 16 }), `准备约 ${candidate.estimated_preparation_days} 天`]) : null,
           ...cardWarnings(result.warnings).map(text => el("li", {}, [icon("lightbulb", { size: 16 }), text])),
         ]),
-        el("p", { class: "gift-choice-status" }, canSelect ? [icon("shield", { size: 18 }), "预算、时间、避开项都符合"] : [icon("ban", { size: 18 }), friendlyMessages(result.errors)[0] || "有条件不符合，暂不可选"]),
         el("details", { class: "candidate-evidence" }, [
           el("summary", {}, [icon("search", { size: 18 }), "为什么推荐它"]),
           el("dl", { class: "kv" }, [
@@ -162,13 +166,11 @@ export function createResultViews(ctx) {
             el("dd", {}, [evidenceList((candidate.fact_refs || []).map(ref => facts.get(ref)).filter(Boolean), "暂无")]),
             el("dt", { text: "我的推断" }), el("dd", {}, [evidenceList(candidate.inferences, "无")]),
             el("dt", { text: "还不确定的" }), el("dd", {}, [evidenceList(candidate.unknowns, "暂无")]),
-            ...(result.errors && result.errors.length ? [el("dt", { text: "哪里不符合" }), el("dd", {}, [evidenceList(friendlyMessages(result.errors), "")])] : []),
+            ...(messages.length ? [el("dt", { text: "补充说明" }), el("dd", {}, [evidenceList(messages, "")])] : []),
           ]),
         ]),
         el("div", { class: "suggest-row" }, [
-          canSelect
-            ? el("button", { class: "btn btn--primary", type: "button", disabled: state.busy, onclick: () => selectCandidate(candidate.id) }, state.busy ? [el("span", { class: "gw-dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "sr-only", text: "加载中" })] : [icon("gift", { size: 18 }), "就选它"])
-            : el("button", { class: "btn btn--ghost", type: "button", disabled: true, text: "暂不可选" }),
+          el("button", { class: "btn btn--primary", type: "button", disabled: state.busy, onclick: () => selectCandidate(candidate.id) }, state.busy ? [el("span", { class: "gw-dots", "aria-hidden": "true" }, [el("i"), el("i"), el("i")]), el("span", { class: "sr-only", text: "加载中" })] : [icon("gift", { size: 18 }), "就选它"]),
         ]),
       ]);
       // 图片来源收进“为什么推荐它”，卡片正面保持干净。
@@ -178,19 +180,16 @@ export function createResultViews(ctx) {
     });
     body.push(grid);
 
-    if ((report.request.preference_inferences || []).length > 0) {
+    if ((report.request?.preference_inferences || []).length > 0) {
       body.push(el("section", { class: "card" }, [
         el("h2", { class: "card__title" }, [icon("lightbulb"), "我从你的回答里推断"]),
         evidenceList(report.request.preference_inferences.map(x => x.text), ""),
       ]));
     }
-    if (report.workflow_errors?.length) body.push(errorBox(report.workflow_errors, "生成时遇到的问题"));
-    if (report.validation.errors?.length) body.push(errorBox(report.validation.errors, "检查时遇到的问题"));
-    if (selectable.size === 0) body.push(el("p", { class: "field__hint", text: "这次三个思路都和你的要求有冲突，改改需求再试一次吧。" }));
 
     return {
       body,
-      actions: [el("button", { class: `btn ${selectable.size ? "btn--ghost" : "btn--primary"}`, type: "button", onclick: () => resetToForm() }, [icon("refresh", { size: 18 }), "重新聊一次"])],
+      actions: [el("button", { class: "btn btn--ghost", type: "button", onclick: () => resetToForm() }, [icon("refresh", { size: 18 }), "重新聊一次"])],
     };
   }
 
