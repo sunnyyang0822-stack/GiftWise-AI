@@ -1,0 +1,11 @@
+{"test":"retrieval-media.test.mjs","exit":0}
+{"test":"retrieval-media-rm001.test.mjs","exit":0}
+{"test":"retrieval-media-history.test.mjs","exit":0}
+{"test":"retrieval-media-http.test.mjs","exit":0}
+{"test":"retrieval-media-integration.test.mjs","exit":0}
+{"test":"retrieval-media-scene.test.mjs","exit":0}
+{"test":"retrieval-media-seedream.test.mjs","exit":0}
+{"test":"access-layer","exit":0}
+{"test":"workflow-verify-local--nov01","exit":0}
+{"test":"ui-revision-module","exit":0}
+{"test":"workflow-intake-previous-gifts","exit":1}
