@@ -1,16 +1,16 @@
 {
   "repository": "https://github.com/sunnyyang0822-stack/GiftWise-AI",
-  "code_branch": "codex/backend-intake-integration-20261031",
-  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "code_branch": "main",
+  "code_sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
   "code_tree": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
   "prepared_reference_sha": "008415e09d1c5203d7bf7bbed54c2382c4cac1f1",
   "frontend_backend_same_tree": true,
   "materials_branch": "codex/integration-handoff-eceef056-20261031",
   "materials_commit": "See pinned remote delivery receipt and materials PR; do not substitute code_sha",
-  "code_archive": "https://github.com/sunnyyang0822-stack/GiftWise-AI/archive/eceef056ce80399b83c61f62860a32d0ead16e3d.zip",
+  "code_archive": "https://github.com/sunnyyang0822-stack/GiftWise-AI/archive/15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879.zip",
   "main_pr": "https://github.com/sunnyyang0822-stack/GiftWise-AI/pull/111",
-  "main_merged": false,
-  "user_walkthrough_approved": false,
+  "main_merged": true,
+  "user_walkthrough_approved": true,
   "cloud_deployed": false,
   "added_prs_since_reference": [
     {
@@ -221,5 +221,13 @@
   ],
   "material_data_manifest_sha256": "a1298ea0f85c0ae05b3a298941ec023deb9fb1c9ed513b14bd6c51252a3c38d4",
   "runtime_required_untracked_source_files": [],
-  "secrets_included": false
+  "secrets_included": false,
+  "qa_tested_code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "main_merged_at": "2026-10-31T20:54:40Z",
+  "main_merge_parents": [
+    "bd1b17e5a9232ee3ced1987990531f84bfeccd2a",
+    "eceef056ce80399b83c61f62860a32d0ead16e3d"
+  ],
+  "main_tree_equals_qa_tree": true,
+  "qa_reexecuted_after_merge": false
 }
