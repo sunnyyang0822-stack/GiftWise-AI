@@ -2,7 +2,7 @@
 
 import json
 
-from validator.rules import validate
+from validator.rules import validate, check_budget_range, CONTRACT_VERSION, _amount
 from workflow.labels import RELATIONS, CLOSENESS, OCCASIONS, INTERESTS, GIFT_STYLES, EXCLUSIONS
 
 
@@ -40,12 +40,45 @@ def adapt_intake(intake_json):
     if not isinstance(data, dict):
         return {"status": "needs_input", "errors": [{"code": "INVALID_TYPE", "path": "intake", "message": "输入根节点须为对象"}], "request_json": None}
 
-    fields = {"recipient_relation", "closeness", "occasion", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context"}
-    for key in data.keys() - fields:
+    fields = {"recipient_relation", "closeness", "occasion", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes"}
+    for key in data:
+        if key in fields:
+            continue
         err("INTAKE_UNKNOWN_FIELD", "intake." + key, "未声明的输入字段，请确认契约版本")
-    for key in ("recipient_relation", "occasion", "budget_amount", "currency", "deadline_days"):
+    revised = any(key in data for key in ("contract_version", "budget_mode", "budget_range"))
+    required = ("recipient_relation", "occasion", "currency", "deadline_days") if revised else ("recipient_relation", "occasion", "budget_amount", "currency", "deadline_days")
+    for key in required:
         if key not in data or data[key] is None:
             err("INTAKE_CLARIFICATION_REQUIRED", "intake." + key, "请补充明确的关系、场合、预算上限、币种及可用天数")
+    budget = data.get("budget_amount")
+    budget_errors = []
+    if revised:
+        if "contract_version" not in data:
+            err("INTAKE_CLARIFICATION_REQUIRED", "intake.contract_version", "请提供新版输入契约版本")
+        elif not isinstance(data["contract_version"], str):
+            err("INVALID_TYPE", "intake.contract_version", "契约版本须为字符串")
+        elif data["contract_version"] != CONTRACT_VERSION:
+            err("INTAKE_UNKNOWN_LABEL", "intake.contract_version", "不支持此输入契约版本")
+        interval = check_budget_range(data.get("budget_range"), "intake.budget_range", budget_errors, data.get("budget_mode"))
+        if interval is not None:
+            if "budget_amount" in data:
+                if isinstance(budget, str) and len(budget) > 1000:
+                    budget_errors.append({"code": "LIMIT_EXCEEDED", "path": "intake.budget_amount", "message": "字段字符串超过 1000 个 Unicode 码点"})
+                    scalar = None
+                else:
+                    scalar = _amount(budget, "intake.budget_amount", budget_errors)
+                if scalar is not None and scalar > 10000:
+                    budget_errors.append({"code": "LIMIT_EXCEEDED", "path": "intake.budget_amount", "message": "预算须在 0 至 10000 之间"})
+                elif scalar is not None and scalar != interval[1]:
+                    budget_errors.append({"code": "BUDGET_RANGE_MISMATCH", "path": "intake.budget_amount", "message": "预算上限须与区间 max 数值一致"})
+            else:
+                budget = data["budget_range"]["max"]
+        errors.extend(budget_errors)
+    dislikes = data.get("dislikes", "")
+    if not isinstance(dislikes, str):
+        err("INVALID_TYPE", "intake.dislikes", "不喜欢的东西须为字符串，可为空")
+    elif len(dislikes) > 1000:
+        err("LIMIT_EXCEEDED", "intake.dislikes", "不喜欢的东西最多 1000 个 Unicode 码点")
 
     def choice(key, table, default=None):
         value = data.get(key, default)
@@ -97,8 +130,9 @@ def adapt_intake(intake_json):
     if not isinstance(exclusions, dict):
         err("INVALID_TYPE", "intake.hard_exclusions", "禁忌须为 tags、terms、unresolved 对象")
         exclusions = {}
-    for key in exclusions.keys() - {"tags", "terms", "unresolved"}:
-        err("INTAKE_UNKNOWN_FIELD", "intake.hard_exclusions." + key, "未知禁忌字段")
+    for key in exclusions:
+        if key not in {"tags", "terms", "unresolved"}:
+            err("INTAKE_UNKNOWN_FIELD", "intake.hard_exclusions." + key, "未知禁忌字段")
     for key in ("tags", "terms", "unresolved"):
         values = exclusions.get(key, [])
         if not isinstance(values, list) or any(not isinstance(v, str) or not v.strip() for v in values):
@@ -120,7 +154,7 @@ def adapt_intake(intake_json):
         "recipient_relation": RELATIONS.get(relation, ""),
         "recipient_relation_id": relation if relation in RELATIONS else "",
         "occasion": OCCASIONS.get(occasion, ""),
-        "budget_amount": data.get("budget_amount"), "currency": data.get("currency"),
+        "budget_amount": budget, "currency": data.get("currency"),
         "available_days": data.get("deadline_days"),
         "facts": [{"id": "interest:" + key, "text": "用户明确知道：对方对“" + INTERESTS[key] + "”感兴趣（未确认该组内具体偏好）"} for key in interests if confidence.get(key, "inferred") == "confirmed"],
         "forbidden_tags": tags, "forbidden_terms": exclusions.get("terms", []),
@@ -128,9 +162,15 @@ def adapt_intake(intake_json):
         "preference_inferences": [{"interest_id": key, "text": "用户猜测：对方可能对“" + INTERESTS[key] + "”感兴趣"} for key in interests if confidence.get(key, "inferred") == "inferred"],
         "gift_styles": styles, "hard_exclusions_original": exclusions,
     }
+    if revised:
+        request.update(contract_version=CONTRACT_VERSION, budget_range=data.get("budget_range"), dislikes=dislikes)
+    elif "dislikes" in data:
+        request["dislikes"] = dislikes
     # 复用原规则的请求检查；空批次产生的候选错误不会成为输入错误。
     checked = validate(dump(request), '{}')
-    errors.extend(e for e in checked["errors"] if e["path"].startswith("request"))
+    errors.extend(e for e in checked["errors"] if e["path"].startswith("request")
+                  and not (budget_errors and e["path"].startswith(("request.budget_range", "request.budget_amount")))
+                  and not ("dislikes" in e["path"] and any(x["path"] == "intake.dislikes" for x in errors)))
     if checked["status"] == "error":
         err("INTERNAL_ERROR", "intake", "输入检查暂不可用，请稍后重试")
     return {"status": "needs_input" if errors else "ready", "errors": errors, "request_json": None if errors else dump(request)}
