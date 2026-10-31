@@ -61,7 +61,7 @@ import {
 } from "./labels.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
 import { runRecommendation, runPresentation } from "./pipeline.mjs";
-import { getRun, runCount } from "./store.mjs";
+import { getRun, runCount, retrievalView } from "./store.mjs";
 import {mediaProvider} from "./media/provider.mjs";
 import { attestation, clientRevisionFrom } from "./attest.mjs";
 import { openCatalogDb, findImageById } from "./catalog/db.mjs";
@@ -439,6 +439,8 @@ async function handleApi(req, res, url) {
       selectable_candidate_ids: run.selectable_candidate_ids,
       selected_candidate_id: run.selected_candidate_id,
       call_counts: run.call_counts,
+      retrieval: retrievalView(run.retrieval),
+      media: {...(run.media??{}),candidates:run.reference_image_slots??run.media?.candidates??[]},
     });
     return true;
   }

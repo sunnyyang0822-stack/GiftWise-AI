@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const DOMESTIC_DOMAINS = ['mi.com', 'huawei.com', 'honor.com', 'midea.com', 'haier.com', 'smzdm.com', 'zdmimg.com', 'sspai.com', 'ithome.com', 'zhihu.com', 'bilibili.com', 'douban.com', 'weibo.com', 'xiaohongshu.com', 'douyin.com', '163.com', 'sohu.com', 'qq.com', 'people.com.cn', 'xinhuanet.com', 'sina.com.cn', 'zol.com.cn', 'pconline.com.cn', 'dianping.com'];
+const GLOBAL_CONTENT_DOMAINS=['pinterest.com','pixiv.net','wikipedia.org','wikimedia.org','unsplash.com','pexels.com','behance.net','dribbble.com','instructables.com','designboom.com','dezeen.com','archdaily.com','flickr.com','imgur.com','reddit.com','youtube.com'];
 const COMMERCE_DOMAINS = ['jd.com', 'jd.hk', 'taobao.com', 'tmall.com', '1688.com', 'pinduoduo.com', 'yangkeduo.com', 'jinritemai.com', 'kwaixiaodian.com', 'vip.com', 'suning.com', 'suning.cn', 'xiaomiyoupin.com', 'dewu.com', 'poizon.com', 'dangdang.com', 'amazon.cn', 'gome.com.cn', 'kaola.com', 'you.163.com'];
 const clean = (value, max = 300) => typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max) : '';
 export const PUBLIC_REFERENCE_SOURCES = Object.freeze({
@@ -21,7 +22,7 @@ function searchUrl(source, keyword, page) {
   return url.href;
 }
 
-/** 解开搜索引擎公开跳转目标后再做国内来源检查，跳转链接本身不作为证据。 */
+/** 解开公开跳转目标后检查非电商资料来源，跳转链接本身不作为证据。 */
 export function publicReferenceUrl(value, source) {
   try {
     let url = new URL(value, source === 'bing' ? 'https://cn.bing.com' : 'https://html.duckduckgo.com');
@@ -39,8 +40,8 @@ export function publicReferenceUrl(value, source) {
     if (COMMERCE_DOMAINS.some(d => url.hostname === d || url.hostname.endsWith('.' + d))) return null;
     if (/^(?:shop|store|mall|buy|item|detail)\./i.test(url.hostname)) return null;
     if (/\/(?:goods-detail|goods|shop|mall|cart|checkout|buy)(?:\/|$)/i.test(url.pathname)) return null;
-    // .cn及已盘点国内公开信息站；海外来源不能因中文标题变成国内参考来源。
-    if (!(url.hostname.endsWith('.cn') || DOMESTIC_DOMAINS.some(d => url.hostname === d || url.hostname.endsWith('.' + d)))) return null;
+    // 参考/灵感允许已盘点的国内外内容站，不开放海外电商采购。
+    if (!(url.hostname.endsWith('.cn') || [...DOMESTIC_DOMAINS,...GLOBAL_CONTENT_DOMAINS].some(d => url.hostname === d || url.hostname.endsWith('.' + d)))) return null;
     if (/login|passport|signin|oauth|authorize/i.test(url.hostname + url.pathname)) return null;
     url.hash = '';
     for (const key of [...url.searchParams.keys()]) if (/^(?:utm_.+|spm|scm|fbclid|msclkid|access_token|token|session|cookie|authorization)$/i.test(key)) url.searchParams.delete(key);
@@ -77,7 +78,7 @@ export function normalizePublicReference(raw, { source = 'duckduckgo', keyword, 
   return {
     record_kind: 'reference', purpose: 'reference', reference_kind: 'public_reference',
     title, product_name: clean(raw.product_name, 150) || null, summary,
-    source_url, source_site: new URL(source_url).hostname, source_platform: source, source_scope: 'domestic_public_information',
+    source_url, source_site: new URL(source_url).hostname, source_platform: source, source_scope: 'public_content_reference',
     product_url: null, sku_id: null, is_live_quote: false,
     price_kind: 'reference_price', price_text: prices.length === 1 ? prices[0].text : null,
     price_amount: prices.length === 1 ? prices[0].amount : null, currency: prices.length ? 'CNY' : null,
@@ -175,7 +176,7 @@ export async function runPublicReferenceSearch(page, { source = 'duckduckgo', ke
   const registry = PUBLIC_REFERENCE_SOURCES[source];
   if (!registry) throw new TypeError('不支持的公开资料来源');
   const count = Math.min(3, Math.max(1, Math.floor(Number(maxPages) || 1)));
-  const coverage = { source, keyword, purpose: 'reference', pages_requested: count, pages_completed: 0, complete: false, status: 'not_observed', scope: 'requested_search_pages_only', execution_mode: source === 'duckduckgo' && packageRoot ? 'native_opencli' : 'public_dom', native_executed: false, limitations: ['公开检索实现尚未真实验证', '搜索服务是发现入口，仅保留国内非电商公开信息网站'], pages: [] };
+  const coverage = { source, keyword, purpose: 'reference', pages_requested: count, pages_completed: 0, complete: false, status: 'not_observed', scope: 'requested_search_pages_only', execution_mode: source === 'duckduckgo' && packageRoot ? 'native_opencli' : 'public_dom', native_executed: false, limitations: ['来源能力盘点不等于本次查询成功，以实际pages状态为准', '搜索服务是发现入口，仅保留允许的非电商公开资料'], pages: [] };
   const records = [], seen = new Set();
   let native;
   if (source === 'duckduckgo' && packageRoot) {
@@ -215,17 +216,18 @@ export async function runPublicReferenceSearch(page, { source = 'duckduckgo', ke
       if (signal?.aborted) { coverage.status = 'aborted'; break; }
       const observedAt = new Date().toISOString();
       const normalized = result.status === 'ok' ? (result.records || []).map(raw => normalizePublicReference(raw, { source, keyword, observedAt })).filter(Boolean) : [];
-      coverage.status = result.status === 'ok' && !normalized.length ? 'no_domestic_reference_results' : result.status;
+      coverage.status = result.status === 'ok' && !normalized.length ? 'no_public_reference_results' : result.status;
       coverage.pages.push({ page: n, status: coverage.status, count: normalized.length, observed_at: observedAt });
       if (coverage.status !== 'ok') break;
       coverage.pages_completed++;
       for (const record of normalized) if (!seen.has(record.source_url)) { seen.add(record.source_url); records.push(record); }
       if (n < count && !result.next_available) { coverage.limitations.push('未见下一页，不宣称全量'); break; }
-    } catch {
+    } catch(error) {
       let observed;
       if(!signal?.aborted)try{observed=await page.evaluate(buildPublicReferenceReadScript(source));}catch{}
       coverage.status=signal?.aborted?'aborted':['restricted','login_required'].includes(observed?.status)?observed.status:'failed';
-      coverage.pages.push({page:n,status:coverage.status,observed_at:new Date().toISOString()});break;
+      coverage.error_code=typeof error?.code==='string'&&/^[A-Z][A-Z0-9_]{1,79}$/.test(error.code)?error.code:'PUBLIC_REFERENCE_READ_FAILED';
+      coverage.pages.push({page:n,status:coverage.status,error_code:coverage.error_code,observed_at:new Date().toISOString()});break;
     }
   }
   coverage.complete = coverage.pages_completed === count;

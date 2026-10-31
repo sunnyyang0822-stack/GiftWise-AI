@@ -13,17 +13,18 @@ import{createSourceAvailabilityTracker}from'./source-availability.mjs';
 const sourceAvailability=createSourceAvailabilityTracker();
 const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,32);
 
-async function referenceRecords(page,records,{source,signal}){
- const result=[];
+async function referenceRecords(page,records,{source,signal,imageValidationLimit=6}){
+ const result=[];let attempted=0;
  for(const record of records){
   if(signal?.aborted)break;
   const reference_id='ref_'+digest(`${source}|${record.source_url}`);
   const r={...record,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null};
-  if(record.image_url){
+  if(record.image_url&&attempted<imageValidationLimit){
+   attempted++;
    const validation=await validateSourceImage(record.image_url,{role:'reference',fetchImpl:page.fetchImage,signal,includeBytes:true});
    const{bytes,...metadata}=validation;r.image_validation=metadata;
    if(validation.ok){r.image_id=digest(`${reference_id}|${record.image_url}`);cacheSourceImage(r.image_id,validation);}
-  }
+  }else if(record.image_url)r.image_validation={ok:false,error_code:'IMAGE_NOT_FETCHED_LIMIT'};
   result.push(r);
  }return result;
 }
@@ -159,7 +160,10 @@ export async function runDomesticSearch(plan, {
         coverage.push(sourceCoverage);
         if(publicReference||useContent){
           const records=outcome.records??[];
-          references.push(...await referenceRecords(page,records,{source,signal:controller.signal}));
+          const resolved=await referenceRecords(page,records,{source,signal:controller.signal});references.push(...resolved);
+          sourceCoverage.image_candidates=records.filter(r=>r.image_url).length;
+          sourceCoverage.image_validation_limit=6;
+          sourceCoverage.images_validation_attempted=resolved.filter(r=>r.image_validation&&r.image_validation.error_code!=='IMAGE_NOT_FETCHED_LIMIT').length;
           if(publicReference){if(db)saveContent(db,records,sourceCoverage,version);onProgress(sourceCoverage);continue;}
         }
         if (useContent) {

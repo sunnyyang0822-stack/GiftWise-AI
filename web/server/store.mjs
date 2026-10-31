@@ -97,7 +97,7 @@ export function reset() {
 export function publicReport(run) {
   return {
     retrieval: retrievalView(run.retrieval),
-    media: run.media || { status: "unavailable", candidates: [], selected: null },
+    media: run.media ? {...run.media,candidates:run.reference_image_slots??run.media.candidates} : { status: "unavailable", candidates: [], selected: null },
     recommendation_run_id: run.run_id,
     created_at: run.created_at,
     mode: run.mode,
