@@ -1,0 +1,8 @@
+FAIL Activity material relative links resolve
+PASS 11 speech sections preserve source slide title/order
+PASS No invented named users in active entry/speech/demo
+PASS All seven material sections present
+PASS Explicit four-way status labels present
+PASS Tracked changes restricted to docs
+FAIL git diff --check
+Scope: documentation checks only; no product tests/model calls/PPT changes.

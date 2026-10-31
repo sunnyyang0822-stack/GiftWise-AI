@@ -1,0 +1,8 @@
+PASS Active material relative links resolve
+PASS 11 titles and page order retained
+PASS No named invented users in active entry/speech/demo
+PASS Seven required sections present
+PASS Four status categories explicit
+PASS git diff --check
+Initial self-check retained; missing output file and CRLF whitespace checks corrected without altering technical conclusions.
+Scope: documents only, no product tests/model calls/PPT edits.
