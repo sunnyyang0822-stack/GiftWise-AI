@@ -25,17 +25,32 @@ export function retrievalContext(request = {}) {
 }
 export function normalizeRetrievalPlan(plan = {}) {
   const queries = [];
-  for (const raw of Array.isArray(plan.queries) ? plan.queries : (plan.keywords ?? []).map(keyword => ({keyword}))) {
+  const hasDecision = typeof plan.needs_retrieval === 'boolean';
+  const decisionReason = clean(plan.decision_reason) || clean(plan.audit?.decision_reason);
+  let rejectedQueries = 0;
+  if (plan.needs_retrieval === true && Array.isArray(plan.queries)) for (const raw of plan.queries) {
     const keyword = clean(raw?.keyword);
-    if (!keyword || GENERIC.has(keyword.toLowerCase())) continue;
+    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => Object.hasOwn(DOMESTIC_SOURCE_HOSTS, id)))];
+    // No implicit source expansion: each query must name the domestic platforms
+    // selected by the model. Missing/overseas-only sources make this query unusable.
+    if (!keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }
     const query = {
       keyword, kind: ['physical', 'experience', 'ticket'].includes(raw.kind) ? raw.kind : null,
-      city: clean(raw.city) || null,
-      sources: [...new Set((Array.isArray(raw.sources) ? raw.sources : []).filter(id => Object.hasOwn(DOMESTIC_SOURCE_HOSTS, id)))],
+      city: clean(raw.city) || null, sources,
     };
     if (!queries.some(q => JSON.stringify(q) === JSON.stringify(query))) queries.push(query);
   }
-  return { category: 'domestic', keywords: [...new Set(queries.map(q => q.keyword))], queries, limit: null, coverage: 'requested_accessible' };
+  const needsRetrieval = hasDecision && plan.needs_retrieval && queries.length > 0;
+  return {
+    category: 'domestic', needs_retrieval: needsRetrieval,
+    keywords: [...new Set(queries.map(q => q.keyword))], queries,
+    limit: null, coverage: 'requested_accessible',
+    audit: {
+      decision_reason: decisionReason || null,
+      decision_status: !hasDecision ? 'missing_decision' : plan.needs_retrieval && !queries.length ? 'no_executable_query' : 'decided',
+      rejected_queries: rejectedQueries,
+    },
+  };
 }
 async function modelPlan(context) {
   const { llmProvider, parseModelJson } = await import('../llm/provider.mjs');
@@ -47,18 +62,20 @@ async function modelPlan(context) {
   return parsed.value;
 }
 export async function buildRetrievalPlan(request = {}, { queries, planImpl = modelPlan, signal } = {}) {
-  const explicit = queries ?? request.searchPlan?.queries ?? request.queries;
-  if (explicit) return {...normalizeRetrievalPlan({queries:explicit}), warnings:[], planned_by:'explicit'};
+  if (request.searchPlan) return {...normalizeRetrievalPlan(request.searchPlan), warnings:[], planned_by:'explicit'};
+  if (queries || request.queries || typeof request.needs_retrieval === 'boolean') {
+    return {...normalizeRetrievalPlan({...request,queries:queries ?? request.queries}),warnings:[],planned_by:'explicit'};
+  }
   const context = retrievalContext(request);
   let planned = null;
-  const warnings = [];
+  let decisionStatus = signal?.aborted ? 'cancelled' : 'model_unavailable';
   if (!signal?.aborted) {
     try { planned = await planImpl(context, {signal}); }
-    catch { warnings.push('检索计划暂不可用，保留需求原话作为补充'); }
+    catch { decisionStatus = 'model_error'; }
   }
-  if (planned && !Array.isArray(planned.queries) && !Array.isArray(planned.keywords)) { warnings.push('模型检索计划格式无效，未猜测检索形式'); planned = null; }
-  if (planned) return {...normalizeRetrievalPlan(planned),warnings,planned_by:'model'};
-  // No keyword/category rules: fallback preserves only explicit preference text.
-  const raw = ['literal_preferences','preferences','preference_text','likes','requirements','interest_details'].flatMap(k => Array.isArray(context[k]) ? context[k] : [context[k]]).filter(v => typeof v === 'string');
-  return {...normalizeRetrievalPlan({keywords:raw}),warnings,planned_by:'verbatim'};
+  const normalized = normalizeRetrievalPlan(planned ?? {});
+  if (!planned) normalized.audit.decision_status = decisionStatus;
+  // Planning failures remain internal audit. No model decision means no outbound
+  // retrieval, while recommendation generation can still use the original context.
+  return {...normalized,warnings:[],planned_by:planned ? 'model' : 'skipped'};
 }
