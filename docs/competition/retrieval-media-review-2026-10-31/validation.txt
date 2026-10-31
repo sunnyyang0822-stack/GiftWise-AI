@@ -1,0 +1,15 @@
+文档检查 2026-10-31T05:22:38.599Z
+base=3890aa57a2c728d3bd94fea00b9117f9d0a8aa93
+command=node docs/competition/retrieval-media-review-2026-10-31/check-materials.cjs
+PASS 仅九份活动材料及新增本轮检查/来源记录
+PASS 无代码、共享架构源、历史证据或 PPT 二进制变更
+PASS 文档相对链接文件目标存在（74 个；不验证远端链接或所有锚点）
+PASS S1–S11 页标题/页序/五分钟计划时间与 release 完全一致
+PASS Demo/分镜/总文档均保留原五段三分钟设计预算
+PASS 包含七项材料和四种状态
+PASS 价格与安全边界齐全
+PASS 图片与失败边界齐全
+PASS QA 与后台固定提交均已区分
+PASS 本轮截图 SC11–SC13 均为待采集
+PASS git diff --check
+范围：文档结构与来源核对；未验证产品功能、渲染、真人时长、真实商品/模型/图像或部署。
