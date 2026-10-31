@@ -199,12 +199,6 @@ function renderStep1() {
           }, { class: "chip--radio" }),
         ),
       ),
-      f.recipient_relation
-        ? el("p", {
-            class: "field__selected",
-            text: `已选「${cfg.labels.relations.find((x) => x.id === f.recipient_relation).zh}」：${cfg.labels.relations.find((x) => x.id === f.recipient_relation).scene}`,
-          })
-        : null,
       f.recipient_relation === "pursuit" && !cfg.pursuit_contract_ready
         ? el("p", { class: "field__error", text: cfg.pursuit_notice })
         : null,
