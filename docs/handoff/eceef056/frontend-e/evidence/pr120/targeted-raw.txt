@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: 停推荐网图：真实参考图响应也无img/空框，三文字与来源数据不变
+ok 1 - 停推荐网图：真实参考图响应也无img/空框，三文字与来源数据不变
+  ---
+  duration_ms: 10.7596
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：pending与重复render均不排程或发推荐GET
+ok 2 - 停推荐网图：pending与重复render均不排程或发推荐GET
+  ---
+  duration_ms: 4.7618
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：错绑/重复/缺失图片不影响服务端三个可选候选
+ok 3 - 停推荐网图：错绑/重复/缺失图片不影响服务端三个可选候选
+  ---
+  duration_ms: 6.4092
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：无图片字段也保留预算、事实与WHY文字
+ok 4 - 停推荐网图：无图片字段也保留预算、事实与WHY文字
+  ---
+  duration_ms: 4.7951
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：业务失败交集和忙碌防重复选择仍按原服务决策
+ok 5 - 停推荐网图：业务失败交集和忙碌防重复选择仍按原服务决策
+  ---
+  duration_ms: 3.262
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选前加载骨架没有图片区占位，选后效果框仍在
+ok 6 - 停推荐网图：选前加载骨架没有图片区占位，选后效果框仍在
+  ---
+  duration_ms: 1.3293
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：运行时不引入推荐poll，共享图类型与选后接口保留
+ok 7 - 停推荐网图：运行时不引入推荐poll，共享图类型与选后接口保留
+  ---
+  duration_ms: 29.3301
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI pending依然文字先读且只排既有任务读取
+ok 8 - 停推荐网图：选后AI pending依然文字先读且只排既有任务读取
+  ---
+  duration_ms: 3.7383
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI ready原位补图，正文/按钮/AI标识保持
+ok 9 - 停推荐网图：选后AI ready原位补图，正文/按钮/AI标识保持
+  ---
+  duration_ms: 4.1186
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后AI failed保留文字与只读刷新，不伪造图片
+ok 10 - 停推荐网图：选后AI failed保留文字与只读刷新，不伪造图片
+  ---
+  duration_ms: 1.8982
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选后读取受阻的刷新继续纯GET，重复点击无并发
+ok 11 - 停推荐网图：选后读取受阻的刷新继续纯GET，重复点击无并发
+  ---
+  duration_ms: 1.7886
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：错候选或错任务的AI快照仍被拒绝
+ok 12 - 停推荐网图：错候选或错任务的AI快照仍被拒绝
+  ---
+  duration_ms: 2.621
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：离开选后页回文字三卡，旧AI响应不会串入
+ok 13 - 停推荐网图：离开选后页回文字三卡，旧AI响应不会串入
+  ---
+  duration_ms: 2.9425
+  type: 'test'
+  ...
+# Subtest: 停推荐网图：选择仍提交原生图呈现POST且pending文字立即进入状态
+ok 14 - 停推荐网图：选择仍提交原生图呈现POST且pending文字立即进入状态
+  ---
+  duration_ms: 10.735
+  type: 'test'
+  ...
+# Subtest: 三卡无网图：已有真实引用也只交付文字卡，来源数据与三选择保留
+ok 15 - 三卡无网图：已有真实引用也只交付文字卡，来源数据与三选择保留
+  ---
+  duration_ms: 7.1715
+  type: 'test'
+  ...
+# Subtest: 三卡无网图：图字段pending也不显示图片加载空态或禁选
+ok 16 - 三卡无网图：图字段pending也不显示图片加载空态或禁选
+  ---
+  duration_ms: 2.4271
+  type: 'test'
+  ...
+# Subtest: 三卡无网图：旧失败图片状态不隐藏任何文字候选或禁选
+ok 17 - 三卡无网图：旧失败图片状态不隐藏任何文字候选或禁选
+  ---
+  duration_ms: 1.7717
+  type: 'test'
+  ...
+# Subtest: 三卡无网图：缺失无效或重复图片引用均不改变三条文字结果
+ok 18 - 三卡无网图：缺失无效或重复图片引用均不改变三条文字结果
+  ---
+  duration_ms: 3.2249
+  type: 'test'
+  ...
+# Subtest: 三卡无网图：新旧运行都不展示推荐图，不复用旧图
+ok 19 - 三卡无网图：新旧运行都不展示推荐图，不复用旧图
+  ---
+  duration_ms: 1.0136
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 644.8942

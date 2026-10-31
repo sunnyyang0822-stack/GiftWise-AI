@@ -1,0 +1,107 @@
+[
+  {
+    "step": 0,
+    "q": "closeness",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 1,
+    "q": "occasion",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 2,
+    "q": "budget",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 3,
+    "q": "interests",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 4,
+    "q": "confidence",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 5,
+    "q": "styles",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 6,
+    "q": "avoid",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 7,
+    "q": "previous",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 8,
+    "q": "extra",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "step": 9,
+    "q": "summary",
+    "bot": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "summary": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "t": "text-shown",
+    "m": {
+      "scrollY": 0,
+      "media": [
+        284,
+        569
+      ],
+      "greetingTop": 881,
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "docH": 1915
+    }
+  },
+  {
+    "t": "media-early",
+    "m": {
+      "scrollY": 119,
+      "media": [
+        284,
+        569
+      ],
+      "greetingTop": 881,
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "docH": 1915
+    }
+  },
+  {
+    "t": "media-late",
+    "m": {
+      "scrollY": 119,
+      "media": [
+        284,
+        569
+      ],
+      "greetingTop": 881,
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "docH": 1915
+    }
+  },
+  {
+    "steps": "[REDACTED:CONVERSATION_CONTENT]"
+  },
+  {
+    "encourageGap": {
+      "gap": 0,
+      "docH": 900,
+      "vh": 900
+    }
+  },
+  {
+    "pageExceptions": []
+  }
+]

@@ -1,0 +1,4 @@
+交付说明更正（不改原始证据、不改代码）：
+PR120最终已审SHA 6d162dfd41ea6c08f1110112d8869a2fd9bbe879保持不变。
+D最终复核git diff --check exit 1，新增web/tests/ui-recommendation-without-images.test.mjs:127末尾空行，D判定非阻断。
+此前开发工作区diff检查未涵盖当时未跟踪的新测试文件，不能声称最终提交diffcheck通过。PR正文已修正；原19/19受控测试证据不改写，不重跑测试、Chrome或review，不修改冻结服务或118/116历史。

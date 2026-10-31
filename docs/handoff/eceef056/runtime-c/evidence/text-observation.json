@@ -1,0 +1,118 @@
+{
+  "status": "ok",
+  "records": [
+    {
+      "reference_id": "web_af6bcf5bdc7889e6ee994e1d3ed29aa8",
+      "reference_kind": "public_reference",
+      "purpose": "inspiration",
+      "source_platform": "web",
+      "source_site": "www.zhihu.com",
+      "source_url": "https://www.zhihu.com/question/556769840",
+      "title": "Cafe 与 coffee 有什么区别？ - 知乎",
+      "summary": "2022年10月8日&ensp;·&ensp;Coffee就是咖啡的泛称，指的是咖啡饮品、咖啡熟豆，就像是Tea就是指茶的泛称一样。 但Cafe就完全不一样，在英 …",
+      "has_summary": true,
+      "material_kind": "search_snippet",
+      "is_full_article": false,
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "image_kind": "reference_image",
+      "image_url": null,
+      "image_id": null,
+      "image_validation": null,
+      "query_params": {
+        "keyword": "coffee lover housewarming gift ideas pour over coffee corner"
+      },
+      "limitations": [
+        "公开搜索结果摘要或标题，未抓取文章全文",
+        "网页资料用于灵感，不代表商品SKU、实时价格或库存"
+      ]
+    },
+    {
+      "reference_id": "web_95032af991e457b7a73f0835956f5d09",
+      "reference_kind": "public_reference",
+      "purpose": "inspiration",
+      "source_platform": "web",
+      "source_site": "www.zhihu.com",
+      "source_url": "https://www.zhihu.com/question/599895904",
+      "title": "espresso,long coffee,American三种咖啡有啥区别？ - 知乎",
+      "summary": "2023年5月11日&ensp;·&ensp;Espresso（意式浓缩咖啡）、Long coffee（加水浓缩咖啡）和American（美式咖啡）是三种不同类型的咖啡。 …",
+      "has_summary": true,
+      "material_kind": "search_snippet",
+      "is_full_article": false,
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "image_kind": "reference_image",
+      "image_url": null,
+      "image_id": null,
+      "image_validation": null,
+      "query_params": {
+        "keyword": "coffee lover housewarming gift ideas pour over coffee corner"
+      },
+      "limitations": [
+        "公开搜索结果摘要或标题，未抓取文章全文",
+        "网页资料用于灵感，不代表商品SKU、实时价格或库存"
+      ]
+    },
+    {
+      "reference_id": "web_1d8455cd71c6276b685f4d8b2d633c3a",
+      "reference_kind": "public_reference",
+      "purpose": "inspiration",
+      "source_platform": "web",
+      "source_site": "zhuanlan.zhihu.com",
+      "source_url": "https://zhuanlan.zhihu.com/p/115002664",
+      "title": "关于咖啡的几个基本概念和家庭咖啡普通指南 - 知乎",
+      "summary": "2022年8月10日&ensp;·&ensp;Brewed coffee is made by pouring hot water onto ground coffee beans, then allowing to brew. There are several …",
+      "has_summary": true,
+      "material_kind": "search_snippet",
+      "is_full_article": false,
+      "observed_at": "2026-10-31T20:02:53.286Z",
+      "image_kind": "reference_image",
+      "image_url": null,
+      "image_id": null,
+      "image_validation": null,
+      "query_params": {
+        "keyword": "coffee lover housewarming gift ideas pour over coffee corner"
+      },
+      "limitations": [
+        "公开搜索结果摘要或标题，未抓取文章全文",
+        "网页资料用于灵感，不代表商品SKU、实时价格或库存"
+      ]
+    }
+  ],
+  "coverage": {
+    "source": "web",
+    "engine": "bing",
+    "status": "ok",
+    "execution_mode": "public_http",
+    "native_executed": false,
+    "pages_requested": 1,
+    "pages_completed": 1,
+    "reported_total": null,
+    "observed_count": 3,
+    "complete": false,
+    "bounded": true,
+    "pages": [
+      {
+        "page": 1,
+        "status": "ok",
+        "observed_count": 3
+      }
+    ],
+    "started_at": "2026-10-31T20:02:52.940Z",
+    "limitations": [
+      "bounded_search_snippets_only",
+      "article_bodies_not_fetched"
+    ],
+    "http_status": 200,
+    "fetch_ms": 287,
+    "response_bytes": 101827,
+    "parse_ms": 9,
+    "records_seen": 10,
+    "records_rejected": 7,
+    "materials_with_summary": 3,
+    "limit_reached": false,
+    "scan_limit_reached": false,
+    "error_code": null,
+    "completed_at": "2026-10-31T20:02:53.295Z",
+    "elapsed_ms": 356
+  },
+  "warnings": []
+}

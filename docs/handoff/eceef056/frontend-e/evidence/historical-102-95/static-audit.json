@@ -1,0 +1,428 @@
+{
+  "versions": {
+    "pr102": "1db4949bf7edee0d6c617a6b71958747ea325587",
+    "pr95": "1447b4233773e28bfbdd50636eb6af148166536f",
+    "integration": "982d2d0172fd101b0aa9484630d425b748202312"
+  },
+  "files": [
+    {
+      "label": "pr102",
+      "path": "web/public/app.js",
+      "bytes": 37677,
+      "sha256": "9d547da8f88d26a7c1e49e210a08073f5e918f879f09d88ca8ffccdb49ef9e94"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/js/results-view.js",
+      "bytes": 23535,
+      "sha256": "47b610fe6940df45da24560cb1654fc9e8a72f99dd7a82a7b515fb75c70f4efa"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/js/media-view.js",
+      "bytes": 17256,
+      "sha256": "c2ddeabb6af97b0050238596eeb0ed7b4d0e9d7a133666fbb64962840e4cbcd1"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/js/icons.js",
+      "bytes": 12500,
+      "sha256": "fc945a8618126187eb6eb90afb5d610f28a9dc505bdb99df2d6de885c725933d"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/js/friendly.js",
+      "bytes": 2633,
+      "sha256": "5d9611c9f4410b8dcf1b23a2d08245941ea07e7986fd482d870613579df01616"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/styles.css",
+      "bytes": 43116,
+      "sha256": "31fe3bc5c2821f0007f176b36d8ec3b8c284f1a9a0f96dc4ed6c11e0e75f8469"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/landing.css",
+      "bytes": 32142,
+      "sha256": "4f6b7d10e23f6c2adf7c19c8437670399f49c15110d68956cf70d0d32f980d90"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/fonts.css",
+      "bytes": 680,
+      "sha256": "e1908df6d76148429f8c64efdf236353a310d2f4f45e4a4270eadf7f8dd1d2d4"
+    },
+    {
+      "label": "pr102",
+      "path": "web/public/index.html",
+      "bytes": 17146,
+      "sha256": "ca16306378fcb8d1f1e592de79ae6284b44d8089ec58c08edfaa681296d80aa6"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/app.js",
+      "bytes": 37146,
+      "sha256": "4e2bc482afa40b8da063c0be741473afbfb3f9abea232c9337bac2bb8ba1fc51"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/js/results-view.js",
+      "bytes": 18644,
+      "sha256": "15fc3dcfc3c8000ec7182c0a6666667198dbafa17c6f1b8d86b564c3c84c1553"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/js/media-view.js",
+      "bytes": 11926,
+      "sha256": "1db89aa8bc51ca1f8a9d167d97b12cb31d18d213b70fe4472ead95fd162100c2"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/js/icons.js",
+      "bytes": 12500,
+      "sha256": "fc945a8618126187eb6eb90afb5d610f28a9dc505bdb99df2d6de885c725933d"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/js/friendly.js",
+      "bytes": 2633,
+      "sha256": "5d9611c9f4410b8dcf1b23a2d08245941ea07e7986fd482d870613579df01616"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/styles.css",
+      "bytes": 30335,
+      "sha256": "1fa9b2e7849ad073fc0f776a62373d9372e07d8ef107596c276e3861e7b80ac5"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/landing.css",
+      "bytes": 31795,
+      "sha256": "2108214bba7f3295bb1e188d18cf1408baaf52baba4f615a62aa1cd8fd04a951"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/fonts.css",
+      "bytes": 1153,
+      "sha256": "36cf57047cf5dc9741f66ecf609c6a7f5e93796e2aa49bc3a16264917d64c631"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/index.html",
+      "bytes": 17146,
+      "sha256": "ca16306378fcb8d1f1e592de79ae6284b44d8089ec58c08edfaa681296d80aa6"
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/fonts/longcang.woff2",
+      "bytes": 378140,
+      "sha256": "60abecbd64d395cb3283ba7a1bdd6890f53c9c0aa45139e49886316141dab7b8",
+      "font_evidence_file_matches": true
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/fonts/longcang-ext.woff2",
+      "bytes": 2565928,
+      "sha256": "81cdc09fde625b88cb4a001ce451c9e3df64200fa141005f8b7127afe0a3b5e5",
+      "font_evidence_file_matches": true
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/fonts/wenkai-regular.woff2",
+      "bytes": 1564964,
+      "sha256": "9a1fcc30cfda74da956af5283644e67c031b5b29033577546e62b3d961f07ab6",
+      "font_evidence_file_matches": true
+    },
+    {
+      "label": "pr95",
+      "path": "web/public/fonts/wenkai-medium.woff2",
+      "bytes": 1614368,
+      "sha256": "210e38f474c99009c3c5d222818f62e91439bffa6acdad7677a4a7760c9e99af",
+      "font_evidence_file_matches": true
+    },
+    {
+      "label": "integration",
+      "path": "web/public/app.js",
+      "bytes": 37146,
+      "sha256": "4e2bc482afa40b8da063c0be741473afbfb3f9abea232c9337bac2bb8ba1fc51"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/js/results-view.js",
+      "bytes": 18644,
+      "sha256": "15fc3dcfc3c8000ec7182c0a6666667198dbafa17c6f1b8d86b564c3c84c1553"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/js/media-view.js",
+      "bytes": 11900,
+      "sha256": "871d18895758c756c9ee71ea6ccffc2297f196db94f76e7ecf6d274dc84492f8"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/js/icons.js",
+      "bytes": 12500,
+      "sha256": "fc945a8618126187eb6eb90afb5d610f28a9dc505bdb99df2d6de885c725933d"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/js/friendly.js",
+      "bytes": 2633,
+      "sha256": "5d9611c9f4410b8dcf1b23a2d08245941ea07e7986fd482d870613579df01616"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/styles.css",
+      "bytes": 30335,
+      "sha256": "1fa9b2e7849ad073fc0f776a62373d9372e07d8ef107596c276e3861e7b80ac5"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/landing.css",
+      "bytes": 31795,
+      "sha256": "2108214bba7f3295bb1e188d18cf1408baaf52baba4f615a62aa1cd8fd04a951"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/fonts.css",
+      "bytes": 680,
+      "sha256": "e1908df6d76148429f8c64efdf236353a310d2f4f45e4a4270eadf7f8dd1d2d4"
+    },
+    {
+      "label": "integration",
+      "path": "web/public/index.html",
+      "bytes": 17146,
+      "sha256": "ca16306378fcb8d1f1e592de79ae6284b44d8089ec58c08edfaa681296d80aa6"
+    }
+  ],
+  "font_tables": {
+    "longcang.woff2": {
+      "flavor": "woff2",
+      "family": "Long Cang",
+      "cmap_count": 1112,
+      "tables": [
+        "GlyphOrder",
+        "head",
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "loca",
+        "glyf",
+        "name",
+        "post",
+        "gasp",
+        "GPOS",
+        "GSUB"
+      ],
+      "units_per_em": 1000,
+      "glyphs": 1113
+    },
+    "longcang-ext.woff2": {
+      "flavor": "woff2",
+      "family": "Long Cang",
+      "cmap_count": 5783,
+      "tables": [
+        "GlyphOrder",
+        "head",
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "loca",
+        "glyf",
+        "name",
+        "post",
+        "gasp",
+        "GPOS",
+        "GSUB"
+      ],
+      "units_per_em": 1000,
+      "glyphs": 5784
+    },
+    "wenkai-regular.woff2": {
+      "flavor": "woff2",
+      "family": "LXGW WenKai",
+      "cmap_count": 6915,
+      "tables": [
+        "GlyphOrder",
+        "head",
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "loca",
+        "glyf",
+        "name",
+        "post",
+        "gasp",
+        "GPOS",
+        "GSUB",
+        "vhea",
+        "vmtx"
+      ],
+      "units_per_em": 1000,
+      "glyphs": 7121
+    },
+    "wenkai-medium.woff2": {
+      "flavor": "woff2",
+      "family": "LXGW WenKai Medium",
+      "cmap_count": 6915,
+      "tables": [
+        "GlyphOrder",
+        "head",
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "loca",
+        "glyf",
+        "name",
+        "post",
+        "gasp",
+        "GPOS",
+        "GSUB",
+        "vhea",
+        "vmtx"
+      ],
+      "units_per_em": 1000,
+      "glyphs": 7121
+    }
+  },
+  "samples": [
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "丝蝴蝶",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "①→≈",
+      "longcang_combined_missing": "①→≈",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    },
+    {
+      "text": "[REDACTED:CONVERSATION_CONTENT]",
+      "longcang_base_missing": "",
+      "longcang_combined_missing": "",
+      "wenkai_missing": ""
+    }
+  ],
+  "overlap_cmap_count": 0,
+  "outside_declared_ext_range": [],
+  "integration_public_unchanged_since_base": true,
+  "ui-before.txt": {
+    "summary": "[REDACTED:CONVERSATION_CONTENT]",
+    "failures": [
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (3.6599ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1815.39ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (3.6599ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1815.39ms)"
+    ]
+  },
+  "ui-after-v3.txt": {
+    "summary": "[REDACTED:CONVERSATION_CONTENT]",
+    "failures": [
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (3.2278ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1827.1747ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (3.2278ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1827.1747ms)"
+    ]
+  },
+  "test-before.txt": {
+    "summary": "[REDACTED:CONVERSATION_CONTENT]",
+    "failures": [
+      "✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (415.4519ms)",
+      "✖ pipeline keeps three overdue candidates eligible for catalog binding and selection (31.4926ms)",
+      "✖ HTTP sections contain model materials/steps and description in the frontend existing items field (435.206ms)",
+      "✖ 本地配置、六档与预算不需要重复确认 (7.6018ms)",
+      "✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (164.8058ms)",
+      "✖ 同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型 (35.6887ms)",
+      "✖ 受控改价/错规格/跨任务引用均清空可选项 (11.5847ms)",
+      "✖ 证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行 (1.7947ms)",
+      "✖ 并发重复推荐共享同一任务，不重复检索或生成 (5.3057ms)",
+      "✖ 平台请求字段、images为安全读取后的data URL，不使用image参数 (2.4777ms)",
+      "✖ 新版排除项分析与确认闸门 (624.799ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (6.895ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1821.38ms)",
+      "✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (415.4519ms)",
+      "✖ pipeline keeps three overdue candidates eligible for catalog binding and selection (31.4926ms)",
+      "✖ HTTP sections contain model materials/steps and description in the frontend existing items field (435.206ms)",
+      "✖ 本地配置、六档与预算不需要重复确认 (7.6018ms)",
+      "✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (164.8058ms)",
+      "✖ 同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型 (35.6887ms)",
+      "✖ 受控改价/错规格/跨任务引用均清空可选项 (11.5847ms)",
+      "✖ 证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行 (1.7947ms)",
+      "✖ 并发重复推荐共享同一任务，不重复检索或生成 (5.3057ms)",
+      "✖ 平台请求字段、images为安全读取后的data URL，不使用image参数 (2.4777ms)",
+      "✖ 新版排除项分析与确认闸门 (624.799ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (6.895ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1821.38ms)"
+    ]
+  },
+  "test-after.txt": {
+    "summary": "[REDACTED:CONVERSATION_CONTENT]",
+    "failures": [
+      "✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (257.7804ms)",
+      "✖ pipeline keeps three overdue candidates eligible for catalog binding and selection (47.7885ms)",
+      "✖ HTTP sections contain model materials/steps and description in the frontend existing items field (289.9655ms)",
+      "✖ 本地配置、六档与预算不需要重复确认 (4.7186ms)",
+      "✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (121.0794ms)",
+      "✖ 同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型 (36.0632ms)",
+      "✖ 受控改价/错规格/跨任务引用均清空可选项 (2.8362ms)",
+      "✖ 证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行 (2.36ms)",
+      "✖ 并发重复推荐共享同一任务，不重复检索或生成 (8.7181ms)",
+      "✖ 平台请求字段、images为安全读取后的data URL，不使用image参数 (2.9693ms)",
+      "✖ 新版排除项分析与确认闸门 (703.7581ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (2.6213ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1824.9833ms)",
+      "✖ HTTP text returns pending; owner polling reaches ready and reads bytes, foreign session gets 404 (257.7804ms)",
+      "✖ pipeline keeps three overdue candidates eligible for catalog binding and selection (47.7885ms)",
+      "✖ HTTP sections contain model materials/steps and description in the frontend existing items field (289.9655ms)",
+      "✖ 本地配置、六档与预算不需要重复确认 (4.7186ms)",
+      "✖ HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图 (121.0794ms)",
+      "✖ 同版受控模型→证据绑定→独立校验→选择→缺图，不调用真实模型 (36.0632ms)",
+      "✖ 受控改价/错规格/跨任务引用均清空可选项 (2.8362ms)",
+      "✖ 证据不足不调用生成；确认科技兴趣门禁；不同会话不共享运行 (2.36ms)",
+      "✖ 并发重复推荐共享同一任务，不重复检索或生成 (8.7181ms)",
+      "✖ 平台请求字段、images为安全读取后的data URL，不使用image参数 (2.9693ms)",
+      "✖ 新版排除项分析与确认闸门 (703.7581ms)",
+      "✖ 草案sidecar独立绑定三候选，不修改核心候选 (2.6213ms)",
+      "✖ 选择前无包装，失败候选禁选，同一选择复用模拟呈现 (1824.9833ms)"
+    ]
+  }
+}

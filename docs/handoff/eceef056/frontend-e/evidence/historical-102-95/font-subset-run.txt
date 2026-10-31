@@ -1,0 +1,7 @@
+wenkai-regular.woff2 1564964 glyph-cps 6915
+wenkai-medium.woff2 1614368 glyph-cps 6915
+longcang.woff2 378140 glyph-cps 1112
+longcang-ext.woff2 2565928 glyph-cps 5783
+site cjk 980 site cjk missing in longcang source 
+gb missing in longcang source 0
+ext unicode-range length 30266 ranges 3466

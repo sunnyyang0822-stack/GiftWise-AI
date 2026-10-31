@@ -1,0 +1,426 @@
+{
+  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "tree": "2772f6d022a15ca98d0d8be9ec0f82033445c182",
+  "date": "2026-10-31",
+  "hash_basis": "bytes/sha256 are canonical Git blob bytes. checkout_* separately records local CRLF-converted bytes; no source rewrite performed.",
+  "complete_scope": "All tracked web/public files, including retained legacy assets. Runtime classification is static HTML/CSS/ES module reachability, not new browser QA.",
+  "asset_count": 40,
+  "canonical_total_bytes": 9544646,
+  "runtime_required_count": 25,
+  "fonts": {
+    "self_hosted": true,
+    "css": "web/public/fonts.css",
+    "license": "SIL OFL 1.1; ship both OFL text files",
+    "font_display": "swap",
+    "chinese_subset": "Repository fonts.css describes site text + GB2312 Hanzi subsets. LongCang base is declared after ext; ext unicode-range covers U+3000–303F/U+4E00–9FFF/U+FF00–FFEF and downloads on demand. Existing PR95/D static cmap evidence is attached; this handoff does not rerun glyph/browser tests.",
+    "files_equal_historical_pr95": {
+      "wenkai-regular.woff2": true,
+      "wenkai-medium.woff2": true,
+      "longcang.woff2": true,
+      "longcang-ext.woff2": true
+    }
+  },
+  "historical_visual_styles_equal_pr102": true,
+  "assets": [
+    {
+      "path": "web/public/app.js",
+      "url": "/app.js",
+      "git_blob_id": "170ab04ba311ea2d2318091ef3290c3dfcd52b26",
+      "bytes": 37677,
+      "sha256": "9d547da8f88d26a7c1e49e210a08073f5e918f879f09d88ca8ffccdb49ef9e94",
+      "checkout_bytes": 38536,
+      "checkout_sha256": "81b96068e38834a1c7b2bcb950fa7aad49d5d27401f907e828e59b79677b4f91",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/chat.css",
+      "url": "/chat.css",
+      "git_blob_id": "ba5b96a5f8c648c0088cc41fc0bbe7617bcf7f63",
+      "bytes": 32393,
+      "sha256": "ebc880e51ea9f9cdba3a27f0e694372c9082179ea0a3bc20ef78910574a59f81",
+      "checkout_bytes": 32766,
+      "checkout_sha256": "c6f11059e715c8294f093f06865664f74b85b092bdbc17fd752973abd3ddc66e",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/fonts.css",
+      "url": "/fonts.css",
+      "git_blob_id": "f9620b810e65fd55b48ead994c423b4a2f0c0f9a",
+      "bytes": 1153,
+      "sha256": "36cf57047cf5dc9741f66ecf609c6a7f5e93796e2aa49bc3a16264917d64c631",
+      "checkout_bytes": 1161,
+      "checkout_sha256": "9acbbd510a6fe9e8b2b8b972e9f79d9ac8c277a349c148f5f73aa00d61e29478",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/fonts/OFL-LXGWWenKai.txt",
+      "url": "/fonts/OFL-LXGWWenKai.txt",
+      "git_blob_id": "bb1634cb03ee7202d5c66bf2754705493bd73e1e",
+      "bytes": 5171,
+      "sha256": "1a25e35da1031c6c3436fde545bb9cb5aca954e9873afe510c834b8b79bd21a0",
+      "checkout_bytes": 5265,
+      "checkout_sha256": "cb973995026e28c931886a1d127397152187e03e53b2f71864e86cee8c25e54a",
+      "runtime": "font-license-required"
+    },
+    {
+      "path": "web/public/fonts/OFL-LongCang.txt",
+      "url": "/fonts/OFL-LongCang.txt",
+      "git_blob_id": "06a1757ca2ae5ff689aac4b410fffa98cd73dad0",
+      "bytes": 4390,
+      "sha256": "603546b7219a94bb59bf8294458194a5010119486354092b66a09a3fd61aeacc",
+      "checkout_bytes": 4483,
+      "checkout_sha256": "98e35ae1e3a953dfdaa2c40fb1face14b37088ed074daeab03e80dcb5fefa2bd",
+      "runtime": "font-license-required"
+    },
+    {
+      "path": "web/public/fonts/longcang-ext.woff2",
+      "url": "/fonts/longcang-ext.woff2",
+      "git_blob_id": "f02621160db483ce8f7f500184dccfea5a788c5a",
+      "bytes": 2565928,
+      "sha256": "81cdc09fde625b88cb4a001ce451c9e3df64200fa141005f8b7127afe0a3b5e5",
+      "checkout_bytes": 2565928,
+      "checkout_sha256": "81cdc09fde625b88cb4a001ce451c9e3df64200fa141005f8b7127afe0a3b5e5",
+      "runtime": "conditional-font-subset"
+    },
+    {
+      "path": "web/public/fonts/longcang.woff2",
+      "url": "/fonts/longcang.woff2",
+      "git_blob_id": "77f2a0f7be1df257ea754ee1988785ecb8f634b7",
+      "bytes": 378140,
+      "sha256": "60abecbd64d395cb3283ba7a1bdd6890f53c9c0aa45139e49886316141dab7b8",
+      "checkout_bytes": 378140,
+      "checkout_sha256": "60abecbd64d395cb3283ba7a1bdd6890f53c9c0aa45139e49886316141dab7b8",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/fonts/wenkai-medium.woff2",
+      "url": "/fonts/wenkai-medium.woff2",
+      "git_blob_id": "75d7d84abbd7ad7d45dcccb29b31c35df72eab4a",
+      "bytes": 1614368,
+      "sha256": "210e38f474c99009c3c5d222818f62e91439bffa6acdad7677a4a7760c9e99af",
+      "checkout_bytes": 1614368,
+      "checkout_sha256": "210e38f474c99009c3c5d222818f62e91439bffa6acdad7677a4a7760c9e99af",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/fonts/wenkai-regular.woff2",
+      "url": "/fonts/wenkai-regular.woff2",
+      "git_blob_id": "293650e6c94e0f86f3d17629b18a442be9dc6fe1",
+      "bytes": 1564964,
+      "sha256": "9a1fcc30cfda74da956af5283644e67c031b5b29033577546e62b3d961f07ab6",
+      "checkout_bytes": 1564964,
+      "checkout_sha256": "9a1fcc30cfda74da956af5283644e67c031b5b29033577546e62b3d961f07ab6",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/img/after-gift-wrapped.png",
+      "url": "/img/after-gift-wrapped.png",
+      "git_blob_id": "56505bae7fec77bf1d661de666d9c4f91f9f491b",
+      "bytes": 1775987,
+      "sha256": "3c4fe017c673d324127fd2568336848b44ae43b8e1b0c8512ec1dc2ddf6addf6",
+      "checkout_bytes": 1775987,
+      "checkout_sha256": "3c4fe017c673d324127fd2568336848b44ae43b8e1b0c8512ec1dc2ddf6addf6",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/img/image-1.webp",
+      "url": "/img/image-1.webp",
+      "git_blob_id": "f2161bde0de36b76ea425eea70342c848116577b",
+      "bytes": 139618,
+      "sha256": "f6fb14f0eeef1b577919260d342263d98118c2867e18840a12e3d1c02c06ab3e",
+      "checkout_bytes": 139618,
+      "checkout_sha256": "f6fb14f0eeef1b577919260d342263d98118c2867e18840a12e3d1c02c06ab3e",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/img/image-2.webp",
+      "url": "/img/image-2.webp",
+      "git_blob_id": "c65afd69c69d946050d1fe784f01b613c36f0424",
+      "bytes": 119074,
+      "sha256": "5b3f71388328392f00a175a8935356005e83731e19fa3533349962b1709e7aba",
+      "checkout_bytes": 119074,
+      "checkout_sha256": "5b3f71388328392f00a175a8935356005e83731e19fa3533349962b1709e7aba",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/img/image-3.webp",
+      "url": "/img/image-3.webp",
+      "git_blob_id": "7004db9a0f45ca9b6cba3b4c8d21513fc13412da",
+      "bytes": 89788,
+      "sha256": "9dc927f2e7c27c3e0b885a6b0f923aca54f2300a6246664109630ec86064daa1",
+      "checkout_bytes": 89788,
+      "checkout_sha256": "9dc927f2e7c27c3e0b885a6b0f923aca54f2300a6246664109630ec86064daa1",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/README.md",
+      "url": "/img/media-demo/README.md",
+      "git_blob_id": "bb9e21f1134d976f6d819843aa581c24e08513f1",
+      "bytes": 1612,
+      "sha256": "091c02771143c7ab3be9c0b6eb491d70fea89e29fb844b1e0ff291c735dda2cc",
+      "checkout_bytes": 1629,
+      "checkout_sha256": "e42acdcb7fca1ec0150ff392237ca3e313999cda18d047da7a8e4ab6179690b0",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/art-photo.jpg",
+      "url": "/img/media-demo/art-photo.jpg",
+      "git_blob_id": "2fb34b347bbf2c4a3b5933597a87e432d9342705",
+      "bytes": 138625,
+      "sha256": "45993544b674476a7d552d52999f7c59e3e7e08ad119fe1dbfb67b167b983c8f",
+      "checkout_bytes": 138625,
+      "checkout_sha256": "45993544b674476a7d552d52999f7c59e3e7e08ad119fe1dbfb67b167b983c8f",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/letter.svg",
+      "url": "/img/media-demo/letter.svg",
+      "git_blob_id": "e0c7371c4f8513ecd5458060c2f75db1f997a720",
+      "bytes": 876,
+      "sha256": "968bbe15ee7d95d3ca2e4ee084016009c563866303bed24f8c33e621db264347",
+      "checkout_bytes": 876,
+      "checkout_sha256": "968bbe15ee7d95d3ca2e4ee084016009c563866303bed24f8c33e621db264347",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/memories.svg",
+      "url": "/img/media-demo/memories.svg",
+      "git_blob_id": "abcd2f4f8af3903d291993416039e74c8b2c8c4c",
+      "bytes": 1028,
+      "sha256": "7a061a7b4481e48265aa6271ee365c4eec1cab60b1d07eb904c1a27ccbdf4cb2",
+      "checkout_bytes": 1028,
+      "checkout_sha256": "7a061a7b4481e48265aa6271ee365c4eec1cab60b1d07eb904c1a27ccbdf4cb2",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/notebook-photo.jpg",
+      "url": "/img/media-demo/notebook-photo.jpg",
+      "git_blob_id": "b6e7210266feb70afb31e63e0feb0dc92774a35b",
+      "bytes": 96981,
+      "sha256": "b5dc55d3c302e99487ce8be586052a4a0336c5878cad2dacbc607b923077fcd3",
+      "checkout_bytes": 96981,
+      "checkout_sha256": "b5dc55d3c302e99487ce8be586052a4a0336c5878cad2dacbc607b923077fcd3",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/photo-sources.json",
+      "url": "/img/media-demo/photo-sources.json",
+      "git_blob_id": "73317a9434b91b02bb6fc657f6cc4afc1680d916",
+      "bytes": 2580,
+      "sha256": "4df793dd5df735354729cf1de0e85a526c8076ff2a41d3441d636743f2d58dcb",
+      "checkout_bytes": 2635,
+      "checkout_sha256": "626d75cc7dcb152b2d79e1577b512812caadfcb63c9f8c3099a926c403ae3690",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/scene-hexagon.jpg",
+      "url": "/img/media-demo/scene-hexagon.jpg",
+      "git_blob_id": "42e4fdb419b5e8beae1e7fd4478f5bd062383e72",
+      "bytes": 91234,
+      "sha256": "642799efc51b4a3098704e135be681b1aa3535a16c365ea0c48ff724f83cf075",
+      "checkout_bytes": 91234,
+      "checkout_sha256": "642799efc51b4a3098704e135be681b1aa3535a16c365ea0c48ff724f83cf075",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/scene-light.jpg",
+      "url": "/img/media-demo/scene-light.jpg",
+      "git_blob_id": "4e60435dc357d2f590f95472fc96c87b119a72ec",
+      "bytes": 46964,
+      "sha256": "c20cb5247d42ad6b7b592659c6bdc1e99d793b066bd0ce9e74fe0c2eb0e468b5",
+      "checkout_bytes": 46964,
+      "checkout_sha256": "c20cb5247d42ad6b7b592659c6bdc1e99d793b066bd0ce9e74fe0c2eb0e468b5",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/scene-paper.jpg",
+      "url": "/img/media-demo/scene-paper.jpg",
+      "git_blob_id": "151748db9815df07dc98b4b8d2adaf3bcd106e60",
+      "bytes": 518965,
+      "sha256": "ae285c61970177ea3419c7dd2df29034322a2e8216ebde8a4e30d7eea7e472ff",
+      "checkout_bytes": 518965,
+      "checkout_sha256": "ae285c61970177ea3419c7dd2df29034322a2e8216ebde8a4e30d7eea7e472ff",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/walk.svg",
+      "url": "/img/media-demo/walk.svg",
+      "git_blob_id": "517557f0d167f042ade315dac9ff7d413f2b5ec7",
+      "bytes": 978,
+      "sha256": "5cd0eaa69ef2c2e99a9e005b9ffdc9602eee688dbd342570f76ac5e766b855f2",
+      "checkout_bytes": 978,
+      "checkout_sha256": "5cd0eaa69ef2c2e99a9e005b9ffdc9602eee688dbd342570f76ac5e766b855f2",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/img/media-demo/workshop-photo.jpg",
+      "url": "/img/media-demo/workshop-photo.jpg",
+      "git_blob_id": "ed2cb46708083d642d922846ab293c5cba10a533",
+      "bytes": 39825,
+      "sha256": "d52437a2ccef121fb8977fba2fb5c4ba1b1c8191967f50e24abead8447222b18",
+      "checkout_bytes": 39825,
+      "checkout_sha256": "d52437a2ccef121fb8977fba2fb5c4ba1b1c8191967f50e24abead8447222b18",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/index.html",
+      "url": "/index.html",
+      "git_blob_id": "d500a8c9e7609af1da66602ee0e9cd9d5435fdbf",
+      "bytes": 17146,
+      "sha256": "ca16306378fcb8d1f1e592de79ae6284b44d8089ec58c08edfaa681296d80aa6",
+      "checkout_bytes": 17410,
+      "checkout_sha256": "971255030ba21524db30849f005a96ca1a97c5178512fd41d432d0e817a619d7",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/chat.js",
+      "url": "/js/chat.js",
+      "git_blob_id": "396909cef5112cb9fc949de7c2809d2c5a294af2",
+      "bytes": 75374,
+      "sha256": "94feb02b60477d16610f9ecd719a68a25632c5324931caab284aa1bc14975a93",
+      "checkout_bytes": 76724,
+      "checkout_sha256": "1bcd0c567a804fe8337c4fd3c990af8633deccd56bcbb0216cb91c3a34800f78",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/exclusion-flow.js",
+      "url": "/js/exclusion-flow.js",
+      "git_blob_id": "41326418e09764d1d3bdd45e6f006a30411f60c3",
+      "bytes": 1302,
+      "sha256": "fbbe102dafabf772f56a902e85a4585131f3cdb751de095a161f2f276f764c12",
+      "checkout_bytes": 1320,
+      "checkout_sha256": "5a1548e851c23de7c65102ae0724dc4407fce1384f9d4be859f227fe0a2bc99a",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/friendly.js",
+      "url": "/js/friendly.js",
+      "git_blob_id": "852af3bcebfcaf5cc8ffcb8da3226a04fbef6c95",
+      "bytes": 2633,
+      "sha256": "5d9611c9f4410b8dcf1b23a2d08245941ea07e7986fd482d870613579df01616",
+      "checkout_bytes": 2677,
+      "checkout_sha256": "8a2366588a582f860b1bccb931c5ac0ce20814dc34dbf080940a96e24272e46d",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/icons.js",
+      "url": "/js/icons.js",
+      "git_blob_id": "ce77e424dce9f24868666ea9f0a6b2e40762056f",
+      "bytes": 12500,
+      "sha256": "fc945a8618126187eb6eb90afb5d610f28a9dc505bdb99df2d6de885c725933d",
+      "checkout_bytes": 12620,
+      "checkout_sha256": "f5ad1583015a1bc830d6fc4d5f8839d0d705cad69ddbf86ce194bc81ce88e2b5",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/landing.js",
+      "url": "/js/landing.js",
+      "git_blob_id": "85661b4e30a4addba53ae7f61162fdc5ae388c27",
+      "bytes": 3807,
+      "sha256": "a2f92405c227eab2943af6f8ca5e75222a2507bc3060c3db1e084d732521c5aa",
+      "checkout_bytes": 3889,
+      "checkout_sha256": "6ae05bb6e47fe2fa0db03536d663ee1730942b03e2183fc99ed33f41d58ef544",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/media-preview.js",
+      "url": "/js/media-preview.js",
+      "git_blob_id": "52edc6ca9e81eb6fddf235d34f7989c21ae659f0",
+      "bytes": 3944,
+      "sha256": "cb020b39753e85d8ee2e4bdd423bb451b562f53e01ba8f46d477d8a82dbd3aa6",
+      "checkout_bytes": 4031,
+      "checkout_sha256": "d347b38c4f0b5edafbdd16bcf9c5b38c3b1508e79bb6660996dfb2589fc64809",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/media-view.js",
+      "url": "/js/media-view.js",
+      "git_blob_id": "4cf23cf92747b9acf7029884360b4daf1136b75a",
+      "bytes": 17290,
+      "sha256": "b3e1853ae9297afd672c2fb76de251b33db5c159c5b1b7856eeab814e23350a9",
+      "checkout_bytes": 17506,
+      "checkout_sha256": "d534b0517eb0054a27448d941019cc2a6b3a7104076530b952f3aa0b3d5ff856",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/parse-intake.js",
+      "url": "/js/parse-intake.js",
+      "git_blob_id": "5df482739caee0b7dc30c14c651fa30308e6882a",
+      "bytes": 18227,
+      "sha256": "297b87bf2bd3446abe9ea843355431bc0fb428ecd71fd5d3b0fba70125ab50a1",
+      "checkout_bytes": 18574,
+      "checkout_sha256": "a8149fbfd68a7bcd7a64423eae2a68c22cd4387ce96fd516b5931e7ca534d5e0",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/preview-api.js",
+      "url": "/js/preview-api.js",
+      "git_blob_id": "8b8502b9c83a7b7a110f5d9ed059fab40567dc99",
+      "bytes": 8956,
+      "sha256": "dece1678be27af287b8f293a5bcc4177a43501fcbeae4936fc11bc9bf18166de",
+      "checkout_bytes": 9070,
+      "checkout_sha256": "f0805b19c3a2443f0485c52d8b3777ef325c525a7b0d620f38bab31259a168a4",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/preview-config.js",
+      "url": "/js/preview-config.js",
+      "git_blob_id": "3a8e4972e1329f6a044ae312e9d1ee4d8e151b3d",
+      "bytes": 4812,
+      "sha256": "e8aae4aeb3aea4a790e4b406cee3b9d61a6448fc2ca16da83e6c1ca6c0d087bb",
+      "checkout_bytes": 5049,
+      "checkout_sha256": "c2c16f16f9b367fc7812304b83a1a133d0d84a729f0a50a2424f8b6df8c3b264",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/js/recommendation-media.js",
+      "url": "/js/recommendation-media.js",
+      "git_blob_id": "1d60f10463083fa19c4e0b8f9d48ba9bc43d7e1c",
+      "bytes": 6944,
+      "sha256": "fc38dd70663dfd81ec416e3fc72321012ca6881643baef4f5a5c20b0bc9f681e",
+      "checkout_bytes": 7068,
+      "checkout_sha256": "fd50ec9b9b0fa8be4efa777b52c48dfa06392e255b587a408c089f67e905f289",
+      "runtime": "retained-not-in-current-entry-graph"
+    },
+    {
+      "path": "web/public/js/results-view.js",
+      "url": "/js/results-view.js",
+      "git_blob_id": "fcf2a71b101f8ff3c13060832ebbb8e2ed2efef0",
+      "bytes": 22868,
+      "sha256": "92169e33fc74242a83ec13c22f209c9dd30e777df8892fa252f9515d21e0cffe",
+      "checkout_bytes": 23232,
+      "checkout_sha256": "4125d90eaf8044c117272e2e70db1e6d3559e8ebaf634f1be3dbcc06a5e795a3",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/landing.css",
+      "url": "/landing.css",
+      "git_blob_id": "d2a9df18192091bcac2e6a395790d3af2e6587b3",
+      "bytes": 32142,
+      "sha256": "4f6b7d10e23f6c2adf7c19c8437670399f49c15110d68956cf70d0d32f980d90",
+      "checkout_bytes": 32552,
+      "checkout_sha256": "258ac8854da9ec54c606dcc86871b99646151c3793eeaed39f1f4a6a30073680",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/styles.css",
+      "url": "/styles.css",
+      "git_blob_id": "eff7ee819892c5c29e10454b0ff8ec2866c59706",
+      "bytes": 43116,
+      "sha256": "31fe3bc5c2821f0007f176b36d8ec3b8c284f1a9a0f96dc4ed6c11e0e75f8469",
+      "checkout_bytes": 43599,
+      "checkout_sha256": "26882072da71b0a67187e632df0990dd79f03e309691f92040232b1fe240f853",
+      "runtime": "entry-dependency"
+    },
+    {
+      "path": "web/public/tokens.css",
+      "url": "/tokens.css",
+      "git_blob_id": "d27efed60c9160c7a88a09251986ff3ff22f3610",
+      "bytes": 5266,
+      "sha256": "a9465ef80d9d1d37a304b687aa06a173a7f40dcfc4d31c5c53a45670087b2de4",
+      "checkout_bytes": 5401,
+      "checkout_sha256": "6db7842765c3eff4586ebb55ae2bbce39ccae79657db7ca856b605e5e4a66877",
+      "runtime": "entry-dependency"
+    }
+  ]
+}

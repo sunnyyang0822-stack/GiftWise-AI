@@ -1,0 +1,642 @@
+{
+  "retrieval": {
+    "status": "partial",
+    "evidence_id": null,
+    "products": [],
+    "references": [
+      {
+        "reference_id": "web_af6bcf5bdc7889e6ee994e1d3ed29aa8",
+        "title": "Cafe 与 coffee 有什么区别？ - 知乎",
+        "summary": "2022年10月8日&ensp;·&ensp;Coffee就是咖啡的泛称，指的是咖啡饮品、咖啡熟豆，就像是Tea就是指茶的泛称一样。 但Cafe就完全不一样，在英 …",
+        "reference_kind": "public_reference",
+        "source_url": "https://www.zhihu.com/question/556769840",
+        "source_platform": "web",
+        "source_site": "www.zhihu.com",
+        "observed_at": "2026-10-31T20:02:53.286Z",
+        "cache_observation": "cached_public_material",
+        "is_realtime": false
+      },
+      {
+        "reference_id": "web_95032af991e457b7a73f0835956f5d09",
+        "title": "espresso,long coffee,American三种咖啡有啥区别？ - 知乎",
+        "summary": "2023年5月11日&ensp;·&ensp;Espresso（意式浓缩咖啡）、Long coffee（加水浓缩咖啡）和American（美式咖啡）是三种不同类型的咖啡。 …",
+        "reference_kind": "public_reference",
+        "source_url": "https://www.zhihu.com/question/599895904",
+        "source_platform": "web",
+        "source_site": "www.zhihu.com",
+        "observed_at": "2026-10-31T20:02:53.286Z",
+        "cache_observation": "cached_public_material",
+        "is_realtime": false
+      },
+      {
+        "reference_id": "web_1d8455cd71c6276b685f4d8b2d633c3a",
+        "title": "关于咖啡的几个基本概念和家庭咖啡普通指南 - 知乎",
+        "summary": "2022年8月10日&ensp;·&ensp;Brewed coffee is made by pouring hot water onto ground coffee beans, then allowing to brew. There are several …",
+        "reference_kind": "public_reference",
+        "source_url": "https://zhuanlan.zhihu.com/p/115002664",
+        "source_platform": "web",
+        "source_site": "zhuanlan.zhihu.com",
+        "observed_at": "2026-10-31T20:02:53.286Z",
+        "cache_observation": "cached_public_material",
+        "is_realtime": false
+      },
+      {
+        "reference_id": "web_e26c58971dc1764ed72d17ec87b69f6d",
+        "title": "新手 (豆瓣)",
+        "summary": "2021年6月13日 · Dall的“不幸“”是选择集体项目，努力实现目标不仅要经历体能层面，心理层面，还有团队价值观影响，这“新手“注定 …",
+        "reference_kind": "public_reference",
+        "purpose": "inspiration",
+        "source_url": "https://movie.douban.com/subject/34981336/",
+        "source_platform": "web",
+        "source_site": "movie.douban.com",
+        "observed_at": "2026-10-31T20:08:06.731Z",
+        "image_id": null,
+        "image_url": null,
+        "image_kind": "reference_image",
+        "image_validation": null,
+        "material_kind": "search_snippet",
+        "has_summary": true,
+        "is_full_article": false
+      },
+      {
+        "reference_id": "web_97aba475f74763b1e42657b27e92bd07",
+        "title": "【WeGame（原TGP）下载】2026年最新官方正式版 ...",
+        "summary": "2026年4月17日 · 软件详情 WeGame是国内最大的数字游戏发行平台，集游戏购买下载、游戏社区等功能于一身，为游戏开发者提供 …",
+        "reference_kind": "public_reference",
+        "purpose": "inspiration",
+        "source_url": "https://pc.qq.com/detail/1/detail_23761.html",
+        "source_platform": "web",
+        "source_site": "pc.qq.com",
+        "observed_at": "2026-10-31T20:08:10.028Z",
+        "image_id": null,
+        "image_url": null,
+        "image_kind": "reference_image",
+        "image_validation": null,
+        "material_kind": "search_snippet",
+        "has_summary": true,
+        "is_full_article": false
+      }
+    ],
+    "source_availability": [
+      {
+        "source": "web",
+        "status": "available",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": "ok",
+        "paused_at": null
+      },
+      {
+        "source": "dianping",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "xiaohongshu",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "bilibili",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": "not_observed",
+        "paused_at": null
+      },
+      {
+        "source": "zhihu",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": "not_observed",
+        "paused_at": null
+      },
+      {
+        "source": "weibo",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "douban",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "huodongxing",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "pinterest",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "pixiv",
+        "status": "unknown",
+        "allow_request": true,
+        "reason_code": null,
+        "scope": null,
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "jd",
+        "status": "paused_by_product_scope",
+        "allow_request": false,
+        "reason_code": "COMMERCE_DISABLED_BY_USER",
+        "scope": "product_scope",
+        "observed_status": null,
+        "paused_at": null
+      },
+      {
+        "source": "taobao",
+        "status": "paused_by_product_scope",
+        "allow_request": false,
+        "reason_code": "COMMERCE_DISABLED_BY_USER",
+        "scope": "product_scope",
+        "observed_status": null,
+        "paused_at": null
+      }
+    ],
+    "contents": [],
+    "images": [],
+    "warnings": [],
+    "enrichment_only": true
+  },
+  "media": {
+    "contract_version": "retrieval-media-v2",
+    "status": "unavailable",
+    "candidates": [
+      {
+        "candidate_id": "c1",
+        "reference_id": "web_1d8455cd71c6276b685f4d8b2d633c3a",
+        "image": null
+      },
+      {
+        "candidate_id": "c3",
+        "reference_id": "web_95032af991e457b7a73f0835956f5d09",
+        "image": null
+      }
+    ],
+    "selected": null
+  },
+  "recommendation_run_id": "[REDACTED:recommendation_run_id]",
+  "created_at": "2026-11-01T04:08:26.053+08:00",
+  "mode": "llm",
+  "status": "passed",
+  "request": {
+    "recipient_relation": "朋友",
+    "recipient_relation_id": "friend",
+    "recipient_relation_custom": null,
+    "occasion": "搬新家",
+    "occasion_custom": "搬新家",
+    "budget_amount": "500.00",
+    "currency": "CNY",
+    "available_days": null,
+    "facts": [
+      {
+        "id": "interest:coffee_food",
+        "text": "用户明确知道：对方对“咖啡与美食”感兴趣（未确认该组内具体偏好）"
+      }
+    ],
+    "forbidden_tags": [],
+    "forbidden_terms": [],
+    "notes": "完全虚构的文本素材验收：普通朋友搬新家，喜欢咖啡，想送实用且好看的礼物，预算500元。请结合提供的真实咖啡方法摘要提出三个不同创意方向，估算简短标明，不说成网上现成套装；不暧昧、不需要推荐页网图。",
+    "closeness": "familiar",
+    "preference_inferences": [],
+    "gift_styles": [
+      "practical",
+      "understated"
+    ],
+    "hard_exclusions_original": {
+      "tags": [],
+      "terms": [],
+      "unresolved": []
+    }
+  },
+  "candidates": [
+    {
+      "id": "c1",
+      "name": "手冲入门组合：滤杯、滤纸、细口壶与分享壶",
+      "description": "按“热水浇在咖啡粉上、经滤纸过滤”的家庭冲煮思路，自行搭配一只单人份滤杯、对应滤纸、约600ml细口壶和小分享壶。挑选时把材质和颜色统一，例如同色系陶瓷滤杯配哑光壶，摆在新家厨房台面上不显杂乱。这是组合建议，不是网上现成的成套商品，价格按常见单品合计估算。",
+      "estimated_total": "380.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 2,
+      "tags": [
+        "other"
+      ],
+      "reason": "适合喜欢咖啡、又想要实用且好看的朋友：每天都能用，不占大件电器的位置，气质偏低调。手冲天然带一点“慢慢来”的仪式感，搬新家后给自己冲一杯也合适。",
+      "fact_refs": [
+        "interest:coffee_food"
+      ],
+      "inferences": [
+        "对方可能愿意在家自己冲咖啡，但组内具体偏好未确认",
+        "从送礼目标看，偏实用、低调的器具比造型夸张的摆件更贴合"
+      ],
+      "unknowns": [
+        "对方是否已有手冲器具或磨豆机",
+        "是否愿意为冲煮花几分钟时间",
+        "家中台面可用空间与常用杯量",
+        "偏好深烘还是浅烘、加奶还是喝黑咖啡"
+      ]
+    },
+    {
+      "id": "c2",
+      "name": "省心浸泡式组合：法压壶或冷萃瓶 + 手摇磨豆机",
+      "description": "把预算优先放在一只容量的法压壶或冷萃瓶上，剩余部分配一把手摇磨豆机或一包咖啡豆。浸泡式萃取对注水手法不敏感，压杆或滤网一压即可，适合刚搬家、厨房还没完全理顺的阶段。整体走不锈钢与玻璃的本色搭配，耐看也好打理。按常见单品估价，非现成礼盒。",
+      "estimated_total": "360.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 1,
+      "tags": [
+        "other"
+      ],
+      "reason": "和手冲方向相比门槛更低、失败率更小，清洗也直接。对“想喝好一点但不想研究手法”的朋友更友好，也符合实用、低调的送礼目标。",
+      "fact_refs": [
+        "interest:coffee_food"
+      ],
+      "inferences": [
+        "对方可能更看重方便而非钻研冲煮手法，这属于推测",
+        "在搬家阶段，少步骤、好清洁的器具使用频率可能更高"
+      ],
+      "unknowns": [
+        "是否已有法压壶、冷萃瓶或磨豆机",
+        "家里是否有冰箱空间放冷萃",
+        "是否接受自己磨豆，或更希望直接收到咖啡豆",
+        "日常一次喝几人份"
+      ]
+    },
+    {
+      "id": "c3",
+      "name": "新家咖啡角软装：陶瓷杯、托盘与密封豆罐",
+      "description": "不涉及任何冲煮技法，选两只口径一致的陶瓷杯、一只木质或石材托盘、一个密封豆罐，凑成一个整洁的咖啡角落；若预算有余，再添一小包咖啡豆。思路来自“咖啡喝法很多样”这一点：意式浓缩、加水的美式、手冲各有各的杯量与浓度，所以杯子选通用容量更稳妥。估价为常见单品合计。",
+      "estimated_total": "300.00",
+      "currency": "CNY",
+      "estimated_preparation_days": 2,
+      "tags": [
+        "other"
+      ],
+      "reason": "最贴近“搬新家”场景：它首先是一件让新家更好看的物件，其次才和咖啡有关。不预设对方已有器具或习惯，压力最小，也便于日后慢慢添置。",
+      "fact_refs": [
+        "interest:coffee_food"
+      ],
+      "inferences": [
+        "对方可能在意家里的整体观感，但审美偏好未确认",
+        "比起专业器具，通用杯具的接受面可能更广"
+      ],
+      "unknowns": [
+        "新家厨房或餐边柜的可用面积与装修色调",
+        "是否已有足够杯具、是否需要密封罐",
+        "是否希望收到咖啡豆，以及是否有忌口",
+        "对方偏好的器皿材质（陶瓷、玻璃或金属）"
+      ]
+    }
+  ],
+  "validation": {
+    "status": "passed",
+    "all_passed": true,
+    "errors": [],
+    "candidate_results": [
+      {
+        "id": "c1",
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          {
+            "code": "TOO_GENERIC",
+            "path": "candidates[0].name",
+            "message": "命中大众品类「台历/日历/相框」（“摆件”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+          },
+          {
+            "code": "HOMOGENEOUS_CANDIDATES",
+            "path": "candidates",
+            "message": "三个方案都只停留在「组合、礼盒、通用」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出"
+          },
+          {
+            "code": "FULFILLMENT_MISSING",
+            "path": "candidates[0].fulfillment",
+            "message": "未标注履约方式，已按最保守的 online（涉及快递）处理；真实链路里该字段应为必填枚举 offline/online/experience"
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          {
+            "code": "HOMOGENEOUS_CANDIDATES",
+            "path": "candidates",
+            "message": "三个方案都只停留在「组合、礼盒、通用」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出"
+          },
+          {
+            "code": "FULFILLMENT_MISSING",
+            "path": "candidates[1].fulfillment",
+            "message": "未标注履约方式，已按最保守的 online（涉及快递）处理；真实链路里该字段应为必填枚举 offline/online/experience"
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "passed": true,
+        "errors": [],
+        "warnings": [
+          {
+            "code": "TOO_GENERIC",
+            "path": "candidates[2].name",
+            "message": "命中大众品类「保温杯/马克杯/杯具」（“杯子”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+          },
+          {
+            "code": "HOMOGENEOUS_CANDIDATES",
+            "path": "candidates",
+            "message": "三个方案都只停留在「组合、礼盒、通用」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出"
+          },
+          {
+            "code": "FULFILLMENT_MISSING",
+            "path": "candidates[2].fulfillment",
+            "message": "未标注履约方式，已按最保守的 online（涉及快递）处理；真实链路里该字段应为必填枚举 offline/online/experience"
+          }
+        ]
+      }
+    ],
+    "business_data_verification": "not_verified",
+    "raw_validation": {
+      "status": "needs_input",
+      "all_passed": false,
+      "errors": [
+        {
+          "code": "INVALID_TYPE",
+          "path": "request.available_days",
+          "message": "天数必须为非负 JSON 整数，不能为布尔值"
+        }
+      ],
+      "candidate_results": [
+        {
+          "id": "c1",
+          "passed": false,
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "id": "c2",
+          "passed": false,
+          "errors": [],
+          "warnings": []
+        },
+        {
+          "id": "c3",
+          "passed": false,
+          "errors": [],
+          "warnings": []
+        }
+      ],
+      "business_data_verification": "not_verified"
+    },
+    "warnings": [
+      {
+        "code": "TOO_GENERIC",
+        "path": "candidates[0].name",
+        "message": "命中大众品类「台历/日历/相框」（“摆件”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+      },
+      {
+        "code": "TOO_GENERIC",
+        "path": "candidates[2].name",
+        "message": "命中大众品类「保温杯/马克杯/杯具」（“杯子”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+      },
+      {
+        "code": "HOMOGENEOUS_CANDIDATES",
+        "path": "candidates",
+        "message": "三个方案都只停留在「组合、礼盒、通用」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出"
+      }
+    ]
+  },
+  "workflow_errors": [],
+  "repair_count": 0,
+  "remaining_repairs": 1,
+  "selected_candidate_id": null,
+  "selectable_candidate_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "business_data_verification": "not_verified",
+  "notices": [
+    "直连大模型模式：接入层直接调用服务端配置的模型接口（不再经过 Dify）。模型调用失败时如实报错，不会用模拟数据顶替；每次真实调用都记入服务端账本。"
+  ],
+  "call_counts": {
+    "recommend": 3,
+    "recommend_revision": 0,
+    "presentation": 0,
+    "presentation_revision": 0
+  },
+  "catalog": {
+    "status": "unavailable",
+    "db_path_configured": false,
+    "products_total": null,
+    "scrapes": [],
+    "results": []
+  },
+  "delivery": {
+    "applicable": false,
+    "reason": "未提供送礼时间",
+    "policy": {
+      "rule": "时间不参与推荐筛选、排序或可选性判断",
+      "shipping": {
+        "defaultDays": 5,
+        "basis": "快递时长未知时暂按3~5天估算，上界不是实测时长",
+        "is_estimate": true,
+        "not_a_guarantee": "时间为估算。"
+      },
+      "presale": {
+        "defaultDays": null,
+        "basis": "预售发货时间缺失时保留未知",
+        "is_estimate": true,
+        "not_a_guarantee": "预售与发货时间来自页面信息或为未知。"
+      },
+      "presale_note": "预售发货时长来自页面信息，缺失时保留未知。",
+      "purchase_window": {
+        "min": 3,
+        "max": 5,
+        "used": 5,
+        "day_type": "calendar",
+        "basis": "快递时长未知时暂按3~5天估算；used仅为估算上界",
+        "not_a_guarantee": "时间为估算。"
+      },
+      "tier_rule": "未知快递统一按3~5天估算，与用户选择的时间档位无关",
+      "not_a_guarantee": "时间为估算。"
+    },
+    "per_candidate": {
+      "c1": {
+        "applicable": false,
+        "product_id": null,
+        "preparation_days": 2,
+        "declared_shipping_days": null,
+        "effective_shipping_days": null,
+        "shipping_basis": "not_applicable",
+        "shipping_days_source": "not_applicable",
+        "shipping_days_default": {
+          "min": 3,
+          "max": 5,
+          "used": 5,
+          "day_type": "calendar",
+          "basis": "快递时长未知时暂按3~5天估算；used仅为估算上界",
+          "not_a_guarantee": "时间为估算。"
+        },
+        "purchase_window": null,
+        "tier_inclusive": false,
+        "shipping_time_text": null,
+        "ships_within_text": null,
+        "effective_presale_days": null,
+        "presale_source_text": null,
+        "is_preorder": false,
+        "shipping_origin": null,
+        "seller_location_text": null,
+        "total_days": null,
+        "available_days": null,
+        "is_estimate": false,
+        "fulfillment": "online",
+        "fulfillment_confidence": "inferred",
+        "fulfillment_note": "线下可获得性与体验档期均为**推测**：没有门店库存与排课接口，无法核验",
+        "fulfillment_hint": null,
+        "page_url": null,
+        "price_basis": null,
+        "price_basis_note": null,
+        "errors": [],
+        "warnings": []
+      },
+      "c2": {
+        "applicable": false,
+        "product_id": null,
+        "preparation_days": 1,
+        "declared_shipping_days": null,
+        "effective_shipping_days": null,
+        "shipping_basis": "not_applicable",
+        "shipping_days_source": "not_applicable",
+        "shipping_days_default": {
+          "min": 3,
+          "max": 5,
+          "used": 5,
+          "day_type": "calendar",
+          "basis": "快递时长未知时暂按3~5天估算；used仅为估算上界",
+          "not_a_guarantee": "时间为估算。"
+        },
+        "purchase_window": null,
+        "tier_inclusive": false,
+        "shipping_time_text": null,
+        "ships_within_text": null,
+        "effective_presale_days": null,
+        "presale_source_text": null,
+        "is_preorder": false,
+        "shipping_origin": null,
+        "seller_location_text": null,
+        "total_days": null,
+        "available_days": null,
+        "is_estimate": false,
+        "fulfillment": "online",
+        "fulfillment_confidence": "inferred",
+        "fulfillment_note": "线下可获得性与体验档期均为**推测**：没有门店库存与排课接口，无法核验",
+        "fulfillment_hint": null,
+        "page_url": null,
+        "price_basis": null,
+        "price_basis_note": null,
+        "errors": [],
+        "warnings": []
+      },
+      "c3": {
+        "applicable": false,
+        "product_id": null,
+        "preparation_days": 2,
+        "declared_shipping_days": null,
+        "effective_shipping_days": null,
+        "shipping_basis": "not_applicable",
+        "shipping_days_source": "not_applicable",
+        "shipping_days_default": {
+          "min": 3,
+          "max": 5,
+          "used": 5,
+          "day_type": "calendar",
+          "basis": "快递时长未知时暂按3~5天估算；used仅为估算上界",
+          "not_a_guarantee": "时间为估算。"
+        },
+        "purchase_window": null,
+        "tier_inclusive": false,
+        "shipping_time_text": null,
+        "ships_within_text": null,
+        "effective_presale_days": null,
+        "presale_source_text": null,
+        "is_preorder": false,
+        "shipping_origin": null,
+        "seller_location_text": null,
+        "total_days": null,
+        "available_days": null,
+        "is_estimate": false,
+        "fulfillment": "online",
+        "fulfillment_confidence": "inferred",
+        "fulfillment_note": "线下可获得性与体验档期均为**推测**：没有门店库存与排课接口，无法核验",
+        "fulfillment_hint": null,
+        "page_url": null,
+        "price_basis": null,
+        "price_basis_note": null,
+        "errors": [],
+        "warnings": []
+      }
+    }
+  },
+  "visual_direction": null,
+  "visual_direction_error": {
+    "code": "MEASUREMENT_NOT_REQUESTED"
+  },
+  "uniqueness": {
+    "warnings": [
+      {
+        "code": "TOO_GENERIC",
+        "path": "candidates[0].name",
+        "message": "命中大众品类「台历/日历/相框」（“摆件”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+      },
+      {
+        "code": "TOO_GENERIC",
+        "path": "candidates[2].name",
+        "message": "命中大众品类「保温杯/马克杯/杯具」（“杯子”）；建议改成更具体、更小众的东西与用法，或说明为什么非它不可"
+      },
+      {
+        "code": "HOMOGENEOUS_CANDIDATES",
+        "path": "candidates",
+        "message": "三个方案都只停留在「组合、礼盒、通用」这类笼统说法上（没有可指认的具体东西与用法），属于同质化输出"
+      }
+    ],
+    "note": "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。"
+  },
+  "nl_parse": null,
+  "limits": {
+    "currency": "CNY",
+    "note": "费用与准备时间仅为估算；未核实真实价格、库存或实际送达。运输与预售时长为页面原文或保守估算，不构成送达保证。"
+  }
+}

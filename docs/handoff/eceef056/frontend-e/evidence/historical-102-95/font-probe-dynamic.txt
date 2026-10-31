@@ -1,0 +1,8 @@
+font requests after load: ["longcang.woff2","wenkai-regular.woff2","wenkai-medium.woff2"]
+font requests after inject: ["longcang.woff2","wenkai-regular.woff2","wenkai-medium.woff2","longcang-ext.woff2"]
+「别送香水、衣服和铁链手链」 => Long Cang:14
+「不要杭州城市纪念品，他听不懂」 => Long Cang:16
+丝带系成蝴蝶结 => Long Cang:7
+卡片插在左侧，铁盒除险后再包 => Long Cang:16
+君子之交，幻想与言听计从 => Long Cang:12
+好好送出去吧 ① → 2 ≈ 3 => LXGW WenKai:3 + Long Cang:13

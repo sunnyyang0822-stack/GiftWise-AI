@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-31T20:07:57.673Z",
+  "scope": "One new real recommendation grounded in three actually observed public text snippets; warm anonymous text cache, not a cold full E2E. No style/present/AI/image calls.",
+  "initial_materials": 3,
+  "material_query_ms": 356,
+  "allowed_optional_new_text_search": true,
+  "no_recommendation_images": true
+}

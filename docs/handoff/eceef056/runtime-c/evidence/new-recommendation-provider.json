@@ -1,0 +1,731 @@
+{
+  "ok": true,
+  "grounding": {
+    "status": "grounded",
+    "reference_ids": [
+      "web_1d8455cd71c6276b685f4d8b2d633c3a",
+      "web_95032af991e457b7a73f0835956f5d09"
+    ]
+  },
+  "outputs": {
+    "candidates_json": "{\"candidates\":[{\"id\":\"c1\",\"name\":\"手冲入门组合：滤杯、滤纸、细口壶与分享壶\",\"description\":\"按“热水浇在咖啡粉上、经滤纸过滤”的家庭冲煮思路，自行搭配一只单人份滤杯、对应滤纸、约600ml细口壶和小分享壶。挑选时把材质和颜色统一，例如同色系陶瓷滤杯配哑光壶，摆在新家厨房台面上不显杂乱。这是组合建议，不是网上现成的成套商品，价格按常见单品合计估算。\",\"estimated_total\":\"380.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"适合喜欢咖啡、又想要实用且好看的朋友：每天都能用，不占大件电器的位置，气质偏低调。手冲天然带一点“慢慢来”的仪式感，搬新家后给自己冲一杯也合适。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能愿意在家自己冲咖啡，但组内具体偏好未确认\",\"从送礼目标看，偏实用、低调的器具比造型夸张的摆件更贴合\"],\"unknowns\":[\"对方是否已有手冲器具或磨豆机\",\"是否愿意为冲煮花几分钟时间\",\"家中台面可用空间与常用杯量\",\"偏好深烘还是浅烘、加奶还是喝黑咖啡\"]},{\"id\":\"c2\",\"name\":\"省心浸泡式组合：法压壶或冷萃瓶 + 手摇磨豆机\",\"description\":\"把预算优先放在一只容量的法压壶或冷萃瓶上，剩余部分配一把手摇磨豆机或一包咖啡豆。浸泡式萃取对注水手法不敏感，压杆或滤网一压即可，适合刚搬家、厨房还没完全理顺的阶段。整体走不锈钢与玻璃的本色搭配，耐看也好打理。按常见单品估价，非现成礼盒。\",\"estimated_total\":\"360.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":1,\"tags\":[\"other\"],\"reason\":\"和手冲方向相比门槛更低、失败率更小，清洗也直接。对“想喝好一点但不想研究手法”的朋友更友好，也符合实用、低调的送礼目标。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能更看重方便而非钻研冲煮手法，这属于推测\",\"在搬家阶段，少步骤、好清洁的器具使用频率可能更高\"],\"unknowns\":[\"是否已有法压壶、冷萃瓶或磨豆机\",\"家里是否有冰箱空间放冷萃\",\"是否接受自己磨豆，或更希望直接收到咖啡豆\",\"日常一次喝几人份\"]},{\"id\":\"c3\",\"name\":\"新家咖啡角软装：陶瓷杯、托盘与密封豆罐\",\"description\":\"不涉及任何冲煮技法，选两只口径一致的陶瓷杯、一只木质或石材托盘、一个密封豆罐，凑成一个整洁的咖啡角落；若预算有余，再添一小包咖啡豆。思路来自“咖啡喝法很多样”这一点：意式浓缩、加水的美式、手冲各有各的杯量与浓度，所以杯子选通用容量更稳妥。估价为常见单品合计。\",\"estimated_total\":\"300.00\",\"currency\":\"CNY\",\"estimated_preparation_days\":2,\"tags\":[\"other\"],\"reason\":\"最贴近“搬新家”场景：它首先是一件让新家更好看的物件，其次才和咖啡有关。不预设对方已有器具或习惯，压力最小，也便于日后慢慢添置。\",\"fact_refs\":[\"interest:coffee_food\"],\"inferences\":[\"对方可能在意家里的整体观感，但审美偏好未确认\",\"比起专业器具，通用杯具的接受面可能更广\"],\"unknowns\":[\"新家厨房或餐边柜的可用面积与装修色调\",\"是否已有足够杯具、是否需要密封罐\",\"是否希望收到咖啡豆，以及是否有忌口\",\"对方偏好的器皿材质（陶瓷、玻璃或金属）\"]}]}",
+    "reference_references_json": "[{\"candidate_id\":\"c1\",\"reference_id\":\"web_1d8455cd71c6276b685f4d8b2d633c3a\"},{\"candidate_id\":\"c2\",\"reference_id\":\"web_1d8455cd71c6276b685f4d8b2d633c3a\"},{\"candidate_id\":\"c3\",\"reference_id\":\"web_95032af991e457b7a73f0835956f5d09\"}]"
+  },
+  "transport": "live",
+  "attempts": 1,
+  "output_attempts": 1,
+  "usage": {
+    "completion_tokens": 2104,
+    "completion_tokens_details": {
+      "reasoning_tokens": 1071
+    },
+    "prompt_tokens": 7453,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "total_tokens": 9557
+  },
+  "model": "deepseek-v4.1-flash-1017",
+  "http_status": 200,
+  "finish_reason": "stop",
+  "elapsed_ms": 15940,
+  "tool_audit": [
+    {
+      "tool_call_id": "call_00_two49gjcs2fpnq3ji81ccrtl",
+      "name": "opencli_search",
+      "arguments": {
+        "purpose": "inspiration",
+        "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+        "sources": [
+          "web",
+          "zhihu",
+          "bilibili"
+        ],
+        "reason": "需要真实咖啡冲煮方法资料支撑器具方向创意，避免凭空拟方案",
+        "city": null
+      },
+      "result": {
+        "status": "partial",
+        "evidence_id": null,
+        "products": [],
+        "references": [
+          {
+            "reference_id": "web_e26c58971dc1764ed72d17ec87b69f6d",
+            "title": "新手 (豆瓣)",
+            "summary": "2021年6月13日 · Dall的“不幸“”是选择集体项目，努力实现目标不仅要经历体能层面，心理层面，还有团队价值观影响，这“新手“注定 …",
+            "reference_kind": "public_reference",
+            "purpose": "inspiration",
+            "source_url": "https://movie.douban.com/subject/34981336/",
+            "source_platform": "web",
+            "source_site": "movie.douban.com",
+            "observed_at": "2026-10-31T20:08:06.731Z",
+            "image_id": null,
+            "image_url": null,
+            "image_kind": "reference_image",
+            "image_validation": null,
+            "material_kind": "search_snippet",
+            "has_summary": true,
+            "is_full_article": false
+          }
+        ],
+        "source_availability": [
+          {
+            "source": "web",
+            "status": "available",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "ok",
+            "paused_at": null
+          },
+          {
+            "source": "dianping",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "xiaohongshu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "bilibili",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "zhihu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "weibo",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "douban",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "huodongxing",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pinterest",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pixiv",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "jd",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "taobao",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          }
+        ],
+        "contents": [],
+        "images": [],
+        "warnings": [],
+        "enrichment_only": true,
+        "coverage": [
+          {
+            "source": "web",
+            "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+            "city": null,
+            "engine": "bing",
+            "status": "ok",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 1,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "ok",
+                "observed_count": 1
+              }
+            ],
+            "started_at": "2026-10-31T20:08:06.439Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 230,
+            "response_bytes": 103137,
+            "parse_ms": 8,
+            "records_seen": 10,
+            "records_rejected": 9,
+            "materials_with_summary": 1,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:06.740Z",
+            "elapsed_ms": 301,
+            "purpose": "inspiration",
+            "discovery_ms": 308.27399999999943
+          },
+          {
+            "source": "web",
+            "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+            "city": null,
+            "engine": "bing",
+            "status": "ok",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 0,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "ok",
+                "observed_count": 1
+              }
+            ],
+            "started_at": "2026-10-31T20:08:06.748Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 94,
+            "response_bytes": 105955,
+            "parse_ms": 3,
+            "records_seen": 10,
+            "records_rejected": 9,
+            "materials_with_summary": 1,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:06.905Z",
+            "elapsed_ms": 157,
+            "purpose": "inspiration",
+            "discovery_ms": 157.07480000000032
+          },
+          {
+            "source": "web",
+            "keyword": "新手 手冲咖啡 滤杯 手冲壶 步骤 入门 器具",
+            "city": null,
+            "engine": "bing",
+            "status": "ok",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 0,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "ok",
+                "observed_count": 1
+              }
+            ],
+            "started_at": "2026-10-31T20:08:06.905Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 91,
+            "response_bytes": 105338,
+            "parse_ms": 2,
+            "records_seen": 10,
+            "records_rejected": 9,
+            "materials_with_summary": 1,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:07.056Z",
+            "elapsed_ms": 150,
+            "purpose": "inspiration",
+            "discovery_ms": 150.67559999999867
+          }
+        ],
+        "recommendations_available": true
+      }
+    },
+    {
+      "tool_call_id": "call_01_qlqmjiz7w3w44yonslhkvxnl",
+      "name": "opencli_search",
+      "arguments": {
+        "purpose": "inspiration",
+        "keyword": "法压壶 爱乐压 咖啡豆 初学者 在家冲煮 方法",
+        "sources": [
+          "web",
+          "zhihu"
+        ],
+        "reason": "比较低门槛冲煮方式的真实方法要点，用于第二方向",
+        "city": null
+      },
+      "result": {
+        "status": "unavailable",
+        "evidence_id": null,
+        "products": [],
+        "references": [],
+        "source_availability": [
+          {
+            "source": "web",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "no_allowed_reference",
+            "paused_at": null
+          },
+          {
+            "source": "dianping",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "xiaohongshu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "bilibili",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "zhihu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "weibo",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "douban",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "huodongxing",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pinterest",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pixiv",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "jd",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "taobao",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          }
+        ],
+        "contents": [],
+        "images": [],
+        "warnings": [],
+        "enrichment_only": true,
+        "coverage": [
+          {
+            "source": "web",
+            "keyword": "法压壶 爱乐压 咖啡豆 初学者 在家冲煮 方法",
+            "city": null,
+            "engine": "bing",
+            "status": "no_allowed_reference",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 0,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "no_allowed_reference",
+                "observed_count": 0
+              }
+            ],
+            "started_at": "2026-10-31T20:08:07.121Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 94,
+            "response_bytes": 106198,
+            "parse_ms": 1,
+            "records_seen": 10,
+            "records_rejected": 10,
+            "materials_with_summary": 0,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:07.274Z",
+            "elapsed_ms": 153,
+            "purpose": "inspiration",
+            "discovery_ms": 153.32420000000093
+          },
+          {
+            "source": "web",
+            "keyword": "法压壶 爱乐压 咖啡豆 初学者 在家冲煮 方法",
+            "city": null,
+            "engine": "bing",
+            "status": "no_allowed_reference",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 0,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "no_allowed_reference",
+                "observed_count": 0
+              }
+            ],
+            "started_at": "2026-10-31T20:08:07.274Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 90,
+            "response_bytes": 105960,
+            "parse_ms": 2,
+            "records_seen": 10,
+            "records_rejected": 10,
+            "materials_with_summary": 0,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:07.427Z",
+            "elapsed_ms": 153,
+            "purpose": "inspiration",
+            "discovery_ms": 153.35040000000117
+          }
+        ],
+        "recommendations_available": true
+      }
+    },
+    {
+      "tool_call_id": "call_00_05rn7yigd46xwso8pxj9fzug",
+      "name": "opencli_search",
+      "arguments": {
+        "city": null,
+        "keyword": "家庭咖啡 冲煮方式 摩卡壶 冷萃 手冲 对比 教程",
+        "purpose": "inspiration",
+        "reason": "再补一次家庭冲煮方式的真实文字资料，若仍无合适结果则复用已有咖啡指南摘要",
+        "sources": [
+          "web"
+        ]
+      },
+      "result": {
+        "status": "partial",
+        "evidence_id": null,
+        "products": [],
+        "references": [
+          {
+            "reference_id": "web_97aba475f74763b1e42657b27e92bd07",
+            "title": "【WeGame（原TGP）下载】2026年最新官方正式版 ...",
+            "summary": "2026年4月17日 · 软件详情 WeGame是国内最大的数字游戏发行平台，集游戏购买下载、游戏社区等功能于一身，为游戏开发者提供 …",
+            "reference_kind": "public_reference",
+            "purpose": "inspiration",
+            "source_url": "https://pc.qq.com/detail/1/detail_23761.html",
+            "source_platform": "web",
+            "source_site": "pc.qq.com",
+            "observed_at": "2026-10-31T20:08:10.028Z",
+            "image_id": null,
+            "image_url": null,
+            "image_kind": "reference_image",
+            "image_validation": null,
+            "material_kind": "search_snippet",
+            "has_summary": true,
+            "is_full_article": false
+          }
+        ],
+        "source_availability": [
+          {
+            "source": "web",
+            "status": "available",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "ok",
+            "paused_at": null
+          },
+          {
+            "source": "dianping",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "xiaohongshu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "bilibili",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "zhihu",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": "not_observed",
+            "paused_at": null
+          },
+          {
+            "source": "weibo",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "douban",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "huodongxing",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pinterest",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "pixiv",
+            "status": "unknown",
+            "allow_request": true,
+            "reason_code": null,
+            "scope": null,
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "jd",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          },
+          {
+            "source": "taobao",
+            "status": "paused_by_product_scope",
+            "allow_request": false,
+            "reason_code": "COMMERCE_DISABLED_BY_USER",
+            "scope": "product_scope",
+            "observed_status": null,
+            "paused_at": null
+          }
+        ],
+        "contents": [],
+        "images": [],
+        "warnings": [],
+        "enrichment_only": true,
+        "coverage": [
+          {
+            "source": "web",
+            "keyword": "家庭咖啡 冲煮方式 摩卡壶 冷萃 手冲 对比 教程",
+            "city": null,
+            "engine": "bing",
+            "status": "ok",
+            "execution_mode": "public_http",
+            "native_executed": false,
+            "pages_requested": 1,
+            "pages_completed": 1,
+            "reported_total": null,
+            "observed_count": 1,
+            "complete": false,
+            "bounded": true,
+            "pages": [
+              {
+                "page": 1,
+                "status": "ok",
+                "observed_count": 1
+              }
+            ],
+            "started_at": "2026-10-31T20:08:09.872Z",
+            "limitations": [
+              "bounded_search_snippets_only",
+              "article_bodies_not_fetched"
+            ],
+            "http_status": 200,
+            "fetch_ms": 99,
+            "response_bytes": 105220,
+            "parse_ms": 2,
+            "records_seen": 10,
+            "records_rejected": 9,
+            "materials_with_summary": 1,
+            "limit_reached": false,
+            "scan_limit_reached": false,
+            "error_code": null,
+            "completed_at": "2026-10-31T20:08:10.030Z",
+            "elapsed_ms": 158,
+            "purpose": "inspiration",
+            "discovery_ms": 158.03369999999995
+          }
+        ],
+        "recommendations_available": true
+      }
+    }
+  ],
+  "model_calls": 3,
+  "synthetic": false
+}

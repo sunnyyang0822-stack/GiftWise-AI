@@ -1,0 +1,725 @@
+{
+  "code_sha": "eceef056ce80399b83c61f62860a32d0ead16e3d",
+  "evidence": "【实测=源码核查】读取冻结源码及既有虚构fixture；【推算】以下为静态请求和局部响应结构示意；【未测】未发送任何请求，不是运行记录。",
+  "live_result": false,
+  "fixture_sources": [
+    "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/workflow/examples/intake.json#L1",
+    "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/tests/exclusion-semantics.test.mjs#L19",
+    "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/tests/fixtures/exclusions/mock.mjs#L1"
+  ],
+  "usage": [
+    "所有response_shape_example都是非穷举局部结构；成功分支仅表示条件满足时的形状，不保证模型理解、候选通过或图像就绪。",
+    "同源调用由浏览器保存服务端会话；本材料不携带Cookie、签名或任何认证值。",
+    "<analysis_id>、<run_id>、<candidate_id>、<task_id>、<asset_sha>均为不可直接发送的占位符，必须替换为当前同owner实际返回值。task_id必须为64位小写hex。",
+    "主示例语义清楚时stage 4跳过续答；歧义与具体禁品是独立分支，不把它们的analysis_id混用。推荐所用intake必须与最新分析绑定的完整intake一致。",
+    "不要把parse再次放进已确认后的推荐请求以悄悄改变intake；如需求变更，重新分析/确认。",
+    "新预算契约单独列出，不作为既有legacy fixture已运行的证据。"
+  ],
+  "intake_variants": {
+    "legacy_fixture_semantic": {
+      "recipient_relation": "friend",
+      "closeness": "limited",
+      "occasion": "birthday",
+      "budget_amount": "200.00",
+      "currency": "CNY",
+      "deadline_days": 7,
+      "interests": [
+        "coffee_food",
+        "design_art"
+      ],
+      "interest_confidence": {
+        "coffee_food": "confirmed",
+        "design_art": "inferred"
+      },
+      "gift_styles": [
+        "practical",
+        "understated"
+      ],
+      "hard_exclusions": {
+        "tags": [
+          "alcohol"
+        ],
+        "terms": [
+          "酒"
+        ],
+        "unresolved": []
+      },
+      "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+      "dislikes": "别让人看起来像表白，卡片也别写得暧昧"
+    },
+    "v2_static_budget_variant": {
+      "recipient_relation": "friend",
+      "closeness": "limited",
+      "occasion": "birthday",
+      "budget_amount": "200.00",
+      "currency": "CNY",
+      "deadline_days": 7,
+      "interests": [
+        "coffee_food",
+        "design_art"
+      ],
+      "interest_confidence": {
+        "coffee_food": "confirmed",
+        "design_art": "inferred"
+      },
+      "gift_styles": [
+        "practical",
+        "understated"
+      ],
+      "hard_exclusions": {
+        "tags": [
+          "alcohol"
+        ],
+        "terms": [
+          "酒"
+        ],
+        "unresolved": []
+      },
+      "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+      "dislikes": "别让人看起来像表白，卡片也别写得暧昧",
+      "contract_version": "giftwise-20261031-v2",
+      "budget_mode": "slider",
+      "budget_range": {
+        "min": "150.00",
+        "max": "200.00"
+      }
+    }
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "配置与存活",
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/config"
+        },
+        {
+          "method": "GET",
+          "path": "/healthz"
+        }
+      ],
+      "response_shape_example": {
+        "config": {
+          "mode": "<effective_mode>",
+          "llm_configured": "<boolean>",
+          "client_timeout_ms": 150000
+        },
+        "health": {
+          "status": "ok",
+          "mode": "<effective_mode>",
+          "runs": "<number>",
+          "attestation": "<object>"
+        }
+      },
+      "notes": [
+        "200不等于供应商可达；configured不是reachable_verified。有效模式须核对，不能只看GW_MODE。attestation不是完整Git SHA的替代证明。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L247",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L353",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/attest.mjs#L93"
+      ]
+    },
+    {
+      "stage": 2,
+      "name": "解析及表单校验",
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/api/intake/parse",
+          "payload": {
+            "text": "别让人看起来像表白，卡片也别写得暧昧",
+            "form": {
+              "recipient_relation": "friend",
+              "closeness": "limited",
+              "occasion": "birthday",
+              "budget_amount": "200.00",
+              "currency": "CNY",
+              "deadline_days": 7,
+              "interests": [
+                "coffee_food",
+                "design_art"
+              ],
+              "interest_confidence": {
+                "coffee_food": "confirmed",
+                "design_art": "inferred"
+              },
+              "gift_styles": [
+                "practical",
+                "understated"
+              ],
+              "hard_exclusions": {
+                "tags": [
+                  "alcohol"
+                ],
+                "terms": [
+                  "酒"
+                ],
+                "unresolved": []
+              },
+              "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。"
+            }
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/intake/validate",
+          "payload": {
+            "intake": {
+              "recipient_relation": "friend",
+              "closeness": "limited",
+              "occasion": "birthday",
+              "budget_amount": "200.00",
+              "currency": "CNY",
+              "deadline_days": 7,
+              "interests": [
+                "coffee_food",
+                "design_art"
+              ],
+              "interest_confidence": {
+                "coffee_food": "confirmed",
+                "design_art": "inferred"
+              },
+              "gift_styles": [
+                "practical",
+                "understated"
+              ],
+              "hard_exclusions": {
+                "tags": [
+                  "alcohol"
+                ],
+                "terms": [
+                  "酒"
+                ],
+                "unresolved": []
+              },
+              "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+              "dislikes": "别让人看起来像表白，卡片也别写得暧昧"
+            }
+          }
+        }
+      ],
+      "response_shape_example": {
+        "parse": {
+          "status": "<ready|needs_input|empty|degraded|disabled>",
+          "source": "<llm|form>",
+          "mode": "<effective_mode>",
+          "intake": "<实际解析或回落的intake对象>",
+          "intake_validation": {
+            "status": "<ready|needs_input>",
+            "errors": "<array>"
+          },
+          "parse": "<object>",
+          "llm": "<object>",
+          "notices": "<array>"
+        },
+        "validate_nonempty_dislikes": {
+          "status": "needs_input",
+          "errors": [
+            {
+              "code": "INTAKE_CLARIFICATION_REQUIRED",
+              "path": "intake.dislikes",
+              "message": "请先完成不喜欢内容的识别与确认。"
+            }
+          ],
+          "derived_hint": "请补充上面提示的信息。"
+        }
+      },
+      "notes": [
+        "两条请求是形状示意。实际analyze必须使用用户核对后的解析结果；不能用本文件预先假定模型会输出semantic样例。",
+        "非空dislikes的validate提示不是清楚语义必须反复追问的规则；继续analyze判断ready/具体确认/真正歧义。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L465",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L500"
+      ]
+    },
+    {
+      "stage": 3,
+      "name": "开放语义理解与分支",
+      "scenarios": [
+        {
+          "name": "语义清楚的主示例",
+          "request": {
+            "method": "POST",
+            "path": "/api/exclusions/analyze",
+            "payload": {
+              "intake": {
+                "recipient_relation": "friend",
+                "closeness": "limited",
+                "occasion": "birthday",
+                "budget_amount": "200.00",
+                "currency": "CNY",
+                "deadline_days": 7,
+                "interests": [
+                  "coffee_food",
+                  "design_art"
+                ],
+                "interest_confidence": {
+                  "coffee_food": "confirmed",
+                  "design_art": "inferred"
+                },
+                "gift_styles": [
+                  "practical",
+                  "understated"
+                ],
+                "hard_exclusions": {
+                  "tags": [
+                    "alcohol"
+                  ],
+                  "terms": [
+                    "酒"
+                  ],
+                  "unresolved": []
+                },
+                "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+                "dislikes": "别让人看起来像表白，卡片也别写得暧昧"
+              }
+            }
+          },
+          "response_shape_example": {
+            "status": "ready",
+            "analysis_id": "<analysis_id>",
+            "candidates": [],
+            "semantic_constraints": [
+              {
+                "source_span": "别让人看起来像表白，卡片也别写得暧昧",
+                "interpretation": "保持普通朋友的边界，卡片使用自然中性措辞",
+                "confidence": "high"
+              }
+            ],
+            "clarification_questions": [],
+            "confirmation_required": false,
+            "errors": []
+          },
+          "note": "源自受控provider虚构fixture，真实模型解释与confidence可不同；不能按关键词强制此输出。"
+        },
+        {
+          "name": "语义与真实禁品并存的替代分支",
+          "request": {
+            "method": "POST",
+            "path": "/api/exclusions/analyze",
+            "payload": {
+              "intake": {
+                "recipient_relation": "friend",
+                "closeness": "limited",
+                "occasion": "birthday",
+                "budget_amount": "200.00",
+                "currency": "CNY",
+                "deadline_days": 7,
+                "interests": [
+                  "coffee_food",
+                  "design_art"
+                ],
+                "interest_confidence": {
+                  "coffee_food": "confirmed",
+                  "design_art": "inferred"
+                },
+                "gift_styles": [
+                  "practical",
+                  "understated"
+                ],
+                "hard_exclusions": {
+                  "tags": [
+                    "alcohol"
+                  ],
+                  "terms": [
+                    "酒"
+                  ],
+                  "unresolved": []
+                },
+                "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+                "dislikes": "别让人看起来像表白，卡片也别写得暧昧，不要香水"
+              }
+            }
+          },
+          "response_shape_example": {
+            "status": "needs_confirmation",
+            "analysis_id": "<physical_analysis_id>",
+            "candidates": [
+              {
+                "id": "xc1",
+                "kind": "tag",
+                "tag": "fragrance",
+                "term": null,
+                "source_span": "不要香水",
+                "confidence": "high",
+                "why": "原话明确避开香水",
+                "evidence": "user_text"
+              }
+            ],
+            "confirmation_required": true
+          },
+          "note": "用户确认后，推荐传confirmed_ids实际完整候选ID集合；示意xc1不代表实际响应固定ID。"
+        },
+        {
+          "name": "真正歧义的替代分支",
+          "request": {
+            "method": "POST",
+            "path": "/api/exclusions/analyze",
+            "payload": {
+              "intake": {
+                "recipient_relation": "friend",
+                "closeness": "limited",
+                "occasion": "birthday",
+                "budget_amount": "200.00",
+                "currency": "CNY",
+                "deadline_days": 7,
+                "interests": [
+                  "coffee_food",
+                  "design_art"
+                ],
+                "interest_confidence": {
+                  "coffee_food": "confirmed",
+                  "design_art": "inferred"
+                },
+                "gift_styles": [
+                  "practical",
+                  "understated"
+                ],
+                "hard_exclusions": {
+                  "tags": [
+                    "alcohol"
+                  ],
+                  "terms": [
+                    "酒"
+                  ],
+                  "unresolved": []
+                },
+                "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+                "dislikes": "别太正式"
+              }
+            }
+          },
+          "response_shape_example": {
+            "status": "needs_input",
+            "analysis_id": "<ambiguous_analysis_id>",
+            "candidates": [],
+            "clarification_questions": [
+              {
+                "source_span": "别太正式",
+                "question": "你主要是希望送礼方式轻松，还是不想要正式包装？"
+              }
+            ],
+            "confirmation_required": false
+          },
+          "note": "只有实际返回需要回答的问题时才续答；这个固定问题是虚构fixture，不是业务硬编码。"
+        }
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/exclusion-service.mjs#L13",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/tests/exclusion-semantics.test.mjs#L28",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/tests/exclusion-semantics.test.mjs#L46",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/tests/exclusion-semantics.test.mjs#L54"
+      ]
+    },
+    {
+      "stage": 4,
+      "name": "条件续答与确认引用",
+      "request_only_if_previous_needs_input": {
+        "method": "POST",
+        "path": "/api/exclusions/analyze",
+        "payload": {
+          "intake": {
+            "recipient_relation": "friend",
+            "closeness": "limited",
+            "occasion": "birthday",
+            "budget_amount": "200.00",
+            "currency": "CNY",
+            "deadline_days": 7,
+            "interests": [
+              "coffee_food",
+              "design_art"
+            ],
+            "interest_confidence": {
+              "coffee_food": "confirmed",
+              "design_art": "inferred"
+            },
+            "gift_styles": [
+              "practical",
+              "understated"
+            ],
+            "hard_exclusions": {
+              "tags": [
+                "alcohol"
+              ],
+              "terms": [
+                "酒"
+              ],
+              "unresolved": []
+            },
+            "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+            "dislikes": "别太正式"
+          },
+          "continuation": {
+            "analysis_id": "<ambiguous_analysis_id>",
+            "answer": "是送礼方式轻松，包装简洁即可"
+          }
+        }
+      },
+      "response_shape_example": {
+        "status": "ready",
+        "analysis_id": "<new_analysis_id>",
+        "candidates": [],
+        "clarification_questions": [],
+        "confirmation_required": false
+      },
+      "confirmation_reference_examples": {
+        "main_semantic_ready": {
+          "analysis_id": "<analysis_id>",
+          "confirmed_ids": []
+        },
+        "answered_ready_no_items": {
+          "analysis_id": "<new_analysis_id>",
+          "confirmed_ids": []
+        },
+        "actual_items_after_user_confirmation": {
+          "analysis_id": "<physical_analysis_id>",
+          "confirmed_ids": [
+            "<全部实际candidates.id，唯一且完整>"
+          ]
+        }
+      },
+      "notes": [
+        "无独立confirm/clarify端点：确认引用随下一步recommend提交。",
+        "主语义示例跳过续答，直接用空ID列表引用已ready分析；不要求用户勾选虚构禁品。",
+        "续答不改原intake/dislikes，成功使用新analysis_id；失败保留旧问题时可保留未送达回答重试。表单变化、跨owner或过期要处理EXCLUSION_ANALYSIS_STALE。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/exclusion-service.mjs#L20",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/exclusion-service.mjs#L45"
+      ]
+    },
+    {
+      "stage": 5,
+      "name": "生成推荐",
+      "request": {
+        "method": "POST",
+        "path": "/api/recommendations",
+        "payload": {
+          "intake": {
+            "recipient_relation": "friend",
+            "closeness": "limited",
+            "occasion": "birthday",
+            "budget_amount": "200.00",
+            "currency": "CNY",
+            "deadline_days": 7,
+            "interests": [
+              "coffee_food",
+              "design_art"
+            ],
+            "interest_confidence": {
+              "coffee_food": "confirmed",
+              "design_art": "inferred"
+            },
+            "gift_styles": [
+              "practical",
+              "understated"
+            ],
+            "hard_exclusions": {
+              "tags": [
+                "alcohol"
+              ],
+              "terms": [
+                "酒"
+              ],
+              "unresolved": []
+            },
+            "additional_context": "完全虚构的联调请求。追求对象默认低压力表达，不假定对方心意或已有双向好感。",
+            "dislikes": "别让人看起来像表白，卡片也别写得暧昧"
+          },
+          "exclusion_confirmation": {
+            "analysis_id": "<analysis_id>",
+            "confirmed_ids": []
+          }
+        }
+      },
+      "response_shape_example": {
+        "recommendation_run_id": "<run_id>",
+        "mode": "<effective_mode>",
+        "status": "<server_run_status>",
+        "request": "<服务端派生冻结对象>",
+        "candidates": "<实际通过校验的候选对象数组>",
+        "validation": "<object>",
+        "selectable_candidate_ids": [
+          "<candidate_id>",
+          "<candidate_id_2>",
+          "<candidate_id_3>"
+        ],
+        "selected_candidate_id": null,
+        "repair_count": "<0|1>",
+        "remaining_repairs": "<1|0>",
+        "business_data_verification": "not_verified",
+        "retrieval": "<object>",
+        "media": "<object>",
+        "notices": "<array>"
+      },
+      "error_shape_example": {
+        "http_status": 400,
+        "body": {
+          "status": "failed",
+          "errors": [
+            {
+              "code": "RECOMMENDATION_INCOMPLETE",
+              "path": "candidates",
+              "message": "未能完成三个可选方案，请调整需求后重新生成。"
+            }
+          ],
+          "run_id": "<failed_run_id>"
+        }
+      },
+      "notes": [
+        "响应只示意形状；本材料没有编造商户、价格、场次、图片或实际候选。只有成功report里的selectable_candidate_ids可供选择。",
+        "资料不足可RETRIEVAL_NO_MATERIAL，基础设施错误可503；不要把固定三个fixture候选写成可用性承诺。时间仅作信息，预算、结构、必要字段等非时间硬约束仍保留。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L522",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/store.mjs#L96",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/pipeline.mjs#L627",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/llm/provider.mjs#L317"
+      ]
+    },
+    {
+      "stage": 6,
+      "name": "用户选定并取得文字指南",
+      "request": {
+        "method": "POST",
+        "path": "/api/presentations",
+        "payload": {
+          "recommendation_run_id": "<run_id>",
+          "selected_candidate_id": "<candidate_id>"
+        }
+      },
+      "response_shape_example": {
+        "recommendation_run_id": "<run_id>",
+        "selected_candidate_id": "<candidate_id>",
+        "status": "completed",
+        "mode": "<effective_mode>",
+        "sections": "<实际非空sections数组>",
+        "presentation_json": "<object>",
+        "presentation_check": {
+          "passed": true
+        },
+        "recheck_summary": "<object>",
+        "media": {
+          "contract_version": "retrieval-media-v2",
+          "status": "pending",
+          "candidates": [],
+          "selected": {
+            "task_id": "<task_id>",
+            "candidate_id": "<candidate_id>",
+            "status": "pending",
+            "image": null
+          }
+        },
+        "media_wait": {
+          "waited": false,
+          "timed_out": false,
+          "waited_ms": 0,
+          "timeout_ms": 0,
+          "task_id": "<task_id>"
+        }
+      },
+      "notes": [
+        "仅示意文字完成且真实生图已授权/配置并成功建立任务的pending分支，不是实跑成功。media也可能ready/failed/unavailable。文字不等图。",
+        "不通过呈现校验可409 presentation_failed；非法选择400；非owner/过期run404。重复选择复用既有任务，不代表免费重新生成。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L602",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/pipeline.mjs#L672",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/pipeline.mjs#L980",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/media/provider.mjs#L87"
+      ]
+    },
+    {
+      "stage": 7,
+      "name": "运行快照、媒体任务和图片读取",
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/runs/<run_id>"
+        },
+        {
+          "method": "GET",
+          "path": "/api/media/tasks/<task_id>"
+        },
+        {
+          "method": "GET",
+          "path": "/api/media/assets/<task_id>"
+        }
+      ],
+      "response_shape_example": {
+        "run_snapshot": {
+          "recommendation_run_id": "<run_id>",
+          "selected_candidate_id": "<candidate_id>",
+          "selectable_candidate_ids": "<array>",
+          "status": "<server_run_status>",
+          "media": "<object>"
+        },
+        "task_pending": {
+          "contract_version": "retrieval-media-v2",
+          "status": "pending",
+          "selected": {
+            "task_id": "<task_id>",
+            "candidate_id": "<candidate_id>",
+            "status": "pending",
+            "image": null
+          }
+        },
+        "task_ready": {
+          "status": "ready",
+          "selected": {
+            "task_id": "<task_id>",
+            "status": "ready",
+            "execution": "succeeded",
+            "image": {
+              "id": "<asset_sha>",
+              "url": "/api/media/assets/<task_id>",
+              "kind": "ai_illustration"
+            },
+            "appearance_consistency": "not_verified"
+          }
+        },
+        "task_failed_execution_unknown": {
+          "status": "failed",
+          "selected": {
+            "task_id": "<task_id>",
+            "status": "failed",
+            "execution": "unknown",
+            "image": null,
+            "error_code": "<IMAGE_*实际错误码>"
+          }
+        },
+        "asset_ready": {
+          "http_status": 200,
+          "body_kind": "图片字节，不是JSON",
+          "cache_control": "private, no-store"
+        },
+        "media_not_found": {
+          "http_status": 404,
+          "body": {
+            "status": "error",
+            "errors": [
+              {
+                "code": "MEDIA_NOT_FOUND",
+                "message": "图片任务不存在、未就绪或不属于当前会话。"
+              }
+            ]
+          }
+        }
+      },
+      "notes": [
+        "ready示意不是图片生成证据；task GET只读取，不提交或重试生图。asset路径使用task_id，不是image.id/文件hash。",
+        "未授权/未配置的unavailable响应可能带task_id但没有持久化任务，此时task GET404是代码设计。",
+        "读任务和图片需有效同owner/run及当前选中候选；重启/TTL可能404。失败/超时不能证明供应商未执行或未计费。"
+      ],
+      "source_urls": [
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L411",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/server.mjs#L423",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/media/provider.mjs#L87",
+        "https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/eceef056ce80399b83c61f62860a32d0ead16e3d/web/server/media/provider.mjs#L108"
+      ]
+    }
+  ]
+}
