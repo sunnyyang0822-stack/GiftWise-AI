@@ -68,7 +68,10 @@
       "unknowns": [
         "尚无最终图，无法核对外观和标注定位",
         "图像服务未接线；本夹具未调用服务"
-      ]
+      ],
+      "plan_version": "packaging-seedream-v1",
+      "execution": "not_submitted",
+      "annotation_status": "not_verified"
     }
   },
   "scene_proposal": {
@@ -200,5 +203,10 @@
         ]
       }
     }
-  ]
+  ],
+  "dify_input_mapping": {
+    "external": "intake_json",
+    "internal_legacy": "request_json",
+    "mapping": "intake_json -> request_json before generation/validation"
+  }
 }

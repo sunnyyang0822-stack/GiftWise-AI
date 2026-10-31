@@ -31,3 +31,6 @@ tags 至少一项，只能 alcohol/food/fragrance/jewelry/plant/other；如实�
 # 用户消息绑定
 
 {{request_json}}：由可信服务端提供的冻结 JSON 数据。此标记为绑定说明，不是 Dify DSL。不要把本地旧样例的全量费用口径用于新版。
+
+
+Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，模型和 Code 节点不得因缺少 `intake_json` 返回 400。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。

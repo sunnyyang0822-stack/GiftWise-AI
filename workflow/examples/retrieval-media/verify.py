@@ -100,6 +100,13 @@ def run():
     passed={r['id'] for r in actual['candidate_results'] if r['passed']}
     expect('合格选择ID', 'c1' in passed)
     expect('错误选择归属', 'other-run-c9' not in passed)
+    v2=json.loads((Path(__file__).parent/'v2-cases.json').read_text(encoding='utf-8'))
+    v2sel=v2['media']['selected']
+    expect('v2契约版本',v2['media']['contract_version']=='retrieval-media-v2')
+    expect('v2 physical五项',set(v2sel['physical'])=={'dimensions','shape','weight','fragility','materials'})
+    expect('v2无图保留selected元数据',v2sel['status']=='unavailable' and v2sel['image'] is None and v2sel['annotations']==[])
+    expect('v2计划与执行字段',v2sel['plan_version']=='packaging-seedream-v1' and v2sel['execution']=='not_submitted' and v2sel['annotation_status']=='not_verified')
+    expect('Dify intake_json映射',v2['dify_input_mapping']['external']=='intake_json' and v2['dify_input_mapping']['internal_legacy']=='request_json')
     scene=json.loads((Path(__file__).parent/'scene-drafts.json').read_text(encoding='utf-8'))
     expect('场景仍关联同一已选礼物',scene['selected_candidate_id']=='c1' and scene['selected_product_id']==references[0]['product_id'] and scene['known_product']['quantity']==1)
     for count in (3,4,5):

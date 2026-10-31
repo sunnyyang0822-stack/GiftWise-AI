@@ -18,13 +18,13 @@ packaging 为 form/description/scale，scale 为 status/必填 note；status 仅
 
 ## v2 标注与最终图绑定
 
-默认3–5处，最多5处。每处仅 id/text/target/label/image_version/text_style/curve；text 为最多30码点的简短中文纯文本，text_style 固定 handwritten。用自然手写感短句说明配色、包装形态、贺卡位置等实际细节，不机械编号、长公式清单或无关抒情，不承诺对方一定喜欢。前端使用许可字体，中文清晰优先，细线曲线箭头由前端叠加，不让图像模型画文字。
+默认3–5处，最多5处。每处仅 id/text/target/label/image_version/text_style/curve，并遵循后台新增 annotation_status；text 为最多30码点的简短中文纯文本，text_style 固定 handwritten。用自然手写感短句说明配色、包装形态、贺卡位置等实际细节，不机械编号、长公式清单或无关抒情，不承诺对方一定喜欢。前端使用许可字体，中文清晰优先，细线曲线箭头由前端叠加，不让图像模型画文字。
 
 label 是文字锚点、target 是最终图可见目标；坐标为有限0–1数。curve 为 null 或 {control_points:[{x,y}]}，1个控制点为二次曲线、2个为三次曲线。每条 image_version 必须等于服务端不可变 image.version；版本不是模型自行生成的可信字段。换图丢弃旧坐标，针对最终图重新校准。不能仅凭坐标数值合法就宣称指向正确；需核对目标物、遮挡和可读性。无法核对时不输出假 ready/已定位。
 
 ## 服务端封装与降级
 
-media.contract_version 为 retrieval-media-v2，读取兼容旧无版本文本响应。已选但无图时保留 selected 的 task_id/status/candidate_id/product_id/physical/packaging/scene/annotations/unknowns，image=null、annotations=[]，状态明确 unavailable/failed/pending；不能退回 selected=null 丢失已选元数据。未生成场景时 description=null、props=[]，packaging.form=undetermined，明确尺寸与能力未知。
+media.contract_version 为 retrieval-media-v2，读取兼容旧无版本文本响应。selected 同时支持 `plan_version=packaging-seedream-v1`、`execution`（succeeded/not_submitted/rejected/failed/unknown/succeeded_output_invalid/succeeded_output_unavailable）和 `annotation_status=not_verified`；未真实校准底图时保持 not_verified 与空 annotations。已选但无图时保留 selected 的 task_id/status/candidate_id/product_id/physical/packaging/scene/annotations/unknowns，image=null、annotations=[]，状态明确 unavailable/failed/pending；不能退回 selected=null 丢失已选元数据。未生成场景时 description=null、props=[]，packaging.form=undetermined，明确尺寸与能力未知。
 
 真实有图时由服务器赋 image.version，kind=ai_illustration、alt含“AI包装效果示意”，URL经安全读取，不接受模型任意地址、SVG或HTML。image=null 时 annotations 必须空。没有最终图的坐标仅保存在离线提案，不进入无图响应。保留等价文字，完整原始宽高比；窄屏不裁异形主体，重排标签不移动目标点。后端执行形状/来源/版本/坐标校验，实际视觉定位另验。
 

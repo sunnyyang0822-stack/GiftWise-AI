@@ -19,3 +19,6 @@ style、色调、贺卡、话术均遵守冻结禁忌，完整时间仍需独立
 # 调用绑定
 
 {{request_json}} / {{selected_candidate_json}} / {{remaining_repairs}} 由可信服务端提供。示例见 workflow/examples/nov01/cases.json。新版线上未验证，旧真实调用不证明本规范有效。
+
+
+Dify 接入边界：对外工作流输入变量统一命名为 `intake_json`；可信服务端若内部仍使用 `request_json`，必须在接入节点显式映射 `intake_json -> request_json`，模型和 Code 节点不得因缺少 `intake_json` 返回 400。冻结后的 previous_gifts 随请求传递，仍是软历史，不自动进入 hard_exclusions/dislikes。

@@ -1,6 +1,6 @@
 ## 当前增量：retrieval-media-v2（2026-10-31）
 
-本节覆盖旧 v1 的媒体字段、selected=null 降级与曲线暂缺说明；其余历史规范仅按各自版本阅读。共享契约唯一写者为后台，基准 PR61@e0c76cad548ffa371287837a36e0fae2a48f0ecf。
+本节覆盖旧 v1 的媒体字段、selected=null 降级与曲线暂缺说明；v2 新增 plan_version、execution、annotation_status；其余历史规范仅按各自版本阅读。共享契约唯一写者为后台，基准 PR61@e0c76cad548ffa371287837a36e0fae2a48f0ecf。
 
 - 先“需要避免的”识别/用户确认或澄清，再冻结预算/天数/事实；previous_gifts 独立软历史。合法预算输入不再增加确认框。
 - 受限检索计划仅 category/keywords/limit，当前只支持 confirmed tech_digital → maker/kit。预算在冻结 request，不让模型改写。足三种有据商品后再生成解释；不足前置澄清。
@@ -9,6 +9,8 @@
 - media.contract_version=retrieval-media-v2。选前 selected=null；选后无图也保留 task/candidate/product/physical/packaging/scene/unknowns，image=null、annotations=[]。无图不会丢失选择，不伪造生成成功。
 - 有图由服务端赋不可变 image.version。默认3–5处短中文标注，每项 id/text/target/label/image_version/text_style/curve；handwritten、最多30码点，曲线1或2个控制点。image_version必须匹配，换图重校准。数值验证不是视觉定位验证。
 - 完整光影造景、按物理证据适形包装、干净无字底图、道具非附送、包装不报价。完整宽高比，不裁主体；详见 prompts/packaging-image.md。
+
+Dify 对外输入变量统一为 `intake_json`；如内部适配仍使用 `request_json`，在接入边界显式做 `intake_json -> request_json` 映射，避免因缺少 intake_json 返回400。previous_gifts 随冻结需求传递但仍为软历史。
 
 本批为离线准备；Seedream验证已授权但未执行，接线与账号配置交后台/PM；Dify仍未授权。没有真实图像、token、调用延迟或费用结果。离线示例/坐标不是实际图像证明，不生成DSL。
 
@@ -36,7 +38,7 @@ VAL-001 的状态优先级、未知标签、候选 ID、重复文本、金额格
 
 ## 推荐阶段的数据契约
 
-以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 节点边界使用 JSON 字符串 `request_json`、`candidates_json`、`validation_json`，另提供浅层状态字段；实际 UI 必须声明对应类型。
+以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 对外节点边界使用 JSON 字符串 `intake_json`、`candidates_json`、`validation_json`；可信适配层可将 `intake_json` 映射为内部校验器参数 `request_json`，实际 UI 不得只声明旧的 request_json 而漏掉 intake_json。
 
 虚构用户输入示例：
 

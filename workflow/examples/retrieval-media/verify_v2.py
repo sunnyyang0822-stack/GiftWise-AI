@@ -8,6 +8,8 @@ plan=d['plan']; assert set(plan)=={'category','keywords','limit'}
 assert plan['category']=='maker' and plan['keywords']==['kit'] and plan['limit']==3
 media=d['media']; assert media['contract_version']=='retrieval-media-v2'
 sel=media['selected']; assert sel and sel['status']=='unavailable' and sel['image'] is None and sel['annotations']==[]
+assert sel['plan_version']=='packaging-seedream-v1' and sel['execution']=='not_submitted' and sel['annotation_status']=='not_verified'
+assert d['dify_input_mapping']=={'external':'intake_json','internal_legacy':'request_json','mapping':'intake_json -> request_json before generation/validation'}
 assert set(sel['physical'])=={'dimensions','shape','weight','fragility','materials'}
 for x in sel['physical'].values(): assert x=={'status':'unknown','value':None,'unit':None,'sources':[]}
 assert sel['packaging']['form']=='undetermined' and sel['packaging']['scale']['status']=='illustrative'
@@ -18,5 +20,5 @@ for a in d['annotation_proposals']:
  assert a['curve'] is None or len(a['curve']['control_points']) in (1,2)
  for p in (a['target'],a['label']):
   assert all(type(v) in (int,float) and not isinstance(v,bool) and math.isfinite(v) and 0<=v<=1 for v in p.values())
-print('PASS retrieval-media-v2 offline structure: plan, physical, selected unavailable, scene, annotations')
+print('PASS retrieval-media-v2 offline structure: plan, physical, selected unavailable, scene, annotations, execution/status, Dify mapping')
 print('SKIP provider/image/visual-coordinate verification: no real service called')

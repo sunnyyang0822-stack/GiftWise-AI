@@ -62,3 +62,19 @@ PR61共享契约已明确商品引用信封。本轮不把后台worker内部cate
 - Dify、模型、Seedream/任何图片服务、OpenCLI：未执行；token、延迟、费用：未测。
 
 仍需后台/PM 接线与独立 QA：真实 provider 的 image.version、最终图像目标点核对、换图重新校准、字体与窄屏显示、物理来源真实性。结构通过不代表真实生图或视觉定位通过。
+
+## RM-003 修复（本 PR 后续提交）
+
+按后台 PR #61 最新提交 `e034aa5` 修复 v2 字段遗漏：提示词、夹具和 oracle 现在覆盖 `physical`、`image_version`、`text_style`、`curve`、`annotation_status`、`plan_version`、`execution`。无图状态保持 selected 候选元数据，`image=null`、`annotations=[]`、`status=unavailable`，并使用 `execution=not_submitted`、`annotation_status=not_verified` 的离线状态。
+
+Dify 边界统一为外部 `intake_json`；若可信接入层内部继续使用 `request_json`，必须显式做 `intake_json -> request_json` 映射。`previous_gifts` 随冻结需求传递，仍是软历史，不进入硬禁忌。
+
+最终命令：
+
+- `python workflow/examples/retrieval-media/verify.py`：PASS，49 项。
+- `python workflow/examples/retrieval-media/verify_v2.py`：PASS。
+- `python -m unittest discover -s tests -q`：PASS，337 项。
+- `python workflow/verify_local.py --nov01`：PASS，29 项。
+- `git diff --check`：PASS。
+
+Dify、模型及图片服务均未调用。结构 oracle 通过不代表真实图片、视觉坐标或线上 Dify 已验证。
