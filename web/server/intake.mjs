@@ -13,6 +13,7 @@
  *     未落地时返回 PURSUIT_CONTRACT_NOT_READY 并拒绝，绝不做关系改写。
  */
 
+import { currentExclusionContext } from "./exclusion-context.mjs";
 import { strictParse, dump, byteLength } from "./jsonstrict.mjs";
 import { RELATIONS_FULL, CLOSENESS_TABLE, OCCASION_TABLE, INTEREST_TABLE, GIFT_STYLE_TABLE, EXCLUSION_TABLE } from "./labels.mjs";
 import { LIMITS, PURSUIT_CONTRACT_READY, PURSUIT_NOT_READY_MESSAGE } from "./config.mjs";
@@ -263,6 +264,8 @@ export function adaptIntake(intakeJson, options = {}) {
     gift_styles: styles,
     hard_exclusions_original: exclusions,
   };
+  const exclusionContext = currentExclusionContext();
+  if (exclusionContext) request.exclusion_context = exclusionContext;
   if (revised || Object.hasOwn(data, "previous_gifts")) request.previous_gifts = previousGifts;
   if (revised) {
     Object.assign(request, { contract_version: CONTRACT_VERSION, budget_range: Object.hasOwn(data, "budget_range") ? data.budget_range : null, dislikes });

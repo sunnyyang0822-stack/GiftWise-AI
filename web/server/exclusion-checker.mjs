@@ -333,10 +333,12 @@ function parse(raw) {
 }
 
 /** aiJson 必须是保留重复键信息的原始 JSON 字符串。无联网、时钟、存储或业务状态写入。 */
-export function checkAiExclusions(aiJson, dislikes) {
+export function checkAiExclusions(aiJson, dislikes, { clarificationAnswers = [] } = {}) {
+  const sources = [dislikes, ...clarificationAnswers.filter(value => typeof value === "string")];
+  const anchored = span => typeof span === "string" && span.trim() && sources.some(source => typeof source === "string" && source.includes(span));
   const fail = (code, path, message) => ({status: 'needs_input', candidates: [], errors: [
     error(code, path, message),
-    ...(typeof dislikes === 'string' && dislikes.trim() ? [error('INTAKE_CLARIFICATION_REQUIRED', 'dislikes', '请修改原话并重新识别，明确限制后才能推荐')] : []),
+    ...(typeof dislikes === 'string' && dislikes.trim() ? [error('INTAKE_CLARIFICATION_REQUIRED', 'dislikes', '请回答当前需要澄清的问题，原话已保留')] : []),
   ]});
   if (typeof dislikes !== 'string') return fail('AI_OUTPUT_INVALID', 'dislikes', '不喜欢的东西须为文字');
   if (length(dislikes) > 1000) return fail('AI_OUTPUT_LIMIT', 'dislikes', '原文最多 1000 码点');
@@ -345,7 +347,19 @@ export function checkAiExclusions(aiJson, dislikes) {
   if (Buffer.byteLength(aiJson, 'utf8') > 32768) return fail('AI_OUTPUT_LIMIT', 'ai_json', '识别结果最多 32768 UTF-8 字节');
   let data;
   try { data = parse(aiJson); } catch { return fail('AI_OUTPUT_INVALID', 'ai_json', '识别结果不是合法且无重复键的严格 JSON'); }
-  if (!exact(data, ['ai_exclusion_candidates', 'ai_unmapped_notes']) || !Array.isArray(data.ai_exclusion_candidates) || !Array.isArray(data.ai_unmapped_notes)) return fail('AI_OUTPUT_INVALID', 'ai_json', '识别信封仅允许候选与未映射备注数组');
+  const oldKeys = ['ai_exclusion_candidates', 'ai_unmapped_notes'];
+  const semanticKeys = [...oldKeys, 'ai_semantic_constraints', 'ai_clarification_questions'];
+  if ((!exact(data, oldKeys) && !exact(data, semanticKeys)) || !Array.isArray(data.ai_exclusion_candidates) || !Array.isArray(data.ai_unmapped_notes)) return fail('AI_OUTPUT_INVALID', 'ai_json', '识别信封字段或数组不合法');
+  const semantics = Object.hasOwn(data, "ai_semantic_constraints") ? data.ai_semantic_constraints : [];
+  const questions = Object.hasOwn(data, "ai_clarification_questions") ? data.ai_clarification_questions : [];
+  if (!Array.isArray(semantics) || !Array.isArray(questions)) return fail('AI_OUTPUT_INVALID', 'ai_json', '语义限制与澄清问题须为数组');
+  if (semantics.length > 5 || questions.length > 3) return fail('AI_OUTPUT_LIMIT', 'ai_json', '最多五条语义限制、三条澄清问题');
+  for (const [index, item] of semantics.entries()) {
+    if (!exact(item, ['source_span', 'interpretation', 'confidence']) || !anchored(item.source_span) || length(item.source_span) > 1000 || typeof item.interpretation !== 'string' || !item.interpretation.trim() || !plain(item.interpretation) || length(item.interpretation) > 300 || !['high','medium','low'].includes(item.confidence)) return fail('AI_OUTPUT_INVALID', `ai_semantic_constraints[${index}]`, '语义限制须包含原话依据、简短理解与可信度');
+  }
+  for (const [index, item] of questions.entries()) {
+    if (!exact(item, ['source_span', 'question']) || !anchored(item.source_span) || length(item.source_span) > 1000 || typeof item.question !== 'string' || !item.question.trim() || !plain(item.question) || length(item.question) > 300) return fail('AI_OUTPUT_INVALID', `ai_clarification_questions[${index}]`, '澄清问题须锚定原话并可直接回答');
+  }
   const items = data.ai_exclusion_candidates;
   const notes = data.ai_unmapped_notes;
   const ids = new Set();
@@ -364,12 +378,11 @@ export function checkAiExclusions(aiJson, dislikes) {
   if (notes.some(x => length(x) > 200)) return fail('AI_OUTPUT_LIMIT', 'ai_unmapped_notes', '每条未映射备注最多 200 码点');
   for (let i = 0; i < items.length; i++) {
     const x = items[i];
-    if (!x.source_span.trim() || !dislikes.includes(x.source_span) || (x.kind === 'term' && !fold(x.source_span).includes(fold(x.term)))) return fail('AI_OUTPUT_UNANCHORED', `ai_exclusion_candidates[${i}].source_span`, '依据须为逐字原文，字面词经归一化后须在依据中');
+    if (!anchored(x.source_span) || (x.kind === 'term' && !fold(x.source_span).includes(fold(x.term)))) return fail('AI_OUTPUT_UNANCHORED', `ai_exclusion_candidates[${i}].source_span`, '依据须为逐字原文，字面词经归一化后须在依据中');
   }
-  /* 2026-11-01 产品负责人裁定（用户输入为准）：能读懂的先采纳。
-     识别出了具体候选 ⇒ 照常交给用户逐条确认；同时附带的「未映射备注」不再让整包作废，
-     作为参考提示随结果返回（不自动变成约束；用户的 dislikes 原话本身仍原样进入推荐）。
-     一条候选都没有时才请用户换个说法。 */
-  if (!dislikes.trim() || !items.length) return {status: 'needs_input', candidates: [], unmapped_notes: notes.map(String), errors: [error('INTAKE_CLARIFICATION_REQUIRED', 'dislikes', '请明确未识别或未映射的限制后重新识别')]};
-  return {status: 'needs_confirmation', candidates: items.map(x => ({...x})), unmapped_notes: notes.map(String), errors: []};
+  const clarificationQuestions = questions.map(item => ({ ...item }));
+  const result = { candidates: items.map(item => ({ ...item })), semantic_constraints: semantics.map(item => ({ ...item })), clarification_questions: clarificationQuestions, unmapped_notes: notes.map(String), errors: [] };
+  if (!items.length && !semantics.length && !clarificationQuestions.length && dislikes.trim()) result.clarification_questions.push({ source_span: dislikes, question: `你说的「${[...dislikes].slice(0, 80).join('')}」希望避免哪种情况？` });
+  if (result.clarification_questions.length || !dislikes.trim()) return { ...result, status:'needs_input', confirmation_required:false, errors:[error('INTAKE_CLARIFICATION_REQUIRED','dislikes','请补充当前问题的回答，原话已保留')] };
+  return { ...result, status:items.length ? 'needs_confirmation' : 'ready', confirmation_required:items.length > 0 };
 }
