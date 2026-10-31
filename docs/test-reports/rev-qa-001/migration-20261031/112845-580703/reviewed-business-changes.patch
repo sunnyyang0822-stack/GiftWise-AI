@@ -1,0 +1,184 @@
+diff --git a/tests/test_cases.json b/tests/test_cases.json
+index ca78404..871b191 100644
+--- a/tests/test_cases.json
++++ b/tests/test_cases.json
+@@ -21460,11 +21460,8 @@
+         ]
+       },
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "code": "LIMIT_EXCEEDED",
+-        "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "status": "passed",
++        "all_passed": true
+       }
+     },
+     {
+@@ -21978,11 +21975,8 @@
+         ]
+       },
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "code": "LIMIT_EXCEEDED",
+-        "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "status": "passed",
++        "all_passed": true
+       }
+     },
+     {
+@@ -22077,11 +22071,8 @@
+         ]
+       },
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "code": "LIMIT_EXCEEDED",
+-        "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "status": "passed",
++        "all_passed": true
+       }
+     },
+     {
+@@ -22176,11 +22167,8 @@
+         ]
+       },
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "code": "LIMIT_EXCEEDED",
+-        "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "status": "passed",
++        "all_passed": true
+       }
+     },
+     {
+@@ -30411,11 +30399,8 @@
+         ]
+       },
+       "expected": {
+-        "status": "needs_input",
+-        "all_passed": false,
+-        "code": "LIMIT_EXCEEDED",
+-        "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "status": "passed",
++        "all_passed": true
+       }
+     },
+     {
+@@ -30514,7 +30499,7 @@
+         "all_passed": false,
+         "code": "LIMIT_EXCEEDED",
+         "path": "request.budget_amount",
+-        "message": "预算须在 1 至 10000 之间"
++        "message": "预算须在 0 至 10000 之间"
+       }
+     },
+     {
+diff --git a/validator/rules.py b/validator/rules.py
+index 25c99d2..a0d694e 100644
+--- a/validator/rules.py
++++ b/validator/rules.py
+@@ -9,6 +9,7 @@ from decimal import Decimal, InvalidOperation
+ TAGS = frozenset({"alcohol", "food", "fragrance", "jewelry", "plant", "other"})
+ AMOUNT = re.compile(r"(?:0|[1-9][0-9]*)(?:\.[0-9]{1,2})?", re.ASCII)
+ UNAVAILABLE = object()
++CONTRACT_VERSION = "giftwise-20261031-v2"
+ 
+ 
+ def _error(errors, code, path, message):
+@@ -104,6 +105,47 @@ def _days(value, path, errors):
+     return value
+ 
+ 
++def check_budget_range(value, path, errors, mode=UNAVAILABLE):
++    """按结构→端点类型/格式/范围→顺序→交互模式检查；不修改输入。"""
++    if not isinstance(value, dict) or set(value) - {"min", "max"}:
++        _error(errors, "INVALID_BUDGET_RANGE", path, "预算区间须为仅含 min、max 的对象")
++        return None
++    start = len(errors)
++    amounts = []
++    for key in ("min", "max"):
++        endpoint = path + "." + key
++        if key not in value:
++            _error(errors, "INVALID_BUDGET_RANGE", endpoint, "预算区间两端均须填写")
++            amounts.append(None)
++            continue
++        if isinstance(value[key], str) and len(value[key]) > 1000:
++            _error(errors, "LIMIT_EXCEEDED", endpoint, "字段字符串超过 1000 个 Unicode 码点")
++            amounts.append(None)
++            continue
++        amount = _amount(value[key], endpoint, errors)
++        if amount is not None and amount > 10000:
++            _error(errors, "LIMIT_EXCEEDED", endpoint, "预算区间端点须在 0 至 10000 之间")
++        amounts.append(amount)
++    if len(errors) != start:
++        return None
++    low, high = amounts
++    if low > high:
++        _error(errors, "INVALID_BUDGET_RANGE", path, "预算区间下限不能超过上限")
++        return None
++    if mode is not UNAVAILABLE:
++        mode_path = path.rsplit(".", 1)[0] + ".budget_mode"
++        if not isinstance(mode, str) or mode not in ("slider", "zero", "other"):
++            _error(errors, "INVALID_BUDGET_RANGE", mode_path, "预算模式须为 slider、zero 或 other")
++            return None
++        if mode == "slider" and (high > 1000 or low % 50 or high % 50):
++            _error(errors, "INVALID_BUDGET_RANGE", path, "滑条两端须在 0 至 1000 之间，步长为 50 元")
++            return None
++        if mode == "zero" and (low != 0 or high != 0):
++            _error(errors, "INVALID_BUDGET_RANGE", path, "不花钱模式的预算两端均须为 0")
++            return None
++    return low, high
++
++
+ def _norm(value):
+     return unicodedata.normalize("NFKC", value).casefold()
+ 
+@@ -120,16 +162,19 @@ def _request(request, errors):
+     if not isinstance(request, dict):
+         _error(errors, "INVALID_REQUEST", "request", "请求根节点必须为对象")
+         return None
+-    _limits(request, "request", errors)
++    _limits({k: v for k, v in request.items() if k != "budget_range"}, "request", errors)
+     _required(request, ("recipient_relation", "occasion", "budget_amount", "currency", "available_days"), "request", errors)
+     for field in ("recipient_relation", "occasion", "currency", "notes"):
+         if field in request:
+             _text(request[field], "request." + field, errors, empty=field == "notes")
++    interval = check_budget_range(request["budget_range"], "request.budget_range", errors) if "budget_range" in request else None
+     budget = _amount(request["budget_amount"], "request.budget_amount", errors) if "budget_amount" in request else None
+     days = _days(request["available_days"], "request.available_days", errors) if "available_days" in request else None
+     # 请求侧范围只在调用点检查：_amount/_days 与候选侧共用，范围约束不得进入共用函数。
+-    if budget is not None and not (1 <= budget <= 10000):
+-        _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 1 至 10000 之间")
++    if budget is not None and budget > 10000:
++        _error(errors, "LIMIT_EXCEEDED", "request.budget_amount", "预算须在 0 至 10000 之间")
++    elif interval is not None and budget is not None and budget != interval[1]:
++        _error(errors, "BUDGET_RANGE_MISMATCH", "request.budget_amount", "预算上限须与区间 max 数值一致")
+     if days is not None and days > 365:
+         _error(errors, "LIMIT_EXCEEDED", "request.available_days", "可用天数须在 0 至 365 天之间")
+     if isinstance(request.get("currency"), str) and request["currency"] != "CNY":
+@@ -157,7 +202,7 @@ def _request(request, errors):
+             _error(errors, "UNKNOWN_TAG", f"request.forbidden_tags[{i}]", "未知禁忌标签，请确认禁忌类别")
+     if errors:
+         return None
+-    return {"budget": budget, "days": days, "fact_ids": fact_ids,
++    return {"budget": budget, "budget_min": interval[0] if interval is not None else None, "days": days, "fact_ids": fact_ids,
+             "forbidden_tags": {_tag(t) for t in forbidden_tags},
+             "forbidden_terms": [_norm(t) for t in forbidden_terms], "currency": request["currency"]}
+ 
+@@ -198,6 +243,8 @@ def _candidate(candidate, index, context):
+     if context is not None:
+         if total is not None and total > context["budget"]:
+             _error(errors, "OVER_BUDGET", path + ".estimated_total", "估算总费用超过预算")
++        if total is not None and context["budget_min"] is not None and total < context["budget_min"]:
++            _error(result["warnings"], "BELOW_BUDGET_RANGE", path + ".estimated_total", "礼物估价低于预算区间下限，仍可选择")
+         if prep is not None and prep > context["days"]:
+             _error(errors, "PREPARATION_TOO_LONG", path + ".estimated_preparation_days", "估算准备时间超过可用天数")
+         if isinstance(candidate.get("currency"), str) and candidate["currency"] != context["currency"]:
