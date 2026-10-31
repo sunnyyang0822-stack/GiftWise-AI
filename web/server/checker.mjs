@@ -391,13 +391,13 @@ function parseJson(raw, path, errors, strictParseFn) {
 
 /* --------------------------------------------------------------- request */
 
-function request(request, errors) {
+function request(request, errors, { optionalTime = false } = {}) {
   if (request === null || typeof request !== "object" || Array.isArray(request)) {
     error(errors, "INVALID_REQUEST", "request", "请求根节点必须为对象");
     return null;
   }
   limits(Object.fromEntries(Object.entries(request).filter(([key]) => key !== "budget_range")), "request", errors);
-  required(request, ["recipient_relation", "occasion", "budget_amount", "currency", "available_days"], "request", errors);
+  required(request, ["recipient_relation", "occasion", "budget_amount", "currency", ...(optionalTime ? [] : ["available_days"])], "request", errors);
   for (const field of ["recipient_relation", "occasion", "currency", "notes"]) {
     if (Object.prototype.hasOwnProperty.call(request, field)) {
       text(request[field], `request.${field}`, errors, field === "notes");
@@ -412,7 +412,7 @@ function request(request, errors) {
   const budget = Object.prototype.hasOwnProperty.call(request, "budget_amount")
     ? amount(request.budget_amount, "request.budget_amount", errors)
     : null;
-  const availableDays = Object.prototype.hasOwnProperty.call(request, "available_days")
+  const availableDays = Object.prototype.hasOwnProperty.call(request, "available_days") && !(optionalTime && request.available_days === null)
     ? days(request.available_days, "request.available_days", errors)
     : null;
   // 请求侧范围**只在调用点**检查：amount()/days() 与候选侧共用，范围约束不得进入共用函数
@@ -554,7 +554,7 @@ function candidate(item, index, context) {
     if (total !== null && context.budgetMin !== null && total < context.budgetMin) {
       error(result.warnings, "BELOW_BUDGET_RANGE", `${path}.estimated_total`, "礼物估价低于预算区间下限，仍可选择");
     }
-    if (prep !== null && prep > context.days) {
+    if (prep !== null && context.days !== null && prep > context.days) {
       error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, "估算准备时间超过可用天数");
     }
     if (stringValue(item.currency) && item.currency !== context.currency) {
@@ -644,6 +644,10 @@ function batch(value, context, errors) {
  * @param {(raw: string, maxBytes?: number) => any} strictParseFn
  */
 export function validate(requestJson, candidatesJson, strictParseFn) {
+  return validateCore(requestJson, candidatesJson, strictParseFn);
+}
+
+function validateCore(requestJson, candidatesJson, strictParseFn, options = {}) {
   const result = {
     status: "failed",
     all_passed: false,
@@ -656,7 +660,7 @@ export function validate(requestJson, candidatesJson, strictParseFn) {
     const batchErrors = [];
     const parsedRequest = parseJson(requestJson, "request_json", requestErrors, strictParseFn);
     const parsedBatch = parseJson(candidatesJson, "candidates_json", batchErrors, strictParseFn);
-    const context = parsedRequest !== undefined ? request(parsedRequest, requestErrors) : null;
+    const context = parsedRequest !== undefined ? request(parsedRequest, requestErrors, options) : null;
     if (parsedBatch !== undefined) {
       result.candidate_results = batch(parsedBatch, context, batchErrors);
     }
@@ -688,7 +692,15 @@ export function validate(requestJson, candidatesJson, strictParseFn) {
 
 /** 纯请求检查，用于把「输入问题」与「候选问题」分开（对齐 workflow/runtime.py:14）。 */
 export function validateRequestOnly(requestJson, strictParseFn) {
-  return validate(requestJson, "{}", strictParseFn);
+  return validateForDecision(requestJson, "{}", strictParseFn);
+}
+
+/** 可选送礼时间的服务端入口：完整重跑所有检查，不过滤原始请求错误来伪装通过。 */
+export function validateForDecision(requestJson, candidatesJson, strictParseFn) {
+  const raw = validate(requestJson, candidatesJson, strictParseFn);
+  const result = withTimeAdvisories(validateCore(requestJson, candidatesJson, strictParseFn, { optionalTime: true }));
+  result.raw_validation = raw;
+  return result;
 }
 
 export function requestIsValid(requestCheck) {
@@ -813,6 +825,17 @@ function checkLegacyPresentation(request, candidate, presentation) {
 
 /** 新版只复核冻结礼物价；呈现不得携带任何报价或旧包装教程。 */
 export function checkPresentation(requestData, selectedCandidate, presentation) {
+  return checkPresentationCore(requestData, selectedCandidate, presentation);
+}
+
+export function checkPresentationForDecision(requestData, selectedCandidate, presentation) {
+  const raw = checkPresentation(requestData, selectedCandidate, presentation);
+  const result = withTimeAdvisories(checkPresentationCore(requestData, selectedCandidate, presentation, { optionalTime: true }));
+  result.raw_validation = raw;
+  return result;
+}
+
+function checkPresentationCore(requestData, selectedCandidate, presentation, options = {}) {
   const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v) && !(v instanceof JsonFloat);
   if (!object(presentation)) {
     return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation", message: "呈现内容必须为对象" }] };
@@ -822,7 +845,16 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
     if (Object.hasOwn(presentation, "contract_version") || Object.hasOwn(presentation, "style") || requestData?.contract_version === CONTRACT_VERSION) {
       return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation.contract_version", message: "请使用明确的新版呈现契约，不能混读新旧结构" }] };
     }
-    return checkLegacyPresentation(requestData, selectedCandidate, presentation);
+    const legacy = checkLegacyPresentation(requestData, selectedCandidate, presentation);
+    if (options.optionalTime) {
+      const requestErrors = [];
+      const context = request(requestData, requestErrors, options);
+      const gift = candidate(selectedCandidate, 0, context);
+      legacy.errors.push(...requestErrors, ...gift.errors);
+      legacy.warnings = gift.warnings;
+      legacy.passed = legacy.errors.length === 0;
+    }
+    return legacy;
   }
   const errors = [];
   const invalid = (path, message) => error(errors, "PRESENTATION_INVALID", path, message);
@@ -866,7 +898,7 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
   if (Object.hasOwn(presentation, "selected_candidate_id") && presentation.selected_candidate_id !== selectedCandidate?.id) {
     invalid("presentation.selected_candidate_id", "呈现须对应用户选中的冻结候选");
   }
-  const context = request(requestData, errors);
+  const context = request(requestData, errors, options);
   const checkedGift = candidate(selectedCandidate, 0, context);
   errors.push(...checkedGift.errors);
   if (typeof presentation.currency === "string" && presentation.currency !== "CNY") {
@@ -874,7 +906,7 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
   }
   const prepared = days(presentation.revised_estimated_preparation_days, "presentation.revised_estimated_preparation_days", errors);
   if (context !== null) {
-    if (prepared !== null && prepared > context.days) {
+    if (prepared !== null && context.days !== null && prepared > context.days) {
       error(errors, "PREPARATION_TOO_LONG", "presentation.revised_estimated_preparation_days", "完整方案准备时间超过可用天数");
     }
     const texts = Object.fromEntries(Object.entries(presentation).filter(([key]) => !["contract_version", "currency", "selected_candidate_id", "revised_estimated_preparation_days"].includes(key)));

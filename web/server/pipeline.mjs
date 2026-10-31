@@ -15,7 +15,7 @@ const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider === "dfrob
 
 import { strictParse, dump } from "./jsonstrict.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
-import { validate, validateRequestOnly, requestIsValid, checkPresentation, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents, withTimeAdvisories } from "./checker.mjs";
+import { validate, validateForDecision, validateRequestOnly, requestIsValid, checkPresentation, checkPresentationForDecision, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents } from "./checker.mjs";
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
 import { GIFT_STYLE_TABLE, CLOSENESS_TABLE } from "./labels.mjs";
 // Dify 客户端保留（历史与对照），但**不再是默认路径**：默认走 llm（无凭证则 mock）。
@@ -330,7 +330,7 @@ async function runRecommendationCore(input, services = {}) {
 
   initialCandidatesJson = candidatesJson;
   initialValidation = validate(requestJson, candidatesJson, strictParse);
-  validation = withTimeAdvisories(initialValidation);
+  validation = validateForDecision(requestJson, candidatesJson, strictParse);
 
   const internal = validation.errors.some((e) => e.code === "INTERNAL_ERROR");
   let repairable = mode === "mock" && !internal && !validation.all_passed && repairCount === 0;
@@ -346,7 +346,7 @@ async function runRecommendationCore(input, services = {}) {
         : buildMockRevision(request, items, validation);
     callCounts.recommend_revision += 1;
     repairCount = 1;
-    const revisedValidation = withTimeAdvisories(validate(requestJson, revised.candidates_json, strictParse));
+    const revisedValidation = validateForDecision(requestJson, revised.candidates_json, strictParse);
     // N6 状态保护：已通过候选必须逐字节不变，否则整次修订不得用于选择。
     const previousPassed = new Map(
       items
@@ -432,10 +432,10 @@ async function runRecommendationCore(input, services = {}) {
   const catalogByCandidate = new Map((catalog.results ?? []).filter((entry) => entry.status === "matched").map((entry) => [entry.candidate_id, entry]));
 
   /* 时间提示：真实模式参考商品页时长，未知快递按3~5天估算；模拟模式不编造物流。 */
-  const deliveryApplicable = mode !== "mock";
+  const deliveryApplicable = mode !== "mock" && typeof request.available_days === "number";
   const delivery = {
     applicable: deliveryApplicable,
-    reason: deliveryApplicable ? null : "模拟数据没有真实物流信息",
+    reason: deliveryApplicable ? null : mode === "mock" ? "模拟数据没有真实物流信息" : "未提供送礼时间",
     policy: {
       rule: "时间估算仅作提示，不影响候选选择；是否赶得上由用户判断",
       shipping: { ...SHIPPING_CONFIG },
@@ -447,7 +447,7 @@ async function runRecommendationCore(input, services = {}) {
     },
     per_candidate: {},
   };
-  if (!deliveryApplicable) notices.push("模拟数据没有真实物流信息。");
+  if (mode === "mock") notices.push("模拟数据没有真实物流信息。");
   validation.candidate_results.forEach((result, index) => {
     const candidate = candidateList[index];
     const bound = catalogByCandidate.get(result.id) ?? null;
@@ -848,13 +848,13 @@ async function runPresentationCore(input, services = {}) {
   }
 
   const rawPresentationCheck = checkPresentation(run.request, candidate, presentation);
-  let recheck = withTimeAdvisories(rawPresentationCheck);
+  let recheck = checkPresentationForDecision(run.request, candidate, presentation);
   // 先检查模型原值，避免覆盖非法/缺失字段；合法估算统一引用冻结候选。
   if (typeof presentation?.revised_estimated_preparation_days === "number" && Number.isInteger(presentation.revised_estimated_preparation_days) && presentation.revised_estimated_preparation_days >= 0 &&
       !recheck.errors.some((e) => e.path === "presentation.revised_estimated_preparation_days")) {
     const reportedDays = presentation.revised_estimated_preparation_days;
     presentation = { ...presentation, revised_estimated_preparation_days: candidate.estimated_preparation_days };
-    recheck = withTimeAdvisories(checkPresentation(run.request, candidate, presentation));
+    recheck = checkPresentationForDecision(run.request, candidate, presentation);
     recheck.raw_validation = structuredClone(rawPresentationCheck);
     if (reportedDays !== candidate.estimated_preparation_days) {
       recheck.warnings.push({ code: "PREPARATION_ESTIMATE_ALIGNED", path: "presentation.revised_estimated_preparation_days", message: `准备时间沿用所选礼物的${candidate.estimated_preparation_days}天估算；呈现模型原估算为${reportedDays}天。` });
@@ -879,7 +879,7 @@ async function runPresentationCore(input, services = {}) {
   // 呈现阶段复用候选准备天数，物流信息仅作提示。
   const boundProduct = run.catalog_bindings?.get(selectedCandidateId)?.product ?? null;
   const boundShipping = boundProduct?.shipping ?? null;
-  const presentationDeliveryApplicable = run.mode !== "mock";
+  const presentationDeliveryApplicable = run.mode !== "mock" && typeof run.request.available_days === "number";
   const presentationDelivery = presentationDeliveryApplicable ? deliveryDeadline({
     prep_days: typeof presentation?.revised_estimated_preparation_days === "number" ? presentation.revised_estimated_preparation_days : null,
     ships_within_days: typeof boundShipping?.ships_within_days === "number" ? boundShipping.ships_within_days : parseDurationDays(boundShipping?.ships_within_text ?? null).days,
@@ -934,7 +934,7 @@ async function runPresentationCore(input, services = {}) {
     const firstErrors = recheck.errors.map((e) => ({ ...e }));
     const revised = buildMockPresentation(run.request, candidate, { attempt: 2 });
     run.call_counts.presentation_revision += 1;
-    const revisedCheck = withTimeAdvisories(checkPresentation(run.request, candidate, revised.presentation));
+    const revisedCheck = checkPresentationForDecision(run.request, candidate, revised.presentation);
     run.repair_count += 1;
     presentation = revised.presentation;
     recheck = revisedCheck;
