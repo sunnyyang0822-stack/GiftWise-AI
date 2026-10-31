@@ -7,8 +7,26 @@ import { openDb, startRun, finishRun, upsertProduct, addProductImages, productId
 import { taskDatabasePath } from '../collect/task-paths.mjs';
 import { isDomesticProduct,imageIdOf } from '../catalog/db.mjs';
 import { unknownPhysical } from '../media/scene.mjs';
-import { enrichDomesticDetail } from '../collect/domestic-detail.mjs';
+import { enrichDomesticDetail,validateSourceImage } from '../collect/domestic-detail.mjs';
 import { cacheSourceImage } from '../catalog/source-image-cache.mjs';
+import{createSourceAvailabilityTracker}from'./source-availability.mjs';
+const sourceAvailability=createSourceAvailabilityTracker();
+const digest=value=>createHash('sha256').update(value).digest('hex').slice(0,32);
+
+async function referenceRecords(page,records,{source,signal}){
+ const result=[];
+ for(const record of records){
+  if(signal?.aborted)break;
+  const reference_id='ref_'+digest(`${source}|${record.source_url}`);
+  const r={...record,reference_id,reference_kind:'public_reference',image_kind:'reference_image',image_id:null};
+  if(record.image_url){
+   const validation=await validateSourceImage(record.image_url,{role:'reference',fetchImpl:page.fetchImage,signal,includeBytes:true});
+   const{bytes,...metadata}=validation;r.image_validation=metadata;
+   if(validation.ok){r.image_id=digest(`${reference_id}|${record.image_url}`);cacheSourceImage(r.image_id,validation);}
+  }
+  result.push(r);
+ }return result;
+}
 
 function asEvidence(record, source) {
   const id = productId(record);
@@ -18,6 +36,14 @@ function asEvidence(record, source) {
     observed_at: record.observed_at || record.scraped_at || new Date().toISOString(),
     evidence_ref: `${source}:${id}`, stock_status: 'unknown', shipping_status: 'unknown',
     image_id: record.image_validation?.ok&&record.image_url?imageIdOf(id,record.image_url):null, physical: unknownPhysical(), source_platform: source };
+}
+function observedQueryCache(db,source,query){
+ if(!db||!['jd','taobao'].includes(source))return[];
+ const rows=db.prepare("SELECT * FROM products WHERE json_extract(query_params,'$.keyword')=? AND scraped_at>=? ORDER BY last_seen_at DESC").all(query.keyword,new Date(Date.now()-30*60*1000).toISOString());
+ return rows.map(row=>{let raw={},conditions=[],params={};try{raw=JSON.parse(row.raw_excerpt||'{}');conditions=JSON.parse(row.price_conditions||'[]');params=JSON.parse(row.query_params||'{}');}catch{}
+  return{...row,price_conditions:conditions,query_params:params,raw_excerpt:raw,variant:raw.variant??'',specifications:raw.specifications??null,
+   image_validation:raw.image_validation??null,image_provenance:raw.image_provenance??null,observed_at:row.scraped_at,page_kind:raw.page_kind??'search'};
+ }).filter(r=>isDomesticProduct(r)&&(source==='jd'?r.source_site==='jd.com':['taobao.com','tmall.com'].includes(r.source_site)));
 }
 function saveRecords(db, records, coverage, version) {
   const runId = startRun(db, { source_site: records[0]?.source_site || coverage.source,
@@ -63,7 +89,7 @@ export async function runDomesticSearch(plan, {
   profileDir = process.env.GW_DOMESTIC_PROFILE || join(REPO_ROOT, '.tmp/domestic-profile'), maxPages = 50,
   pageFactory = createDomesticPage, platformSearch, contentSearch, dianpingSearch = searchDianping, onProgress = () => {},
 } = {}) {
-  const products = [], contents = [], images = [], coverage = [], warnings = [];
+  const products = [], references=[], contents = [], images = [], coverage = [], warnings = [];
   let page, db, root, version;
   const controller = new AbortController();
   const abort = () => controller.abort();
@@ -90,12 +116,18 @@ export async function runDomesticSearch(plan, {
       if (controller.signal.aborted) { coverage.push({ source, keyword: query.keyword, city: query.city ?? null,
         status: signal?.aborted ? 'cancelled' : 'timeout', pages_completed: 0, observed_count: 0, complete: false,
         limitations: ['本次检索已取消或到达时限，未执行此来源；可继续模型推荐'] }); continue; }
+      const availability=sourceAvailability.getAvailability({source});
+      if(!availability.allow_request){coverage.push({source,keyword:query.keyword,status:availability.reason_code,complete:false,pages_completed:0,observed_count:0});continue;}
+      const publicReference=query.purpose==='reference'&&['duckduckgo','bing'].includes(source);
       const inspiration = query.purpose === 'inspiration';
       const useContent = inspiration && Boolean(DOMESTIC_CONTENT_SOURCES[source]);
-      if(query.purpose==='purchase'&&!['jd','taobao','dianping'].includes(source)){
-        coverage.push({source,keyword:query.keyword,status:'PAUSED_BY_PRODUCT_SCOPE',complete:false,pages_completed:0,observed_count:0,limitations:['该电商来源按当前产品范围暂缓']});continue;
+      const cached=query.purpose==='purchase'?observedQueryCache(db,source,query):[];
+      if(cached.length){
+        products.push(...cached.map(r=>asEvidence(r,source)));
+        coverage.push({source,keyword:query.keyword,status:'cached_observations',cached:true,pages_completed:0,observed_count:cached.length,complete:false,
+          limitations:['复用同一查询的历史公开观察，具体所选规格与价格可继续调用详情工具核实']});continue;
       }
-      if (!['purchase','inspiration'].includes(query.purpose) || (query.purpose === 'purchase' && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source]) || (!useContent && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source])) {
+      if (!['purchase','inspiration','reference'].includes(query.purpose) || (query.purpose === 'reference'&&!publicReference) || (query.purpose === 'purchase' && source !== 'dianping') || (!publicReference&&!useContent && source !== 'dianping')) {
         coverage.push({ source, keyword: query.keyword, status: 'SOURCE_NOT_ALLOWED', complete: false, pages_completed: 0,
           limitations: ['来源尚未接入或不适用于本次用途'] }); continue;
       }
@@ -103,7 +135,9 @@ export async function runDomesticSearch(plan, {
         const desiredProfile=['taobao','tmall','1688'].includes(source)&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
         if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
         if(!page){page=await pageFactory({ port, headless, profileDir:desiredProfile, signal: controller.signal, timeoutMs: Math.min(timeoutMs, 20000) });page.__taskProfile=desiredProfile;}
-        const outcome = useContent
+        const outcome = publicReference
+          ? await (await import('../collect/public-reference.mjs')).runPublicReferenceSearch(page,{source,keyword:query.keyword,packageRoot:root,maxPages:Math.min(maxPages,1),signal:controller.signal})
+          : useContent
           ? await (contentSearch ?? searchContent)(page, { source, keyword: query.keyword, city: query.city ?? null,
             packageRoot: root, maxPages, signal: controller.signal })
           : DOMESTIC_EXTRA_PLATFORMS[source]
@@ -121,7 +155,13 @@ export async function runDomesticSearch(plan, {
         sourceCoverage.complete = sourceCoverage.complete === true;
         sourceCoverage.observed_count = outcome.records?.length ?? 0;
         sourceCoverage.purpose = query.purpose;
+        sourceAvailability.observe({source,coverage:sourceCoverage,observation_id:`${source}:${sourceCoverage.observed_at??Date.now()}`});
         coverage.push(sourceCoverage);
+        if(publicReference||useContent){
+          const records=outcome.records??[];
+          references.push(...await referenceRecords(page,records,{source,signal:controller.signal}));
+          if(publicReference){if(db)saveContent(db,records,sourceCoverage,version);onProgress(sourceCoverage);continue;}
+        }
         if (useContent) {
           const records = outcome.records ?? [];
           contents.push(...records);
@@ -145,9 +185,9 @@ export async function runDomesticSearch(plan, {
   } catch (error) { warnings.push(error.code || error.message); }
   finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); await page?.close?.(); db?.close(); }
   const unique = [...new Map(products.map(p => [p.product_id, p])).values()];
-  return { status: unique.length || contents.length ? (coverage.every(c => c.complete) ? 'ready' : 'partial') : 'unavailable',
+  return { status: unique.length || contents.length || references.length ? (coverage.every(c => c.complete) ? 'ready' : 'partial') : 'unavailable',
     evidence_id: unique.length ? createHash('sha256').update(unique.map(p => p.product_id).join('|')).digest('hex').slice(0, 32) : null,
-    products: unique, contents: [...new Map(contents.map(c => [c.source_url, c])).values()], images,
+    products: unique, references:[...new Map(references.map(r=>[r.reference_id,r])).values()], contents: [...new Map(contents.map(c => [c.source_url, c])).values()], images,source_availability:sourceAvailability.toModelContext({sources:[...new Set(['jd','taobao',...queries.flatMap(q=>q.sources??[])])]}).source_availability,
     coverage, warnings, recommendations_available: true, enrichment_only: true, opencli_version: version ?? null, audit: plan?.audit ?? null };
 }
 
@@ -163,19 +203,23 @@ export async function runDomesticDetails(records,{
    if(signal?.aborted)break;
    if(!isDomesticProduct(record))continue;
    const source=record.source_platform;
+   const availability=sourceAvailability.getAvailability({source});
+   if(!availability.allow_request){coverage.push({source,status:availability.reason_code,complete:false,pages_completed:0,observed_count:0});continue;}
    const desiredProfile=source==='taobao'&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
    if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
    if(!page){page=await pageFactory({port,profileDir:desiredProfile,headless,signal});page.__taskProfile=desiredProfile;}
    const detailPlatform=source==='taobao'&&record.source_site==='tmall.com'?'tmall':source;
    const detail=await enrichDomesticDetail(page,record,{platform:detailPlatform,signal,fetchImpl:page.fetchImage,includeImageBytes:true});
    const validation=detail.image_validation;
-   const evidence=asEvidence({...detail,name:detail.title||record.name,variant:detail.specifications||'',capability:record.capability},source);
+   const successful=detail.detail_observation?.status==='ok';
+   const retained=!successful&&!validation?.ok?{...record,detail_observation:detail.detail_observation}:detail;
+   const evidence=asEvidence({...retained,name:retained.title||record.name,variant:retained.specifications||record.variant||'',capability:record.capability},source);
    if(validation?.bytes&&validation.ok&&evidence.image_id)cacheSourceImage(evidence.image_id,validation);
    if(validation){const {bytes,...metadata}=validation;detail.image_validation=metadata;evidence.image_validation=metadata;}
-   const observed={source,keyword:record.query_params?.keyword??null,status:detail.detail_observation?.status??'unavailable',pages_completed:1,complete:true,
+   const observed={source,keyword:record.query_params?.keyword??null,status:detail.detail_observation?.status??'unavailable',pages_completed:1,complete:successful,
     observed_count:1,image_status:validation?.ok?'validated':validation?.error_code??'missing',detail:detail.detail_observation};
    coverage.push(observed);products.push(evidence);
-   if(db)saveRecords(db,[{...detail,name:evidence.name,variant:evidence.variant}],observed,null);
+   if(db&&successful)saveRecords(db,[{...detail,name:evidence.name,variant:evidence.variant}],observed,null);
   }
  }finally{await page?.close?.();db?.close();}
  return{status:products.length?'partial':'unavailable',products,contents:[],images:[],coverage,warnings:[],enrichment_only:true};

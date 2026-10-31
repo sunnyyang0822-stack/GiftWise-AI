@@ -379,6 +379,12 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  // Only previously validated reference-image bytes; never accepts a model/client URL.
+  if (req.method === 'GET' && /^\/api\/reference\/images\/[a-f0-9]{32,64}$/.test(pathname)) {
+    const cached=await readImageCache(pathname.split('/').at(-1));
+    if(!cached){sendJson(res,404,{status:'error',errors:[{code:'REFERENCE_IMAGE_NOT_FOUND',message:'参考图片不可用。'}]});return true;}
+    res.writeHead(200,{'content-type':cached.type,'content-length':cached.bytes.length,'cache-control':'private, max-age=86400','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'"});res.end(cached.bytes);return true;
+  }
   /* 真实商品图代理：**同源**才允许前端渲染（`media-view.js` 的 localMediaUrl 只认 `/...`）。
      只放行库内确实存在的 image_id，且只允许 https 源站；失败一律诚实 404 + 原因码，
      ⛔ 绝不回落到占位图或库存图。 */

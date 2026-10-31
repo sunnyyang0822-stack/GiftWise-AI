@@ -221,7 +221,12 @@ export async function runPublicReferenceSearch(page, { source = 'duckduckgo', ke
       coverage.pages_completed++;
       for (const record of normalized) if (!seen.has(record.source_url)) { seen.add(record.source_url); records.push(record); }
       if (n < count && !result.next_available) { coverage.limitations.push('未见下一页，不宣称全量'); break; }
-    } catch { coverage.status = signal?.aborted ? 'aborted' : 'failed'; coverage.pages.push({ page: n, status: coverage.status }); break; }
+    } catch {
+      let observed;
+      if(!signal?.aborted)try{observed=await page.evaluate(buildPublicReferenceReadScript(source));}catch{}
+      coverage.status=signal?.aborted?'aborted':['restricted','login_required'].includes(observed?.status)?observed.status:'failed';
+      coverage.pages.push({page:n,status:coverage.status,observed_at:new Date().toISOString()});break;
+    }
   }
   coverage.complete = coverage.pages_completed === count;
   if (!coverage.complete) coverage.scope = 'partial_or_unavailable';

@@ -1,7 +1,7 @@
 /** 来源暂停状态只在内存中保存。调用者须在每次导航/请求前检查，逐页观察后更新。 */
 const COMMERCE = new Set([
-  'jd', 'taobao', 'tmall', 'pinduoduo', 'douyin', 'kuaishou', '1688', 'vip',
-  'suning', 'youpin', 'dewu', 'xianyu', 'dangdang', 'yanxuan', 'xiaomi', 'xiaohongshu_shop',
+  'jd', 'taobao', 'tmall', 'pdd','pinduoduo', 'douyin', 'kuaishou', '1688', 'vip',
+  'suning', 'youpin','xiaomiyoupin', 'dewu', 'xianyu','goofish', 'dangdang', 'yanxuan', 'xiaomi', 'xiaohongshu_shop',
 ]);
 const RISK = new Map([
   ['restricted', 'access_restricted'], ['access_restricted', 'access_restricted'],

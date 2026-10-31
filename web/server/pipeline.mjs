@@ -5,6 +5,7 @@ import { mintReferenceGrant } from "./media/plan.mjs";
 import { DomesticProvider,runDomesticDetails } from "./retrieval/domestic-provider.mjs";
 import { normalizeRetrievalPlan } from "./retrieval/query-plan.mjs";
 import { createOpencliToolSession } from "./retrieval/agent-tool.mjs";
+import { bindReferenceEvidence } from './retrieval/reference-evidence.mjs';
 import { RETRIEVAL_CONFIG } from "./config.mjs";
 const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider !== "unavailable" ? new DomesticProvider({packageRoot:RETRIEVAL_CONFIG.packageRoot || undefined}) : unavailableProvider, RETRIEVAL_CONFIG);
 /**
@@ -244,7 +245,7 @@ async function runRecommendationCore(input, services = {}) {
     : {status:"skipped",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]};
   const agentTools = createOpencliToolSession({signal:input.signal,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}),details:(records,{signal})=>(services.retrieveProductDetails??runDomesticDetails)(records,{signal,dbPath:services.catalogDbPath??localDbPath()})});
   const useAgentTools = mode==='llm' && retrievalEnabled;
-  let productReferences = null;
+  let productReferences = null,referenceReferences=null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
   if (mode === "dify") {
@@ -262,6 +263,7 @@ async function runRecommendationCore(input, services = {}) {
     const raw = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     candidatesJson = raw;
     productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
+    referenceReferences = parseJsonOrNull(call.outputs?.reference_references_json || 'null');
   } else if (mode === "llm") {
     // 直连大模型：一次真实调用（含超时与重试上限）。
     // 失败一律如实上报为基础设施错误，绝不静默改用模拟候选。
@@ -297,6 +299,7 @@ async function runRecommendationCore(input, services = {}) {
     }
     candidatesJson = call.outputs && typeof call.outputs.candidates_json === "string" ? call.outputs.candidates_json : null;
     productReferences = parseJsonOrNull(call.outputs?.product_references_json || "null");
+    referenceReferences = parseJsonOrNull(call.outputs?.reference_references_json || 'null');
     if(agentTools.audit.length){retrieval=agentTools.retrieval;searchPlan=agentTools.plan;}
   } else if (demo === "model_error") {
     const broken = buildBrokenModelOutput();
@@ -375,6 +378,7 @@ async function runRecommendationCore(input, services = {}) {
   let evidenceBindings = new Map();
   const optionalEvidence=bindOptionalCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates??[],productReferences,request.budget_amount);
   evidenceBindings=optionalEvidence.bindings;
+  const optionalReferences=bindReferenceEvidence(retrieval.references??[],(parseJsonOrNull(candidatesJson)||{}).candidates??[],referenceReferences);
   for(const id of optionalEvidence.knownOverBudget){const result=validation.candidate_results.find(r=>r.id===id);if(result){result.passed=false;pushError(result.errors,'OVER_BUDGET',id+'.estimated_total','所选商品的无附加条件观察价超过预算上限');}}
 
   /* ---- 追加规则 1：独特性启发式（warning 级，绝不硬错）------------------- */
@@ -406,7 +410,7 @@ async function runRecommendationCore(input, services = {}) {
     accounting: { candidates: candidateList.length, library_hits: 0, fallback_hits: 0, degraded: candidateList.length, scrape_calls: 0, scrape_total_elapsed_ms: 0, fallback_skipped_reason: catalogEnabled ? null : "SCRAPE_DISABLED", scrape_enabled: false },
   };
   if (catalogEnabled) {
-    const passable = candidateList.filter((candidate) => evidenceBindings.has(candidate.id) && validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
+    const passable = candidateList.filter((candidate) => evidenceBindings.has(candidate.id) && evidenceBindings.get(candidate.id).reference_kind!=='public_reference' && validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
     // External tool work already followed the model's pre-generation decision. Do not blind-scrape again.
     const scrapeEnabled = false;
     const scrapeTimeoutMs = Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) > 0 ? Number(process.env.GIFTWISE_CATALOG_SCRAPE_TIMEOUT_MS) : 20000;
@@ -569,8 +573,9 @@ async function runRecommendationCore(input, services = {}) {
     nl_parse: nlParse,
   });
   run.retrieval = retrieval;
-  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,rejected_references:optionalEvidence.rejected};
+  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,reference_references:referenceReferences,rejected_references:[...optionalEvidence.rejected,...optionalReferences.rejected]};
   run.product_bindings = evidenceBindings;
+  run.reference_bindings=optionalReferences.bindings;
   /* 库内真实商品的绑定与媒体：候选图走「来源展示」通道（真实商品图 URL），
      包装图才走「生成」通道；两条通道不交叉（设计说明「两条通道不越界」）。 */
   run.catalog = catalog;
@@ -598,7 +603,9 @@ async function runRecommendationCore(input, services = {}) {
         : null,
     })),
     ...[...evidenceBindings].map(([candidate_id,p])=>({candidate_id,product_id:p.product_id,
-      image:p.image_id&&p.image_validation?.ok?{id:p.image_id,url:`/api/catalog/images/${p.image_id}`,version:p.image_id,kind:'source_photo',alt:`真实商品来源图：${p.name}`,source_url:p.image_url,price_observed_at:p.observed_at}:null})),
+      image:p.image_id&&p.image_validation?.ok?{id:p.image_id,url:`/api/catalog/images/${p.image_id}`,version:p.image_id,kind:'source_photo',alt:`真实商品来源图：${p.name}`,source_url:p.source_url??p.image_url,price_observed_at:p.observed_at}:null})),
+    ...[...optionalReferences.bindings].filter(([id])=>!evidenceBindings.has(id)).map(([candidate_id,r])=>({candidate_id,reference_id:r.reference_id,
+      image:r.image_id&&r.image_validation?.ok?{id:r.image_id,url:`/api/reference/images/${r.image_id}`,version:r.image_id,kind:'reference_image',alt:`公开资料参考图：${r.title}`,source_url:r.source_url,price_observed_at:r.observed_at}:null})),
   ];
   for(const entry of run.catalog_bindings.values()){
     const p=entry.product;if(!p.image_validation?.ok)continue;

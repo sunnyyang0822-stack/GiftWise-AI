@@ -8,6 +8,7 @@ import {buildJdDetailReadScript,normalizeJdDetail} from './jd-detail-reader.mjs'
 import {buildAlibabaDetailReadScript} from './alibaba-reader.mjs';
 
 const CDN = ['alicdn.com', '360buyimg.com', 'pddpic.com', 'byteimg.com', 'douyinpic.com', 'kwaicdn.com', 'kwimgs.com', 'vipstatic.com', 'suning.cn', 'mi-img.com', 'youpin.mi-img.com', 'geilicdn.com', 'dangdang.com'];
+const REFERENCE_CDN=['mm.bing.net','th.bing.com','duckduckgo.com','pinimg.com','hdslb.com','xhscdn.com','zhimg.com','sinaimg.cn','doubanio.com','zdmimg.com','huaban.com','cdn.sspai.com','images.unsplash.com','images.pexels.com','imgix.net'];
 const DETAILS = {
   jd: { host: 'item.jd.com', path: '^/[0-9]+\\.html$', root: '.product-intro, .page-content-main', title: '.sku-name, .sku-title-text', price: '.summary-price .p-price, .summary-price .price, .product-price--main', sku: '#choose-attrs .selected, #choose-attrs .item.selected, .specification-item-sku.selected, .specification-item-sku.active, .specification-item-sku[aria-checked="true"]', gallery: '#spec-n1 img, #spec-list img', currency: '.summary-price, .product-price-panel' },
   taobao: { host: 'item.taobao.com', path: '^/item\\.htm$', id: 'id', root: '#detail, [class*="ItemDetail--"]', title: '.tb-main-title, [class*="mainTitle--"]', price: '.tb-property .tb-rmb-num, [class*="Price--priceText"], [class*="priceText--"]', sku: '.tb-sku .tb-selected, [class*="skuItem--"][class*="selected"]', gallery: '#J_ImgBooth, #J_UlThumb img, [class*="mainPic--"] img', currency: '.tb-property, [class*="Price--"], [class*="price--"]' },
@@ -17,10 +18,10 @@ const DETAILS = {
 const clean = value => typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
 const inDomain = (host, domains) => domains.some(d => host === d || host.endsWith(`.${d}`));
 
-function validImageUrl(value) {
+function validImageUrl(value, role) {
   try {
     const url = new URL(value);
-    if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443') || !inDomain(url.hostname, CDN)) return null;
+    if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443') || !inDomain(url.hostname, role==='reference'?REFERENCE_CDN:CDN)) return null;
     url.hash = '';
     return url;
   } catch { return null; }
@@ -193,9 +194,9 @@ export function inspectImage(bytes, mime) {
   return dimensions;
 }
 
-export async function validateSourceImage(value, { fetchImpl, signal, maxBytes = 8 * 1024 * 1024, includeBytes = false } = {}) {
+export async function validateSourceImage(value, { fetchImpl, signal, maxBytes = 8 * 1024 * 1024, includeBytes = false, role = 'product' } = {}) {
   const limit = Math.min(20 * 1024 * 1024, Math.max(1, Number(maxBytes) || 8 * 1024 * 1024));
-  let url = validImageUrl(value);
+  let url = validImageUrl(value,role);
   if (!url) return fail('IMAGE_URL_NOT_ALLOWED');
   if (signal?.aborted) return fail('IMAGE_ABORTED');
   let reader;
@@ -206,7 +207,7 @@ export async function validateSourceImage(value, { fetchImpl, signal, maxBytes =
         await response.body?.cancel?.();
         const target = response.headers.get('location');
         if (!target) return fail('IMAGE_REDIRECT_INVALID');
-        url = validImageUrl(new URL(target, url).href);
+        url = validImageUrl(new URL(target, url).href,role);
         if (!url) return fail('IMAGE_REDIRECT_NOT_ALLOWED');
         if (redirects === 4) return fail('IMAGE_REDIRECT_LIMIT');
         continue;
@@ -293,9 +294,13 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
     }else if(['taobao','tmall'].includes(platform)){
       const observed=await page.evaluate(buildAlibabaDetailReadScript(platform));
       raw={...observed,page_url:observed.product_url??requested.href};
+      if(['detail_root_missing','detail_title_missing'].includes(raw.status)){
+        await page.wait(3);const retry=await page.evaluate(buildAlibabaDetailReadScript(platform));raw={...retry,page_url:retry.product_url??requested.href};
+      }
     }else raw=await page.evaluate(buildDomesticDetailReadScript(platform));
+    if (['restricted','login_required'].includes(raw.status)) { observation.status=raw.status; return output; }
     const actual = detailUrl(raw.page_url, platform);
-    const sameProduct = actual && actual.pathname === requested.pathname && (!DETAILS[platform].id || actual.searchParams.get(DETAILS[platform].id) === requested.searchParams.get(DETAILS[platform].id));
+    const sameProduct = actual && actual.pathname === requested.pathname && (!DETAILS[platform].id || actual.searchParams.get(DETAILS[platform].id) === requested.searchParams.get(DETAILS[platform].id))&&(!requested.searchParams.get('skuId')||!actual.searchParams.get('skuId')||requested.searchParams.get('skuId')===actual.searchParams.get('skuId'));
     observation.status = sameProduct ? raw.status : 'detail_product_changed';
     observation.observed_at = new Date().toISOString();
     if (sameProduct && raw.status === 'ok') {

@@ -25,7 +25,7 @@ test('模型不查时不解析OpenCLI/不启动浏览器；不以预算或关键
   }
   assert.equal(starts, 0);
 });
-test('只执行模型指定来源；单平台失败保留其他来源及未知价，并真实写入独立夹具库', async () => {
+test('产品停用电商后搜索与详情均不启动浏览器，不复用旧记录冒充新采集', async () => {
   const calls = []; let closed = 0;
   const dbPath = join(temp, 'fixture-catalog.sqlite');
   const result = await runDomesticSearch(plan([query('jd'), query('taobao')]), {
@@ -38,12 +38,12 @@ test('只执行模型指定来源；单平台失败保留其他来源及未知�
         image_url: null, price_unit: null, price_conditions: [], raw_excerpt: {} }], pages_completed: 2, complete: true, status: 'ok' };
     },
   });
-  assert.deepEqual(calls, ['jd','taobao']); assert.equal(closed, 1);
-  assert.equal(result.products.length, 1); assert.equal(result.products[0].price_amount, null);
-  assert.equal(result.recommendations_available, true); assert.equal(result.coverage[0].pages_completed, 2);
-  assert.equal(result.coverage[1].status, 'AUTH_REQUIRED');
+  assert.deepEqual(calls, []); assert.equal(closed, 0);
+  assert.equal(result.products.length, 0);
+  assert.equal(result.recommendations_available, true); assert.equal(result.coverage[0].pages_completed, 0);
+  assert.ok(result.coverage.every(c=>c.status==='COMMERCE_DISABLED_BY_USER'));
   const db = new DatabaseSync(dbPath, { readOnly: true });
-  try { const row = db.prepare('select * from products').get(); assert.equal(row.title, '夹具杯子'); assert.equal(row.price_amount, null); }
+  try { assert.equal(db.prepare('select count(*) as n from products').get().n,0); }
   finally { db.close(); }
 });
 test('海外来源不执行且不得夹带到国内商品；无默认全平台扩展', async () => {
@@ -80,7 +80,7 @@ test('国内worker接受多需求与原话标点，单次取消不会毒化后�
 });
 test('全球灵感与图独立返回和存档，不进入商品/SKU绑定；采购不调用内容源', async () => {
   const dbPath=join(temp,'content-fixture.sqlite'); let calls=0;
-  const options={packageRoot:fixturePackage,dbPath,pageFactory:async()=>({close:async()=>{}}),contentSearch:async()=>{
+  const options={packageRoot:fixturePackage,dbPath,pageFactory:async()=>({close:async()=>{},fetchImage:async()=>new Response('fixture-unavailable',{status:404})}),contentSearch:async()=>{
     calls++; return {records:[{record_kind:'content',purpose:'inspiration',title:'夹具参考图',source_url:'https://www.pinterest.com/pin/123/',
       source_site:'pinterest.com',source_platform:'pinterest',product_url:null,image_url:'https://i.pinimg.com/fixture.jpg',
       image_role:'inspiration_reference',observed_at:'2026-10-31T10:00:00Z'}],coverage:{pages_completed:1,complete:false,status:'ok'}};

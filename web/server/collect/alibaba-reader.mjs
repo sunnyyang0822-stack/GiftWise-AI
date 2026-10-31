@@ -77,7 +77,7 @@ export function normalizeAlibabaRecord(platform, raw, ctx = {}) {
   }).filter(Boolean))];
   return {
     record_kind: 'product', source_platform: platform, source_site: platform === '1688' ? cfg.site : parsed.hostname === 'detail.tmall.com' ? 'tmall.com' : 'taobao.com',
-    external_id: platform === '1688' ? parsed.pathname.match(/\/offer\/(\d+)/)?.[1] : parsed.searchParams.get('id'), sku_id: parsed.searchParams.get('skuId'),
+    external_id: platform === '1688' ? parsed.pathname.match(/\/offer\/(\d+)/)?.[1] : parsed.searchParams.get('id')+(parsed.searchParams.get('skuId')?':'+parsed.searchParams.get('skuId'):''), sku_id: parsed.searchParams.get('skuId'),
     title: clean(raw.title), product_url: url, ...parseAlibabaPrice(raw),
     seller: clean(raw.seller || raw.seller_name || raw.shop) || null, location: clean(raw.location) || null,
     specifications: clean(raw.specifications) || null,
@@ -157,7 +157,8 @@ function readDetail(platform, canonical) {
   if (/验证码|安全验证|访问受限|异常访问/.test(body) || /captcha|_____tmd_____/.test(location.pathname)) return { ...base, status: 'restricted' };
   if (/请先登录|扫码登录|登录后查看/.test(body) || /login|passport|signin/i.test(location.hostname + location.pathname)) return { ...base, status: 'login_required' };
   if (!base.product_url) return { ...base, status: 'not_product_page' };
-  const root = document.querySelector('#detail, [class*="ItemDetail--"], [class*="BasicContent--"], [class*="ProductDetail--"], [class*="ItemDetailPage--"]');
+  let root = document.querySelector('#detail, [class*="ItemDetail--"], [class*="BasicContent--"], [class*="ProductDetail--"], [class*="ItemDetailPage--"]');
+  if(!root&&document.querySelector('[class*="mainTitle--"]')&&document.querySelector('[class*="picGallery--"]'))root=document.body;
   if (!root) return { ...base, status: 'detail_root_missing' };
   const usable = node => node && !node.closest('[class*="recommend"], [class*="Recommend"], .related-products');
   const first = selector => Array.from(root.querySelectorAll(selector)).find(usable);

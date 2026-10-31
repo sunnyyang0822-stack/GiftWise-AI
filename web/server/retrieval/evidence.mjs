@@ -48,11 +48,12 @@ export function bindOptionalCandidateEvidence(evidence, candidates, references, 
    const exactName=identityText(candidate.name)===identityText(product.name+' '+product.variant)||identityText(candidate.name)===identityText(product.name);
    const specCompatible=!product.variant||identityText(candidate.name+' '+candidate.description).includes(identityText(product.variant));
    if(!exactName&&!specCompatible)throw new Error('PRODUCT_SPEC_MISMATCH');
-   if(product.price_source==='browser_observed'&&(!Number.isFinite(Date.parse(product.observed_at))||Date.now()-Date.parse(product.observed_at)>600000))throw new Error('EVIDENCE_STALE');
+   const observedMs=Date.parse(product.observed_at);
+   const observationFresh=Number.isFinite(observedMs)&&observedMs<=Date.now()+60000&&Date.now()-observedMs<=600000;
    // This binds an observed item/photo, not a claim that conditional prices are universally available.
    const priceEqual=product.price_amount!==null&&cents(candidate.estimated_total)===cents(product.price_amount);
-   if(product.price_amount!==null&&!(product.price_conditions??[]).length&&cents(product.price_amount)>cents(budget))knownOverBudget.push(candidate.id);
-   bindings.set(candidate.id,{...product,price_binding_status:priceEqual?'observed_amount_used':'model_estimate_separate_from_observation'});seen.add(product.product_id);
+   if(observationFresh&&product.price_amount!==null&&!(product.price_conditions??[]).length&&cents(product.price_amount)>cents(budget))knownOverBudget.push(candidate.id);
+   bindings.set(candidate.id,{...product,observation_freshness:observationFresh?'recent_observation':'historical_observation',price_binding_status:priceEqual?'observed_amount_used':'model_estimate_separate_from_observation'});seen.add(product.product_id);
   }catch(error){rejected.push({candidate_id:reference?.candidate_id??null,code:error.message});}
  }
  return {bindings,rejected,knownOverBudget};

@@ -1,21 +1,20 @@
 import { normalizeRetrievalPlan } from './query-plan.mjs';
-import { DOMESTIC_PLATFORMS } from '../collect/domestic-platforms.mjs';
 import { DOMESTIC_CONTENT_SOURCES } from '../collect/domestic-content.mjs';
-import {DOMESTIC_EXTRA_PLATFORMS}from'../collect/domestic-extra-platforms.mjs';
 import { retrievalView } from '../store.mjs';
+import {createSourceAvailabilityTracker}from'./source-availability.mjs';
 
 /** The model chooses whether to call; the server only validates and executes this fixed tool. */
-export function createOpencliToolSession({ search,details, signal } = {}) {
+export function createOpencliToolSession({ search, signal } = {}) {
   const audit=[];
+  const availability=createSourceAvailabilityTracker();
   const queries=[];
-  let aggregate={status:'skipped',evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[],enrichment_only:true};
-  const sources=[...new Set(['jd','taobao','dianping',...Object.keys(DOMESTIC_CONTENT_SOURCES)])];
-  const tools=[{type:'function',function:{name:'opencli_search',description:'按当前完整需求决定是否查外部资料。购买信息仅国内电商/大众点评；未明确购买的灵感与参考图片可用国内外内容平台。不需要查时直接推荐。检索词宜用核心物品/活动加少量属性，避免把整段需求变成同时匹配的长词串；无结果时可自主简化重试。只读查询，不下单支付。',parameters:{type:'object',additionalProperties:false,properties:{purpose:{type:'string',enum:['purchase','inspiration']},keyword:{type:'string',description:'本次具体相关检索词，不含姓名/联系方式/认证材料'},sources:{type:'array',items:{type:'string',enum:sources},minItems:1},city:{type:['string','null'],description:'仅相关本地商户查询需要；未知可为null'},reason:{type:'string',description:'内部工具使用理由，不面向用户'}},required:['purpose','keyword','sources','reason']}}}];
-  tools.push({type:'function',function:{name:'opencli_product_details',description:'只读查看本次搜索中你选出的商品详情、已选规格、实际价格条件与原图。product_ids必须来自此前opencli_search返回，不能传任意URL。按需求选合适商品，不自动取首条。',parameters:{type:'object',additionalProperties:false,properties:{product_ids:{type:'array',items:{type:'string'},minItems:1,maxItems:6},reason:{type:'string'}},required:['product_ids','reason']}}});
+  let aggregate={status:'skipped',evidence_id:null,products:[],references:[],contents:[],images:[],coverage:[],warnings:[],enrichment_only:true};
+  const sources=[...new Set(['duckduckgo','bing','dianping',...Object.keys(DOMESTIC_CONTENT_SOURCES).filter(s=>s!=='douyin')])];
+  const tools=[{type:'function',function:{name:'opencli_search',description:'按完整需求自主查公开图片与灵感，优先reference/duckduckgo公开搜索（OpenCLI通路），bing为公开DOM辅路；inspiration用于内容平台。当前全部国内电商直抓已停用，不能调用或重试。大众点评体验可用purchase。资料图是参考图，不是实时在售SKU、成交价或库存。遇安全验证停止该来源，换可用公开资料或直接建议。无图片/数据不阻断推荐。只读，不下单。',parameters:{type:'object',additionalProperties:false,properties:{purpose:{type:'string',enum:['purchase','inspiration','reference']},keyword:{type:'string',description:'本次具体图片或灵感检索词，不含姓名/联系方式/认证材料'},sources:{type:'array',items:{type:'string',enum:sources},minItems:1},city:{type:['string','null'],description:'仅相关本地商户查询需要；未知可为null'},reason:{type:'string',description:'内部工具使用理由，不面向用户'}},required:['purpose','keyword','sources','reason']}}}];
   function merge(result){
     const dedup=(records,key)=>[...new Map(records.map(r=>[r[key],r])).values()];
     aggregate={...aggregate,status:result.status,evidence_id:result.evidence_id??aggregate.evidence_id,
-      products:dedup([...aggregate.products,...(result.products??[])],'product_id'),contents:dedup([...aggregate.contents,...(result.contents??[])],'source_url'),
+      products:dedup([...aggregate.products,...(result.products??[])],'product_id'),references:dedup([...aggregate.references,...(result.references??[])],'reference_id'),contents:dedup([...aggregate.contents,...(result.contents??[])],'source_url'),source_availability:result.source_availability??aggregate.source_availability,
       images:dedup([...aggregate.images,...(result.images??[])],'url'),coverage:[...aggregate.coverage,...(result.coverage??[])]};
   }
   async function executeTool(call) {
@@ -23,29 +22,26 @@ export function createOpencliToolSession({ search,details, signal } = {}) {
     audit.push(entry);
     try{
       const args=typeof call.arguments==='string'?JSON.parse(call.arguments):call.arguments;
-      if(call.name==='opencli_product_details'){
-        if(!args||Object.keys(args).some(k=>!['product_ids','reason'].includes(k))||!Array.isArray(args.product_ids)||args.product_ids.length<1||args.product_ids.length>6||args.product_ids.some(id=>typeof id!=='string'))throw new Error('INVALID_TOOL_ARGUMENTS');
-        if(typeof details!=='function')throw new Error('DETAIL_TOOL_UNAVAILABLE');
-        const unavailable=args.product_ids.filter(id=>!aggregate.products.some(p=>p.product_id===id));
-        const records=[...new Set(args.product_ids)].map(id=>aggregate.products.find(p=>p.product_id===id)).filter(Boolean);
-        if(!records.length)throw new Error('UNKNOWN_PRODUCT_REFERENCES');
-        entry.product_ids=args.product_ids;entry.reason=args.reason;
-        const result=await details(records,{signal});entry.status=result.status;entry.coverage=result.coverage??[];merge(result);
-        return {...retrievalView(result),coverage:result.coverage??[],unavailable_product_ids:unavailable,recommendations_available:true};
-      }
+      if(call.name==='opencli_product_details')throw new Error('COMMERCE_DISABLED_BY_USER');
       if(call.name!=='opencli_search')throw new Error('TOOL_NOT_ALLOWED');
       if(!args||Object.keys(args).some(k=>!['purpose','keyword','sources','city','reason'].includes(k)))throw new Error('INVALID_TOOL_ARGUMENTS');
+      if(!Array.isArray(args.sources)||args.sources.some(s=>!sources.includes(s)))throw new Error('SOURCE_DISABLED_OR_NOT_ALLOWED');
       const plan=normalizeRetrievalPlan({needs_retrieval:true,decision_reason:args.reason,queries:[args]});
       if(plan.queries.length!==1||!plan.needs_retrieval)throw new Error('INVALID_TOOL_ARGUMENTS');
       if(signal?.aborted)throw new Error('RETRIEVAL_CANCELLED');
       entry.plan=plan;
       queries.push(...plan.queries);
-      const result=await search(plan,{signal});
+      const allowed=plan.queries[0].sources.filter(source=>availability.getAvailability({source}).allow_request);
+      const blocked=plan.queries[0].sources.filter(source=>!allowed.includes(source));
+      const result=allowed.length?await search({...plan,queries:[{...plan.queries[0],sources:allowed}]},{signal}):{status:'unavailable',products:[],references:[],coverage:[]};
+      for(const source of allowed)availability.observe({source,coverage:result.coverage,observation_id:call.id});
+      result.coverage=[...(result.coverage??[]),...blocked.map(source=>({source,status:'source_paused',complete:false,pages_completed:0,observed_count:0}))];
+      result.source_availability=availability.toModelContext({sources:[...sources,'jd','taobao']}).source_availability;
       entry.status=result.status;entry.coverage=result.coverage??[];
       merge(result);
       const view=retrievalView(result);
       return {...view,coverage:result.coverage??[],recommendations_available:true};
-    }catch(error){entry.status='unavailable';entry.error_code=error.code??error.message;return {status:'unavailable',products:[],contents:[],images:[],recommendations_available:true,error_code:entry.error_code};}
+    }catch(error){entry.status='unavailable';entry.error_code=error.code??error.message;return {status:'unavailable',products:[],references:[],contents:[],images:[],...availability.toModelContext({sources:[...sources,'jd','taobao']}),recommendations_available:true,error_code:entry.error_code};}
   }
   return {tools,executeTool,audit,get retrieval(){return aggregate;},get plan(){return normalizeRetrievalPlan({needs_retrieval:queries.length>0,queries,decision_reason:'模型通过opencli_search工具调用自行请求'});}};
 }

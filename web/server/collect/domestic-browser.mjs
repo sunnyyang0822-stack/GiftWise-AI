@@ -94,7 +94,14 @@ export async function createDomesticPage({ port = 19366, profileDir = join(REPO_
         const headers={};for(const [key,value] of Object.entries(resource.headers??{}))if(['content-type','content-length'].includes(key.toLowerCase()))headers[key]=String(value);
         return new Response(Buffer.concat(chunks),{status:resource.httpStatusCode||200,headers});
       },
-      async wait(seconds) { await new Promise((r, reject) => { const t = setTimeout(r, seconds * 1000); if (signal?.aborted) { clearTimeout(t); reject(new Error('RETRIEVAL_CANCELLED')); } }); },
+      async wait(seconds) {
+        if(seconds&&typeof seconds==='object'&&typeof seconds.selector==='string'){
+          const until=Date.now()+Math.min(20000,Math.max(1,Number(seconds.timeout)||8)*1000);
+          while(Date.now()<until){if(signal?.aborted)throw Error('RETRIEVAL_CANCELLED');if(await evaluate(`Boolean(document.querySelector(${JSON.stringify(seconds.selector)}))`))return;await new Promise(r=>setTimeout(r,200));}
+          throw Error('SELECTOR_TIMEOUT');
+        }
+        await new Promise((r, reject) => { const t = setTimeout(r, seconds * 1000); if (signal?.aborted) { clearTimeout(t); reject(new Error('RETRIEVAL_CANCELLED')); } });
+      },
       async close() { signal?.removeEventListener('abort', abort); rejectPending('CDP_CLOSED'); ws.close(); await browser.stop(); },
     };
   } catch (error) { ws?.close(); await browser.stop(); throw error; }

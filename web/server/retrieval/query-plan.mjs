@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 export const DOMESTIC_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','smzdm','damai','maoyan','bilibili','zhihu','weibo','douban','rednote','xiaohongshu','huodongxing']);
 
 export const GLOBAL_CONTENT_SOURCE_IDS = Object.freeze(['pinterest', 'pixiv', 'wikipedia']);
-export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['jd','taobao','dianping']);
+export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['dianping']);
+export const REFERENCE_SOURCE_IDS = Object.freeze(['duckduckgo','bing']);
 const PROMPT = readFileSync(new URL('../../../workflow/prompts/retrieval-plan.md', import.meta.url), 'utf8');
 const GENERIC = new Set(['礼物', '礼品', '送人', '生日礼物', '其他', 'unknown']);
 const clean = value => typeof value === 'string' ? value.trim() : '';
@@ -34,8 +35,8 @@ export function normalizeRetrievalPlan(plan = {}) {
   let rejectedQueries = 0;
   if (plan.needs_retrieval === true && Array.isArray(plan.queries)) for (const raw of plan.queries) {
     const keyword = clean(raw?.keyword);
-    const purpose = ['purchase', 'inspiration'].includes(raw?.purpose) ? raw.purpose : null;
-    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => purpose === 'purchase' ? PURCHASE_RETRIEVAL_SOURCES.includes(id) : purpose === 'inspiration' && (DOMESTIC_RETRIEVAL_SOURCES.includes(id) || GLOBAL_CONTENT_SOURCE_IDS.includes(id))))];
+    const purpose = ['purchase', 'inspiration','reference'].includes(raw?.purpose) ? raw.purpose : null;
+    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => purpose === 'purchase' ? PURCHASE_RETRIEVAL_SOURCES.includes(id) : purpose==='reference'?REFERENCE_SOURCE_IDS.includes(id):purpose === 'inspiration' && (['bilibili','zhihu','weibo','douban','xiaohongshu','huodongxing'].includes(id) || GLOBAL_CONTENT_SOURCE_IDS.includes(id))))];
     // No implicit source expansion: each query must name the platforms permitted for its purpose
     // selected by the model. Missing/overseas-only sources make this query unusable.
     if (!purpose || !keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }
