@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 // planning ID does not claim that its adapter is connected or currently available.
 export const DOMESTIC_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','smzdm','damai','maoyan','bilibili','zhihu','weibo','douban','rednote','xiaohongshu','huodongxing']);
 
+export const GLOBAL_CONTENT_SOURCE_IDS = Object.freeze(['pinterest', 'pixiv', 'wikipedia']);
 export const PURCHASE_RETRIEVAL_SOURCES = Object.freeze(['taobao','tmall','jd','pdd','pinduoduo','douyin','kuaishou','1688','vip','suning','xiaomiyoupin','youpin','dewu','xianyu','goofish','dangdang','dianping','damai','maoyan']);
 const PROMPT = readFileSync(new URL('../../../workflow/prompts/retrieval-plan.md', import.meta.url), 'utf8');
 const GENERIC = new Set(['礼物', '礼品', '送人', '生日礼物', '其他', 'unknown']);
@@ -34,8 +35,8 @@ export function normalizeRetrievalPlan(plan = {}) {
   if (plan.needs_retrieval === true && Array.isArray(plan.queries)) for (const raw of plan.queries) {
     const keyword = clean(raw?.keyword);
     const purpose = ['purchase', 'inspiration'].includes(raw?.purpose) ? raw.purpose : null;
-    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => DOMESTIC_RETRIEVAL_SOURCES.includes(id) && (purpose !== 'purchase' || PURCHASE_RETRIEVAL_SOURCES.includes(id))))];
-    // No implicit source expansion: each query must name the domestic platforms
+    const sources = [...new Set((Array.isArray(raw?.sources) ? raw.sources : []).filter(id => purpose === 'purchase' ? PURCHASE_RETRIEVAL_SOURCES.includes(id) : purpose === 'inspiration' && (DOMESTIC_RETRIEVAL_SOURCES.includes(id) || GLOBAL_CONTENT_SOURCE_IDS.includes(id))))];
+    // No implicit source expansion: each query must name the platforms permitted for its purpose
     // selected by the model. Missing/overseas-only sources make this query unusable.
     if (!purpose || !keyword || GENERIC.has(keyword.toLowerCase()) || sources.length === 0) { rejectedQueries += 1; continue; }
     const query = {

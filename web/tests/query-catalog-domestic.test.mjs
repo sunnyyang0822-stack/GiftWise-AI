@@ -139,3 +139,8 @@ test('normalizing a skipped decision preserves its internal failure audit',async
  const normalized=normalizeRetrievalPlan(p);
  assert.equal(normalized.needs_retrieval,false);assert.equal(normalized.audit.decision_status,'model_error');assert.deepEqual(normalized.queries,[]);
 });
+
+test('global content is allowed for inspiration and rejected for purchase including Amazon',async()=>{
+ const p=await buildRetrievalPlan({}, {planImpl:async()=>({needs_retrieval:true,decision_reason:'需要全球版式灵感',queries:[{keyword:'旅行手账排版',purpose:'inspiration',intent:'images',sources:['pinterest','pixiv','wikipedia','amazon']},{keyword:'旅行手账本',purpose:'purchase',intent:'products',sources:['pinterest','pixiv','wikipedia','amazon']}]})});
+ assert.equal(p.queries.length,1);assert.deepEqual(p.queries[0].sources,['pinterest','pixiv','wikipedia']);assert.equal(p.queries[0].purpose,'inspiration');assert.equal(p.audit.rejected_queries,1);
+});
