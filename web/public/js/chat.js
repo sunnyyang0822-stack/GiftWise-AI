@@ -5,9 +5,10 @@
  *   - 只负责收集与逐题校验 intake 字段；提交、识别接口与结果页仍由 app.js 负责；
  *   - 自由文字理解集中在 interpret(questionId, text)：以后接真实 AI 时只替换这一个函数；
  *   - 用户输入一律以 textContent / value 渲染，不使用 innerHTML；
- *   - 前端不解释“需要避免的”原话里的关键词，原话交给 /api/exclusions/analyze 识别并逐条确认。
+ *   - 前端不解释“需要避免的”原话里的关键词；采用服务端语义理解，只对具体禁品确认，歧义在当前聊天接续。
  */
 import { icon, OPTION_ICONS, DEADLINE_ICONS } from "./icons.js";
+import { exclusionConfirmation, exclusionQuestions } from "./exclusion-flow.js";
 import {
   applyParsedToForm, budgetDisplayText, deadlineDisplayText, overriddenRows, literalPreferences,
   requiredFollowups, echoBudgetAmount, echoDeadlineDays, echoDeadlinePhrase,
@@ -39,6 +40,7 @@ const intakeKey = () => JSON.stringify(api.buildIntake());
 export function newChatState() {
   return { done: [], shownKey: null, entryKey: null, entryInterests: null, notes: [], draft: "", enterMe: null,
     analyzing: false, analysisError: null, analysisToken: 0, confirmRestart: false, sheetOpen: false,
+    exclusionAnalysisKey: null, exclusionTurns: [], pendingExclusionContinuation: null,
     /* 第 1 步解析：parsing = 正在等解析响应；parseReport = 最近一次解析的展示信息
        （原话 / 覆盖 / 原文 / 必答追问）；deadlineAlert = 相对时间必须由用户确认的提示。
        都只是前端记账，不下发任何新字段。 */
@@ -160,7 +162,7 @@ const QUESTIONS = [
     check: () => budgetProblems()[0]?.message || null,
   },
   {
-    id: "deadline", group: 0, kind: "single",
+    id: "deadline", group: 0, kind: "single", when: f => f.deadline_days !== "" && f.deadline_days != null,
     ask: () => ["大概多久之后送出？"],
     options: () => (deadlineOptions() || []).map(r => opt(String(r.days), DEADLINE_SHORT[r.days] || r.label, DEADLINE_ICONS[r.days])),
     selected: () => form().deadline_days,
@@ -168,9 +170,9 @@ const QUESTIONS = [
     // 原值回显优先：解析给过 echo.deadline_days 且仍然是当前取值时，显示用户输入的原值（不显示 ±1 天区间）。
     answer: () => deadlineDisplayText(form(), parseBlock()) || (deadlineOptions() || []).find(r => String(r.days) === form().deadline_days)?.label || "",
     check: () => {
-      const options = deadlineOptions();
-      if (!options) return "准备时间的选项还没有准备好，请稍后刷新再试。";
-      return options.some(r => String(r.days) === form().deadline_days) ? null : "请选择可用准备时间。";
+      const value = form().deadline_days;
+      if (value === "" || value == null) return null;
+      return /^\d+$/.test(String(value)) && Number(value) <= 365 ? null : "时间参考需为 0–365 天的整数，也可以留空。";
     },
   },
   {
@@ -298,7 +300,6 @@ export function parseFollowups() {
   if (!report || !report.parse) return [];
   const f = form();
   return requiredFollowups(report.parse).filter(item => {
-    if (item.id === "deadline_confirm") return report.deadlinePending === true;
     if (item.id === "city") return !String(f.city_answer || "").trim();
     return false;
   });
@@ -367,34 +368,71 @@ export function reopen(qid, message) {
   c.confirmRestart = false;
   api.render();
 }
-async function runAnalysis() {
+export async function runAnalysis(continuation = null) {
   const c = chat();
+  if (c.analyzing) return;
   const token = ++c.analysisToken;
+  const key = intakeKey();
+  const questions = exclusionQuestions(st().analysis);
   c.analyzing = true;
   c.analysisError = null;
   api.render();
   try {
-    const analysis = await api.analyze(api.buildIntake());
-    if (token !== c.analysisToken) return;
+    const analysis = await api.analyze(api.buildIntake(), continuation);
+    if (chat() !== c || token !== c.analysisToken) return;
+    if (intakeKey() !== key) { c.analyzing = false; api.render(); return; }
+    if (!["ready", "needs_confirmation", "needs_input"].includes(analysis?.status)
+      || typeof analysis?.analysis_id !== "string" || !analysis.analysis_id.trim() || !Array.isArray(analysis.candidates)
+      || analysis.status === "ready" && !exclusionConfirmation(analysis)) {
+      throw new Error("analysis_incomplete");
+    }
+    if (continuation) {
+      c.exclusionTurns.push({ questions, answer: continuation.answer });
+      c.pendingExclusionContinuation = null;
+      c.draft = "";
+      c.notes = [];
+    }
     st().analysis = analysis;
     st().confirmedIds = [];
+    c.exclusionAnalysisKey = key;
     /* 用户亲口说出的避开项，本身就是确认（2026-11-01 产品负责人：不要让用户把同一件事再确认一遍）。
        识别出的每一项都锚定在用户原话上、且模型有把握（非 low）⇒ 自动确认并继续，这一步不在对话里出现；
        有低把握项或识别失败时，仍照常请用户逐条确认。 */
     const items = analysis?.status === "needs_confirmation" && Array.isArray(analysis.candidates) ? analysis.candidates : [];
-    const dislikes = form().dislikes || "";
-    if (items.length && items.every(x => x.confidence !== "low" && typeof x.source_span === "string" && dislikes.includes(x.source_span))) {
+    const source = [form().dislikes || "", ...c.exclusionTurns.map(turn => turn.answer)].join("\n");
+    if (items.length && items.every(x => ["high", "medium"].includes(x.confidence) && typeof x.source_span === "string" && x.source_span && source.includes(x.source_span))) {
       st().confirmedIds = items.map(x => x.id);
+    }
+    if (exclusionConfirmation(analysis, st().confirmedIds)) {
       if (!c.done.includes("avoid_confirm")) c.done.push("avoid_confirm");
       c.viaParse = [...new Set([...(c.viaParse || []), "avoid_confirm"])];
     }
   } catch {
-    if (token !== c.analysisToken) return;
-    c.analysisError = "刚刚没能读懂这句话，再试一次好吗？";
+    if (chat() !== c || token !== c.analysisToken) return;
+    c.analysisError = "刚刚没能完成识别，可以再试一次。";
   }
   c.analyzing = false;
   api.render();
   revealCurrent();
+}
+
+export async function answerExclusionClarification(answer) {
+  const c = chat();
+  if (c.analyzing || typeof answer !== "string" || !answer.trim()) return;
+  if (codePoints(answer) > 1000) { note("这条补充最多 1000 字。", null); return; }
+  const analysis = st().analysis;
+  if (analysis?.status !== "needs_input" || !analysis.analysis_id) {
+    note("这次识别还没完成，可以点上面的按钮继续。", null);
+    return;
+  }
+  if (c.exclusionAnalysisKey !== null && c.exclusionAnalysisKey !== intakeKey()) {
+    api.invalidateAnalysis();
+    c.analysisError = "需求有了更新，我们按现在的内容再识别一次。";
+    api.render();
+    return;
+  }
+  c.pendingExclusionContinuation = { analysis_id: analysis.analysis_id, answer };
+  await runAnalysis(c.pendingExclusionContinuation);
 }
 
 /* ------------------------------------------------------------ 自由文字 */
@@ -558,6 +596,11 @@ const PARSE_DEGRADED_NOTE = "这句我没能完整读懂，先按你点选的继
 function send() {
   const c = chat();
   const q = current();
+  if (q.kind === "confirm") {
+    if (st().analysis?.status === "needs_input") void answerExclusionClarification(c.draft);
+    else if (!c.analyzing) applyText(q, c.draft);
+    return;
+  }
   if (!c.draft.trim()) {
     if (q.kind === "avoid") commitAvoid(q);
     return;
@@ -600,20 +643,8 @@ async function answerWithParse(q, said) {
       // 解析改动了 intake ⇒ 之前的限制识别结果作废，必须重新逐条确认（与 finish() 同口径）。
       api.invalidateAnalysis();
       c.done = c.done.filter(x => x !== "avoid_confirm");
-      /* 相对时间（例：「下个月」）模型换算不稳定 ⇒ ⛔ 不静默采用：
-         把期限这一题退回去，让用户看着模型算的值与原话的差额**亲自确认一次**。 */
-      const confirmItem = requiredFollowups(parse).find(item => item.id === "deadline_confirm");
-      if (confirmItem) {
-        c.deadlineAlert = {
-          phrase: parse?.deadline_check?.phrase || echoDeadlinePhrase(parse) || "",
-          current: Number.isInteger(confirmItem.current_value) ? confirmItem.current_value : null,
-          expected: Number.isInteger(confirmItem.expected) ? confirmItem.expected
-            : (Number.isInteger(confirmItem.suggested_value) ? confirmItem.suggested_value : null),
-          reason: typeof confirmItem.reason === "string" ? confirmItem.reason : (parse?.deadline_check?.reason || ""),
-        };
-        c.parseReport.deadlinePending = true;
-        c.done = c.done.filter(x => x !== "deadline");
-      }
+      // 时间仅保留用户主动提及的合法参考，不因缺失或旧相对时间提示强制追问。
+      c.deadlineAlert = null;
       c.done = [...new Set(c.done)];
       c.viaParse = [...new Set([...(c.viaParse || []), ...applied.qids.filter(qid => c.done.includes(qid))])];
       if (literals.length) c.literals = [...new Set([...(c.literals || []), ...literals])];
@@ -626,7 +657,6 @@ async function answerWithParse(q, said) {
       const ack = [
         heard.length ? `收到～${heard.join("，")}，我都记下了。` : "收到～我记下了。",
         changed.length ? `你之前选的「${[...new Set(changed)].join("、")}」，按这句话改过来了。` : "",
-        confirmItem ? "时间是个相对说法，下面帮我点一下确切的准备时间。" : "",
       ].filter(Boolean).join("");
       c.exchanges = [...(c.exchanges || []), { asked: q.id, said, ack, before: current().id }];
       c.notes = [];
@@ -677,7 +707,7 @@ const PLACEHOLDERS = {
   confidence: "比如：很确定，或者是猜的",
   styles: "比如：实用一点、有纪念意义",
   summary: "说“生成”，或点上面的按钮",
-  avoid_confirm: "也可以点上面的按钮确认",
+  avoid_confirm: "直接回答小礼的问题",
 };
 const QUICK = {
   previous: ["去年送过一本书", "送过围巾"],
@@ -687,7 +717,7 @@ const SHEET = [
   { qid: "relation", icon: "user", term: "送给", covers: ["relation", "relation_other", "closeness"] },
   { qid: "occasion", icon: "calendar", term: "场合", covers: ["occasion", "occasion_other"] },
   { qid: "budget", icon: "wallet", term: "预算", covers: ["budget"] },
-  { qid: "deadline", icon: "clock", term: "送出", covers: ["deadline"] },
+  { qid: "deadline", icon: "clock", term: "时间", covers: ["deadline"] },
   { qid: "interests", icon: "sparkles", term: "喜欢", covers: ["interests", "confidence"] },
   { qid: "styles", icon: "wand", term: "感觉", covers: ["styles"] },
   { qid: "avoid", icon: "ban", term: "避开", covers: ["avoid", "avoid_confirm"] },
@@ -929,13 +959,10 @@ function confirmAttach(q) {
   const c = chat();
   const a = st().analysis;
   if (c.analysisError) return attach([optionGrid("识别失败", [
-    optionButton(opt("retry", "再试一次", "refresh"), false, () => runAnalysis(), 0, "analysis-retry"),
+    optionButton(opt("retry", c.pendingExclusionContinuation ? "重试这次回答" : "再试一次", "refresh"), false, () => runAnalysis(c.pendingExclusionContinuation), 0, "analysis-retry"),
     optionButton(opt("edit", "改一下原话", "edit"), false, () => reopen("avoid"), 1, "analysis-edit", "gw-opt--quiet"),
   ])]);
-  if (a.status !== "needs_confirmation") return attach([optionGrid("需要澄清", [
-    optionButton(opt("edit", "改一下原话", "edit"), false, () => reopen("avoid"), 0, "analysis-edit"),
-    optionButton(opt("retry", "重新识别", "refresh"), false, () => { api.invalidateAnalysis(); runAnalysis(); }, 1, "analyze-again", "gw-opt--quiet"),
-  ])]);
+  if (a?.status !== "needs_confirmation") return null;
   const confirmed = st().confirmedIds;
   const all = a.candidates.length > 0 && a.candidates.every(item => confirmed.includes(item.id));
   return attach([
@@ -955,7 +982,7 @@ function confirmAttach(q) {
     })),
     el("div", { class: "gw-attach__foot" }, [
       el("button", { type: "button", class: "gw-text-btn", "data-field": "analysis-edit", onclick: () => reopen("avoid") }, [icon("edit", { size: 14 }), "不对，我改一下"]),
-      el("button", { type: "button", class: "gw-send-btn", id: "exclusion-continue", disabled: !all, "data-field": "exclusion-continue", onclick: () => finish(q) }, ["都对，继续", icon("arrow-right", { size: 15 })]),
+      el("button", { type: "button", class: "gw-send-btn", id: "exclusion-continue", disabled: !all, "data-field": "exclusion-continue", onclick: () => { if (exclusionConfirmation(a, st().confirmedIds)) finish(q); } }, ["都对，继续", icon("arrow-right", { size: 15 })]),
     ]),
   ]);
 }
@@ -1094,7 +1121,9 @@ function currentTurn(q, typing, entering) {
   }
   if (q.kind === "confirm" && (c.analyzing || (!st().analysis && !c.analysisError))) {
     if (!st().analysis && !c.analyzing) setTimeout(runAnalysis, 0);
-    turn.append(botGroup([ackFor(q)].filter(Boolean)), el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
+    turn.append(botGroup(exclusionQuestions(st().analysis).length ? exclusionQuestions(st().analysis) : [ackFor(q)].filter(Boolean)),
+      ...(c.pendingExclusionContinuation ? [meGroup(c.pendingExclusionContinuation.answer)] : []),
+      el("div", { class: "gw-group gw-group--bot gw-typing gw-typing--live", "aria-hidden": "true" }, [
       botAvatar(), el("div", { class: "gw-group__col" }, [el("p", { class: "gw-bubble gw-bubble--bot gw-bubble--typing" }, [
         el("span", { class: "gw-dots" }, [el("i"), el("i"), el("i")]),
       ])]),
@@ -1104,8 +1133,9 @@ function currentTurn(q, typing, entering) {
   let texts = botTexts(q);
   if (q.kind === "confirm") {
     const a = st().analysis;
-    texts = c.analysisError ? [c.analysisError]
-      : a.status !== "needs_confirmation" ? ["要避开的这句，我没能拆出具体的东西。可以直接写几样吗？比如「香水、衣服」。"]
+    texts = a?.status === "needs_input" ? [...(exclusionQuestions(a).length ? exclusionQuestions(a) : ["这条要求里，你最希望我注意的是什么？"]), c.analysisError].filter(Boolean)
+      : c.analysisError ? [c.analysisError]
+      : a?.status !== "needs_confirmation" ? ["这条要求还在整理，请稍后再试。"]
       : [ackFor(q), "要避开的，我拆成了下面几项，帮我确认一下：",
         // 没能拆成具体项的那部分（例：「不适合初次见面送的」）不丢：用户的原话会原样带进挑选。
         ...(a.unmapped_notes?.length ? ["其余的要求，挑的时候我会照着你的原话来。"] : [])].filter(Boolean);
@@ -1184,7 +1214,7 @@ function sheet(q) {
         }, [
           el("span", { class: "gw-sheet__icon", "aria-hidden": "true" }, [icon(item.icon, { size: 15 })]),
           el("span", { class: "gw-sheet__term", text: item.term }),
-          el("span", { class: "gw-sheet__value", text: value || (isActive ? "正在聊…" : "待聊") }),
+          el("span", { class: "gw-sheet__value", text: value || (item.qid === "deadline" ? "未指定（选填）" : isActive ? "正在聊…" : "待聊") }),
           value ? el("span", { class: "gw-sheet__edit", "aria-hidden": "true" }, [icon("edit", { size: 13 })]) : null,
         ])]);
       })),
@@ -1205,6 +1235,7 @@ function composer(q) {
     id: q.kind === "avoid" ? "dislikes" : "chat-input", class: "gw-composer__input", rows: "1",
     placeholder: spec?.placeholder || PLACEHOLDERS[q.id] || "直接打字回答也可以",
     "aria-label": spec?.aria || "回答当前问题", "data-field": spec?.field || "chat-input", enterkeyhint: "send",
+    disabled: q.kind === "confirm" && c.analyzing,
     oninput: e => { c.draft = e.target.value; grow(e.target); },
     onkeydown: e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } },
   });
@@ -1218,7 +1249,7 @@ function composer(q) {
     }, [text]))) : null,
     el("form", { class: "gw-composer", onsubmit: e => { e.preventDefault(); send(); } }, [
       input,
-      el("button", { type: "submit", class: "gw-composer__send", "aria-label": "发送" }, [icon("send", { size: 18 })]),
+      el("button", { type: "submit", class: "gw-composer__send", "aria-label": "发送", disabled: q.kind === "confirm" && c.analyzing }, [icon("send", { size: 18 })]),
     ]),
   ]);
 }
@@ -1275,6 +1306,9 @@ export function renderChat() {
   const log = el("ol", { class: "gw-log", role: "log", "aria-live": "polite", "aria-label": "和小礼的对话" }, [introGroup()]);
   const exchangesBefore = id => (c.exchanges || []).filter(x => x.before === id).map(exchangeTurn);
   for (const item of applicable()) {
+    if (item.kind === "confirm") {
+      for (const turn of c.exclusionTurns) log.append(el("li", { class: "gw-turn gw-turn--past" }, [botGroup(turn.questions), meGroup(turn.answer)]));
+    }
     if (item === q) break;
     log.append(...exchangesBefore(item.id));
     if ((c.viaParse || []).includes(item.id)) continue;
