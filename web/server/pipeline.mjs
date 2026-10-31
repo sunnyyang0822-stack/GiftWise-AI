@@ -34,7 +34,7 @@ import { provideRealProducts } from "./catalog/provide.mjs";
 import { libraryPreview } from "./catalog/match.mjs";
 import { createRun, getRun, getRunByRecommendationKey, publicReport, retrievalView } from "./store.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
-import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, PRESENTATION_WAIT_MS, LIMITS, INTAKE_PARSE_CONFIG, localDbPath } from "./config.mjs";
+import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, LIMITS, INTAKE_PARSE_CONFIG, localDbPath } from "./config.mjs";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -784,10 +784,20 @@ async function runPresentationCore(input, services = {}) {
   // 幂等：同一选择重复提交返回同一份呈现，不重复消耗修订额度，并显式告知调用方这是重放。
   if (run.selections.has(selectedCandidateId)) {
     const cached = run.selections.get(selectedCandidateId);
+    // 重新选择已完成文字的方案也复用其媒体任务，恢复选定绑定后只读状态。
+    run.selected_candidate_id = selectedCandidateId;
+    run.presentation = { presentation: cached.presentation_json, recheck: cached.presentation_check };
+    run.media = cached.media;
+    const taskId = cached.media?.selected?.task_id;
+    if (taskId && cached.media.status !== "unavailable") {
+      try { run.media = (await mediaProvider.task(run, taskId)).media; } catch { /* 保留已知媒体状态及文字。 */ }
+    }
+    const replay = { ...cached, media: run.media, idempotent_replay: true };
+    run.selections.set(selectedCandidateId, replay);
     return {
       kind: "presentation",
       run,
-      view: { ...cached, idempotent_replay: true },
+      view: replay,
       idempotent: true,
     };
   }
@@ -977,41 +987,9 @@ async function runPresentationCore(input, services = {}) {
      ⇒ 参考图只提供形态信息、不提供配色决策（见 media/plan.mjs 的 prompt）。 */
   run.reference_grant = mintReferenceGrant(run, selectedCandidateId);
   try {run.media = await mediaProvider.packaging(run, selectedCandidateId);} catch {run.media = {...mediaProvider.candidates(),status:"failed",warnings:["图像任务不可用，文字结果仍可查看；不自动重复调用"]};}
-  /* 「等图就绪」方案 A：在返回前等到图就绪或超时（默认 30s，见 config.mjs PRESENTATION_WAIT_MS），
-     这样前端只渲染一次也能拿到图；超时则如实返回 pending + 等待过的时长，不假装成功。 */
-  let waitInfo = { waited: false, timed_out: false, waited_ms: 0, timeout_ms: PRESENTATION_WAIT_MS };
-  const pendingTaskId = run.media?.status === "pending" ? run.media.selected?.task_id ?? null : null;
-  if (pendingTaskId && mediaProvider.wait) {
-    const startedWait = Date.now();
-    let settled = null;
-    /* 超时计时器必须显式清理并 unref：否则一个"等图超时"的定时器会把进程多留 30 秒，
-       也会让测试进程迟迟不退出（这不是业务语义，是资源卫生问题）。 */
-    let waitTimer = null;
-    const timeoutPromise = new Promise((resolve) => {
-      waitTimer = setTimeout(() => resolve("timeout"), PRESENTATION_WAIT_MS);
-      if (typeof waitTimer.unref === "function") waitTimer.unref();
-    });
-    try {
-      settled = await Promise.race([
-        mediaProvider.wait(pendingTaskId).catch(() => null),
-        timeoutPromise,
-      ]);
-    } catch {
-      settled = null;
-    } finally {
-      if (waitTimer) clearTimeout(waitTimer);
-    }
-    waitInfo = { waited: true, timed_out: settled === "timeout", waited_ms: Date.now() - startedWait, timeout_ms: PRESENTATION_WAIT_MS, task_id: pendingTaskId };
-    try {
-      const record = await mediaProvider.task(run, pendingTaskId);
-      if (record?.media) run.media = record.media;
-    } catch {
-      /* 读不到就保持原样：如实 pending */
-    }
-    if (waitInfo.timed_out && run.media?.status === "pending") {
-      run.notices.push(`图片生成在 ${PRESENTATION_WAIT_MS}ms 内未就绪，已如实返回 pending 状态；文字结果不受影响，可稍后按 task_id 取图。`);
-    }
-  }
+  // packaging 只等待任务建立；图片网络请求在 provider 内后台执行。
+  const waitInfo = { waited: false, timed_out: false, waited_ms: 0, timeout_ms: 0,
+    ...(run.media?.selected?.task_id ? { task_id: run.media.selected.task_id } : {}) };
   run.status = "completed";
   const view = { ...presentationView(run, candidate, presentation, recheck, extras), retrieval: retrievalView(run.retrieval), media: run.media, media_wait: waitInfo, media_reference: referenceReport(run, selectedCandidateId), catalog: publicReport(run).catalog, visual_direction: run.visual_direction, delivery: run.delivery, uniqueness: run.uniqueness };
   run.selections.set(selectedCandidateId, view);

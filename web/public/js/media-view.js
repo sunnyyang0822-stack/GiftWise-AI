@@ -36,23 +36,23 @@ export function candidateMedia(report, candidate) {
   }
   return figure;
 }
-export function packagingMedia(view) {
+export function packagingMedia(view, options = {}) {
   const selected = view.media?.selected;
   const section = node("section", { class: "packaging-media", "aria-label": "所选礼物包装效果示意" });
   section.append(node("div", { class: "packaging-media__head" }, [
     node("h2", { text: "把心意，好好包起来。" }),
     node("span", { class: "media-kind", text: "包装效果示意" }),
   ]));
-  if (!selected || selected.candidate_id !== view.selected_candidate_id) { section.append(mediaFigure(null)); return section; }
+  if (!selected || selected.candidate_id !== view.selected_candidate_id) { section.append(mediaFigure(null, [], "unavailable", { packaging: true, message: "暂时没有效果图" })); return section; }
   const annotations = view.media?.contract_version === "retrieval-media-v2" && !selected.image?.version ? [] : selected.annotations;
-  section.append(mediaFigure(selected.image, annotations, view.media?.status)); return section;
+  section.append(mediaFigure(selected.image, annotations, view.media?.status, { ...options, packaging: true })); return section;
 }
-function mediaFigure(image, annotations = [], status = "ready") {
+function mediaFigure(image, annotations = [], status = "ready", options = {}) {
   const figure = node("figure", { class: "gift-media", "data-image-id": image?.id || "missing" });
   const safe = image && Object.hasOwn(kinds, image.kind) && localMediaUrl(image.url);
   const notes = validAnnotations(annotations, image?.version);
-  const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}` });
-  const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: safe ? status === "pending" ? "图片正在准备，文字结果可先查看。" : "图片加载中…" : "暂无图片，文字结果仍可查看。" });
+  const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}${options.pending ? " media-stage--pending" : ""}` });
+  const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: options.packaging && (!safe || status !== "ready") ? options.message || "暂时没有效果图" : safe ? status === "pending" ? "图片正在准备，文字结果可先查看。" : "图片加载中…" : "暂无图片，文字结果仍可查看。" });
   const retry = node("button", { type: "button", class: "btn media-retry", text: "重试加载图片" }); retry.hidden = true;
   let img;
   const load = () => {
@@ -68,6 +68,7 @@ function mediaFigure(image, annotations = [], status = "ready") {
     stage.append(img); img.src = safe;
   };
   retry.addEventListener("click", load);
+  if (options.pending) stage.append(node("span", { class: "gw-dots", "aria-hidden": "true" }, [node("i"), node("i"), node("i")]));
   // 产品裁定（2026-10-31）：主界面不出现任何关于图片来源的文字/徽标/角标。
   //   改前：图下会渲染一个「商品来源图 / AI 效果示意」角标，并渲染一个
   //         「图片来源：<attribution>」的可展开块（旧第 71–73 行）。
@@ -79,6 +80,7 @@ function mediaFigure(image, annotations = [], status = "ready") {
   //   ⇒ 展示层隐藏、数据层如实：答辩被追问时可以当场从 DOM 或接口字段追到真值。
   //   img 的 alt 仍用后端给的原文（无障碍需要，且图加载失败时会被移除、不会显示成文字）。
   figure.append(...[stage, notice, retry].filter(Boolean));
+  if (options.onRefresh) figure.append(node("button", { type: "button", class: "btn media-retry", text: options.refreshing ? "正在更新图片状态" : "刷新图片状态", ...(options.refreshing ? { disabled: "" } : {}), onclick: options.onRefresh }));
   if (image) {
     figure.dataset.imageKind = image.kind || "";
     figure.dataset.imageKindLabel = kinds[image.kind] || "";
@@ -91,7 +93,7 @@ function mediaFigure(image, annotations = [], status = "ready") {
     figure.append(node("details", { class: "media-notes" }, [node("summary", { text: "文字版说明" }), list]));
   }
   if (safe && status !== "pending" && status !== "failed" && status !== "unavailable") load();
-  else if (safe) { retry.hidden = false; retry.textContent = "重新查看图片"; if (status !== "pending") notice.textContent = "图片暂不可用，文字结果可先查看。"; }
+  else if (safe && !options.packaging) { retry.hidden = false; retry.textContent = "重新查看图片"; if (status !== "pending") notice.textContent = "图片暂不可用，文字结果可先查看。"; }
   return figure;
 }
 function overlay(stage, notes) {
