@@ -1,0 +1,111 @@
+{
+  "date": "2026-11-01",
+  "changed_files": [
+    {
+      "local_path": "演讲稿-5分钟.md",
+      "source_sha256": "64d22e90714377819446b7f4d42cdb512248a06cd90f83ba5a10f27745cb32cf",
+      "published_path": "submission-sync/演讲稿-5分钟.md",
+      "published_sha256": "64d22e90714377819446b7f4d42cdb512248a06cd90f83ba5a10f27745cb32cf",
+      "path_redacted": false
+    },
+    {
+      "local_path": "答辩问答-30题.md",
+      "source_sha256": "61090fa92d14ed27c66625c733cd863265a023bf1de81a5f424862aa52b87f1a",
+      "published_path": "submission-sync/答辩问答-30题.md",
+      "published_sha256": "61090fa92d14ed27c66625c733cd863265a023bf1de81a5f424862aa52b87f1a",
+      "path_redacted": false
+    },
+    {
+      "local_path": "README.md",
+      "source_sha256": "4c4c0b5120301347931d4150f19b469a971cd7a68a1cebbf98897ba324f932fc",
+      "published_path": "submission-sync/README.md",
+      "published_sha256": "4c4c0b5120301347931d4150f19b469a971cd7a68a1cebbf98897ba324f932fc",
+      "path_redacted": false
+    },
+    {
+      "local_path": "01-答辩材料/Demo脚本-3分钟.md",
+      "source_sha256": "2e1718f9396f17a391c2c3c67ca64a140e8ade873af6ca2e3d8504171eb105c8",
+      "published_path": "submission-sync/01-答辩材料/Demo脚本-3分钟.md",
+      "published_sha256": "2e1718f9396f17a391c2c3c67ca64a140e8ade873af6ca2e3d8504171eb105c8",
+      "path_redacted": false
+    },
+    {
+      "local_path": "02-提交材料/代码快照与材料变更声明.md",
+      "source_sha256": "663a0996c637b87dd05fc7c746aefbe9f0787fd58a1fb770e9e755f6e954316c",
+      "published_path": "submission-sync/02-提交材料/代码快照与材料变更声明.md",
+      "published_sha256": "663a0996c637b87dd05fc7c746aefbe9f0787fd58a1fb770e9e755f6e954316c",
+      "path_redacted": false
+    },
+    {
+      "local_path": "02-提交材料/专项材料/Agent执行流程-2026-11-01.md",
+      "source_sha256": "86ed6c503363f65320cb4e256e2ccd2364771e541c2f0926b5d665a8d3a7fb87",
+      "published_path": "submission-sync/02-提交材料/专项材料/Agent执行流程-2026-11-01.md",
+      "published_sha256": "542e295be0520a421b48c77216eb87d95181846264aee073d97e82c792556ee6",
+      "path_redacted": true
+    },
+    {
+      "local_path": "02-提交材料/专项材料/可观测性证据-2026-11-01.md",
+      "source_sha256": "a45527aa155d2dfca2fc1dc688d1464b4ce64da860dff99695c58d76352d5975",
+      "published_path": "submission-sync/02-提交材料/专项材料/可观测性证据-2026-11-01.md",
+      "published_sha256": "f89bdbfdf4356cb94bc0b72f375862c9b5f474bdd70d380058c89b53a6fa93f0",
+      "path_redacted": true
+    },
+    {
+      "local_path": "02-提交材料/专项材料/异常处理说明-2026-11-01.md",
+      "source_sha256": "0663f1cebf0c86c4688213ceff63e932ef6b9dc2140f872b4a5e57ca1390a0cd",
+      "published_path": "submission-sync/02-提交材料/专项材料/异常处理说明-2026-11-01.md",
+      "published_sha256": "5585f1f256aa7040a26fce89547d415766bcbece0e0e90e331bc1c3ce25d2ebf",
+      "path_redacted": true
+    },
+    {
+      "local_path": "02-提交材料/专项材料/Demo与代码仓库-2026-11-01.md",
+      "source_sha256": "c105fbc59b8b91a62154d2853454df8841350ab0c4f4412065de6fc529544965",
+      "published_path": "submission-sync/02-提交材料/专项材料/Demo与代码仓库-2026-11-01.md",
+      "published_sha256": "d93010afe4bde43714e449cfa97bbda2a0ce110275c530ac23e04af43dcfa174",
+      "path_redacted": true
+    },
+    {
+      "local_path": "02-提交材料/专项材料/成本与性能分析-2026-11-01.md",
+      "source_sha256": "3e9bf5affc84547e8e6dd7d6c6d77573268272c5e40c0a50e121186d147412c1",
+      "published_path": "submission-sync/02-提交材料/专项材料/成本与性能分析-2026-11-01.md",
+      "published_sha256": "3e9bf5affc84547e8e6dd7d6c6d77573268272c5e40c0a50e121186d147412c1",
+      "path_redacted": false
+    },
+    {
+      "local_path": "02-提交材料/专项材料/GiftWise-AI-系统架构设计.pdf",
+      "source_sha256": "ee97175b863f54eb68ed6c258b4d4fa7717fb10abe766be2e288cf4e2f72e8e6",
+      "published_path": "submission-sync/02-提交材料/专项材料/GiftWise-AI-系统架构设计.pdf",
+      "published_sha256": "ee97175b863f54eb68ed6c258b4d4fa7717fb10abe766be2e288cf4e2f72e8e6",
+      "path_redacted": false
+    },
+    {
+      "local_path": "02-提交材料/版本与文件清单.json",
+      "source_sha256": "b18d9a2f28771a8a9243c4235a795bbd0c6b313a1cdf6569f5cd229942b48a9f",
+      "published_path": "submission-sync/02-提交材料/版本与文件清单.json",
+      "published_sha256": "b18d9a2f28771a8a9243c4235a795bbd0c6b313a1cdf6569f5cd229942b48a9f",
+      "path_redacted": false
+    }
+  ],
+  "ppt_and_related_exports_unchanged": [
+    "01-答辩材料\\GiftWise-AI-答辩.pdf",
+    "01-答辩材料\\GiftWise-AI-答辩.pptx",
+    "01-答辩材料\\架构图\\架构图-GiftWise-AI-2026-10-31.drawio",
+    "01-答辩材料\\架构图\\架构图-GiftWise-AI-2026-10-31.png",
+    "01-答辩材料\\架构图\\架构图-GiftWise-AI-2026-10-31.svg"
+  ],
+  "analysis_sha": "15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879",
+  "validation": {
+    "old_cost_figures_removed_from_active_material": true,
+    "raw_historical_records_preserved": true,
+    "pdf_pages": 10,
+    "pdf_visually_checked_pages": [
+      2,
+      4,
+      5,
+      6,
+      10
+    ],
+    "stale_manifest_entries_removed": 1
+  },
+  "remote_scope": "docs/performance/cost-perf-20261101 only; no main merge or deployment"
+}

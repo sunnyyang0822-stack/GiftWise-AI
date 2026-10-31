@@ -11,8 +11,10 @@
     {
       "path": "README.md",
       "source_sha256": "36b26811f86c544cfd42755f92b0e386d7282c59150ad4b1d51d1ea6cf3c7c6b",
-      "published_sha256": "36b26811f86c544cfd42755f92b0e386d7282c59150ad4b1d51d1ea6cf3c7c6b",
-      "changed_for_path_redaction": false
+      "published_sha256": "e5b2eb43682861230147c8faa2c06b5564be04ea651628fd512d4cc04226b75e",
+      "changed_for_path_redaction": false,
+      "previous_published_sha256": "36b26811f86c544cfd42755f92b0e386d7282c59150ad4b1d51d1ea6cf3c7c6b",
+      "publication_revision": "cost submission sync"
     },
     {
       "path": "原始证据/成本性能分析-2026-11-01/.gitignore",
@@ -875,8 +877,85 @@
     {
       "path": "成本与性能分析-2026-11-01.md",
       "source_sha256": "35bccff98d274fb903199f35a4d0b6f3f6a9c22b9cb73b9d86623f831b2b2247",
-      "published_sha256": "35bccff98d274fb903199f35a4d0b6f3f6a9c22b9cb73b9d86623f831b2b2247",
-      "changed_for_path_redaction": false
+      "published_sha256": "3e9bf5affc84547e8e6dd7d6c6d77573268272c5e40c0a50e121186d147412c1",
+      "changed_for_path_redaction": false,
+      "previous_published_sha256": "35bccff98d274fb903199f35a4d0b6f3f6a9c22b9cb73b9d86623f831b2b2247",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": ".gitattributes",
+      "published_sha256": "1591b8407afdd1258c2f5e4094c244f0aeb37a46b9305b94928106382c4cdcba",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "COST-SYNC-RECEIPT.json",
+      "published_sha256": "aa63929791fc19870b6f55829c7cdbb0ab03160dae4ab61a914c7856e8920544",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "发布核验.json",
+      "published_sha256": "e123d97cbf946d0759694cc567208140aaf765346f54ee514a58a1dd69dfd3cc",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/README.md",
+      "published_sha256": "ce0dc061d0e29efee10cc353f7fa2f69e73e4dde72b87022b2ef463cbb8c5709",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/演讲稿-5分钟.md",
+      "published_sha256": "64d22e90714377819446b7f4d42cdb512248a06cd90f83ba5a10f27745cb32cf",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/答辩问答-30题.md",
+      "published_sha256": "61090fa92d14ed27c66625c733cd863265a023bf1de81a5f424862aa52b87f1a",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/01-答辩材料/Demo脚本-3分钟.md",
+      "published_sha256": "2e1718f9396f17a391c2c3c67ca64a140e8ade873af6ca2e3d8504171eb105c8",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/代码快照与材料变更声明.md",
+      "published_sha256": "663a0996c637b87dd05fc7c746aefbe9f0787fd58a1fb770e9e755f6e954316c",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/版本与文件清单.json",
+      "published_sha256": "b18d9a2f28771a8a9243c4235a795bbd0c6b313a1cdf6569f5cd229942b48a9f",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/Agent执行流程-2026-11-01.md",
+      "published_sha256": "542e295be0520a421b48c77216eb87d95181846264aee073d97e82c792556ee6",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/Demo与代码仓库-2026-11-01.md",
+      "published_sha256": "d93010afe4bde43714e449cfa97bbda2a0ce110275c530ac23e04af43dcfa174",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/GiftWise-AI-系统架构设计.pdf",
+      "published_sha256": "ee97175b863f54eb68ed6c258b4d4fa7717fb10abe766be2e288cf4e2f72e8e6",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/可观测性证据-2026-11-01.md",
+      "published_sha256": "f89bdbfdf4356cb94bc0b72f375862c9b5f474bdd70d380058c89b53a6fa93f0",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/异常处理说明-2026-11-01.md",
+      "published_sha256": "5585f1f256aa7040a26fce89547d415766bcbece0e0e90e331bc1c3ce25d2ebf",
+      "publication_revision": "cost submission sync"
+    },
+    {
+      "path": "submission-sync/02-提交材料/专项材料/成本与性能分析-2026-11-01.md",
+      "published_sha256": "3e9bf5affc84547e8e6dd7d6c6d77573268272c5e40c0a50e121186d147412c1",
+      "publication_revision": "cost submission sync"
     }
   ]
 }
