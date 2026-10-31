@@ -234,11 +234,13 @@ export class LlmProvider {
     const envelope = buildRecommendEnvelope({requestJson,intakeJson,retrieval:retrieval && retrieval.status !== 'unavailable' ? retrieval : null,library,inputParse});
     const messages = buildRecommendMessages(envelope);
     if (registered.size) messages[0].content += [
-      '\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部信息时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。',
-      '每次工具结果的source_availability及来源状态是真实执行反馈。某站已风控、要求登录、受限或不可用时，不在同一站反复循环重试；结合上下文选择工具允许的其他可用来源、公开参考资料，或直接形成建议。检索无数据不阻止最终推荐，不要求用户补非必要信息。',
-      '公开资料、参考价和参考图按工具返回的reference_kind及相关标记保留其性质，不能称为实时成交价、当前库存、可售SKU或商品实拍。参考资料缺字段时说明未知，不补造价格、规格、库存或来源；来源覆盖有限时简短说明即可。内容图片仅作灵感，不冒充所推荐商品的实际照片。',
-      '采用本次结果中的具体商品时可在最终JSON根对象另附product_references:[{candidate_id,product_id}]，只引用工具结果中明确给出的product_id；对应name写为商品name + " · " + variant，规格及数量一致，观察价及条件原样尊重，不把新人/首单价当普通结算价。来源若标记为参考资料，引用不改变其参考性质。',
-      '只有公开内容、参考图而没有product_id时无需商品引用，不把内容source_id、图片ID或链接冒充product_id。不新增reference_references。未采用商品的候选无需引用；product_references由服务端剥离，不进入严格候选对象。先完成理解与比较，再给最终建议及可选引用。',
+      '\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部资料时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。',
+      '当前所有电商直抓均已停用，不调用或重试京东、淘宝及其他电商，也不要求用户登录这些电商。主要自主查公开图片、内容与灵感；可使用工具提供的duckduckgo/OpenCLI能力，bing作辅助，具体可用工具和来源以服务端schema及source_availability为准。工具不可用或无数据不阻止最终建议。',
+      '每次工具结果的source_availability及来源状态是真实执行反馈。对停用、风控、要求登录、受限或不可用的来源不反复循环重试；结合上下文改用允许的公开来源，或直接形成建议。不要求用户补非必要信息。',
+      '公开参考资料在references[]返回，每项以reference_id标识；参考图片标记为reference_image，内容与参考图不能叫商品SKU、source_photo、商品实拍、实时成交价或当前库存。不要求参考资料有价格，也不补造价格、规格、库存或来源。若有参考价，按其参考性质说明即可。',
+      '采用公开参考图或资料时，可在最终JSON根对象附reference_references:[{candidate_id,reference_id}]，只引用本次工具references[]中的真实reference_id。不得把reference_id、图片ID、链接或内容source_id改造成product_id来满足商品照片门槛；没有SKU不影响模型建议，也不影响以参考图辅助理解。',
+      '历史真实商品结果若明确提供product_id，仍可单独用product_references:[{candidate_id,product_id}]引用；对应name写为商品name + " · " + variant，规格及数量一致，观察价及条件原样尊重。该历史支持不授权重新抓取电商，更不允许把公开参考当成商品。',
+      'product_references和reference_references是独立可选sidecar，由服务端剥离，不进入严格候选对象。无需图或没有资料时不必引用；先完成理解与比较，再给最终建议及可选引用。',
     ].join('\n');
     const toolAudit = [];
     const cfg = this.config();
@@ -293,8 +295,8 @@ export class LlmProvider {
       if (parsed.ok) break;
       if (outputAttempts > this.outputRetries() || ['LLM_OUTPUT_TRUNCATED','LLM_OUTPUT_REASONING_EXHAUSTED'].includes(parsed.code)) return {...parsed,transport:reply.transport,attempts:reply.attempts,output_attempts:outputAttempts,...meta()};
     }
-    const {product_references, ...candidateOutput} = parsed.value;
-    return {ok:true,outputs:{candidates_json:dump(candidateOutput),...(product_references !== undefined ? {product_references_json:dump(product_references)} : {})},transport:reply.transport,attempts:reply.attempts ?? 0,output_attempts:outputAttempts,usage:reply.usage ?? null,model:reply.model ?? null,http_status:reply.http_status ?? null,finish_reason:reply.finish_reason ?? null,elapsed_ms:reply.elapsed_ms ?? null,...meta()};
+    const {product_references, reference_references, ...candidateOutput} = parsed.value;
+    return {ok:true,outputs:{candidates_json:dump(candidateOutput),...(product_references !== undefined ? {product_references_json:dump(product_references)} : {}),...(reference_references !== undefined ? {reference_references_json:dump(reference_references)} : {})},transport:reply.transport,attempts:reply.attempts ?? 0,output_attempts:outputAttempts,usage:reply.usage ?? null,model:reply.model ?? null,http_status:reply.http_status ?? null,finish_reason:reply.finish_reason ?? null,elapsed_ms:reply.elapsed_ms ?? null,...meta()};
   }
 
   /**
