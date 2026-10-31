@@ -22,4 +22,3 @@ await click('#step-next');check(tag+' no budget checkbox',await ev(`!document.qu
  check(tag+' no overflow',await ev(`document.documentElement.scrollWidth<=innerWidth`));check(tag+' zero old API calls',requests.filter(r=>r.session===sessionId&&new URL(r.url).pathname.startsWith('/api/')).length===0);await send('Target.closeTarget',{targetId});
 }
 ws.close();fs.writeFileSync(`${root}/preview-flow-results.json`,JSON.stringify({total:checks.length,passed:checks.filter(x=>x.passed).length,checks},null,2));console.log('TOTAL',checks.length,'PASS',checks.filter(x=>x.passed).length);
-
