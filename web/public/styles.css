@@ -1047,7 +1047,7 @@ textarea {
   font-weight: 750;
   letter-spacing: -0.02em;
 }
-.budget-sliders { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); }
+.budget-sliders { display: grid; gap: 8px; padding: 0; border: 0; border-radius: 0; background: transparent; }
 .range-dual { position: relative; height: 44px; margin-inline: 4px; }
 .range-dual__track, .range-dual__fill { position: absolute; top: 18px; left: 0; right: 0; height: 8px; border-radius: 999px; pointer-events: none; }
 .range-dual__track { background: #dce5f6; }
