@@ -1,10 +1,10 @@
 {
   "notice": "Stage B 独立验收的现行文件基线（SHA256）。测试运行以本文件为准。",
   "baseline_date": "2026-10-31（Asia/Shanghai +08:00）",
-  "pinned_at": "2026-10-31T01:20:45+08:00",
+  "pinned_at": "2026-10-31T11:32:13.934393+08:00",
   "baseline_owner": "GiftWise｜测试验收 Agent（Issue #8）",
-  "approved_by": "PM（Issue #8 夜间指令明确授权\"重钉基线\"，并指明可落在 manifest 或测试文件中）",
-  "reason": "规则侧请求侧数值范围校验落地（validator/rules.py 新增：预算 ∈ [1,10000]、可用天数 ≤ 365）后，规则源码、单元测试与用例集发生经 PM 确认的合法变更，导致 2026-10-29 评审钉住值过时。",
+  "approved_by": "本轮 PM 明确授权：工作流重建正式合入并检查实际内容后，核验发布测试指纹；不得只改哈希修绿",
+  "reason": "PR #54 已正式合入 3dfb186；先审阅真实规则/开发夹具语义变化，5份生成物重建内容一致，31组生成规则语义与新契约一致，随后记录发布基线哈希。",
   "why_not_edit_review": "docs/pm-reviews/** 是 B 类历史记录，不得改写数字。故本基线另立于此，并在 superseded_sha256 中逐条保留旧值以保持可追溯；测试会断言这些旧值与评审文件逐条一致。",
   "superseded_review": "docs/pm-reviews/val-001-rereview-2026-10-29.md",
   "superseded_sha256": {
@@ -21,8 +21,38 @@
   },
   "files": {
     "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
-    "validator/rules.py": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
+    "validator/rules.py": "f548f9554176dbcf3f4729dfba67898ccac8a4a7cd8020e20a123c5bf86a4258",
     "tests/test_validator.py": "9c83a4c6c6341ed54c724498ca4d1bab6c196071c7809c6d144696d2339c601e",
-    "tests/test_cases.json": "07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db"
-  }
+    "tests/test_cases.json": "546e9b43ca9766885634d05f94d2729f8e827203e878c943c56aa6a93fc18669"
+  },
+  "previous_release_baseline": {
+    "notice": "Stage B 独立验收的现行文件基线（SHA256）。测试运行以本文件为准。",
+    "baseline_date": "2026-10-31（Asia/Shanghai +08:00）",
+    "pinned_at": "2026-10-31T01:20:45+08:00",
+    "baseline_owner": "GiftWise｜测试验收 Agent（Issue #8）",
+    "approved_by": "PM（Issue #8 夜间指令明确授权\"重钉基线\"，并指明可落在 manifest 或测试文件中）",
+    "reason": "规则侧请求侧数值范围校验落地（validator/rules.py 新增：预算 ∈ [1,10000]、可用天数 ≤ 365）后，规则源码、单元测试与用例集发生经 PM 确认的合法变更，导致 2026-10-29 评审钉住值过时。",
+    "why_not_edit_review": "docs/pm-reviews/** 是 B 类历史记录，不得改写数字。故本基线另立于此，并在 superseded_sha256 中逐条保留旧值以保持可追溯；测试会断言这些旧值与评审文件逐条一致。",
+    "superseded_review": "docs/pm-reviews/val-001-rereview-2026-10-29.md",
+    "superseded_sha256": {
+      "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+      "validator/rules.py": "4782255bb9c9ab48494382ca712d6b92ade248bf64143406161418b6ae744ca3",
+      "tests/test_validator.py": "0193c90ca6b32e3c4cf2ec80621e03973fba0c52b86294e1e2eb178d573bb19b",
+      "tests/test_cases.json": "5f2f16dfc006b38e9d432891f35a5a9fd5c493fabda03f43ec0f81aadd709d3a"
+    },
+    "changed_since_review": {
+      "validator/__init__.py": "未变（范围校验加在 rules.py 的调用点，未进入共用函数所在模块）",
+      "validator/rules.py": "+5 行：请求侧范围校验（含注释\"范围约束不得进入 _amount/_days 共用函数\"）",
+      "tests/test_validator.py": "+6/-2：test_decimal_boundary_ignores_context_rounding 改用 10000 / 10000.00 / 10000.01（超上界会先被 LIMIT_EXCEEDED 拦下，测不到候选侧）",
+      "tests/test_cases.json": "313 → 320 条（+7/-0）：新增 T02_budget_below_min、T02_budget_min_1、T02_budget_max_10000、T02_budget_above_max、T04_days_max_365、T04_days_above_max、T02_T04_zero_estimates_candidate_allowed"
+    },
+    "files": {
+      "validator/__init__.py": "f94446ea4292f37bfb11d9db94f7ef6fc1c5823d00ab5a631a36c6126fb50bc5",
+      "validator/rules.py": "1f389dad4c2589fb8ddbc31d4e749d27a83ae43de422ee5036155d97d3d1a500",
+      "tests/test_validator.py": "9c83a4c6c6341ed54c724498ca4d1bab6c196071c7809c6d144696d2339c601e",
+      "tests/test_cases.json": "07f2ad6fb5853bf440fe8150107cef08f6665a6d4b9a3088b9138e30f45fb1db"
+    }
+  },
+  "content_review_evidence": "docs/test-reports/rev-qa-001/migration-20261031/rebuilt-content/review.json",
+  "integration_sha": "3dfb186b74a4afabfef82c7213401fb60587f946"
 }

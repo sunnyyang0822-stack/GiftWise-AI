@@ -25,7 +25,9 @@ def main():
         'release_sha':git('rev-parse','origin/release/2026-11-01-submission').strip(),
         'worktree':str(ROOT),'initial_status':git('status','--short'),
         'python':subprocess.check_output([PY,'--version'],text=True).strip(),
-        'scope':'pre-rebuild migration; final source fingerprint gates remain blocked until rebuild merged',
+        'scope':('post-rebuild migration on release 3dfb186 with reviewed QA pins'
+                 if git('rev-parse','origin/release/2026-11-01-submission').strip().startswith('3dfb186')
+                 else 'pre-rebuild migration; fingerprint gates not yet closed'),
         'commands':[]}
     historical = git('ls-files','docs/test-reports/rev-qa-001/final-20261031').splitlines()
     protected = git('ls-files','validator','web/server','web/public','workflow','tests/test_cases.json','tests/test_validator.py').splitlines()
@@ -36,7 +38,7 @@ def main():
     # 先归档真实内容差异，再记录指纹；不更改 pinned_hashes.json 或生成物。
     (out/'reviewed-business-changes.patch').write_bytes(subprocess.check_output(['git','diff','e4ba08f',record['release_sha'],'--','validator/rules.py','tests/test_cases.json'],cwd=ROOT))
     baseline = json.loads((ROOT/'tests/acceptance/stage_b/pinned_hashes.json').read_text(encoding='utf-8'))
-    record['fingerprint_review']={'pin_update_performed':False,'existing_pins':baseline['files'],
+    record['fingerprint_review']={'pin_update_performed':bool(baseline.get('content_review_evidence')),'existing_pins':baseline['files'],
         'current_observed_after_content_review':hashes(baseline['files'])}
     for name,args in [
         ('prepare-migration',['tests/acceptance/nov01_revision/prepare_migration.py']),
