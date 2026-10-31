@@ -25,6 +25,7 @@ async function referenceRecords(page,records,{source,signal,imageValidationLimit
    attempted++;
    const validation=await validateSourceImage(record.image_url,{role:'reference',fetchImpl:page.fetchImage,signal,includeBytes:true});
    const{bytes,...metadata}=validation;r.image_validation=metadata;
+   r.image_provenance={...record.image_provenance,validation_status:validation.ok?'validated':'failed',image_observed_at:metadata.observed_at??null};
    if(validation.ok){r.image_id=digest(`${reference_id}|${record.image_url}`);cacheSourceImage(r.image_id,validation);}
   }else if(record.image_url)r.image_validation={ok:false,error_code:'IMAGE_NOT_FETCHED_LIMIT'};
   result.push(r);
@@ -166,7 +167,7 @@ export async function runDomesticSearch(plan, {
           sourceCoverage.image_candidates=records.filter(r=>r.image_url).length;
           sourceCoverage.image_validation_limit=6;
           sourceCoverage.images_validation_attempted=resolved.filter(r=>r.image_validation&&r.image_validation.error_code!=='IMAGE_NOT_FETCHED_LIMIT').length;
-          if(publicReference){if(db)saveContent(db,records,sourceCoverage,version);onProgress(sourceCoverage);continue;}
+          if(publicReference){if(db)saveContent(db,resolved,sourceCoverage,version);onProgress(sourceCoverage);continue;}
         }
         if (useContent) {
           const records = outcome.records ?? [];
