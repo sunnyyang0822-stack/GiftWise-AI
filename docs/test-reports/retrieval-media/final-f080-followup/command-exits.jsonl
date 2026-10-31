@@ -1,0 +1,6 @@
+{"test":"workflow-verify-default","exit":0}
+{"test":"workflow-verify-nov01","exit":0}
+{"test":"backend-retrieval-media","exit":0}
+{"test":"backend-seedream-controlled","exit":0}
+{"test":"access-layer","exit":0}
+{"test":"previous-gifts-release-probe","exit":1}

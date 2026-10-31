@@ -1,0 +1,33 @@
+{
+  "counts": {
+    "PASS": 6,
+    "FAIL": 4
+  },
+  "parity": [
+    {
+      "case": "valid",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "empty",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "non_string",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "long",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "none",
+      "same_status": true,
+      "same_request_json": true
+    }
+  ]
+}

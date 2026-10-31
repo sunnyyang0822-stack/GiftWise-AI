@@ -1,0 +1,226 @@
+{
+  "release_sha": "f080ad51e0f22ca7384ce3a93f75d0dba91d0508",
+  "scope": "offline_release_probe",
+  "counts": {
+    "PASS": 6,
+    "FAIL": 4
+  },
+  "parity": [
+    {
+      "case": "valid",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "empty",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "non_string",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "long",
+      "same_status": true,
+      "same_request_json": true
+    },
+    {
+      "case": "none",
+      "same_status": true,
+      "same_request_json": true
+    }
+  ],
+  "rows": [
+    {
+      "case": "valid",
+      "layer": "workflow.intake.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": false
+    },
+    {
+      "case": "valid",
+      "layer": "workflow/generated/intake_node.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": false
+    },
+    {
+      "case": "empty",
+      "layer": "workflow.intake.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": false
+    },
+    {
+      "case": "empty",
+      "layer": "workflow/generated/intake_node.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": false
+    },
+    {
+      "case": "non_string",
+      "layer": "workflow.intake.py",
+      "expected_status": "needs_input",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": true
+    },
+    {
+      "case": "non_string",
+      "layer": "workflow/generated/intake_node.py",
+      "expected_status": "needs_input",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": true
+    },
+    {
+      "case": "long",
+      "layer": "workflow.intake.py",
+      "expected_status": "needs_input",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": true
+    },
+    {
+      "case": "long",
+      "layer": "workflow/generated/intake_node.py",
+      "expected_status": "needs_input",
+      "actual": {
+        "status": "needs_input",
+        "errors": [
+          {
+            "code": "INTAKE_UNKNOWN_FIELD",
+            "path": "intake.previous_gifts",
+            "message": "未声明的输入字段，请确认契约版本"
+          }
+        ],
+        "request_json": null
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": null,
+      "status_matches_expected": true
+    },
+    {
+      "case": "none",
+      "layer": "workflow.intake.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "ready",
+        "errors": [],
+        "request_json": "{\"recipient_relation\":\"朋友\",\"recipient_relation_id\":\"friend\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"200\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"200\"},\"dislikes\":\"不要香水\"}"
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": "不要香水",
+      "status_matches_expected": true
+    },
+    {
+      "case": "none",
+      "layer": "workflow/generated/intake_node.py",
+      "expected_status": "ready",
+      "actual": {
+        "status": "ready",
+        "errors": [],
+        "request_json": "{\"recipient_relation\":\"朋友\",\"recipient_relation_id\":\"friend\",\"recipient_relation_custom\":null,\"occasion\":\"生日\",\"occasion_custom\":null,\"budget_amount\":\"200\",\"currency\":\"CNY\",\"available_days\":5,\"facts\":[],\"forbidden_tags\":[],\"forbidden_terms\":[],\"notes\":\"QA虚构\",\"closeness\":\"unknown\",\"preference_inferences\":[],\"gift_styles\":[],\"hard_exclusions_original\":{\"tags\":[],\"terms\":[],\"unresolved\":[]},\"contract_version\":\"giftwise-20261031-v2\",\"budget_range\":{\"min\":\"100\",\"max\":\"200\"},\"dislikes\":\"不要香水\"}"
+      },
+      "request_previous_gifts": null,
+      "request_hard_exclusions": null,
+      "request_dislikes": "不要香水",
+      "status_matches_expected": true
+    }
+  ],
+  "note": "未调用Dify；ready仅表示本地适配输出，不表示真实工作流成功。"
+}

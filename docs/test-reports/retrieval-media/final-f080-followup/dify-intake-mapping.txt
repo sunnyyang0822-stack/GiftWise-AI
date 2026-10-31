@@ -1,0 +1,30 @@
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:302:def validate(request_json: str, candidates_json: str) -> dict:
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:308:        request = _parse(request_json, "request_json", request_errors)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:374:def adapt_intake(intake_json):
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:381:        data = strict_load(intake_json)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:383:        return {"status": "needs_input", "errors": [{"code": "INTAKE_INVALID_JSON", "path": "intake", "message": "输入须为不超过 32768 UTF-8 字节的严格 JSON 对象"}], "request_json": None}
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:385:        return {"status": "needs_input", "errors": [{"code": "INVALID_TYPE", "path": "intake", "message": "输入根节点须为对象"}], "request_json": None}
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:542:    return {"status": "needs_input" if errors else "ready", "errors": errors, "request_json": None if errors else dump(request)}
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:553:def check(request_json, candidates_json, repair_count=0):
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:556:    validation = validate(request_json, candidates_json)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:558:    request_check = validate(request_json, '{}')
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:562:    return {"request_json": request_json, "candidates_json": candidates_json,
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:580:def recheck(request_json, previous_candidates_json, candidates_json, repair_count=0):
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:581:    previous = check(request_json, previous_candidates_json, repair_count)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:587:    state = check(request_json, candidates_json, 1)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:607:    validation = validate(state["request_json"], state["candidates_json"])
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:613:        request = strict_load(state["request_json"])
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:664:            value = adapt_intake(payload["intake_json"])
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:666:            value = check(payload["request_json"], payload["candidates_json"], payload["repair_count"])
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:668:            value = recheck(payload["request_json"], payload["previous_candidates_json"], payload["candidates_json"], payload["repair_count"])
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:685:def main(intake_json: str) -> dict:
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:686:    value = adapt_intake(intake_json)
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\generated\intake_node.py:687:    return {"request_json": value["request_json"] or "", "errors_json": dump(value["errors"]), "status": value["status"]}
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:38:| Start | 用户输入 | intake_json: String | 绑定 N1；可信服务端持有 task/run 标识与已有 repair_count |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:39:| N1 | generated/intake_node.py | intake_json: String | request_json、errors_json、status: String；status=ready 才到 N2，否则中文补充提示，零模型调用 |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:40:| N2 | prompts/generate.md | N1.request_json | LLM 原始 text 即 candidates_json；不剥围栏、不自动修 JSON |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:41:| N3 | generated/check_node.py | N1.request_json、N2.text、repair_count: Number（首轮可信常量 0，已有任务取服务端记录） | envelope_json/status/validation_json/preserved_candidates_json: String；all_passed/repairable: Boolean；repair_count: Number |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:43:| N5 | prompts/repair.md | N1.request_json、N2.text、N3.validation_json、N3.preserved_candidates_json | 只生成一次；自动重试关闭，失败不重新发起 |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\dify-setup.md:44:| N6 | generated/recheck_node.py | request_json=N1、previous_candidates_json=N2、candidates_json=N5.text、repair_count=N3 原计数 | 复用相同 validate、计数变 1、检查原通过项未改；输出 envelope_json/status/all_passed/repairable/repair_count |
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\workflow-spec.md:17:以下为应用契约，不是 Dify 原生 DSL。保留既有校验器接口和候选结构，便于首个编码任务继续执行。Dify 节点边界使用 JSON 字符串 `request_json`、`candidates_json`、`validation_json`，另提供浅层状态字段；实际 UI 必须声明对应类型。
+C:\Users\lenovo\Desktop\giftwise\qa-final-f080\workflow\workflow-spec.md:71:纯函数：`validate(request_json: str, candidates_json: str) -> dict`。不调用模型、不访问网络、不修改输入。下面仅展示一个候选结果的形状，完整有效批次返回三个结果：
