@@ -30,9 +30,9 @@ export function candidateMedia(report, candidate) {
     const reference = matches.length === 1 ? matches[0] : null;
     if (!reference || reference.image_kind !== "reference_image" || typeof binding.image.id !== "string" || !binding.image.id.trim() || reference.image_id !== binding.image.id
       || reference.image_validation?.ok !== true || !localMediaUrl(binding.image.url)) return mediaFigure(null);
-    // 公开资料引用独立绑定；不为参考图片制造商品/SKU，也不借用商品价格说明。
+    // 引用图已独立校验，不受整体选后生图状态影响；不制造商品/SKU或借用报价。
     return mediaFigure({ ...binding.image, reference_id: reference.reference_id, reference_kind: reference.reference_kind,
-      source_url: binding.image.source_url || reference.source_url, observed_at: reference.observed_at ?? binding.image.price_observed_at }, [], report.media?.status);
+      source_url: binding.image.source_url || reference.source_url, observed_at: reference.observed_at ?? binding.image.price_observed_at });
   }
   const products = (report.retrieval?.products || []).filter(p => p.product_id === binding.product_id);
   const product = products.length === 1 ? products[0] : null;
