@@ -126,7 +126,7 @@ export class SeedreamProvider {
    }
   }
   if(typeof prompt!=='string'||!prompt.trim()||prompt.length>6000)throw new ImageProviderError('IMAGE_PROMPT_INVALID',{execution:'not_submitted'});
-  const body={model:SEEDREAM_MODEL,prompt,size:'2K',sequential_image_generation:'disabled',stream:false,response_format:'b64_json',watermark:true,...(images.length?{images}:{})};
+  const body={model:SEEDREAM_MODEL,prompt,size:'2K',sequential_image_generation:'disabled',stream:false,response_format:'b64_json',watermark:false,...(images.length?{images}:{})};
   const started=performance.now();const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),this.timeoutMs);
   let metadata={};
   try{

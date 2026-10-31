@@ -70,6 +70,12 @@ export class MediaProvider {
 
  async packaging(run,id){
   if(run.selected_candidate_id!==id||!run.selectable_candidate_ids.includes(id))throw new Error('INVALID_SELECTION');
+  // A plan-version upgrade must not resubmit a selected task already known to this trusted run.
+  const previous=run.selections?.get(id)?.media??(run.media?.selected?.candidate_id===id?run.media:null);
+  if(previous?.selected?.task_id){
+   if(previous.status==='unavailable')return previous;
+   return (await this.task(run,previous.selected.task_id)).media;
+  }
   let jobs=this.jobs.get(run);if(!jobs){jobs=new Map();this.jobs.set(run,jobs);}
   const key=id+':'+IMAGE_PLAN_VERSION;
   if(!jobs.has(key)){const job=this.begin(run,id);jobs.set(key,job);}

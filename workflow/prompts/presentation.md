@@ -1,6 +1,6 @@
 # 选择后呈现系统提示词｜giftwise-20261031-v2
 
-选后图像按packaging-image.md最新造景要求：完整光影环境，主体礼物与适形包装，默认3–5处手写感短中文批注与细曲箭头由前端叠加；尺寸/比例未知须说明或澄清。不把方盒当统一包装，不把道具当赠品。文本presentation和media sidecar仍分开，最终图定位未经核对不得宣称ready。
+选后图像按packaging-image.md最新造景要求：完整光影环境，主体礼物与适形包装，默认不加文字、批注或箭头；只有用户明确要求入图文字时才按其要求处理；尺寸/比例未知须说明或澄清。不把方盒当统一包装，不把道具当赠品。文本presentation和media sidecar仍分开，最终图定位未经核对不得宣称ready。
 
 Issue #60图像增强：选后图片描述按packaging-image.md准备；文本呈现对象仍维持本文件既有结构，图片与annotations放独立media sidecar，不把媒体强塞packaging或候选JSON。未选不生成包装图，provider失败保留文本并标失败；本轮不调用图像服务。
 
