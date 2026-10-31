@@ -1,0 +1,24 @@
+# 当前公网部署事实（材料更新权威增量）
+
+当前站点 **http://117.50.83.57/**，仅 HTTP，未配置 HTTPS；用户已确认首页可访问。
+实际运行 SHA `19b6819fe80787717571beb7cc0d17f89587c2d9`，分支 codex/deploy-portable-material-root-20261101，PR #125 尚未合并。main 基础为 15e29edcc150c3a4a8a9ba04e9f0c8a2bb614879。证据提交 `6e92a9e076d5989f7ad510bebf3639a9dd2dadf8` 与运行提交必须分开。
+
+Compshare / Ubuntu 22.04.4 / Node v24.16.0 / Nginx 公网80→127.0.0.1:8787 / systemd 单进程守护；此次没有构建、启动容器，没有使用旧 Python Dockerfile。P40×1、8核、64GB、100GB为购买配置，不是实际消耗或本地模型推理证明；模型与生图通过远端 API。
+
+【实测】公网首页、healthz、config 200，真实 llm 模式、mock 关闭；40/40静态文件状态/大小/哈希通过。交接 QA 51/51 离线和1/1受控HTTP不能当公网证据；路径迁移测试 Windows、Linux各18/18是部署负责人自测，不冒称独立QA全量复验。
+
+【实测】一条虚构追求对象流程：推荐39.391秒，三个均可选；输入1天、估算2/2/5天仍可选。明确选择c1后文字12.797秒返回，media_wait.waited=false、图pending；图后台生成10.960秒，ready/succeeded，2304×1728，877634字节，已下载目视。另一会话读run/task/asset均404。时间不是可选性或图片生成门禁；纯体验不强制空包装章，未新增该分支付费实测。
+
+本轮文本模型5次（recommend2、recommend_revision1、style_direction1、present1），全部ok，29513 tokens，自动业务修订1次；Seedream生图1张。未测试本轮真实自然语言解析，不得把这5次当作含解析的固定每任务调用数。模型检索工具2次，新检索含站点首页摘要，最终模型引用2条历史公开摘要，保留观察时间，不冒充全文、SKU或实时报价。无参考图输入（reference_count=0、none_provided），不能写成本轮使用了历史单参考图。
+
+【实测】/var/lib/giftwise/runtime绑定release/.tmp，/var/lib/giftwise/db绑定release/.local-db；独立SQLite、文字缓存、检索审计、媒体task/asset、LLM账本落盘。没有Redis、K8s、外置共享状态或多副本。run/analysis/selection/会话签名仍在内存，重启旧流程失效；文件存在不等于旧owner可查询。
+
+在线SQLite备份integrity_check=ok；runtime归档是非事务逐文件复制、同盘备份、未异地备份。重启恢复、实际版本回滚、压测、完整浏览器点击闭环未验收；首页人工确认与公网HTTP闭环分别记录。自动执行策略拒绝停服/重启命令，此项未执行。原8903和演示库未操作；它们只保留为历史或明确标记的备用，不再充当公网版本。
+
+【推算】资源0.38元/小时、48小时约18.24元，非已结算费用；供应商实际金额未测。平台已设北京时间2026-11-03 05:11关机，网站届时停止。成本协作者的约0.35元/任务、100次约35.22元、隔离fixture峰值86.54MiB保留其原假设/版本和证据，不与云端单样本混成账单、P95或容量结论。
+
+公网文字检索主路径是匿名HTTP与公开文字缓存，云端生产服务不依赖本机Chrome登录态；OpenCLI是本次云部署操作通道。电商采集、商品库优先、推荐卡网图、Dify编排、Docker规则API均不能画成当前生产主链。
+
+固定报告与原始API/图片/脱敏摘录：https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/6e92a9e076d5989f7ad510bebf3639a9dd2dadf8/docs/deployment/2026-11-01/REPORT.md
+运行、备份和回滚： https://github.com/sunnyyang0822-stack/GiftWise-AI/blob/19b6819fe80787717571beb7cc0d17f89587c2d9/ops/compshare/README.md
+成本独立来源： https://github.com/sunnyyang0822-stack/GiftWise-AI/tree/1a6a49bf5f51454a5541d4fce03e90d1f15d6113

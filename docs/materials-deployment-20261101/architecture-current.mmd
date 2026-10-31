@@ -1,0 +1,31 @@
+flowchart TB
+    U["浏览器：需求/排除项确认→三方案比较→明确选择"]
+    subgraph C["Compshare Ubuntu22.04.4 · 单实例 · 实测公网HTTP"]
+      N["Nginx :80"]
+      S["Node v24.16.0 · 127.0.0.1:8787 · systemd守护"]
+      R["需求解析/排除分析 · 服务端固定确认约束"]
+      P["公开文字依据→模型三方案→独立预算/禁忌/结构检查"]
+      D["方向规则推导+llm_text润色 · 时间不影响可选性"]
+      SELECT["服务端校验用户明确选择 · 全局最多一次业务修订"]
+      T["指南生成与复核 · 先返回文字+task_id"]
+      IMG["后台Seedream任务 · pending→ready/failed/unknown"]
+      MEM["内存：run/analysis/selection/签名 · 重启旧流程失效"]
+      FS["/var/lib/giftwise/runtime：文字缓存/媒体/审计/LLM账本"]
+      DB["/var/lib/giftwise/db：独立SQLite · 不用演示库"]
+    end
+    L["外部文字模型API · HTTPS · 真实配置"]
+    WEB["公开文字HTTP检索 + 保留观察时点的合法历史摘要"]
+    SEED["Seedream API · HTTPS · 仅选后显式授权"]
+    U -->|HTTP| N --> S --> R --> P --> D
+    P <-->|按需工具调用| WEB
+    P <--> L
+    D -->|三个可选方案| U
+    U -->|选择事件| SELECT --> T
+    T <--> L
+    T -->|文字先返回| U
+    T --> IMG --> SEED
+    IMG --> FS
+    U -->|只读GET task/asset·同源·owner校验| S
+    S --> MEM
+    S --> FS
+    S --> DB

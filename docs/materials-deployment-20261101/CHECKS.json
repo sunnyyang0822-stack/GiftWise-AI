@@ -1,0 +1,16 @@
+{
+  "input_files_checked": 19,
+  "input_source_drift": [],
+  "source_removed_after_snapshot": [
+    "01-答辩材料/GiftWise-AI-答辩.pdf"
+  ],
+  "pptx_unchanged": true,
+  "architecture_pdf_unchanged": true,
+  "pptx_update_status": "delegated_to_other_device_not_done",
+  "architecture_pdf_update_status": "reviewed_and_change_list_provided_not_done",
+  "known_secret_value_matches": 0,
+  "faq_questions": 30,
+  "notes": 8,
+  "business_source_modified": false,
+  "paid_calls_this_task": 0
+}
