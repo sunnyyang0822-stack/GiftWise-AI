@@ -40,7 +40,7 @@ def adapt_intake(intake_json):
     if not isinstance(data, dict):
         return {"status": "needs_input", "errors": [{"code": "INVALID_TYPE", "path": "intake", "message": "输入根节点须为对象"}], "request_json": None}
 
-    fields = {"recipient_relation", "recipient_relation_custom", "closeness", "occasion", "occasion_custom", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes"}
+    fields = {"recipient_relation", "recipient_relation_custom", "closeness", "occasion", "occasion_custom", "budget_amount", "currency", "deadline_days", "interests", "interest_confidence", "gift_styles", "hard_exclusions", "additional_context", "contract_version", "budget_mode", "budget_range", "dislikes", "previous_gifts"}
     for key in data:
         if key in fields:
             continue
@@ -76,9 +76,18 @@ def adapt_intake(intake_json):
         errors.extend(budget_errors)
     dislikes = data.get("dislikes", "")
     if not isinstance(dislikes, str):
-        err("INVALID_TYPE", "intake.dislikes", "不喜欢的东西须为字符串，可为空")
+        err("INVALID_TYPE", "intake.dislikes", "需要避免的内容须为字符串，可为空")
     elif len(dislikes) > 1000:
-        err("LIMIT_EXCEEDED", "intake.dislikes", "不喜欢的东西最多 1000 个 Unicode 码点")
+        err("LIMIT_EXCEEDED", "intake.dislikes", "需要避免的内容最多 1000 个 Unicode 码点")
+    elif not dislikes.strip():
+        dislikes = ""
+    previous_gifts = data.get("previous_gifts", "")
+    if not isinstance(previous_gifts, str):
+        err("INVALID_TYPE", "intake.previous_gifts", "以前送过什么须为字符串，可为空")
+    elif len(previous_gifts) > 1000:
+        err("LIMIT_EXCEEDED", "intake.previous_gifts", "送礼历史最多 1000 个 Unicode 码点")
+    elif not previous_gifts.strip():
+        previous_gifts = ""
 
     def choice(key, table, default=None):
         value = data.get(key, default)
@@ -184,6 +193,9 @@ def adapt_intake(intake_json):
         "preference_inferences": [{"interest_id": key, "text": "用户猜测：对方可能对“" + INTERESTS[key] + "”感兴趣"} for key in interests if confidence.get(key, "inferred") == "inferred"],
         "gift_styles": styles, "hard_exclusions_original": exclusions,
     }
+    # 旧版未提供时仍省略派生字段，避免旧快照被重新解释；读取默认空字符串。
+    if "previous_gifts" in data or revised:
+        request["previous_gifts"] = previous_gifts
     if revised:
         request.update(contract_version=CONTRACT_VERSION, budget_range=data.get("budget_range"), dislikes=dislikes)
     elif "dislikes" in data:
