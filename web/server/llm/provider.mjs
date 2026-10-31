@@ -105,6 +105,42 @@ export function parseModelJson(text, { requireKey = null, finishReason = null, u
   return { ok: true, value: parsed };
 }
 
+/** Bound model context without discarding every observation from a large result.
+ * Full collection persistence belongs to the executor; this only bounds the tool message.
+ */
+function boundToolResult(result, maxChars = 256000) {
+  const originalChars = JSON.stringify(result).length;
+  if (originalChars <= maxChars) return result;
+  let itemLimit = 40, textLimit = 2048;
+  const compact = (value,depth=0) => {
+    if (typeof value === 'string') return value.length > textLimit ? value.slice(0,textLimit) : value;
+    if (value === null || typeof value !== 'object') return value;
+    if (depth > 8) return Array.isArray(value) ? [] : {};
+    if (Array.isArray(value)) return value.slice(0,itemLimit).map(v=>compact(v,depth+1));
+    return Object.fromEntries(Object.entries(value).slice(0,80).map(([key,v])=>[key,compact(v,depth+1)]));
+  };
+  let bounded;
+  while (true) {
+    bounded = compact(result);
+    const collections = Object.fromEntries(Object.entries(result).filter(([,v])=>Array.isArray(v)).slice(0,80).map(([key,v])=>[key.slice(0,128),{total:v.length,returned:Array.isArray(bounded[key])?bounded[key].length:0}]));
+    bounded.tool_result_meta = {truncated:true,original_chars:originalChars,collections,item_limit:itemLimit,text_limit:textLimit};
+    if (JSON.stringify(bounded).length <= maxChars) return bounded;
+    itemLimit = Math.max(1,Math.floor(itemLimit/2));
+    textLimit = Math.max(64,Math.floor(textLimit/2));
+    // JSON object breadth/depth are bounded above; at the minimum preserve only
+    // the standard evidence collections and status instead of losing all results.
+    if (itemLimit === 1 && textLimit === 64) {
+      bounded = Object.fromEntries(['status','products','contents','images','coverage','warnings','recommendations_available','tool_result_meta'].filter(k=>k in bounded).map(k=>[k,bounded[k]]));
+      if (JSON.stringify(bounded).length <= maxChars) return bounded;
+      const shallow = value => value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).slice(0,32).filter(([,v])=>v === null || ['string','number','boolean'].includes(typeof v)).map(([k,v])=>[k.slice(0,128),typeof v === 'string' ? v.slice(0,256) : v])) : typeof value === 'string' ? value.slice(0,256) : value;
+      const minimal = {status:typeof result.status === 'string' ? result.status.slice(0,64) : null,tool_result_meta:bounded.tool_result_meta};
+      for (const key of ['products','contents','images','coverage','warnings']) if (Array.isArray(result[key])) {minimal[key]=result[key].slice(0,1).map(shallow); minimal.tool_result_meta.collections[key]={total:result[key].length,returned:minimal[key].length};}
+      minimal.tool_result_meta.nested_fields_omitted=true;
+      return minimal;
+    }
+  }
+}
+
 export class LlmProvider {
   /**
    * @param {{live?: object, config?: Function, hasConfig?: Function}} deps
@@ -233,7 +269,7 @@ export class LlmProvider {
                   result = await executeTool({name,arguments:args,id:call.id});
                   if (!result || typeof result !== 'object') result = {ok:false,error:{code:'TOOL_RESULT_INVALID'}};
                   result = redact(result);
-                  if (JSON.stringify(result).length > 256000) result = {ok:false,error:{code:'TOOL_RESULT_TOO_LARGE'}};
+                  result = boundToolResult(result);
                 } catch { result = {ok:false,error:{code:'TOOL_EXECUTION_FAILED'}}; }
               }
             }
