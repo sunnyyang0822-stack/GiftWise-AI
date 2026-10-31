@@ -17,7 +17,7 @@ test('synthetic OpenAI tool calls execute callback and return role:tool before c
  let received;
  const result=await provider.requestCandidates({...input,executeTool:async call=>{received=call;return {ok:true,products:[{product_id:'p1',title:'星图'}]};}});
  assert.equal(result.ok,true);assert.equal(result.synthetic,true);assert.equal(result.model_calls,2);
- assert.deepEqual(received,{name:'search_context',arguments:{keyword:'星图'},id:'call_1'});
+ assert.deepEqual(received,{name:'search_context',arguments:{keyword:'星图'},id:'call_1',model_round:1});
  assert.deepEqual(bodies[0].tools,tools);assert.equal(bodies[0].tool_choice,'auto');
  const assistant=bodies[1].messages.at(-2),tool=bodies[1].messages.at(-1);
  assert.equal(assistant.role,'assistant');assert.equal(assistant.content,null);assert.equal(tool.role,'tool');assert.equal(tool.tool_call_id,'call_1');assert.equal(JSON.parse(tool.content).products[0].product_id,'p1');
