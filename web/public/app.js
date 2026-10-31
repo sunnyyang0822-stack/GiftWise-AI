@@ -14,6 +14,7 @@ import { createResultViews } from "./js/results-view.js";
 import { setupChat, ensureChat, newChatState, renderChat, chatProblems, chatProgress, reopen, codePoints } from "./js/chat.js";
 import { parseTimeoutMs, composeAdditionalContext, parseEnabled } from "./js/parse-intake.js";
 import { friendlyMessages } from "./js/friendly.js";
+import { exclusionConfirmation } from "./js/exclusion-flow.js";
 
 const el = (tag, props = {}, children = []) => {
   const node = document.createElement(tag);
@@ -126,6 +127,13 @@ const STEP_TITLES = ["关系场合预算时间", "兴趣风格", "需要避免�
 function invalidateAnalysis() {
   state.analysis = null;
   state.confirmedIds = [];
+  if (state.chat) {
+    state.chat.analysisToken++;
+    state.chat.analyzing = false;
+    state.chat.exclusionAnalysisKey = null;
+    state.chat.exclusionTurns = [];
+    state.chat.pendingExclusionContinuation = null;
+  }
 }
 function cancelPending() {
   state.requestVersion++;
@@ -367,7 +375,7 @@ export function buildIntake() {
     budget_mode: f.budget_mode,
     budget_range: { min: f.budget_min, max: f.budget_max },
     currency: "CNY",
-    deadline_days: Number(f.deadline_days),
+    ...(f.deadline_days !== "" && f.deadline_days != null ? { deadline_days: Number(f.deadline_days) } : {}),
     interests: f.interests_unknown ? [] : [...f.interests],
     interest_confidence: f.interests_unknown ? {} : { ...f.interest_confidence },
     gift_styles: f.styles_unknown ? [] : [...f.gift_styles],
@@ -387,8 +395,8 @@ export function buildIntake() {
   return intake;
 }
 
-async function analyzeDislikes(intake) {
-  const response = await apiFetch("/api/exclusions/analyze", { intake });
+async function analyzeDislikes(intake, continuation) {
+  const response = await apiFetch("/api/exclusions/analyze", { intake, ...(continuation ? { continuation } : {}) });
   return response.data || { status: "error", errors: [{code:"BAD_RESPONSE",message:"识别暂未完成，请重试。"}] };
 }
 
@@ -526,9 +534,10 @@ async function submitIntake() {
     backToQuestion("avoid", "需要避免的、以前送过的礼物和补充说明，每项最多 1000 字。");
     return;
   }
-  // 填写了“需要避免的”：必须先经 /api/exclusions/analyze 识别并在对话里逐条确认，没有默认全选。
-  if (intake.dislikes && (!state.analysis || state.analysis.status !== "needs_confirmation" || state.confirmedIds.length !== state.analysis.candidates.length)) {
-    backToQuestion("avoid_confirm", "请先逐条确认我理解到的限制。");
+  // 语义限制采用服务端 ready 引用；具体禁品仍须确认，待澄清状态不能提交推荐。
+  const confirmation = exclusionConfirmation(state.analysis, state.confirmedIds);
+  if (intake.dislikes && !confirmation) {
+    backToQuestion("avoid_confirm", "我们先把这条要求聊清楚。");
     return;
   }
   state.busy = true;
@@ -545,7 +554,7 @@ async function submitIntake() {
       return;
     }
     const payload = { intake, demo: state.demo || null };
-    if (intake.dislikes) payload.exclusion_confirmation = { analysis_id: state.analysis.analysis_id, confirmed_ids: [...state.confirmedIds] };
+    if (intake.dislikes) payload.exclusion_confirmation = confirmation;
     const response = await apiFetch("/api/recommendations", payload);
     if (version !== state.requestVersion) return;
     state.busy = false;
@@ -761,7 +770,7 @@ function selectLast() {
   return submitIntake();
 }
 
-setupChat({ state, el, render: () => render(), submit: () => submitIntake(), analyze: intake => analyzeDislikes(intake), buildIntake, invalidateAnalysis, restart: () => restartChat(), parseText: utterance => parseIntakeText(utterance) });
+setupChat({ state, el, render: () => render(), submit: () => submitIntake(), analyze: (intake, continuation) => analyzeDislikes(intake, continuation), buildIntake, invalidateAnalysis, restart: () => restartChat(), parseText: utterance => parseIntakeText(utterance) });
 
 /**
  * 真实 /api/config → 前端运行时配置的最小归一化。
