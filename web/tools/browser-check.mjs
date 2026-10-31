@@ -350,14 +350,11 @@ async function fillStep1(page, { realKeys = false } = {}) {
   await page.click("chip", "追求对象");
   await page.click("chip", "了解不多");
   await page.click("chip", "生日");
-  await page.click("chip", "100–200 元");
-  if (realKeys) await page.typeKeys('input[aria-label="预算上限金额"]', "180.00");
-  else await page.setInput('input[aria-label="预算上限金额"]', "180.00");
-  await page.tickConfirm("全量上限");
-  await page.click("chip", "3–7 天");
-  if (realKeys) await page.typeKeys('input[aria-label="可用准备天数"]', "5");
-  else await page.setInput('input[aria-label="可用准备天数"]', "5");
-  await page.tickConfirm("完整准备时间");
+  await page.click("chip", "选择预算区间");
+  await page.setInput('#budget-min', "100");
+  await page.setInput('#budget-max', "300");
+  await page.tickConfirm("确认当前礼物预算区间");
+  await page.click("chip", "3–5天");
 }
 
 async function fillStep2(page) {
@@ -370,7 +367,7 @@ async function fillStep2(page) {
 
 async function fillStep3(page) {
   await page.click("chip", "酒类");
-  await page.setInput('input[aria-label="明确禁忌的字面词"]', "酒、香水");
+  await page.setInput('textarea[aria-label="不喜欢的东西"]', "");
   await page.setInput('textarea[aria-label="补充说明"]', "完全虚构的演示请求：希望表达生日祝福，不制造关系压力。");
 }
 
@@ -481,10 +478,8 @@ async function main() {
     await page.screenshot(`04-step3-${tag}`);
 
     await fillStep3(page);
-    await page.setInput('input[aria-label="待澄清的禁忌"]', "不要看起来像在暗示关系");
-    const clarify = await page.eval("return document.body.textContent.includes('INTAKE_CLARIFICATION_REQUIRED')");
-    check(`[${tag}] 待澄清禁忌在提交前就说明`, clarify);
-    await page.setInput('input[aria-label="待澄清的禁忌"]', "");
+    const clarify = await page.eval("return document.body.textContent.includes('不喜欢的东西') && document.body.textContent.includes('确认')");
+    check(`[${tag}] 不喜欢内容先识别并由用户确认`, clarify);
 
     await page.click("button", "生成三个方案");
     await page.waitFor("return document.body.textContent.includes('推荐结果')", { label: "推荐结果", timeout: 30000 });
@@ -496,7 +491,7 @@ async function main() {
       const has = (kw) => nodes.filter((n) => (n.textContent || '').includes(kw)).length;
       return {
         check: has('独立检查结果'),
-        cost: has('全量估算费用'),
+        cost: has('礼物估价'),
         days: has('准备时间'),
         reason: has('理由'),
         unknown: has('仍未知'),
@@ -535,21 +530,20 @@ async function main() {
     await page.clickId("cta-start");
     await page.click("chip", "追求对象");
     await page.click("chip", "生日");
-    await page.click("chip", "100–200 元");
-    await page.typeKeys('input[aria-label="预算上限金额"]', "180.00");
+    await page.click("chip", "选择预算区间");
+    await page.setInput('#budget-max', "300");
     const budget = await page.eval(`
-      const el = document.querySelector('input[aria-label="预算上限金额"]');
+      const el = document.querySelector('#budget-max');
       return { value: el ? el.value : null, focused: !!el && document.activeElement === el, caret: el ? el.selectionStart : null };
     `);
-    check("真实逐字输入预算后内容完整（180.00）", budget.value === "180.00", `value=${budget.value} focused=${budget.focused} caret=${budget.caret}`);
-    check("真实逐字输入预算后焦点仍在该输入框", budget.focused === true, JSON.stringify(budget));
-    await page.click("chip", "3–7 天");
-    await page.typeKeys('input[aria-label="可用准备天数"]', "5");
+    check("键盘预算上限控件值可读（300）", budget.value === "300", `value=${budget.value} focused=${budget.focused}`);
+    check("预算上限控件可聚焦", budget.focused === true, JSON.stringify(budget));
+    await page.click("chip", "3–5天");
     const days = await page.eval(`
-      const el = document.querySelector('input[aria-label="可用准备天数"]');
-      return { value: el ? el.value : null, focused: !!el && document.activeElement === el };
+      const el = [...document.querySelectorAll('label.chip')].find(n => n.textContent.includes('3–5天'));
+      return { value: el ? el.textContent.trim() : null, selected: !!el?.querySelector('input:checked') };
     `);
-    check("真实逐字输入天数后值正确且焦点保留", days.value === "5" && days.focused === true, JSON.stringify(days));
+    check("三至五天选项可选择", days.selected === true, JSON.stringify(days));
     await page.screenshot("07-real-keyboard-input", { fullPage: false });
     await close(client, targetId);
   }

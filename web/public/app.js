@@ -50,8 +50,10 @@ const state = {
   pending: null,
   form: {
     recipient_relation: null,
+    recipient_relation_other: "",
     closeness: null,
     occasion: null,
+    occasion_other: "",
     budget_mode: "slider",
     budget_min: "100",
     budget_max: "300",
@@ -192,13 +194,29 @@ function renderStep1() {
       el(
         "div",
         { class: "chips" },
-        cfg.labels.relations.map((item) =>
+      cfg.labels.relations.map((item) =>
           chip(item.zh, f.recipient_relation === item.id, () => {
             f.recipient_relation = f.recipient_relation === item.id ? null : item.id;
+            if (f.recipient_relation !== "other") f.recipient_relation_other = "";
             render();
           }, { class: "chip--radio" }),
         ),
       ),
+      f.recipient_relation === "other"
+        ? el("label", { class: "text-field", for: "recipient-relation-other" }, [
+            el("span", { text: "请填写你与对方的关系（必填）" }),
+            el("input", {
+              id: "recipient-relation-other",
+              type: "text",
+              value: f.recipient_relation_other,
+              placeholder: "例如：社团伙伴",
+              "aria-label": "其他关系",
+              "data-field": "recipient_relation_other",
+              required: true,
+              oninput: (event) => { f.recipient_relation_other = event.target.value; render(); },
+            }),
+          ])
+        : null,
       f.recipient_relation === "pursuit" && !cfg.pursuit_contract_ready
         ? el("p", { class: "field__error", text: cfg.pursuit_notice })
         : null,
@@ -231,10 +249,26 @@ function renderStep1() {
         cfg.labels.occasions.map((item) =>
           chip(item.zh, f.occasion === item.id, () => {
             f.occasion = f.occasion === item.id ? null : item.id;
+            if (f.occasion !== "other") f.occasion_other = "";
             render();
           }, { class: "chip--radio", type: "radio" }),
         ),
       ),
+      f.occasion === "other"
+        ? el("label", { class: "text-field", for: "occasion-other" }, [
+            el("span", { text: "请填写具体送礼场合（必填）" }),
+            el("input", {
+              id: "occasion-other",
+              type: "text",
+              value: f.occasion_other,
+              placeholder: "例如：搬家庆祝",
+              "aria-label": "其他送礼场合",
+              "data-field": "occasion_other",
+              required: true,
+              oninput: (event) => { f.occasion_other = event.target.value; render(); },
+            }),
+          ])
+        : null,
     ]),
   );
 
@@ -289,7 +323,9 @@ function budgetProblems() {
 function validateStep1() {
   const f = state.form, errors = budgetProblems();
   if (!f.recipient_relation) errors.unshift({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择送礼对象的关系。"});
+  if (f.recipient_relation === "other" && !f.recipient_relation_other.trim()) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请填写你与对方的关系。"});
   if (!f.occasion) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择送礼场合。"});
+  if (f.occasion === "other" && !f.occasion_other.trim()) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请填写具体送礼场合。"});
   const options = deadlineOptions();
   if (!options) errors.push({code:"CONFIG_VERSION_UNSUPPORTED",message:"准备时间配置尚未更新为六档，请稍后重试。"});
   else if (!options.some(r => String(r.days) === f.deadline_days)) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请选择可用准备时间。"});
@@ -998,6 +1034,8 @@ function buildIntake() {
     hard_exclusions: { tags: [...f.exclusion_tags], terms: [], unresolved: [] },
     additional_context: f.additional_context || "",
   };
+  if (f.recipient_relation === "other") intake.recipient_relation_other = f.recipient_relation_other.trim();
+  if (f.occasion === "other") intake.occasion_other = f.occasion_other.trim();
   if (f.closeness) intake.closeness = f.closeness;
   return intake;
 }
