@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { runRecommendation } from '../server/pipeline.mjs';
 import { reset } from '../server/store.mjs';
-import { freezeEvidence } from '../server/retrieval/evidence.mjs';
+import { freezeEvidence,bindOptionalCandidateEvidence } from '../server/retrieval/evidence.mjs';
 
 const base=JSON.parse(readFileSync(new URL('../../workflow/examples/intake.json',import.meta.url),'utf8'));
 const intake=()=>({...structuredClone(base),budget_amount:'800',deadline_days:null,interests:[],interest_confidence:{},hard_exclusions:{tags:[],terms:[],unresolved:[]}});
@@ -46,4 +46,11 @@ test('模型明确选择同规格商品后，验证来源图以唯一槽位与�
  const items=candidates();items[0].name=product.name+' · '+product.variant;
  const out=await runRecommendation({intake:intake(),mode:'llm'},services({retrievalWorker:{submit:async()=>({status:'partial',products:[product]})},requestCandidates:async input=>{await input.executeTool({id:'fixture_call',name:'opencli_search',arguments:{purpose:'purchase',keyword:'夹具杯',sources:['jd'],reason:'fixture'}});return result(items,[{candidate_id:'c1',product_id:product.product_id}]);}}));
  assert.equal(out.report.media.candidates.length,1);const slot=out.report.media.candidates[0];assert.equal(slot.product_id,product.product_id);assert.equal(slot.image.id,product.image_id);assert.equal(slot.image.kind,'source_photo');assert.equal(out.report.retrieval.products[0].image_id,slot.image.id);
+});
+test('来源图绑定容许同名分隔符及独立估价，促销观察价不被伪装为普通结算价',()=>{
+ const p={product_id:'observed',name:'官方杯碟套装 双杯双碟礼盒款',variant:'',price_amount:'218',price_conditions:['首单到手价'],price_source:'seed'};
+ const c={id:'c1',name:'官方杯碟套装 · 双杯双碟礼盒款',estimated_total:'258.00'};
+ const bound=bindOptionalCandidateEvidence({products:[p]},[c],[{candidate_id:'c1',product_id:p.product_id}],'500');
+ assert.equal(bound.bindings.size,1);assert.equal(bound.bindings.get('c1').price_amount,'218');assert.equal(bound.bindings.get('c1').price_binding_status,'model_estimate_separate_from_observation');
+ assert.deepEqual(bound.knownOverBudget,[]);assert.equal(bindOptionalCandidateEvidence({products:[p]},[{...c,name:'另一规格单只杯'}],[{candidate_id:'c1',product_id:p.product_id}],'500').bindings.size,0);
 });

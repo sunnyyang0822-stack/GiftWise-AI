@@ -4,6 +4,8 @@ import { lookup } from 'node:dns/promises';
 import { Readable } from 'node:stream';
 import { inflateSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
+import {buildJdDetailReadScript,normalizeJdDetail} from './jd-detail-reader.mjs';
+import {buildAlibabaDetailReadScript} from './alibaba-reader.mjs';
 
 const CDN = ['alicdn.com', '360buyimg.com', 'pddpic.com', 'byteimg.com', 'douyinpic.com', 'kwaicdn.com', 'kwimgs.com', 'vipstatic.com', 'suning.cn', 'mi-img.com', 'youpin.mi-img.com', 'geilicdn.com', 'dangdang.com'];
 const DETAILS = {
@@ -280,7 +282,18 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
     await page.goto(requested.href);
     if (page.wait) await page.wait(2);
     if (signal?.aborted) { observation.status = 'aborted'; return output; }
-    const raw = await page.evaluate(buildDomesticDetailReadScript(platform));
+    let raw;
+    if(platform==='jd'){
+      const observed=await page.evaluate(buildJdDetailReadScript());
+      if(observed.source_url){
+        const normalized=normalizeJdDetail(observed,{product_url:requested.href,external_id:record.external_id});
+        raw={...normalized,page_url:observed.source_url,status:normalized.observation.status,price_text:normalized.observation.price_text,
+          currency_evidence:normalized.currency,price_context_text:normalized.observation.price_context};
+      }else raw=observed; // injected legacy fixture compatibility
+    }else if(['taobao','tmall'].includes(platform)){
+      const observed=await page.evaluate(buildAlibabaDetailReadScript(platform));
+      raw={...observed,page_url:observed.product_url??requested.href};
+    }else raw=await page.evaluate(buildDomesticDetailReadScript(platform));
     const actual = detailUrl(raw.page_url, platform);
     const sameProduct = actual && actual.pathname === requested.pathname && (!DETAILS[platform].id || actual.searchParams.get(DETAILS[platform].id) === requested.searchParams.get(DETAILS[platform].id));
     observation.status = sameProduct ? raw.status : 'detail_product_changed';
@@ -291,6 +304,7 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
       output.title = clean(raw.title) || null;
       output.specifications = clean(raw.specifications) || null;
       output.specifications_basis=raw.specifications_basis??(output.specifications?'selected_option':null);
+      output.secondary_price_text=raw.secondary_price_text??null;
       output.price_text = clean(raw.price_text) || null;
       output.currency = output.price_text && raw.currency_evidence ? 'CNY' : null;
       const price = output.currency ? output.price_text?.replace(/\s+/g,'').match(/^(?:[¥￥]|人民币|CNY)?(\d[\d,]*(?:\.\d+)?)(?:元)?$/) : null;
@@ -309,6 +323,10 @@ export async function enrichDomesticDetail(page, record, { platform, signal, fet
       let imageUrl;
       try { imageUrl = new URL(candidate, requested).href; } catch { imageUrl = candidate; }
       output.image_validation = await validateSourceImage(imageUrl, { fetchImpl, signal,includeBytes:includeImageBytes });
+      if(output.image_validation.ok&&raw.image_natural_width&&raw.image_natural_height&&
+        (raw.image_natural_width!==output.image_validation.width||raw.image_natural_height!==output.image_validation.height)){
+        output.image_validation=fail('IMAGE_DIMENSION_MISMATCH');
+      }
       output.image_provenance = { page_kind: detailImage ? 'detail' : 'search', product_url: requested.href, observed_at: observation.observed_at };
       if (output.image_validation.ok) output.image_url = imageUrl;
     }

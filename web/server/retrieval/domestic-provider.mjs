@@ -92,6 +92,9 @@ export async function runDomesticSearch(plan, {
         limitations: ['本次检索已取消或到达时限，未执行此来源；可继续模型推荐'] }); continue; }
       const inspiration = query.purpose === 'inspiration';
       const useContent = inspiration && Boolean(DOMESTIC_CONTENT_SOURCES[source]);
+      if(query.purpose==='purchase'&&!['jd','taobao','dianping'].includes(source)){
+        coverage.push({source,keyword:query.keyword,status:'PAUSED_BY_PRODUCT_SCOPE',complete:false,pages_completed:0,observed_count:0,limitations:['该电商来源按当前产品范围暂缓']});continue;
+      }
       if (!['purchase','inspiration'].includes(query.purpose) || (query.purpose === 'purchase' && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source]) || (!useContent && source !== 'dianping' && !DOMESTIC_PLATFORMS[source]&&!DOMESTIC_EXTRA_PLATFORMS[source])) {
         coverage.push({ source, keyword: query.keyword, status: 'SOURCE_NOT_ALLOWED', complete: false, pages_completed: 0,
           limitations: ['来源尚未接入或不适用于本次用途'] }); continue;
@@ -156,12 +159,15 @@ export async function runDomesticDetails(records,{
  const products=[],coverage=[];let page,db;
  try{
   if(dbPath)db=openDb(taskDatabasePath(dbPath));
-  page=await pageFactory({port,profileDir,headless,signal});
   for(const record of records){
    if(signal?.aborted)break;
    if(!isDomesticProduct(record))continue;
    const source=record.source_platform;
-   const detail=await enrichDomesticDetail(page,record,{platform:source,signal,fetchImpl:page.fetchImage,includeImageBytes:true});
+   const desiredProfile=source==='taobao'&&process.env.GW_ALIBABA_PROFILE?process.env.GW_ALIBABA_PROFILE:profileDir;
+   if(page&&page.__taskProfile!==desiredProfile){await page.close();page=null;}
+   if(!page){page=await pageFactory({port,profileDir:desiredProfile,headless,signal});page.__taskProfile=desiredProfile;}
+   const detailPlatform=source==='taobao'&&record.source_site==='tmall.com'?'tmall':source;
+   const detail=await enrichDomesticDetail(page,record,{platform:detailPlatform,signal,fetchImpl:page.fetchImage,includeImageBytes:true});
    const validation=detail.image_validation;
    const evidence=asEvidence({...detail,name:detail.title||record.name,variant:detail.specifications||'',capability:record.capability},source);
    if(validation?.bytes&&validation.ok&&evidence.image_id)cacheSourceImage(evidence.image_id,validation);

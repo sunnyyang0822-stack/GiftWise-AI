@@ -33,8 +33,8 @@ export function verifyCandidateEvidence(evidence,candidates,references,budget){
 
 /** Optional references enrich individual suggestions; missing/stale references never reject a batch. */
 export function bindOptionalCandidateEvidence(evidence, candidates, references, budget) {
- const bindings=new Map(), rejected=[];
- if(!Array.isArray(references))return {bindings,rejected};
+ const bindings=new Map(), rejected=[],knownOverBudget=[];
+ if(!Array.isArray(references))return {bindings,rejected,knownOverBudget};
  const seen=new Set();
  for(const reference of references){
   try{
@@ -44,13 +44,16 @@ export function bindOptionalCandidateEvidence(evidence, candidates, references, 
    const product=evidence.products?.find(p=>p.product_id===reference.product_id);
    if(!product)throw new Error('UNKNOWN_PRODUCT');
    if(product.price_source==='browser_observed'&&!isDomesticProduct({...product,source_site:product.source_site??new URL(product.source_url).hostname,product_url:product.source_url}))throw new Error('FOREIGN_PURCHASE_SOURCE');
-   const exactName=candidate.name===product.name+' · '+product.variant||(candidate.name===product.name&&(!product.variant||product.name.includes(product.variant)));
-   if(!exactName)throw new Error('PRODUCT_SPEC_MISMATCH');
-   if(product.price_amount!==null&&cents(candidate.estimated_total)!==cents(product.price_amount))throw new Error('PRICE_EVIDENCE_MISMATCH');
+   const identityText=s=>String(s??'').normalize('NFKC').replace(/[\p{P}\p{Z}\s]+/gu,'').toLowerCase();
+   const exactName=identityText(candidate.name)===identityText(product.name+' '+product.variant)||identityText(candidate.name)===identityText(product.name);
+   const specCompatible=!product.variant||identityText(candidate.name+' '+candidate.description).includes(identityText(product.variant));
+   if(!exactName&&!specCompatible)throw new Error('PRODUCT_SPEC_MISMATCH');
    if(product.price_source==='browser_observed'&&(!Number.isFinite(Date.parse(product.observed_at))||Date.now()-Date.parse(product.observed_at)>600000))throw new Error('EVIDENCE_STALE');
    // This binds an observed item/photo, not a claim that conditional prices are universally available.
-   bindings.set(candidate.id,product);seen.add(product.product_id);
+   const priceEqual=product.price_amount!==null&&cents(candidate.estimated_total)===cents(product.price_amount);
+   if(product.price_amount!==null&&!(product.price_conditions??[]).length&&cents(product.price_amount)>cents(budget))knownOverBudget.push(candidate.id);
+   bindings.set(candidate.id,{...product,price_binding_status:priceEqual?'observed_amount_used':'model_estimate_separate_from_observation'});seen.add(product.product_id);
   }catch(error){rejected.push({candidate_id:reference?.candidate_id??null,code:error.message});}
  }
- return {bindings,rejected};
+ return {bindings,rejected,knownOverBudget};
 }

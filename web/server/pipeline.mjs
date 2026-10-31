@@ -375,6 +375,7 @@ async function runRecommendationCore(input, services = {}) {
   let evidenceBindings = new Map();
   const optionalEvidence=bindOptionalCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates??[],productReferences,request.budget_amount);
   evidenceBindings=optionalEvidence.bindings;
+  for(const id of optionalEvidence.knownOverBudget){const result=validation.candidate_results.find(r=>r.id===id);if(result){result.passed=false;pushError(result.errors,'OVER_BUDGET',id+'.estimated_total','所选商品的无附加条件观察价超过预算上限');}}
 
   /* ---- 追加规则 1：独特性启发式（warning 级，绝不硬错）------------------- */
   const candidateList = (parseJsonOrNull(candidatesJson) || {}).candidates || [];
@@ -568,7 +569,7 @@ async function runRecommendationCore(input, services = {}) {
     nl_parse: nlParse,
   });
   run.retrieval = retrieval;
-  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],rejected_references:optionalEvidence.rejected};
+  run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,rejected_references:optionalEvidence.rejected};
   run.product_bindings = evidenceBindings;
   /* 库内真实商品的绑定与媒体：候选图走「来源展示」通道（真实商品图 URL），
      包装图才走「生成」通道；两条通道不交叉（设计说明「两条通道不越界」）。 */

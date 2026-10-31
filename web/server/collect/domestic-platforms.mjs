@@ -143,7 +143,11 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
         report.native_capability='opencli jd/search';report.native_returned=native.length;report.native_limit=30;
       }else await page.goto(url);
       if (page.wait) await page.wait(Math.min(10000, Math.max(0, Number(waitMs) || 0)) / 1000);
-      const result = await page.evaluate(buildDomesticReadScript(id));
+      let result = await page.evaluate(buildDomesticReadScript(id));
+      if(['taobao','tmall','1688'].includes(id)&&packageRoot){
+        const {readAlibabaSearch}=await import('./alibaba-reader.mjs');
+        result={...result,...await readAlibabaSearch(page,{platform:id,keyword})};
+      }
       const entry = { page: n, requested_url: url, observed_at: new Date().toISOString(), ...result };
       delete entry.records;
       report.pages.push(entry);
@@ -153,7 +157,7 @@ export async function runDomesticSearch(page, { platform: id, keyword, city, pag
       report.pages_completed++;
       const previousCount = report.records.length;
       for (const raw of result.records || []) {
-        const record = platform.normalize({...raw,native_record:nativeRecords.find(r=>r.sku===raw.sku)??null}, { keyword, city, page: n, scrapedAt: entry.observed_at });
+        const record = raw.record_kind==='product'&&raw.source_site?raw:platform.normalize({...raw,native_record:nativeRecords.find(r=>r.sku===raw.sku)??null}, { keyword, city, page: n, scrapedAt: entry.observed_at });
         if (record && !seen.has(record.product_url)) { seen.add(record.product_url); report.records.push(record); }
       }
       if(report.records.length===previousCount&&n===1){report.status='no_valid_product_urls';report.limitations.push('页面条目没有通过商品直链校验，不计为已接通搜索');break;}
