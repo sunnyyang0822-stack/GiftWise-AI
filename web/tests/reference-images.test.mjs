@@ -53,3 +53,15 @@ test('图片补搜使用实际assistant/tool协议，最终只采引用、不接
  const result=await provider.requestReferenceImages({requestJson:'{}',candidates,references:[],missingCandidateIds:candidates.map(c=>c.id),tools:session.tools,executeTool:session.executeTool});
  assert.equal(result.ok,true);assert.equal(result.model_calls,2);assert.deepEqual(result.reference_references,citations());assert.equal('candidates'in result,false);assert.equal(messages[1].messages.at(-1).role,'tool');assert.equal(JSON.parse(messages[1].messages.at(-1).content).references.length,3);
 });
+
+test('补图遇明确受限后不再访问同源，其他非电商来源仍可尝试',async()=>{
+ const run=makeRun();let restrictedRequests=0,otherRequests=0;
+ const session=createOpencliToolSession({search:async plan=>{
+  const source=plan.queries[0].sources[0];if(source==='pixiv'){restrictedRequests++;return{status:'unavailable',references:[],coverage:[{source,status:'restricted',complete:false,observed_count:0}]};}
+  otherRequests++;return{status:'unavailable',references:[],coverage:[{source,status:'empty',complete:false}]};
+ }});
+ const job=startReferenceImages(run,{session,requestJson:'{}',requestImages:async input=>{
+  for(let i=0;i<2;i++)await input.executeTool({name:'opencli_search',arguments:{purpose:'inspiration',keyword:'离线插画',sources:['pixiv']}});
+  await input.executeTool(searchCall);return{ok:true,reference_references:[]};
+ }});await job.promise;assert.equal(restrictedRequests,1);assert.equal(otherRequests,1);assert.ok(run.reference_image_slots.every(s=>s.status==='unavailable'));assert.deepEqual(run.selectable_candidate_ids,['c1','c2','c3']);
+});
