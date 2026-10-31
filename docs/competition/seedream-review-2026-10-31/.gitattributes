@@ -1,0 +1,3 @@
+request.json -text whitespace=cr-at-eol
+result.json -text whitespace=cr-at-eol
+packaging-scene-1.jpg -text

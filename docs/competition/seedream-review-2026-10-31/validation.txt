@@ -1,0 +1,11 @@
+Seedream 复制件离线检查 2026-10-31T06:58:09.157Z
+PASS 请求模型与返回模型分别记录
+PASS 纯文字请求无参考图字段
+PASS JSON 仅含审阅过的字段，无密钥/认证字段
+PASS 单次耗时/usage 原记录一致
+PASS request.json 字节数及SHA256匹配
+PASS result.json 字节数及SHA256匹配
+PASS packaging-scene-1.jpg 字节数及SHA256匹配
+PASS JPEG 图片头实际尺寸2304×1728
+PASS 原记录图像哈希与尺寸匹配
+边界：这些检查不证明视觉通过、参考图/SKU保持、产品接线、独立QA、部署、全站性能或费用。

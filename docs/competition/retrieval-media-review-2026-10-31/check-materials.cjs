@@ -9,10 +9,10 @@ const git=(...a)=>cp.execFileSync('git',a,{encoding:'utf8'}).trim();
 let out=['文档检查 '+new Date().toISOString(),'base='+base,'command=node '+prefix+'check-materials.cjs'];let errors=[];
 function check(name,ok){out.push((ok?'PASS ':'FAIL ')+name);if(!ok)errors.push(name)}
 let changed=[...new Set([...git('diff','--name-only','-z',base).split('\0'),...git('ls-files','--others','--exclude-standard','-z').split('\0')].filter(Boolean))];
-check('仅九份活动材料及新增本轮检查/来源记录',changed.every(f=>docs.includes(f)||f.startsWith(prefix)));
+check('仅九份活动材料及新增本轮检查/来源记录',changed.every(f=>docs.includes(f)||f.startsWith(prefix)||f.startsWith('docs/competition/seedream-review-2026-10-31/')));
 check('无代码、共享架构源、历史证据或 PPT 二进制变更',!git('diff','--name-only',base,'--','web','validator','workflow','research','deploy','tests','docs/architecture.md','docs/architecture','*.pptx','docs/competition/page-alignment-2026-10-31','docs/competition/status-review-2026-10-31','docs/test-reports'));
 let links=0,missing=[];
-for(const f of docs){let s=read(f).replace(/```[\s\S]*?```/g,'');for(const m of s.matchAll(/\[[^\]\n]*\]\(([^)\n]+)\)/g)){let t=m[1];if(/^(https?:|#|mailto:)/.test(t))continue;let file=t.split('#')[0];links++;if(!fs.existsSync(path.resolve(root,path.dirname(f),decodeURIComponent(file))))missing.push(f+' -> '+file)}}
+for(const f of [...docs,'docs/competition/seedream-review-2026-10-31/README.md']){let s=read(f).replace(/```[\s\S]*?```/g,'');for(const m of s.matchAll(/\[[^\]\n]*\]\(([^)\n]+)\)/g)){let t=m[1];if(/^(https?:|#|mailto:)/.test(t))continue;let file=t.split('#')[0];links++;if(!fs.existsSync(path.resolve(root,path.dirname(f),decodeURIComponent(file))))missing.push(f+' -> '+file)}}
 check('文档相对链接文件目标存在（'+links+' 个；不验证远端链接或所有锚点）',missing.length===0);out.push(...missing);
 let speech=read(docs[3]),baseSpeech=cp.execFileSync('git',['show',base+':'+docs[3]],{encoding:'utf8'}).replace(/\r\n/g,'\n');
 let headings=speech.match(/^## S\d+｜.*$/gm)||[];check('S1–S11 页标题/页序/五分钟计划时间与 release 完全一致',headings.length===11&&JSON.stringify(headings)===JSON.stringify(baseSpeech.match(/^## S\d+｜.*$/gm)));
@@ -24,4 +24,4 @@ check('QA 与后台固定提交均已区分',e.includes('902cbd4071d49a1acacce58
 check('本轮截图 SC11–SC13 均为待采集', ['SC11','SC12','SC13','本轮未采集'].every(t=>read(docs[2]).includes(t)));
 try{cp.execFileSync('git',['diff','--check',base],{encoding:'utf8',stdio:'pipe'});check('git diff --check',true)}catch(e){check('git diff --check',false);out.push(e.stdout?.toString()||'')}
 out.push('范围：文档结构与来源核对；未验证产品功能、渲染、真人时长、真实商品/模型/图像或部署。');
-const result=out.join('\n')+'\n';fs.writeFileSync(path.join(root,prefix,'validation.txt'),result);process.stdout.write(result);if(errors.length)process.exitCode=1;
+const result=out.join('\n')+'\n';fs.writeFileSync(path.join(root,'docs/competition/seedream-review-2026-10-31/material-validation.txt'),result);process.stdout.write(result);if(errors.length)process.exitCode=1;
