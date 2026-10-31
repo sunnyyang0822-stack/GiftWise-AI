@@ -130,11 +130,12 @@ function boundToolResult(result, maxChars = 256000) {
     // JSON object breadth/depth are bounded above; at the minimum preserve only
     // the standard evidence collections and status instead of losing all results.
     if (itemLimit === 1 && textLimit === 64) {
-      bounded = Object.fromEntries(['status','products','contents','images','coverage','warnings','recommendations_available','tool_result_meta'].filter(k=>k in bounded).map(k=>[k,bounded[k]]));
+      bounded = Object.fromEntries(['status','source_availability','products','contents','images','references','coverage','warnings','recommendations_available','tool_result_meta'].filter(k=>k in bounded).map(k=>[k,bounded[k]]));
       if (JSON.stringify(bounded).length <= maxChars) return bounded;
       const shallow = value => value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).slice(0,32).filter(([,v])=>v === null || ['string','number','boolean'].includes(typeof v)).map(([k,v])=>[k.slice(0,128),typeof v === 'string' ? v.slice(0,256) : v])) : typeof value === 'string' ? value.slice(0,256) : value;
       const minimal = {status:typeof result.status === 'string' ? result.status.slice(0,64) : null,tool_result_meta:bounded.tool_result_meta};
-      for (const key of ['products','contents','images','coverage','warnings']) if (Array.isArray(result[key])) {minimal[key]=result[key].slice(0,1).map(shallow); minimal.tool_result_meta.collections[key]={total:result[key].length,returned:minimal[key].length};}
+      for (const key of ['source_availability','products','contents','images','references','coverage','warnings']) if (Array.isArray(result[key])) {minimal[key]=result[key].slice(0,1).map(shallow); minimal.tool_result_meta.collections[key]={total:result[key].length,returned:minimal[key].length};}
+      if (result.source_availability && !Array.isArray(result.source_availability)) minimal.source_availability=shallow(result.source_availability);
       minimal.tool_result_meta.nested_fields_omitted=true;
       return minimal;
     }
@@ -232,7 +233,13 @@ export class LlmProvider {
     }
     const envelope = buildRecommendEnvelope({requestJson,intakeJson,retrieval:retrieval && retrieval.status !== 'unavailable' ? retrieval : null,library,inputParse});
     const messages = buildRecommendMessages(envelope);
-    if(registered.size)messages[0].content+='\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部信息时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。采用具体商品时可在最终JSON根对象另附product_references:[{candidate_id,product_id}]，只引用本次结果；对应name写为商品name + " · " + variant，观察价及条件原样尊重，不把新人/首单价当普通结算价。未采用商品的候选无需引用；该sidecar由服务端剥离，不进入严格候选对象。';
+    if (registered.size) messages[0].content += [
+      '\n\n工具模式：是否调用工具由你结合完整上下文自主决定，不需要外部信息时直接推荐。工具结果回来后继续理解与比较，再输出最终候选，不铺原始列表。',
+      '每次工具结果的source_availability及来源状态是真实执行反馈。某站已风控、要求登录、受限或不可用时，不在同一站反复循环重试；结合上下文选择工具允许的其他可用来源、公开参考资料，或直接形成建议。检索无数据不阻止最终推荐，不要求用户补非必要信息。',
+      '公开资料、参考价和参考图按工具返回的reference_kind及相关标记保留其性质，不能称为实时成交价、当前库存、可售SKU或商品实拍。参考资料缺字段时说明未知，不补造价格、规格、库存或来源；来源覆盖有限时简短说明即可。内容图片仅作灵感，不冒充所推荐商品的实际照片。',
+      '采用本次结果中的具体商品时可在最终JSON根对象另附product_references:[{candidate_id,product_id}]，只引用工具结果中明确给出的product_id；对应name写为商品name + " · " + variant，规格及数量一致，观察价及条件原样尊重，不把新人/首单价当普通结算价。来源若标记为参考资料，引用不改变其参考性质。',
+      '只有公开内容、参考图而没有product_id时无需商品引用，不把内容source_id、图片ID或链接冒充product_id。不新增reference_references。未采用商品的候选无需引用；product_references由服务端剥离，不进入严格候选对象。先完成理解与比较，再给最终建议及可选引用。',
+    ].join('\n');
     const toolAudit = [];
     const cfg = this.config();
     const redact = (value, depth = 0) => {

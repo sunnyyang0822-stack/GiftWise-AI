@@ -60,3 +60,31 @@ test('large results preserve bounded evidence, collection totals and truncation 
  assert.equal(data.tool_result_meta.truncated,true);assert.equal(data.tool_result_meta.collections.products.total,400);assert.equal(data.tool_result_meta.collections.products.returned,data.products.length);
  assert.ok(!tool.content.includes('TOOL_RESULT_TOO_LARGE'));assert.equal(result.tool_audit[0].result.tool_result_meta.truncated,true);
 });
+
+
+test('risk-control status and public references reach model before it chooses an alternative and final advice',async()=>{
+ const search=(source,id,purpose='purchase')=>({choices:[{finish_reason:'tool_calls',message:{role:'assistant',content:null,tool_calls:[{id,type:'function',function:{name:'opencli_search',arguments:JSON.stringify({purpose,keyword:'单只咖啡杯',sources:[source]})}}]}}]});
+ const {provider,messages}=synthetic([search('jd','jd_1'),search('bing','public_1','reference'),final([{...candidates[0],name:'公开杯具资料 · 单只',estimated_total:'49',description:'参考价；当前库存未知'},...candidates.slice(1)],[{candidate_id:'A',product_id:'public-note-1'}])]);
+ const selected=[];
+ const reference={product_id:'public-note-1',name:'公开杯具资料',variant:'单只',source_site:'bing',reference_kind:'public_reference',price_amount:'49',price_kind:'reference_price',image_url:'https://example.test/reference.jpg',image_kind:'reference_image',title:'单只杯具公开资料'};
+ const result=await provider.requestCandidates({...base,executeTool:async call=>{
+  selected.push(call.arguments.sources[0]);
+  if(call.arguments.sources[0]==='jd')return {status:'partial',source_availability:[{source:'jd',status:'risk_control',retryable:false,reference_available:true}],products:[],contents:[],images:[],recommendations_available:true};
+  return {status:'partial',source_availability:[{source:'bing',status:'public_reference_available',retryable:false}],products:[reference],contents:[],images:[{url:reference.image_url,image_kind:'reference_image'}],recommendations_available:true};
+ }});
+ assert.equal(result.ok,true);assert.deepEqual(selected,['jd','bing']);assert.equal(result.model_calls,3);
+ const firstTool=JSON.parse(messages[1].messages.at(-1).content);
+ assert.deepEqual(firstTool.source_availability,[{source:'jd',status:'risk_control',retryable:false,reference_available:true}]);assert.deepEqual(firstTool.products,[]);
+ const publicTool=JSON.parse(messages[2].messages.at(-1).content);assert.equal(publicTool.source_availability[0].status,'public_reference_available');assert.deepEqual(publicTool.products,[reference]);assert.equal(publicTool.images[0].image_kind,'reference_image');
+ assert.deepEqual(JSON.parse(result.outputs.product_references_json),[{candidate_id:'A',product_id:'public-note-1'}]);assert.equal(JSON.parse(result.outputs.candidates_json).candidates.length,3);assert.ok(!('product_references' in JSON.parse(result.outputs.candidates_json)));
+ assert.ok(messages[0].messages[0].content.includes('不在同一站反复循环重试'));assert.ok(messages[0].messages[0].content.includes('不能称为实时成交价'));
+ for(const call of messages)assert.ok(JSON.stringify(call.messages).includes(exclusion.clarifications[0].answer));
+});
+test('bounded public-reference results retain source availability and reference-kind metadata',async()=>{
+ const {provider,messages}=synthetic([toolCall(),final()]);
+ const result=await provider.requestCandidates({...base,executeTool:async()=>({status:'partial',source_availability:[{source:'jd',status:'risk_control',retryable:false}],contents:[],products:Array.from({length:300},(_,i)=>({product_id:'reference-'+i,reference_kind:'public_reference',price_kind:'reference_price',image_kind:'reference_image',title:'公开杯具资料',text:'公开资料'.repeat(2000)})),images:[],recommendations_available:true})});
+ assert.equal(result.ok,true);
+ const feedback=JSON.parse(messages[1].messages.at(-1).content);
+ assert.equal(feedback.source_availability[0].status,'risk_control');assert.equal(feedback.products[0].reference_kind,'public_reference');assert.equal(feedback.products[0].price_kind,'reference_price');assert.equal(feedback.products[0].image_kind,'reference_image');
+ assert.equal(feedback.tool_result_meta.collections.products.total,300);assert.equal(feedback.tool_result_meta.truncated,true);
+});
