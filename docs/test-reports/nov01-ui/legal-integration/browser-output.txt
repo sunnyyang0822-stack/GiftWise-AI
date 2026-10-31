@@ -1,0 +1,100 @@
+PASS /privacy.html HTTP 200
+PASS /terms.html HTTP 200
+PASS /legal.css HTTP 200
+PASS privacy 1440 UTF8
+PASS privacy 1440 noOverflow
+PASS privacy 1440 noReplacement
+PASS privacy 1440 mail
+PASS privacy 1440 operator
+PASS privacy 1440 anchors
+PASS privacy 1440 mutualLink
+PASS privacy 1440 home
+PASS privacy 1440 noExternal
+PASS privacy 1440 anchor click
+PASS privacy 1440 keyboard skip link
+PASS privacy 1440 skip target
+PASS terms 1440 UTF8
+PASS terms 1440 noOverflow
+PASS terms 1440 noReplacement
+PASS terms 1440 mail
+PASS terms 1440 operator
+PASS terms 1440 anchors
+PASS terms 1440 mutualLink
+PASS terms 1440 home
+PASS terms 1440 noExternal
+PASS terms 1440 anchor click
+PASS terms 1440 keyboard skip link
+PASS terms 1440 skip target
+PASS home 1440 footer links
+PASS form 1440 footer links remain
+PASS form 1440 step2
+PASS form 1440 multiple interests per row
+PASS form 1440 interest no overflow
+PASS form 1440 back retains relation
+PASS form 1440 no budget checkbox
+PASS form 1440 policy opens new page
+PASS privacy 390 UTF8
+PASS privacy 390 noOverflow
+PASS privacy 390 noReplacement
+PASS privacy 390 mail
+PASS privacy 390 operator
+PASS privacy 390 anchors
+PASS privacy 390 mutualLink
+PASS privacy 390 home
+PASS privacy 390 noExternal
+PASS privacy 390 anchor click
+PASS privacy 390 keyboard skip link
+PASS privacy 390 skip target
+PASS terms 390 UTF8
+PASS terms 390 noOverflow
+PASS terms 390 noReplacement
+PASS terms 390 mail
+PASS terms 390 operator
+PASS terms 390 anchors
+PASS terms 390 mutualLink
+PASS terms 390 home
+PASS terms 390 noExternal
+PASS terms 390 anchor click
+PASS terms 390 keyboard skip link
+PASS terms 390 skip target
+PASS home 390 footer links
+PASS form 390 footer links remain
+PASS form 390 step2
+PASS form 390 multiple interests per row
+PASS form 390 interest no overflow
+PASS form 390 back retains relation
+PASS form 390 no budget checkbox
+PASS form 390 policy opens new page
+PASS privacy 320 UTF8
+PASS privacy 320 noOverflow
+PASS privacy 320 noReplacement
+PASS privacy 320 mail
+PASS privacy 320 operator
+PASS privacy 320 anchors
+PASS privacy 320 mutualLink
+PASS privacy 320 home
+PASS privacy 320 noExternal
+PASS privacy 320 anchor click
+PASS privacy 320 keyboard skip link
+PASS privacy 320 skip target
+PASS terms 320 UTF8
+PASS terms 320 noOverflow
+PASS terms 320 noReplacement
+PASS terms 320 mail
+PASS terms 320 operator
+PASS terms 320 anchors
+PASS terms 320 mutualLink
+PASS terms 320 home
+PASS terms 320 noExternal
+PASS terms 320 anchor click
+PASS terms 320 keyboard skip link
+PASS terms 320 skip target
+PASS home 320 footer links
+PASS form 320 footer links remain
+PASS form 320 step2
+PASS form 320 multiple interests per row
+PASS form 320 interest no overflow
+PASS form 320 back retains relation
+PASS form 320 no budget checkbox
+PASS form 320 policy opens new page
+TOTAL 99 PASS 99

@@ -316,7 +316,7 @@ function budgetProblems() {
   else if (min > max) errors.push({code:"INVALID_BUDGET_RANGE",message:"预算下限不能高于上限。"});
   else if (f.budget_mode === "slider" && (max > 100000 || min % 5000 || max % 5000)) errors.push({code:"INVALID_BUDGET_RANGE",message:"滑条区间需在 0–1000 元内，每次调整 50 元。"});
   else if (f.budget_mode === "zero" && (min !== 0 || max !== 0)) errors.push({code:"INVALID_BUDGET_RANGE",message:"不花钱的心意应为 0–0 元。"});
-  if (!f.budget_confirmed) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请调整滑条或明确确认礼物预算区间。"});
+  if (!f.budget_confirmed) errors.push({code:"INTAKE_CLARIFICATION_REQUIRED",message:"请调整滑条或填写礼物预算区间。"});
   return errors;
 }
 function validateStep1() {
@@ -357,7 +357,6 @@ function renderBudget() {
       document.querySelectorAll('[data-budget-value]').forEach(n=>{n.textContent=f[`budget_${n.dataset.budgetValue}`]+" 元"});
       const selected = document.querySelector(".range-dual__selected");
       if (selected) selected.textContent = `${f.budget_min}–${f.budget_max} 元`;
-      const confirm = $("budget-confirm"); if(confirm) confirm.checked = true;
     };
     body.push(
       el("p", {id:"budget-readout",class:"budget-readout",role:"status","aria-live":"polite",text:`预算下限 ${f.budget_min} 元 — 上限 ${f.budget_max} 元`}),
@@ -378,17 +377,12 @@ function renderBudget() {
     body.push(el("div",{class:"budget-custom"},["min","max"].map(which=>el("label",{},[
       el("span",{text:which === "min" ? "预算下限（元）" : "预算上限（元）"}),
       el("input",{type:"text",inputmode:"decimal",value:f[`budget_${which}`],id:`budget-other-${which}`,"aria-label":which === "min" ? "其他金额下限" : "其他金额上限","data-field":`budget_other_${which}`,oninput:e=>{
-        f[`budget_${which}`]=e.target.value;f.budget_confirmed=false;invalidateAnalysis();
-        const c=$("budget-confirm");if(c)c.checked=false;
+        f[`budget_${which}`]=e.target.value;f.budget_confirmed=true;invalidateAnalysis();
       }}),
     ]))),el("p",{class:"field__hint",text:"两端必填，0–10000 元，最多两位小数。"}));
   } else if (f.budget_mode === "zero") {
     body.push(el("p",{class:"field__selected",text:"用已有材料、手写或陪伴，表达不花钱的心意。"}));
   } else body.push(el("p",{class:"field__hint",text:"可以先想一想愿意花多少。不确定时会先请你澄清，不直接生成。"}));
-  if (["slider","other"].includes(f.budget_mode)) body.push(el("label",{class:"confirm-row"},[
-    el("input",{id:"budget-confirm",type:"checkbox",checked:f.budget_confirmed,onchange:e=>{f.budget_confirmed=e.target.checked;invalidateAnalysis();}}),
-    el("span",{text:"我确认当前礼物预算区间（初始显示不代表已经确认）"}),
-  ]));
   return el("section",{class:"card budget-card"},body);
 }
 function renderDeadline() {
@@ -414,12 +408,11 @@ function renderStep2() {
   body.push(
     el("section", { class: "card" }, [
       el("h2", { class: "card__title", text: "对方的兴趣（可跳过）" }),
-      el("p", { class: "field__hint", text: cfg.unknown_interests_hint }),
       el(
         "div",
         { class: "chips" },
         [
-          chip("暂时不知道（互斥）", f.interests_unknown, (checked) => {
+          chip("暂时不知道", f.interests_unknown, (checked) => {
             f.interests_unknown = checked;
             if (checked) {
               f.interests = [];
@@ -429,7 +422,7 @@ function renderStep2() {
           }, { class: "chip--muted" }),
         ],
       ),
-      el("div", { style: "margin-top:10px" },
+      el("div", { class: "interest-grid" },
         cfg.labels.interests.map((item) => {
           const selected = f.interests.includes(item.id);
           const row = el("div", { class: "interest-row" }, [
@@ -485,7 +478,7 @@ function renderStep2() {
         "div",
         { class: "chips" },
         [
-          chip("不确定（互斥）", f.styles_unknown, (checked) => {
+          chip("不确定", f.styles_unknown, (checked) => {
             f.styles_unknown = checked;
             if (checked) f.gift_styles = [];
             render();
@@ -1298,7 +1291,8 @@ function render() {
   })();
   actions.replaceChildren(...[].concat(rendered.actions || []).filter(Boolean));
   actions.hidden = !state.inFlow;
-  document.querySelector(".app-footer").hidden = true;
+  document.querySelector(".app-footer").hidden = false;
+  document.body.classList.toggle("gw-flow-active", state.inFlow);
   restoreFocus(focused);
 
   $("footer-meta").textContent = "";

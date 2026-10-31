@@ -523,6 +523,16 @@ body {
   cursor: not-allowed;
 }
 
+.interest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; align-items: start; }
+.interest-grid .interest-row { margin: 0; padding: 8px 10px; min-width: 0; justify-content: flex-start; }
+.interest-grid .interest-row .chip { width: 100%; }
+.interest-grid .seg { display: flex; flex-wrap: wrap; border-radius: 10px; width: 100%; }
+.interest-grid .seg button { flex: 1 1 70px; padding: 8px 5px; }
+@media (max-width: 599px) {
+  .interest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .interest-grid .interest-row { padding: 4px; gap: 4px; }
+  .interest-grid .interest-row .chip { padding: 4px; gap: 6px; font-size: 12px; white-space: normal; }
+}
 .interest-row {
   display: flex;
   flex-wrap: wrap;
@@ -932,9 +942,10 @@ textarea {
 
 @media (prefers-reduced-motion: no-preference) {
   #view.gw-enter {
-    animation: gw-view-in 320ms var(--gw-motion-ease) both;
+    animation: gw-view-shift 180ms var(--gw-motion-ease) both;
   }
 }
+@keyframes gw-view-shift { from { transform: translateY(6px); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   #view.gw-enter {
     animation: none;
@@ -1153,3 +1164,10 @@ body .gw-band + .gw-band, body .gw-how + .gw-band { border-top: 0; }
 .legal-page__section p { font-size: 16px; line-height: 1.9; color: var(--ink-2); margin: 0; }
 .legal-page__links { display: flex; gap: 24px; margin-top: 40px; }
 .legal-page__links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); text-underline-offset: 5px; }
+
+/* 政策入口在首页与流程页持续提供，流程内打开新页以保留已填输入。 */
+.app-footer { border: 0; padding: 16px 24px 24px; }
+.app-footer__meta:empty { display: none; }
+.legal-footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px 28px; }
+.legal-footer-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-underline-offset: 4px; }
+.gw-flow-active .app-footer { padding-bottom: 190px; }

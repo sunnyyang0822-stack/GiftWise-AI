@@ -353,7 +353,6 @@ async function fillStep1(page, { realKeys = false } = {}) {
   await page.click("chip", "选择预算区间");
   await page.setInput('#budget-min', "100");
   await page.setInput('#budget-max', "300");
-  await page.tickConfirm("确认当前礼物预算区间");
   await page.click("chip", "3–5天");
 }
 
