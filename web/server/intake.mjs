@@ -32,7 +32,7 @@ export const INTAKE_FIELDS = new Set([
   "gift_styles",
   "hard_exclusions",
   "additional_context",
-  "contract_version", "budget_mode", "budget_range", "dislikes",
+  "contract_version", "budget_mode", "budget_range", "dislikes", "previous_gifts",
 ]);
 
 /**
@@ -110,6 +110,15 @@ export function adaptIntake(intakeJson, options = {}) {
     err("INVALID_TYPE", "intake.dislikes", "不喜欢的东西须为字符串，可为空");
   } else if ([...dislikes].length > 1000) {
     err("LIMIT_EXCEEDED", "intake.dislikes", "不喜欢的东西最多 1000 个 Unicode 码点");
+  }
+
+  let previousGifts = Object.hasOwn(data, "previous_gifts") ? data.previous_gifts : "";
+  if (typeof previousGifts !== "string") {
+    err("INVALID_TYPE", "intake.previous_gifts", "以前送过什么须为字符串，可为空");
+  } else if ([...previousGifts].length > 1000) {
+    err("LIMIT_EXCEEDED", "intake.previous_gifts", "送礼历史最多 1000 个 Unicode 码点");
+  } else if (/^[\u0009-\u000d\u001c-\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/u.test(previousGifts)) {
+    previousGifts = "";
   }
 
   const choice = (key, table, fallback = null) => {
@@ -253,6 +262,7 @@ export function adaptIntake(intakeJson, options = {}) {
     gift_styles: styles,
     hard_exclusions_original: exclusions,
   };
+  if (revised || Object.hasOwn(data, "previous_gifts")) request.previous_gifts = previousGifts;
   if (revised) {
     Object.assign(request, { contract_version: CONTRACT_VERSION, budget_range: Object.hasOwn(data, "budget_range") ? data.budget_range : null, dislikes });
   } else if (Object.hasOwn(data, "dislikes")) {
