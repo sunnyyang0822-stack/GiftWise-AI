@@ -2,11 +2,13 @@
    只负责渲染；选择、重置等动作由 app.js 通过 ctx 传入，业务状态与契约不在这里改。
    所有服务端/用户文本一律以 textContent 渲染。 */
 import { icon } from "./icons.js";
-import { candidateMedia, packagingMedia } from "./media-view.js";
+import { packagingMedia } from "./media-view.js";
+import { createRecommendationMedia } from "./recommendation-media.js";
 import { friendlyMessages, cardWarnings } from "./friendly.js";
 
 export function createResultViews(ctx) {
   const { el, state, selectCandidate, resetToForm, backToEncourage, backToHome, errorBox, stateView, render, apiFetch } = ctx;
+  const recommendationMedia = createRecommendationMedia(ctx);
   const withIcon = (name, text, cls = "") => el("span", { class: cls }, [icon(name, { size: 18 }), text]);
   const money = (v, cur = "CNY") => (cur === "CNY" ? `¥${v}` : `${v} ${cur}`);
 
@@ -118,6 +120,7 @@ export function createResultViews(ctx) {
   /* ---------------------------------------------------- 三个礼物思路 */
   function renderRecommendation() {
     const report = state.report;
+    recommendationMedia.begin(report);
     const body = [];
     const facts = new Map((report.request?.facts || []).map(f => [f.id, f.text]));
     const results = new Map((report.validation?.candidate_results || []).map(r => [r.id, r]));
@@ -151,7 +154,7 @@ export function createResultViews(ctx) {
           el("span", { class: "gift-choice__no", "aria-hidden": "true", text: ["壹", "贰", "叁"][index] || String(index + 1) }),
           el("span", { class: "sr-only", text: `方案 ${index + 1}` }),
         ]),
-        (() => { const figure = candidateMedia(report, candidate); return figure.dataset.imageId === "missing" ? null : figure; })(),
+        recommendationMedia.candidateSlot(report, candidate),
         el("div", { class: "gift-choice-heading" }, [
           el("h2", { class: "card__title", id: `gift-title-${index}`, text: candidate.name }),
           el("span", { class: "gift-choice-price", text: price }),
@@ -302,5 +305,5 @@ export function createResultViews(ctx) {
     };
   }
 
-  return { renderRecommendation, renderPresentation, renderEncourage, withIcon, stopMediaPoll };
+  return { renderRecommendation, renderPresentation, renderEncourage, withIcon, stopMediaPoll, stopRecommendationMediaPoll: recommendationMedia.stopRecommendationMediaPoll };
 }
