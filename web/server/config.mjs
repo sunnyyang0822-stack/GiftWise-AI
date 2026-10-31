@@ -395,7 +395,7 @@ export const STYLE_DIRECTION_CONFIG = Object.freeze({
 export const PRESENTATION_WAIT_MS =
   Number.isFinite(Number(process.env.GIFTWISE_PRESENTATION_WAIT_MS)) && Number(process.env.GIFTWISE_PRESENTATION_WAIT_MS) >= 0
     ? Math.floor(Number(process.env.GIFTWISE_PRESENTATION_WAIT_MS))
-    : 30000;
+    : 60000;
 
 /**
  * 本地库路径的**单一事实来源**（2026-10-31 缺陷修复：同一服务两个端点读不同库）。
