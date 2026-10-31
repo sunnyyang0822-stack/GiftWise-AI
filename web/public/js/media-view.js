@@ -1,3 +1,5 @@
+import { icon } from "./icons.js";
+
 const node = (tag, attrs = {}, children = []) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -47,16 +49,87 @@ export function candidateMedia(report, candidate) {
   }
   return figure;
 }
+// 选后包装效果图：文字先读，图在固定比例的相框里原位出现。
+// 状态只来自真实任务：pending 才有生成动效；failed / unavailable / 读取受阻都停下动效，只给一句状态与只读的「刷新图片状态」。
+const WAIT_LINES = ["效果图慢慢成形中", "给这份心意添一点细节", "文字建议可以先看起来"];
+const FRAME_ASPECT = 4 / 3; // 生图任务固定横幅 4:3（2304×1728）；真实尺寸到达后以图片为准
 export function packagingMedia(view, options = {}) {
   const selected = view.media?.selected;
-  const section = node("section", { class: "packaging-media", "aria-label": "所选礼物包装效果示意" });
+  const bound = selected && selected.candidate_id === view.selected_candidate_id;
+  const status = bound ? view.media?.status : "unavailable";
+  const image = bound ? selected.image : null;
+  const safe = image && Object.hasOwn(kinds, image.kind) && localMediaUrl(image.url);
+  const phase = options.pending ? "pending" : safe && status === "ready" ? "ready"
+    : status === "failed" ? "failed" : options.blocked ? "blocked" : status === "pending" ? "waiting" : "unavailable";
+  const section = node("section", { class: `packaging-media packaging-media--${phase}`, "data-media-state": phase, "aria-label": "所选礼物包装效果示意" });
   section.append(node("div", { class: "packaging-media__head" }, [
-    node("h2", { text: "把心意，好好包起来。" }),
     node("span", { class: "media-kind", text: "包装效果示意" }),
+    node("h2", { text: "把心意，好好包起来" }),
   ]));
-  if (!selected || selected.candidate_id !== view.selected_candidate_id) { section.append(mediaFigure(null, [], "unavailable", { packaging: true, message: "暂时没有效果图" })); return section; }
-  const annotations = view.media?.contract_version === "retrieval-media-v2" && !selected.image?.version ? [] : selected.annotations;
-  section.append(mediaFigure(selected.image, annotations, view.media?.status, { ...options, packaging: true })); return section;
+  if (phase === "ready") {
+    const annotations = view.media?.contract_version === "retrieval-media-v2" && !image.version ? [] : selected.annotations;
+    section.append(readyFigure(image, safe, annotations));
+    return section;
+  }
+  const figure = node("figure", { class: "gift-media media-frame", "data-image-id": image?.id || "missing" });
+  if (image) bindImageData(figure, image);
+  const message = options.message || "暂时没有效果图";
+  if (phase === "pending") {
+    // 动效与短句都是装饰（aria-hidden）；读屏只读状态一句。短句只是语气轮换，不代表生成阶段。
+    figure.append(node("div", { class: "media-wait media-stage--pending" }, [
+      node("span", { class: "media-wait__light", "aria-hidden": "true" }),
+      node("span", { class: "media-wait__gift", "aria-hidden": "true" }, [icon("gift", { size: 30 })]),
+      node("p", { class: "media-status", role: "status", "aria-live": "polite", text: message }),
+      node("p", { class: "media-wait__lines", "aria-hidden": "true" }, WAIT_LINES.map(text => node("span", { text }))),
+    ]));
+    return section.append(figure), section;
+  }
+  const sub = { failed: "这次没画出来，包装和贺卡建议不受影响。", waiting: "图还在路上，文字建议已经可以照着准备。", blocked: "图片状态暂时没读到，文字建议不受影响。", unavailable: "包装和贺卡建议已经准备好了。" }[phase];
+  figure.append(node("div", { class: "media-rest" }, [
+    node("span", { class: "media-rest__icon", "aria-hidden": "true" }, [icon(phase === "unavailable" ? "ribbon" : "gift", { size: 26 })]),
+    node("p", { class: "media-status", role: "status", "aria-live": "polite", text: message }),
+    node("p", { class: "media-rest__sub", text: sub }),
+    options.onRefresh ? node("button", { type: "button", class: "btn btn--sm media-retry", text: options.refreshing ? "正在更新图片状态" : "刷新图片状态", ...(options.refreshing ? { disabled: "" } : {}), onclick: options.onRefresh }) : null,
+  ]));
+  section.append(figure);
+  return section;
+}
+function bindImageData(figure, image) {
+  // 产品裁定（2026-10-31）：界面不显示来源说明；真实标识保留在数据属性上，可从 DOM 追到接口原值。
+  figure.dataset.imageKind = image.kind || "";
+  figure.dataset.imageKindLabel = kinds[image.kind] || "";
+  if (image.version) figure.dataset.imageVersion = image.version;
+  if (image.source_url) figure.dataset.imageSourceUrl = image.source_url;
+  if (image.attribution) figure.dataset.imageAttribution = image.attribution;
+}
+function readyFigure(image, url, annotations) {
+  const figure = node("figure", { class: "gift-media media-frame media-frame--ready", "data-image-id": image.id || "missing" });
+  bindImageData(figure, image);
+  const notes = validAnnotations(annotations, image.version);
+  const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}` });
+  // 相框先按图片真实宽高（无则 4:3）占位，图到达后不推挤下方文字；整图 contain，不裁主体。
+  const aspect = image.width > 0 && image.height > 0 ? image.width / image.height : FRAME_ASPECT;
+  stage.style.aspectRatio = String(aspect); stage.style.setProperty("--media-aspect", String(aspect));
+  const notice = node("p", { class: "media-status media-status--quiet", role: "status", "aria-live": "polite", text: "" });
+  const retry = node("button", { type: "button", class: "btn btn--sm media-retry", text: "重试加载图片" }); retry.hidden = true;
+  const load = () => {
+    retry.hidden = true; notice.textContent = ""; stage.replaceChildren(); figure.querySelector(".media-active-note")?.remove();
+    const img = node("img", { alt: image.alt || "礼物包装效果示意", decoding: "async" });
+    img.addEventListener("load", () => {
+      const real = img.naturalWidth / img.naturalHeight;
+      if (Number.isFinite(real) && real > 0) { stage.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`; stage.style.setProperty("--media-aspect", String(real)); }
+      img.setAttribute("data-loaded", "");
+      if (notes.length) overlay(stage, notes);
+    });
+    // 只重新读取同一张已生成的图片字节，不发起新的生成。
+    img.addEventListener("error", () => { stage.replaceChildren(); notice.textContent = "图片没加载出来，文字建议不受影响。"; retry.hidden = false; });
+    stage.append(img); img.src = url;
+  };
+  retry.addEventListener("click", load);
+  figure.append(stage, notice, retry);
+  if (notes.length) figure.append(node("details", { class: "media-notes" }, [node("summary", { text: "文字版说明" }), node("ol", {}, notes.map(a => node("li", { text: a.text })))]));
+  load();
+  return figure;
 }
 function mediaFigure(image, annotations = [], status = "ready", options = {}) {
   const figure = node("figure", { class: "gift-media", "data-image-id": image?.id || "missing" });

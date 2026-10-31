@@ -680,6 +680,8 @@ function restoreFocus(snapshot) {
 /** 当前视图标识：只在切换时重放一次入场动效，同一视图内的重绘（打字）不重放。 */
 function currentViewKey() {
   if (!state.config) return state.configError ? "error" : "waiting";
+  if (state.busy && state.pending?.kind === "recommend") return "recommendation";
+  if (state.busy && state.pending?.kind === "present") return "presentation";
   if (state.busy && !state.report && !state.presentation) return "generating";
   if (state.timeout) return "timeout";
   if (state.error && state.error.kind === "error") return "error";
@@ -706,6 +708,11 @@ function render() {
     rendered = renderWaiting();
   } else if (!state.inFlow) {
     rendered = { body: [el("p", { class: "sr-only", text: "点击开始挑选礼物进入三页流程。" })], actions: [] };
+  } else if (state.busy && state.pending?.kind === "recommend") {
+    // 聊完直接进入结果页，文字没回来前在结果页里等（不再停在独立加载页）。
+    rendered = views().renderRecommendationLoading();
+  } else if (state.busy && state.pending?.kind === "present") {
+    rendered = views().renderPresentationLoading(state.pending.candidateId);
   } else if (state.busy) {
     rendered = renderGenerating();
   } else if (state.timeout) {
