@@ -1,0 +1,5 @@
+FAIL scene-ready-image-url-validation AssertionError [ERR_ASSERTION]: Missing expected exception.
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:61:155
+    at test (file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:18:66)
+    at file:///C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media/tests/acceptance/retrieval_media/review_modules.mjs:61:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

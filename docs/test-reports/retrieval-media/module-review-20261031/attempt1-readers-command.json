@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    "tests/acceptance/retrieval_media/review_readers.mjs"
+  ],
+  "started": "2026-10-31T15:00:29.198077+08:00",
+  "finished": "2026-10-31T15:00:29.302913+08:00",
+  "exit_code": 1
+}

@@ -1,0 +1,13 @@
+{
+  "sha": "a4d639bb757cc99315ca9acc633d45192d20c15a",
+  "scope": "offline_record_audit_not_live_source_or_image_permission",
+  "counts": {
+    "PASS": 20,
+    "FAIL": 0
+  },
+  "records": 20,
+  "known_prices": 14,
+  "unknown_prices": 6,
+  "authorized_images": 0,
+  "limitation": "仅核对资料内部结构和证据片段/引用；未实时读取页面，不确认售价、权利授权、视觉、库存和送达。"
+}
