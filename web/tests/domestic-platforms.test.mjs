@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import vm from 'node:vm';
 import { DOMESTIC_PLATFORMS as platforms, normalizeDomesticRecord, buildDomesticReadScript, runDomesticSearch } from '../server/collect/domestic-platforms.mjs';
 
 test('直接来源覆盖，搜索词编码与分页，不将官网探测称检索', () => {
@@ -67,4 +68,20 @@ test('不重复首屏冒充分页或全量；页面异常被记录', async () =>
   assert.equal(failed.status, 'failed');
   assert.equal(failed.pages[0].error_code, 'TIMEOUT');
   assert.equal(JSON.stringify(failed).includes('secret'), false);
+});
+
+test('真实搜索域与登录/风控跳转识别，不保存访问挑战参数', () => {
+  const evaluate = (id, href, body = '') => {
+    const url = new URL(href);
+    return vm.runInNewContext(buildDomesticReadScript(id), {
+      location: url,
+      document: { body: { innerText: body }, title: '搜索', querySelectorAll: () => [], querySelector: () => null },
+    });
+  };
+  assert.equal(evaluate('taobao', 'https://s.taobao.com/search?q=杯子').status, 'empty_or_selector_changed');
+  assert.equal(evaluate('tmall', 'https://s.taobao.com/search?tab=mall').status, 'empty_or_selector_changed');
+  assert.equal(evaluate('1688', 'https://login.taobao.com/?redirect_url=secret').status, 'login_required');
+  const blocked = evaluate('jd', 'https://cfe.m.jd.com/privatedomain/risk_handler/123/?token=secret');
+  assert.equal(blocked.status, 'restricted');
+  assert.equal(blocked.url, 'https://cfe.m.jd.com/privatedomain/risk_handler/123/');
 });
