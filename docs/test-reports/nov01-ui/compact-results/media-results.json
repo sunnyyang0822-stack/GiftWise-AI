@@ -1,0 +1,738 @@
+{
+  "total": 183,
+  "passed": 183,
+  "checks": [
+    {
+      "name": "1440-normal visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "1440-normal three images bound",
+      "passed": true
+    },
+    {
+      "name": "1440-normal responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no result information panel",
+      "passed": true
+    },
+    {
+      "name": "1440-normal cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "1440-normal reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "1440-normal complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "1440-normal sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "1440-normal package selected only",
+      "passed": true
+    },
+    {
+      "name": "1440-normal three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "1440-normal arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "1440-normal keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "1440-normal curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "1440-normal scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "1440-normal touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "1440-normal keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "1440-normal bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "1440-normal document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1440-normal no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-normal visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-normal three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-normal responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-normal no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-normal cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-normal no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-normal no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-normal reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-normal complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "390-normal sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "390-normal package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-normal three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "390-normal arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "390-normal keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "390-normal curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "390-normal scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "390-normal touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "390-normal keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "390-normal bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-normal document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-normal no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "320-normal visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "320-normal three images bound",
+      "passed": true
+    },
+    {
+      "name": "320-normal responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "320-normal no result information panel",
+      "passed": true
+    },
+    {
+      "name": "320-normal cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "320-normal no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "320-normal no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "320-normal reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "320-normal complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "320-normal sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "320-normal package selected only",
+      "passed": true
+    },
+    {
+      "name": "320-normal three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "320-normal arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "320-normal keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "320-normal curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "320-normal scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "320-normal touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "320-normal keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "320-normal bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "320-normal document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320-normal no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-failed visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-failed three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-failed responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-failed no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-failed cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-failed no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-failed no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-failed reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-failed failed leaves candidate selectable",
+      "passed": true
+    },
+    {
+      "name": "390-failed complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "390-failed sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "390-failed package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-failed three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "390-failed arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "390-failed keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "390-failed curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "390-failed scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "390-failed touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "390-failed keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "390-failed bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-failed document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-failed no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-missing visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-missing three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-missing responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-missing no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-missing cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-missing no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-missing no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-missing reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-missing missing does not block text selection",
+      "passed": true
+    },
+    {
+      "name": "390-missing package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-missing bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-missing document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-missing no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-pending visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-pending three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-pending responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-pending no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-pending cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-pending no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-pending no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-pending reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-pending pending status visible",
+      "passed": true
+    },
+    {
+      "name": "390-pending pending can reload",
+      "passed": true
+    },
+    {
+      "name": "390-pending package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-pending three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "390-pending arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "390-pending keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "390-pending curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "390-pending scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "390-pending touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "390-pending keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "390-pending bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-pending document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-pending no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon three images bound",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon no result information panel",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon package selected only",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1440-hexagon no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-paper visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-paper three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-paper responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-paper no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-paper cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-paper no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-paper no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-paper reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-paper complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "390-paper sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "390-paper package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-paper three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "390-paper arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "390-paper keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "390-paper curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "390-paper scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "390-paper touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "390-paper keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "390-paper bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-paper document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-paper no business or external requests",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed visible preview marker",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed three images bound",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed responsive card arrangement",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed no result information panel",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed cards first visible result",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed no image zoom controls",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed no package request before selection",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed reference source and unread date",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed complete images no stretching",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed sample provenance visible",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed package selected only",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed package image failure keeps bill",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed three Chinese arrows and equivalent text",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed arrows align with original image bounds",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed keyboard label updates readable text",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed curves and unframed notes",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed scene full original ratio",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed touch target >=44",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed keyboard equivalent description",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed bill single gift and no package price",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed document no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390-package_failed no business or external requests",
+      "passed": true
+    }
+  ]
+}

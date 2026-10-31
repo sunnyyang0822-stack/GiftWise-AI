@@ -52,24 +52,21 @@ function mediaFigure(image, annotations = [], status = "ready") {
   const stage = node("div", { class: `media-stage${notes.length ? " media-scene" : ""}` });
   const notice = node("p", { class: "media-status", role: "status", "aria-live": "polite", text: safe ? status === "pending" ? "图片正在准备，文字结果可先查看。" : "图片加载中…" : "暂无图片，文字结果仍可查看。" });
   const retry = node("button", { type: "button", class: "btn media-retry", text: "重试加载图片" }); retry.hidden = true;
-  const zoom = node("button", { type: "button", class: "btn media-zoom", text: "放大查看", "aria-label": `放大查看：${image?.alt || "礼物配图"}` }); zoom.hidden = true;
-  let loaded = false;
   let img;
   const load = () => {
     if (!safe) return;
-    loaded = false; retry.hidden = true; zoom.hidden = true; stage.replaceChildren(); figure.querySelector(".media-active-note")?.remove();
+    retry.hidden = true; stage.replaceChildren(); figure.querySelector(".media-active-note")?.remove();
     notice.textContent = "图片加载中…"; notice.hidden = false;
     img = node("img", { alt: image.alt || "礼物配图", decoding: "async" });
     img.addEventListener("load", () => {
-      loaded = true; stage.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`; stage.style.setProperty("--media-aspect", String(img.naturalWidth / img.naturalHeight));
-      notice.hidden = true; zoom.hidden = false; if (notes.length) overlay(stage, notes);
+      stage.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`; stage.style.setProperty("--media-aspect", String(img.naturalWidth / img.naturalHeight));
+      notice.hidden = true; if (notes.length) overlay(stage, notes);
     });
     img.addEventListener("error", () => { stage.replaceChildren(); notice.hidden = false; notice.textContent = "图片加载失败，文字结果仍可查看。"; retry.hidden = false; });
     stage.append(img); img.src = safe;
   };
   retry.addEventListener("click", load);
-  zoom.addEventListener("click", () => { if (loaded) openZoom(image, notes, zoom); });
-  figure.append(stage, notice, node("figcaption", { class: "media-caption", text: image ? kinds[image.kind] || "图片类型未知，未展示" : "图片缺失" }), retry, zoom);
+  figure.append(stage, notice, node("figcaption", { class: "media-caption", text: image ? kinds[image.kind] || "图片类型未知，未展示" : "图片缺失" }), retry);
   if (image?.attribution) figure.append(node("details", { class: "media-source" }, [node("summary", { text: "图片来源与说明" }), node("p", { class: "media-attribution", text: image.attribution })]));
   if (notes.length) {
     const list = node("ol", {}, notes.map(a => node("li", { text: a.text })));
@@ -107,18 +104,4 @@ function overlay(stage, notes) {
     label.style.left = `${a.label.x * 100}%`; label.style.top = `${a.label.y * 100}%`; stage.append(label);
   });
   stage.append(svg); stage.insertAdjacentElement("afterend", active);
-}
-function openZoom(image, notes, opener) {
-  const dialog = node("dialog", { class: "media-dialog", "aria-label": "礼物图片放大查看" });
-  const close = node("button", { class: "btn", type: "button", text: "关闭图片", onclick: () => dialog.close() });
-  const canvas = node("div", { class: "media-zoom-canvas" }, [mediaFigure(image, notes)]);
-  // 放大层只提供一次放大，不递归打开模态。
-  canvas.querySelector(".media-zoom").remove();
-  const scale = node("button", { class: "btn", type: "button", text: "放大至200%", "aria-pressed": "false", onclick: () => {
-    const expanded = scale.getAttribute("aria-pressed") !== "true"; scale.setAttribute("aria-pressed", String(expanded)); scale.textContent = expanded ? "恢复适应窗口" : "放大至200%";
-    canvas.classList.toggle("is-enlarged", expanded);
-  } });
-  dialog.append(node("div", { class: "media-dialog-tools" }, [close, scale]), canvas); document.body.append(dialog);
-  dialog.addEventListener("close", () => { dialog.remove(); if (opener.isConnected) opener.focus(); }, { once: true });
-  dialog.showModal(); close.focus();
 }

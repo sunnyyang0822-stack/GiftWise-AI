@@ -671,50 +671,11 @@ function renderGenerating() {  return {
 
 function renderRecommendation() {
   const report = state.report;
-  const cfg = state.config;
   const body = [];
   const facts = new Map((report.request.facts || []).map((f) => [f.id, f.text]));
   const errorsByCandidate = new Map((report.validation.candidate_results || []).map((r) => [r.id, r]));
   const selectable = new Set(report.selectable_candidate_ids || []);
-  const statusText = {
-    passed: "三个方案均通过独立规则检查，请自行选择。",
-    failed: "部分或全部方案未通过独立规则检查；失败项不可选。",
-    needs_input: "请补充或澄清需求后再推荐。",
-    error: "检查暂不可用，未把结果标记为通过。",
-  }[report.status] || "状态未知。";
-
-  body.push(
-    el("section", { class: `card ${selectable.size > 0 ? "card--ok" : "card--fail"}` }, [
-      el("h2", { class: "card__title", text: `推荐结果${PREVIEW_MODE ? "（模拟）" : ""}：${statusText}` }),
-      el("dl", { class: "kv" }, [
-        el("dt", { text: "运行编号" }),
-        el("dd", { class: "code", text: report.recommendation_run_id }),
-        el("dt", { text: "关系 / 场合" }),
-        el("dd", { text: `${report.request.recipient_relation} · ${report.request.occasion}` }),
-        el("dt", { text: "预算 / 天数" }),
-        el("dd", { text: `${report.request.budget_range ? `${report.request.budget_range.min}–${report.request.budget_range.max}` : report.request.budget_amount || "未提供"} ${report.request.currency} · ${report.request.available_days} 天（仅估算，不是送达承诺）` }),
-        el("dt", { text: "可用自动修订" }),
-        el("dd", { text: `已用 ${report.repair_count} / 1，剩余 ${report.remaining_repairs}（由服务端持有，浏览器不能提交）` }),
-        el("dt", { text: "当前选择" }),
-        el("dd", { text: report.selected_candidate_id === null ? "尚未选择（推荐阶段服务端固定返回 null）" : String(report.selected_candidate_id) }),
-      ]),
-      report.workflow_errors && report.workflow_errors.length > 0
-        ? errorBox(report.workflow_errors, "工作流层错误（影响可选范围）")
-        : null,
-      report.validation.errors && report.validation.errors.length > 0
-        ? errorBox(report.validation.errors, "批次级校验错误")
-        : null,
-    ]),
-  );
-
-  if ((report.request.preference_inferences || []).length > 0) {
-    body.push(
-      el("section", { class: "card" }, [
-        el("h2", { class: "card__title", text: "你提供的兴趣归因（推断，不是事实）" }),
-        el("ul", { class: "list" }, report.request.preference_inferences.map((x) => el("li", { text: x.text }))),
-      ]),
-    );
-  }
+  body.push(el("h1", { class: "sr-only", text: "推荐结果：三个礼物方案" }));
 
   if ((report.candidates || []).length === 0) {
     return stateView("空状态：没有收到任何候选方案", [
@@ -792,6 +753,18 @@ function renderRecommendation() {
     if (provenance) candidateCard.querySelector(".candidate-evidence").append(provenance);
     candidateGrid.append(candidateCard);
   });
+
+  if ((report.request.preference_inferences || []).length > 0) {
+    body.push(
+      el("section", { class: "card" }, [
+        el("h2", { class: "card__title", text: "你提供的兴趣归因（推断，不是事实）" }),
+        el("ul", { class: "list" }, report.request.preference_inferences.map((x) => el("li", { text: x.text }))),
+      ]),
+    );
+  }
+
+  if (report.workflow_errors?.length) body.push(errorBox(report.workflow_errors, "方案生成问题"));
+  if (report.validation.errors?.length) body.push(errorBox(report.validation.errors, "方案校验问题"));
 
   body.push(
     el("section", { class: "card" }, [
