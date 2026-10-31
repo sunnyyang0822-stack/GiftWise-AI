@@ -26,7 +26,7 @@
 - `deadline`：明确天数或可确定的日期使用 `{"days": 整数, "phrase": "原话里的时间说法", "explicit": true|false}`。只有“下周／下个月”等没有具体日期的说法时，输出 `{"phrase":"原话","explicit":false}`，省略 days，不猜成 1 天或 30 天。时间不纳入推荐筛选、排序、可选性或流程判断。用户主动提到时仅保留简短参考；未提到不追问，不要求补充期限才能继续。
 - `interests`：数组，每项 `{"id": 兴趣ID, "explicit": true|false, "evidence": "原话片段"}`。
 - `gift_styles`：数组，每项 `{"id": 风格ID, "explicit": true|false, "evidence": "原话片段"}`。
-- `exclusion_terms`：数组，每项 `{"text":"原话中的字面东西","confidence":"high"|"medium"|"low"}`。只有确实表达排除且把握高时标 high；不确定的含义保留 dislikes 原话，供用户确认，不补同义词。明确禁忌不得遗漏。
+- `exclusion_terms`：数组，每项 `{"text":"原话中的字面东西","confidence":"high"|"medium"|"low"}`。只有确实表达排除且把握高时标 high；不确定的含义保留 dislikes 原话，供用户确认，不补同义词。明确禁忌不得遗漏。语气、关系、卡片表达等限制保留在 dislikes 原话，交排除项语义理解；不能把抽象表达拆成字面禁词。
 - `exclusion_tags`：数组，每项 `{"id": 禁忌类别ID, "evidence": "原话片段"}`（仅作建议，由用户确认）。
 - `dislikes`：字符串，用户关于“不要什么 / 讨厌什么 / 过敏”的原话。
 - `previous_gifts`：字符串，用户提到以前送过的礼物的原话。

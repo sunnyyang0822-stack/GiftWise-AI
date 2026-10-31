@@ -67,11 +67,11 @@ import { attestation, clientRevisionFrom } from "./attest.mjs";
 import { openCatalogDb, findImageById } from "./catalog/db.mjs";
 import { CATALOG_CONFIG, IMAGE_GENERATION_CONFIG, RETRIEVAL_CONFIG } from "./config.mjs";
 import { STYLE_BOARD_DIR } from "./visual/provider.mjs";
-import { recognizeExclusions } from "./exclusion-provider.mjs";
 import { llmProvider } from "./llm/provider.mjs";
 import { parseIntakeText } from "./llm/intake-parse.mjs";
-import { checkAiExclusions } from "./exclusion-checker.mjs";
-import { createAnalysis, getAnalysis } from "./exclusion-store.mjs";
+import { withExclusionContext } from "./exclusion-context.mjs";
+import { analyzeExclusionIntake, prepareExclusionRecommendation } from "./exclusion-service.mjs";
+import { getAnalysis } from "./exclusion-store.mjs";
 
 const sessionSecret=randomBytes(32);
 function ownerScope(req,res){
@@ -473,32 +473,14 @@ async function handleApi(req, res, url) {
   }
 
   if (pathname === "/api/exclusions/analyze") {
-    const basic = adaptIntakeObject(payload.intake);
-    if (basic.status !== "ready") {
-      sendJson(res, 200, { status: "needs_input", mode: MODE.current, analysis_id: null, candidates: [], errors: basic.errors });
-      return true;
-    }
-    const dislikes = typeof payload.intake?.dislikes === "string" ? payload.intake.dislikes : "";
-    // llm 模式：用同一个直连 provider 做识别（真实调用，计入账本）。
-    // dify / mock 保持原样（dify 无识别提供者 → 如实报未配置；mock 用标注夹具）。
-    const exclusionMode = MODE.current;
-    const provider =
-      exclusionMode === "llm"
-        ? (args) => llmProvider.recognizeExclusions({ dislikes: args.dislikes })
-        : undefined;
-    const recognized = await recognizeExclusions({ dislikes, mode: exclusionMode, provider });
-    if (!recognized.ok) {
-      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: recognized.errors });
-      return true;
-    }
-    if (recognized.ai_json === null) {
-      sendJson(res, 200, { status: "needs_input", mode: recognized.mode, analysis_id: null, candidates: [], errors: [] });
-      return true;
-    }
-    const checked = checkAiExclusions(recognized.ai_json, dislikes);
-    const analysisId = createAnalysis({ intake: payload.intake, mode: recognized.mode, candidates: checked.candidates, status: checked.status, errors: checked.errors });
-    getAnalysis(analysisId).owner_scope=owner;
-    sendJson(res, 200, { status: checked.status, mode: recognized.mode, analysis_id: analysisId, candidates: checked.candidates, unmapped_notes: checked.unmapped_notes || [], errors: checked.errors });
+    const result = await analyzeExclusionIntake({
+      intake: payload.intake,
+      continuation: payload.continuation,
+      mode: MODE.current,
+      owner,
+      provider: MODE.current === "llm" ? args => llmProvider.recognizeExclusions(args) : undefined,
+    });
+    sendJson(res, 200, result);
     return true;
   }
 
@@ -583,7 +565,14 @@ async function handleApi(req, res, url) {
     }
     /* `enableImageGeneration` 是**显式**授权闸门（默认关闭，见 config.mjs）：
        只有部署方打开 GIFTWISE_IMAGE_GENERATION=1 且真实模式才允许提交生图任务。 */
-    const outcome = await runRecommendation({ signal:cancellation.signal, ownerScope:owner, intake: effectiveIntake, naturalLanguage: naturalText || null, inputParse, parseNotice, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis }, { enableImageGeneration: IMAGE_GENERATION_CONFIG.enabled });
+    const prepared = prepareExclusionRecommendation({ intake: effectiveIntake, analysis, confirmation: payload.exclusion_confirmation, owner });
+    if (!prepared.ok) {
+      sendJson(res, 400, { status: "needs_input", errors: prepared.errors, clarification_questions: prepared.clarification_questions ?? [] });
+      return true;
+    }
+    effectiveIntake = prepared.intake;
+    analysis = prepared.analysis;
+    const outcome = await withExclusionContext(analysis, () => runRecommendation({ signal:cancellation.signal, ownerScope:owner, intake: effectiveIntake, naturalLanguage: naturalText || null, inputParse, parseNotice, demo: payload.demo, mode: MODE.current, exclusion_confirmation: payload.exclusion_confirmation, analysis }, { enableImageGeneration: IMAGE_GENERATION_CONFIG.enabled }));
     const attest = attestation({ clientCodeRevision: clientRevisionFrom(req.headers) });
     if (outcome.kind === "report") {
       sendJson(res, 200, { ...outcome.report, attestation: attest });

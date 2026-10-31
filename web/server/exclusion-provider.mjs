@@ -9,7 +9,7 @@ import { MOCK_DISLIKES, MOCK_AI_JSON } from '../tests/fixtures/exclusions/mock.m
  * llm/replay 走服务端直连 provider（默认回放，不消耗额度）；缺 provider 时如实报未配置，
  * **不**静默改用 mock 夹具。
  */
-export async function recognizeExclusions({dislikes = '', mode, provider} = {}) {
+export async function recognizeExclusions({dislikes = '', clarifications = [], mode, provider} = {}) {
   const result = (ok, ai_json, errors = []) => ({ok, mode, ai_json, errors});
   const fail = (code, message, path = 'provider') => result(false, null, [{code, path, message}]);
   if (!['mock', 'dify', 'llm', 'replay'].includes(mode)) return fail('AI_OUTPUT_INVALID', '识别模式须明确为 mock / dify / llm / replay', 'mode');
@@ -22,7 +22,7 @@ export async function recognizeExclusions({dislikes = '', mode, provider} = {}) 
   }
   if (typeof provider !== 'function') return fail('EXCLUSION_PROVIDER_NOT_CONFIGURED', '尚未配置真实识别能力');
   try {
-    const raw = await provider({dislikes});
+    const raw = await provider({dislikes, clarifications});
     if (typeof raw !== 'string') return fail('AI_OUTPUT_INVALID', '提供者须返回原始 JSON 字符串');
     if (Buffer.byteLength(raw, 'utf8') > 32768) return fail('AI_OUTPUT_LIMIT', '识别结果最多 32768 UTF-8 字节', 'ai_json');
     return result(true, raw);

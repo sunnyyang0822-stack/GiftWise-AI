@@ -5,8 +5,6 @@
 const FRIENDLY = {
   OVER_BUDGET: "价格超出了你的预算。",
   BELOW_BUDGET_RANGE: "估价低于你的预算下限，仍可选择。",
-  PREPARATION_TOO_LONG: "准备时间超过了你留出的天数。",
-  DELIVERY_TOO_LONG: "算上快递时间，可能赶不上你想送出的时间。",
   FORBIDDEN_TAG: "和你要避开的东西有冲突。",
   FORBIDDEN_TERM: "和你要避开的东西有冲突。",
   EXCLUSION_CONFLICT: "和你要避开的东西有冲突。",
@@ -15,6 +13,8 @@ const FRIENDLY = {
 };
 /** 只对系统有意义、对用户没有帮助的条目：不展示。 */
 const INTERNAL = new Set(["REPAIR_NOT_ALLOWED", "MISSING_RESULT", "AI_OUTPUT_INVALID", "AI_OUTPUT_LIMIT", "AI_OUTPUT_UNANCHORED"]);
+// 兼容旧响应：时间仅作中性参考，不在结果上转成警告；服务端可选决策仍原样保留。
+const TIME_REFERENCE = new Set(["PREPARATION_TOO_LONG", "DELIVERY_TOO_LONG"]);
 /** 用户可见的卡片提示只保留这些（其余多为数据来源、默认估算之类的内部说明）。 */
 const CARD_WARNINGS = new Set(["BELOW_BUDGET_RANGE"]);
 
@@ -27,13 +27,13 @@ function plain(message) {
 /** 一条校验结果 ⇒ 用户可见的一句话；返回空串表示不展示。 */
 export function friendlyMessage(item) {
   const code = typeof item?.code === "string" ? item.code : "";
-  if (INTERNAL.has(code)) return "";
+  if (INTERNAL.has(code) || TIME_REFERENCE.has(code)) return "";
   return FRIENDLY[code] || plain(item?.message) || "";
 }
 
 /** 一组校验结果 ⇒ 去重后的用户可见句子；全部被过滤时给一句通用说明。 */
 export function friendlyMessages(items, fallback = "有一项条件不太符合。") {
-  const list = Array.isArray(items) ? items : [];
+  const list = (Array.isArray(items) ? items : []).filter(item => !TIME_REFERENCE.has(item?.code));
   const out = [...new Set(list.map(friendlyMessage).filter(Boolean))];
   return out.length || !list.length ? out : [fallback];
 }
