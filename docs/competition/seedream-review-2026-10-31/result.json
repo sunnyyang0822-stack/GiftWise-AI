@@ -1,0 +1,18 @@
+{
+  "status": "generated",
+  "model": "doubao-seedream-4-5-251128",
+  "elapsed_seconds": 8.813,
+  "usage": {
+    "generated_images": 1,
+    "output_tokens": 15552,
+    "total_tokens": 15552
+  },
+  "images": [
+    {
+      "path": "C:\\Users\\lenovo\\Desktop\\giftwise\\.tmp\\seedream-validation\\packaging-scene-1.jpg",
+      "bytes": 761733,
+      "sha256": "ce4179e1d3046956f5aeb6eda467fec20135a5198b974d9b2ac9fab56dbdfbe0",
+      "size": "2304x1728"
+    }
+  ]
+}

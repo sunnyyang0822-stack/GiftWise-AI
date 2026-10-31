@@ -1,0 +1,23 @@
+{
+  "copied_at": "2026-10-31T06:58:08.922Z",
+  "source_directory": "C:/Users/lenovo/Desktop/giftwise/.tmp/seedream-validation",
+  "attribution": "PM 提供；材料 Agent 仅检查文件/哈希并目视审阅，不重新调用",
+  "provider_attribution": "UCloud ModelVerse（据 PM 本轮说明；所提供 JSON 无供应商端点/请求 ID/时间戳，不能单靠文件独立核验供应商和执行日期）",
+  "files": [
+    {
+      "file": "request.json",
+      "bytes": 865,
+      "sha256": "d770c7595427550bd65cdb71bb687a3786291b8f43e063c4037cc7c74b7ba69f"
+    },
+    {
+      "file": "result.json",
+      "bytes": 480,
+      "sha256": "81d2b222c5aece989d59a051fd6fdd80a9e14eb4012bac862f8d7a2911159cad"
+    },
+    {
+      "file": "packaging-scene-1.jpg",
+      "bytes": 761733,
+      "sha256": "ce4179e1d3046956f5aeb6eda467fec20135a5198b974d9b2ac9fab56dbdfbe0"
+    }
+  ]
+}
