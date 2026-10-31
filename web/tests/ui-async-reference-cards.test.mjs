@@ -172,3 +172,17 @@ test("app选前离开入口与既有选后轮询独立清理", async () => {
   assert.match(source, /if \(!state.report \|\| state.presentation \|\| !state.inFlow \|\| state.busy \|\| state.encourage \|\| state.timeout \|\| state.error\) resultViews\?\.stopRecommendationMediaPoll\(\);/);
   assert.match(source, /resultViews\?\.stopMediaPoll\(\)/);
 });
+
+test("合并后骨架导出和选前清理入口共存，加载骨架不启动参考图轮询", () => {
+  const h = setup(); h.views.stopRecommendationMediaPoll();
+  for (const name of ["renderRecommendationLoading", "renderPresentationLoading", "stopMediaPoll", "stopRecommendationMediaPoll"]) assert.equal(typeof h.views[name], "function", name);
+  const recommendation = h.views.renderRecommendationLoading();
+  const before = el("main", {}, recommendation.body);
+  assert.equal(before.querySelectorAll(".candidate-grid--loading").length, 1);
+  assert.equal(before.querySelectorAll("img").length, 0);
+  const presentation = h.views.renderPresentationLoading("c2");
+  const after = el("main", {}, presentation.body);
+  assert.match(after.textContent, /方案c2/);
+  assert.equal(after.querySelectorAll(".present-layout--loading").length, 1);
+  assert.equal(h.timers.size, 0); assert.equal(h.calls.length, 0);
+});

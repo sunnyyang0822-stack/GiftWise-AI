@@ -2,7 +2,7 @@
 import { MOCK_DISLIKES, MOCK_AI_JSON } from '../tests/fixtures/exclusions/mock.mjs';
 
 /**
- * provider: async ({dislikes}) => 原始严格 JSON 字符串；只调用一次。
+ * provider: async ({dislikes, clarifications?}) => 原始严格 JSON 字符串；只调用一次。
  * mode 必填 mock/dify/llm/replay；mock 只支持标注的固定虚构原文。
  * 空白原文返回 ok=true/ai_json=null 与显式跳过码，接入层无需确认。
  * ok 仅表示获取到字符串；接入层必须另调用 checkAiExclusions 后才能展示确认。
@@ -22,7 +22,8 @@ export async function recognizeExclusions({dislikes = '', clarifications = [], m
   }
   if (typeof provider !== 'function') return fail('EXCLUSION_PROVIDER_NOT_CONFIGURED', '尚未配置真实识别能力');
   try {
-    const raw = await provider({dislikes, clarifications});
+    // 无续答时保留旧提供者载荷；实际历史非空时才追加兼容字段。
+    const raw = await provider({dislikes, ...(clarifications.length ? {clarifications} : {})});
     if (typeof raw !== 'string') return fail('AI_OUTPUT_INVALID', '提供者须返回原始 JSON 字符串');
     if (Buffer.byteLength(raw, 'utf8') > 32768) return fail('AI_OUTPUT_LIMIT', '识别结果最多 32768 UTF-8 字节', 'ai_json');
     return result(true, raw);

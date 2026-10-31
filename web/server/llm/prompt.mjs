@@ -44,6 +44,7 @@ export const DERIVED_REQUEST_FIELDS = Object.freeze([
 
 export const PROMPT_SOURCES = Object.freeze({
   recommend: "workflow/prompts/generate.md",
+  repair: "workflow/prompts/repair.md",
   present: "workflow/prompts/presentation.md",
   exclusions: "workflow/prompts/exclusions.md",
   /** 第 1 步：自然语言 ⇒ 现有 intake 字段（字段清单由 llm/intake-parse.mjs 用代码追加，不写在提示词里）。 */
@@ -119,7 +120,8 @@ export function buildRecommendEnvelope({ requestJson, intakeJson = null, retriev
       constraints.literal_preferences = inputParse.literal_preferences;
     }
     if (inputParse.city) constraints.city = inputParse.city;
-    if (inputParse.budget_band) constraints.budget_band = inputParse.budget_band;
+    const budgetBand = inputParse.constraints?.budget_band ?? inputParse.budget_band;
+    if (budgetBand) constraints.budget_band = budgetBand;
     if (inputParse.region_price) constraints.region_price = inputParse.region_price;
     if (Object.keys(constraints).length) envelope.input_constraints = constraints;
   }
@@ -154,10 +156,9 @@ function bindingSection(envelope) {
   }
   if (Object.hasOwn(envelope, "input_constraints")) {
     lines.push(
-      "- input_constraints：服务端从**用户第 1 步的自由输入**里抽出的硬约束（不是建议）：",
-      "  * `literal_preferences`：用户的**原话**。⛔ 不许用预设类目替代它：候选的名称与说明必须能在字面上与这些原话对得上；",
-      "    只把「喜欢黑白」写成「设计感礼物」而不体现黑白，视为没有满足用户要求。",
-      "  * `budget_band`：金额约束按服务端预算契约执行。送礼期限与时间带宽不用于推荐生成。",
+      "- input_constraints：服务端保留的用户原话、语义上下文和金额约束：",
+      "  * `literal_preferences`：保留的用户原话。结合完整上下文理解多重喜好与实际要求，不用固定关键词或类目代替语义判断，也不要求每个方案照抄词句。",
+      "  * `budget_band`：预算上限与用户明确的区间约束须满足；user_min/user_max 表示用户区间。仅标量金额派生的下限是软参考，不表示用户禁止更便宜的方案。未知报价不等于预算违规，不编造实价。送礼期限与时间带宽不用于推荐生成。",
       "  * `city`：已知时供相关本地查询使用；只有确实影响具体商户/套餐检索时才自然追问，不要求所有体验补城市，不编造城市报价。",
       "  * 预算、禁忌等非时间硬约束仍须满足；时间仅保留为可选事实信息。",
     );
@@ -199,6 +200,20 @@ function messagesFor(kind, envelope) {
 
 export function buildRecommendMessages(envelope) {
   return messagesFor("recommend", envelope);
+}
+
+export function buildRepairMessages({ candidatesJson, validation, preservedCandidates, productReferences, referenceReferences, ...input }) {
+  const { raw_validation, ...decisionValidation } = validation;
+  const envelope = {
+    ...buildRecommendEnvelope(input), action: "recommend_revision",
+    candidates_json: candidatesJson, validation_json: decisionValidation,
+    preserved_candidates_json: preservedCandidates,
+    product_references: productReferences, reference_references: referenceReferences,
+  };
+  return [
+    { role: "system", content: [loadPromptBody("recommend"), loadPromptBody("repair"), bindingSection(envelope)].filter(Boolean).join("\n\n") },
+    { role: "user", content: JSON.stringify(envelope) },
+  ];
 }
 
 export function buildPresentMessages(envelope) {
