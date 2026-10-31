@@ -5,6 +5,8 @@ import { mintReferenceGrant } from "./media/plan.mjs";
 import { DomesticProvider,runDomesticDetails } from "./retrieval/domestic-provider.mjs";
 import { normalizeRetrievalPlan } from "./retrieval/query-plan.mjs";
 import { createOpencliToolSession } from "./retrieval/agent-tool.mjs";
+import{createRetrievalAudit,retrievalSensitiveValues}from'./retrieval/audit-store.mjs';
+import{startReferenceImages}from'./retrieval/reference-images.mjs';
 import { bindReferenceEvidence } from './retrieval/reference-evidence.mjs';
 import { RETRIEVAL_CONFIG } from "./config.mjs";
 const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider !== "unavailable" ? new DomesticProvider({packageRoot:RETRIEVAL_CONFIG.packageRoot || undefined}) : unavailableProvider, RETRIEVAL_CONFIG);
@@ -256,8 +258,8 @@ async function runRecommendationCore(input, services = {}) {
   let retrieval = retrievalEnabled && searchPlan.needs_retrieval
     ? await (services.retrievalWorker ?? retrievalWorker).submit(searchPlan,{signal:input.signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}).catch(() => ({status:"unavailable",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]}))
     : {status:"skipped",evidence_id:null,products:[],contents:[],images:[],coverage:[],warnings:[]};
-  const agentTools = createOpencliToolSession({signal:input.signal,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}}),details:(records,{signal})=>(services.retrieveProductDetails??runDomesticDetails)(records,{signal,dbPath:services.catalogDbPath??localDbPath()})});
   const useAgentTools = mode==='llm' && retrievalEnabled;
+  const agentTools = createOpencliToolSession({signal:input.signal,auditStore:useAgentTools?(services.retrievalAuditStore??createRetrievalAudit({sensitiveValues:retrievalSensitiveValues(input)})):null,search:(plan,{signal})=>(services.retrievalWorker??retrievalWorker).submit(plan,{signal,providerOptions:{dbPath:services.catalogDbPath??localDbPath(),onProgress:services.onRetrievalProgress}})});
   let productReferences = null,referenceReferences=null;
   /* 第一次生成 */
   if (demo === "slow") await sleep(45000);
@@ -302,6 +304,7 @@ async function runRecommendationCore(input, services = {}) {
     });
     callCounts.recommend += call.model_calls ?? 1;
     if (!call.ok) {
+      if(useAgentTools)agentTools.finalize({status:input.signal?.aborted?'cancelled':'failed',errorCode:call.code});
       return {
         kind: "infrastructure_error",
         status: "error",
@@ -596,6 +599,7 @@ async function runRecommendationCore(input, services = {}) {
     if(existing)Object.assign(existing,observed);else run.retrieval.products.push(observed);
   }
   run.media = mediaProvider.candidates([...new Map(mediaBindings.map(b=>[b.candidate_id,b])).values()]);
+  if(useAgentTools)run.retrieval_audit.persistence=agentTools.finalize({runId:run.run_id,status:batchComplete?'completed':'failed',errorCode:batchComplete?null:'RECOMMENDATION_INCOMPLETE',bindings:run.media.candidates,rejected:run.retrieval_audit.rejected_references,candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
   run.delivery = delivery;
   run.uniqueness = { warnings: validation.warnings ?? [], note: "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。" };
   run.visual_direction = directionOutcome?.ok ? directionOutcome.direction : null;
@@ -618,6 +622,10 @@ async function runRecommendationCore(input, services = {}) {
     errors: [{ code: "RECOMMENDATION_INCOMPLETE", path: "candidates", message: "未能完成三个可选方案，请调整需求后重新生成。" }],
     notices,
   };
+  const referenceImagesEnabled=services.referenceImagesEnabled??(useAgentTools&&!process.env.NODE_TEST_CONTEXT);
+  if(!run.recommendation_failure&&batchComplete&&referenceImagesEnabled&&useAgentTools&&run.candidates.length===LIMITS.candidatesPerBatch){
+    startReferenceImages(run,{session:agentTools,requestJson,intakeJson:dump(effectiveIntake),signal:input.signal,isCurrent:()=>getRun(run.run_id)===run,requestImages:services.requestReferenceImages??llmProvider.requestReferenceImages});
+  }
   return recommendationOutcome(run);
 }
 

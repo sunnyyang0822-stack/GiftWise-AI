@@ -31,10 +31,10 @@ test('模型实际执行受控工具回调再给最终建议；未知价格/单�
  assert.equal(out.run.retrieval_audit.tool_calls.length,1);assert.equal(out.run.retrieval_audit.rejected_references.length,1);
  assert.deepEqual(out.report.retrieval.warnings,[]);assert.equal(JSON.stringify(out.report).includes('internal decision fixture'),false);
 });
-test('已知预算越界仍使该候选失败，不将未知价误判为违规',async()=>{
- reset();const out=await runRecommendation({intake:intake(),mode:'llm'},services({requestCandidates:async()=>result(candidates('801'))}));
- assert.equal(out.kind,'report');assert.equal(out.report.validation.candidate_results[0].passed,false);
- assert.ok(out.report.validation.candidate_results[0].errors.some(e=>e.code==='OVER_BUDGET'));assert.equal(out.report.selectable_candidate_ids.includes('c2'),true);
+test('已知预算越界需修订，不能凑齐三条时失败；其他未知价候选不误判预算违规',async()=>{
+ reset();const out=await runRecommendation({intake:intake(),mode:'llm'},services({requestCandidates:async()=>result(candidates('801')),requestCandidateRevision:async()=>({ok:false,code:'CONTROLLED_REPAIR_FAILED'})}));
+ assert.equal(out.kind,'recommendation_failed');assert.equal(out.run.validation.candidate_results[0].passed,false);
+ assert.ok(out.run.validation.candidate_results[0].errors.some(e=>e.code==='OVER_BUDGET'));assert.ok(out.run.validation.candidate_results.slice(1).every(r=>r.passed));assert.deepEqual(out.run.selectable_candidate_ids,[]);assert.equal(out.run.reference_image_job,undefined);
 });
 test('概念单只杯不得被目录相似标题误绑成四杯套装图',async()=>{
  reset();const out=await runRecommendation({intake:intake(),mode:'llm'},services({requestCandidates:async()=>result(),provideRealProducts:async({candidates:requested})=>{

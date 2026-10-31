@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {once} from 'node:events';
-process.env.GW_PORT='0';process.env.GW_MODE='mock';delete process.env.DIFY_API_KEY;
+import {fileURLToPath} from 'node:url';
+// Only this test's own listener may use C's reserved port; EADDRINUSE fails without touching its owner.
+process.env.GW_PORT='8906';process.env.GW_HOST='127.0.0.1';process.env.GW_MODE='mock';
+process.env.GIFTWISE_STYLE_DIRECTION_CHANNEL='rules';
+process.env.GW_LOCAL_DB=fileURLToPath(new URL('../../.tmp/issue98-http/catalog.sqlite',import.meta.url));
+process.env.GW_LLM_LEDGER_FILE=fileURLToPath(new URL('../../.tmp/issue98-http/ledger.jsonl',import.meta.url));
+delete process.env.DIFY_API_KEY;
 const {server}=await import('../server/server.mjs');
 if(!server.listening)await once(server,'listening');
 const base='http://127.0.0.1:'+server.address().port;
@@ -10,7 +16,7 @@ const intake=JSON.parse(readFileSync(new URL('../../workflow/examples/intake.jso
 const headers=cookie=>({'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})});
 test('HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图',async()=>{try{
  const a=await fetch(base+'/api/config');const cookieA=a.headers.get('set-cookie').split(';')[0];const b=await fetch(base+'/api/config');const cookieB=b.headers.get('set-cookie').split(';')[0];assert.notEqual(cookieA,cookieB);
- const recommend=await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieA),body:JSON.stringify({intake})});const report=await recommend.json();assert.equal(recommend.status,200);assert.equal(report.media.selected,null);assert.equal(report.retrieval.status,'unavailable');
+ const recommend=await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieA),body:JSON.stringify({intake})});const report=await recommend.json();assert.equal(recommend.status,200);assert.equal(report.media.selected,null);assert.equal(report.retrieval.status,'skipped');assert.equal(report.retrieval.products.length,0);assert.equal(report.selectable_candidate_ids.length,3);
  const id=report.recommendation_run_id;assert.ok(id);
  assert.equal((await fetch(base+'/api/runs/'+id,{headers:headers(cookieB)})).status,404);
  assert.equal((await fetch(base+'/api/runs/'+id,{headers:headers(cookieA.slice(0,-1)+(cookieA.endsWith('0')?'1':'0'))})).status,404);
@@ -21,4 +27,4 @@ test('HTTP会话隔离、不可伪造归属、完整sidecar及选后缺图',asyn
  const wrongAnalysis=await(await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieB),body:JSON.stringify({intake:modern,exclusion_confirmation:{analysis_id:analysis.analysis_id,confirmed_ids:['xc1']}})})).json();assert.equal(wrongAnalysis.errors[0].code,'EXCLUSION_ANALYSIS_STALE');
  const select=()=>fetch(base+'/api/presentations',{method:'POST',headers:headers(cookieA),body:JSON.stringify({recommendation_run_id:id,selected_candidate_id:report.selectable_candidate_ids[0]})});const selected=await select();const view=await selected.json();assert.equal(selected.status,200);assert.equal(view.media.status,'unavailable');assert.equal(view.media.selected.image,null);assert.equal(view.media.selected.physical.dimensions.status,'unknown');assert.equal(view.media.selected.scene.text_baked_in,false);const replay=await(await select()).json();assert.equal(replay.media.selected.task_id,view.media.selected.task_id);
  const other=await(await fetch(base+'/api/recommendations',{method:'POST',headers:headers(cookieB),body:JSON.stringify({intake})})).json();assert.notEqual(id,other.recommendation_run_id);
-}finally{await new Promise(resolve=>server.close(resolve));server.closeAllConnections();}});
+}finally{await new Promise(resolve=>{server.closeAllConnections();server.close(resolve);});}});

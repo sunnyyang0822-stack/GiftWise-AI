@@ -13,11 +13,16 @@ test('Bing是公开DOM而非虚构native，DDG保留实际OpenCLI命令能力', 
   assert.equal(new URL(PUBLIC_REFERENCE_SOURCES.duckduckgo.searchUrl('咖啡 布置')).searchParams.get('kl'), 'cn-zh');
 });
 
+test('全球非电商内容可用于图片灵感，海外电商仍拒绝',()=>{
+ for(const url of ['https://www.pinterest.com/pin/123/','https://unsplash.com/photos/fixture','https://www.instructables.com/Coffee-Corner/'])assert.ok(publicReferenceUrl(url,'bing'));
+ for(const url of ['https://amazon.com/item/1','https://www.ebay.com/itm/123','https://www.etsy.com/listing/123'])assert.equal(publicReferenceUrl(url,'bing'),null);
+});
+
 test('公开跳转目标解码后只保留国内非电商来源，去认证/追踪字段', () => {
   const target = 'https://sspai.com/post/123?utm_source=tracking&token=private';
   const bing = 'https://www.bing.com/ck/a?u=a1' + Buffer.from(target).toString('base64url');
   assert.equal(publicReferenceUrl(bing, 'bing'), 'https://sspai.com/post/123');
-  assert.equal(publicReferenceUrl('https://duckduckgo.com/l/?uddg=' + encodeURIComponent('https://www.huawei.com/cn/'), 'duckduckgo'), 'https://www.huawei.com/cn/');
+  assert.equal(publicReferenceUrl('https://duckduckgo.com/l/?uddg=' + encodeURIComponent('https://sspai.com/post/123'), 'duckduckgo'), 'https://sspai.com/post/123');
   for (const url of ['https://amazon.com/item/1', 'https://item.jd.com/123.html', 'https://item.taobao.com/item.htm?id=1', 'https://detail.tmall.com/item.htm?id=1', 'https://you.163.com/item/detail?id=1', 'https://www.suning.cn/product/1', 'https://www.xiaohongshu.com/goods-detail/123', 'https://www.mi.com/shop/buy/detail?product_id=1', 'https://store.honor.com/cn/', 'https://sspai.com.evil.test/post/1', 'https://user:pass@sspai.com/post/1', 'http://127.0.0.1/']) assert.equal(publicReferenceUrl(url, 'bing'), null);
 });
 
