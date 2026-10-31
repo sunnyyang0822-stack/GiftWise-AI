@@ -19,7 +19,7 @@ const retrievalWorker = new RetrievalWorker(RETRIEVAL_CONFIG.provider !== "unava
  */
 
 import { strictParse, dump } from "./jsonstrict.mjs";
-import { packagingSectionItems } from "./presentation-packaging.mjs";
+import { packagingSections } from "./presentation-packaging.mjs";
 import { adaptIntakeObject } from "./intake.mjs";
 import { validate, validateForDecision, validateRequestOnly, requestIsValid, checkPresentation, checkPresentationForDecision, error as pushError, deliveryDeadline, parseDurationDays, attachUniquenessWarnings, fulfillmentOf, relationAssumptionErrors, fulfillmentWordingErrors, amountToCents } from "./checker.mjs";
 import { buildMockCandidates, buildMockRevision, buildMockPresentation, buildBrokenModelOutput, buildMockPartialFailure, buildMockStressCandidates, stressifyPresentation } from "./mock-model.mjs";
@@ -651,11 +651,7 @@ function buildSections(presentation, candidate, request) {
         `围绕方案：${candidate.name} —— ${candidate.description}`,
       ],
     },
-    {
-      key: "packaging",
-      title: "② 包装材料与步骤",
-      items: packagingSectionItems(presentation.packaging),
-    },
+    ...packagingSections(presentation.packaging),
     {
       key: "card",
       title: "③ 贺卡正文与装饰物建议",

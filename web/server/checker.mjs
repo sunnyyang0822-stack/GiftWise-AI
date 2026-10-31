@@ -863,7 +863,7 @@ function checkPresentationCore(requestData, selectedCandidate, presentation, opt
   };
   const list = (value, path, nonempty = false) => {
     if (!Array.isArray(value) || (nonempty && value.length === 0)) {
-      invalid(path, nonempty ? "至少需要一种包装色调" : "须为呈现文本数组，可为空");
+      invalid(path, nonempty ? "至少需要一种配色" : "须为呈现文本数组，可为空");
       return;
     }
     value.forEach((v, i) => string(v, `${path}[${i}]`));
@@ -885,8 +885,8 @@ function checkPresentationCore(requestData, selectedCandidate, presentation, opt
     const materials = packagingTextItems(presentation.packaging.materials);
     const steps = packagingTextItems(presentation.packaging.steps);
     const description = packagingTextItems(presentation.packaging.description);
-    if (!description.length && !(materials.length && steps.length)) {
-      invalid("presentation.packaging", "请提供包装材料与步骤；无需实体包装时，请说明适合这份礼物的呈现方式");
+    if ((materials.length || steps.length) && !description.length && !(materials.length && steps.length)) {
+      invalid("presentation.packaging", "已提供实体包装内容时，请补全材料与步骤或说明使用方式");
     }
   }
   if (shape(presentation.giving_advice, "presentation.giving_advice", ["timing", "wording", "relationship_cautions"])) {

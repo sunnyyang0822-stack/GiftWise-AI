@@ -18,7 +18,7 @@
  */
 
 import { dump } from "../jsonstrict.mjs";
-import { packagingSectionItems } from "../presentation-packaging.mjs";
+import { packagingSections } from "../presentation-packaging.mjs";
 import { norm } from "../checker.mjs";
 import { CLOSENESS_TABLE } from "../labels.mjs";
 
@@ -139,7 +139,7 @@ export function buildLocalPresentation(request, candidate, options = {}) {
     presentation = {
       contract_version: "giftwise-20261031-v2",
       style: styleText,
-      packaging: { color_palette: colorPalette, description: `本地呈现示例：把${candidate?.name ?? "所选礼物"}自然交给对方，配上以下贺卡和简短说明；本示例不要求新增包装采购。` },
+      packaging: { color_palette: colorPalette },
       card_text: cardText,
       giving_advice: { timing, wording, relationship_cautions: cautions },
       unknowns: sharedUnknowns,
@@ -185,7 +185,7 @@ export function buildLocalPresentation(request, candidate, options = {}) {
   };
 }
 
-/** ① 风格与配色 ② 包装材料与步骤 ③ 贺卡正文与装饰物 ④ 赠送时机、方式与话术 */
+/** Actual content sections; packaging is optional and physical description-only content has its own title. */
 function buildLocalSections(presentation, candidate, request, ctx) {
   const packaging = presentation.packaging || {};
   return [
@@ -199,17 +199,13 @@ function buildLocalSections(presentation, candidate, request, ctx) {
         `围绕方案：${candidate?.name ?? "未命名候选"}`,
       ],
     },
-    {
-      key: "packaging",
-      title: "② 包装材料与步骤",
-      items: packagingSectionItems(packaging),
-    },
+    ...packagingSections(packaging),
     {
       key: "card",
       title: "③ 贺卡正文与装饰物建议",
       items: [
         `贺卡正文：${ctx.cardText}`,
-        ...(Array.isArray(presentation.decorative_advice) ? presentation.decorative_advice.map((d) => `装饰物：${d}`) : ["装饰物：不加额外装饰，避免喧宾夺主"]),
+        ...(Array.isArray(presentation.decorative_advice) ? presentation.decorative_advice.map((d) => `装饰物：${d}`) : []),
       ],
     },
     {
