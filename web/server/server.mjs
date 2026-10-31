@@ -593,6 +593,7 @@ async function handleApi(req, res, url) {
       mode: outcome.mode,
       notices: outcome.notices || [],
       attestation: attest,
+      ...(outcome.kind === "recommendation_failed" ? { run_id: outcome.run_id, repair_count: outcome.repair_count, call_counts: outcome.call_counts } : {}),
       ...(outcome.retrieval ? {retrieval:outcome.retrieval,media:outcome.media} : {}),
     });
     return true;

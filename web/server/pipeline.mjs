@@ -37,7 +37,7 @@ import { provideRealProducts } from "./catalog/provide.mjs";
 import { libraryPreview } from "./catalog/match.mjs";
 import { createRun, getRun, getRunByRecommendationKey, publicReport, retrievalView } from "./store.mjs";
 import { checkAiExclusions } from "./exclusion-checker.mjs";
-import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, LIMITS, INTAKE_PARSE_CONFIG, localDbPath } from "./config.mjs";
+import { MODE, MOCK_MODE_NOTICE, MOCK_CANDIDATE_NOTICE, MOCK_PRESENTATION_NOTICE, GLOBAL_REPAIR_LIMIT, modeNotices, modeFallbackNotices, CATALOG_CONFIG, SHIPPING_CONFIG, PRESALE_CONFIG, PURCHASE_WINDOW_CONFIG, FULFILLMENT_CONFIG, LIMITS, localDbPath } from "./config.mjs";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -66,89 +66,101 @@ function parseJsonOrNull(text) {
 }
 
 function computeSelectable(validation, workflowErrors) {
-  if (validation.errors.length > 0 || workflowErrors.length > 0) return [];
-  return validation.candidate_results.filter((r) => r.passed).map((r) => r.id);
+  if (!validation.all_passed || validation.candidate_results.length !== LIMITS.candidatesPerBatch || validation.errors.length > 0 || workflowErrors.length > 0) return [];
+  const ids = validation.candidate_results.filter((r) => r.passed).map((r) => r.id);
+  return ids.length === LIMITS.candidatesPerBatch ? ids : [];
 }
 
-/* --------------------------------------------------- 第 1 步解析出的用户硬约束 gate */
-
-/** 从用户原文里取「有辨识度」的比对片段：连续 2-gram + ASCII 词，去掉通用词。 */
-const LITERAL_STOP_TOKENS = new Set(["喜欢", "比较", "有点", "一点", "特别", "东西", "礼物", "一下", "的话", "而且", "还有", "就是", "可以", "不要", "别的", "其它", "其他"]);
-function literalTokens(text) {
-  const tokens = new Set();
-  if (typeof text !== "string") return [];
-  for (const word of text.toLowerCase().match(/[a-z0-9]{2,}/g) ?? []) tokens.add(word);
-  const cjk = [...text.replace(/[^\u4e00-\u9fff]+/g, " ")].filter((ch) => /[\u4e00-\u9fff]/.test(ch));
-  for (let i = 0; i + 1 < cjk.length; i += 1) {
-    const token = `${cjk[i]}${cjk[i + 1]}`;
-    if (!LITERAL_STOP_TOKENS.has(token)) tokens.add(token);
-  }
-  return [...tokens];
-}
-
-/** 用户输入约束：预算继续按现有契约检查，时间仅提示，喜好保留原文。 */
-export function applyInputParseGates({ inputParse, validation, candidates, delivery = null, notices }) {
+/** Parsed preferences remain model context; only explicit monetary bounds are hard gates. */
+export function applyInputParseGates({ inputParse, validation, candidates }) {
   if (!inputParse || typeof inputParse !== "object") return null;
-  const budgetBand = inputParse.constraints?.budget_band ?? null;
-  const daysBand = inputParse.constraints?.days_band ?? null;
-  const literals = Array.isArray(inputParse.literal_preferences) ? inputParse.literal_preferences.filter((item) => typeof item === "string" && item.trim()) : [];
-  if (!budgetBand && !daysBand && literals.length === 0) return null;
-  const literalGate = INTAKE_PARSE_CONFIG.literalPreferenceGate;
+  const band = inputParse.constraints?.budget_band ?? inputParse.budget_band ?? null;
+  const days = inputParse.constraints?.days_band ?? null;
+  const literals = Array.isArray(inputParse.literal_preferences) ? inputParse.literal_preferences : [];
+  if (!band && !days && !literals.length) return null;
   const audit = {
-    budget_band: budgetBand ? { ...budgetBand, enforced: "hard_gate" } : null,
-    days_band: daysBand
-      ? {
-          ...daysBand,
-          enforced: "not_used_for_decision",
-          enforced_note:
-            "时间不参与推荐筛选或排序。",
-        }
-      : null,
-    literal_preferences: literals,
-    literal_preferences_enforced: literalGate ? "hard_gate" : "warning",
-    literal_gate_env: "GIFTWISE_LITERAL_PREFERENCE_GATE=1",
-    findings: [],
+    budget_band: band ? { ...band, enforced: "upper_and_explicit_user_range", derived_lower_bound: "soft_reference" } : null,
+    days_band: days ? { ...days, enforced: "not_used_for_decision", enforced_note: "时间不参与推荐筛选或排序。" } : null,
+    literal_preferences: literals, literal_preferences_enforced: "model_context", findings: [],
   };
-  const byId = new Map((Array.isArray(candidates) ? candidates : []).map((candidate) => [candidate?.id, candidate]));
   for (const result of validation.candidate_results ?? []) {
-    const candidate = byId.get(result.id);
-    if (!candidate) continue;
-    const total = amountToCents(String(candidate.estimated_total ?? ""));
-    if (budgetBand && total !== null) {
-      const low = amountToCents(String(budgetBand.min ?? ""));
-      const high = amountToCents(String(budgetBand.max ?? ""));
-      if (low !== null && total < low) {
-        pushError(result.errors, "PRICE_OUT_OF_BAND", `${result.id}.estimated_total`, `估算总价 ${candidate.estimated_total} 低于用户所给金额 ${budgetBand.user_amount} 的下界 ${budgetBand.min}（带宽上下不超过 ${budgetBand.band_cny} 元）`);
-        result.passed = false;
-        audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side: "below", estimated_total: candidate.estimated_total, band: [budgetBand.min, budgetBand.max], level: "error" });
-      } else if (high !== null && total > high) {
-        pushError(result.errors, "PRICE_OUT_OF_BAND", `${result.id}.estimated_total`, `估算总价 ${candidate.estimated_total} 超过用户所给金额 ${budgetBand.user_amount} 的上界 ${budgetBand.max}（带宽上下不超过 ${budgetBand.band_cny} 元）`);
-        result.passed = false;
-        audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side: "above", estimated_total: candidate.estimated_total, band: [budgetBand.min, budgetBand.max], level: "error" });
-      }
-    }
-    if (literals.length > 0) {
-      const haystack = canonical(candidate).toLowerCase();
-      const reflected = literals.some((literal) => literalTokens(literal).some((token) => haystack.includes(token)));
-      if (!reflected) {
-        const finding = {
-          candidate_id: result.id,
-          code: "LITERAL_PREFERENCE_NOT_REFLECTED",
-          message: `候选文案里找不到用户原文（${literals.join(" / ")}）的落点：用户的原文是硬约束，不接受只用预设类目替代。`,
-          level: literalGate ? "error" : "warning",
-        };
-        audit.findings.push(finding);
-        if (literalGate) {
-          pushError(result.errors, "LITERAL_PREFERENCE_NOT_REFLECTED", result.id, finding.message);
-          result.passed = false;
-        } else {
-          result.warnings = [...(result.warnings ?? []), finding];
-          notices.push(`⚠ 候选 ${result.id} 未能体现用户原文「${literals.join(" / ")}」；已如实记为警示（未阻止选择，避免把用户卡死）。`);
-        }
-      }
+    const candidate = candidates.find(c => c?.id === result.id);
+    const total = amountToCents(String(candidate?.estimated_total ?? ""));
+    if (!band || total === null) continue;
+    // user_min is present for a user range, absent for a scalar-derived ±50 band.
+    const low = amountToCents(String(band.user_min ?? ""));
+    const high = amountToCents(String(band.user_max ?? band.user_amount ?? ""));
+    const side = low !== null && total < low ? "below" : high !== null && total > high ? "above" : null;
+    if (side) {
+      pushError(result.errors, "PRICE_OUT_OF_BAND", result.id + ".estimated_total", side === "below" ? "估算金额低于用户明确的预算区间下限。" : "估算金额超过用户预算上限。");
+      result.passed = false;
+      audit.findings.push({ candidate_id: result.id, code: "PRICE_OUT_OF_BAND", side, estimated_total: candidate.estimated_total, level: "error" });
     }
   }
   return audit;
+}
+
+/** The same complete non-time validation runs before and after the one repair. */
+function evaluateRecommendationBatch({ requestJson, request, candidatesJson, retrieval, productReferences, referenceReferences, inputParse, overBudgetObservations = [] }) {
+  const parsed = parseJsonOrNull(candidatesJson);
+  const candidates = Array.isArray(parsed?.candidates) ? parsed.candidates : [];
+  const objects = candidates.filter(c => c && typeof c === 'object' && !Array.isArray(c));
+  const validation = validateForDecision(requestJson, candidatesJson, strictParse);
+  const optionalEvidence = bindOptionalCandidateEvidence(retrieval, objects, productReferences, request.budget_amount);
+  const optionalReferences = bindReferenceEvidence(retrieval.references ?? [], objects, referenceReferences);
+  for (const id of optionalEvidence.knownOverBudget) {
+    const result = validation.candidate_results.find(r => r.id === id);
+    if (result) {
+      result.passed = false;
+      pushError(result.errors, 'OVER_BUDGET', id + '.estimated_total', '所选商品的无附加条件观察价超过预算上限');
+    }
+  }
+  // Removing a citation alone does not change a previously observed over-budget item.
+  // This retains the price fact without reattaching an old image to a revised suggestion.
+  for (const previous of overBudgetObservations) {
+    const candidate = objects.find(c => c.id === previous.id);
+    const result = validation.candidate_results.find(r => r.id === previous.id);
+    if (candidate?.name === previous.name && !optionalEvidence.bindings.has(previous.id) && result) {
+      result.passed = false;
+      pushError(result.errors, 'OVER_BUDGET', previous.id + '.estimated_total', '该方案已有超预算的真实观察价，删除引用不能改变价格事实。');
+    }
+  }
+  attachUniquenessWarnings(validation, candidates);
+  const fulfillmentByCandidate = new Map();
+  validation.candidate_results.forEach((result, index) => {
+    const candidate = candidates[index];
+    const verdict = fulfillmentOf(candidate, index);
+    fulfillmentByCandidate.set(result.id ?? `candidates[${index}]`, verdict);
+    result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
+    const errors = [...verdict.errors, ...relationAssumptionErrors(candidate, index, { relation_id: request.recipient_relation_id ?? request.recipient_relation ?? null })];
+    if (errors.length) { result.passed = false; result.errors.push(...errors); }
+  });
+  const audit = applyInputParseGates({ inputParse, validation, candidates });
+  if (audit) validation.input_parse_gates = audit;
+  validation.all_passed = validation.errors.length === 0 && validation.candidate_results.length === LIMITS.candidatesPerBatch && validation.candidate_results.every(r => r.passed);
+  if (!["error", "needs_input"].includes(validation.status)) validation.status = validation.all_passed ? "passed" : "failed";
+  return { candidates, validation, optionalEvidence, optionalReferences, fulfillmentByCandidate };
+}
+
+function preservedCandidates(evaluated) {
+  return evaluated.candidates.filter((c, index) => c && evaluated.validation.candidate_results[index]?.passed && evaluated.candidates.filter(x => x?.id === c.id).length === 1);
+}
+
+function protectReferences(previous, revised, preserved, workflowErrors, field) {
+  const oldRefs = Array.isArray(previous) ? previous : [];
+  const nextRefs = Array.isArray(revised) ? revised : [];
+  const ids = new Set(preserved.map(c => c.id));
+  for (const id of ids) {
+    const old = oldRefs.filter(r => r?.candidate_id === id);
+    const next = nextRefs.filter(r => r?.candidate_id === id);
+    if (next.length && canonical(old) !== canonical(next)) workflowErrors.push({ code: "PASSED_BINDING_CHANGED", path: field + "." + id, message: "修订改动了已通过候选的来源绑定。" });
+  }
+  return [...oldRefs.filter(r => ids.has(r?.candidate_id)), ...nextRefs.filter(r => !ids.has(r?.candidate_id))];
+}
+
+function recommendationOutcome(run) {
+  if (run.recommendation_failure) return { ...run.recommendation_failure, run, run_id: run.run_id, repair_count: run.repair_count, call_counts: run.call_counts };
+  return { kind: "report", status: run.status, run, report: publicReport(run) };
 }
 
 /* ------------------------------------------------------------ 推荐阶段 */
@@ -166,8 +178,8 @@ export async function runRecommendation(input, services = {}) {
 }
 async function runRecommendationCore(input, services = {}) {
   /* 第 1 步自然语言解析的结果（可为 null：没有自由文本，或前端已在 /api/intake/parse 解析过）。
-     它只影响两处：① 候选侧的用户硬约束 gate；② 响应里的 nl_parse 审计块。
-     ⛔ 它**不**影响校验：effectiveIntake 仍旧走 adaptIntakeObject + checker 同一套硬规则。 */
+     原文提供给模型理解，明确金额边界参与完整校验；effectiveIntake 仍走同一适配契约。
+     完整解析结果保留在 nl_parse 审计块。 */
   const nlParse = input.inputParse && typeof input.inputParse === "object" ? input.inputParse : null;
   let effectiveIntake = input.intake;
   if (input.analysis && input.exclusion_confirmation && Array.isArray(input.exclusion_confirmation.confirmed_ids)) {
@@ -212,7 +224,7 @@ async function runRecommendationCore(input, services = {}) {
   }
   const key = canonical({ owner:input.ownerScope || "internal", intake: effectiveIntake,analysis:input.analysis??null,inputParse:input.inputParse??null, exclusion_confirmation: input.exclusion_confirmation || null, mode, demo });
   const cached = getRunByRecommendationKey(key);
-  if (cached) return { kind: "report", status: cached.status, run: cached, report: publicReport(cached), idempotent: true };
+  if (cached) return { ...recommendationOutcome(cached), idempotent: true };
   const requestJson = adapterResult.request_json;
   const request = parseJsonOrNull(requestJson);
   const requestCheck = validateRequestOnly(requestJson, strictParse);
@@ -330,78 +342,54 @@ async function runRecommendationCore(input, services = {}) {
 
   initialCandidatesJson = candidatesJson;
   initialValidation = validate(requestJson, candidatesJson, strictParse);
-  validation = validateForDecision(requestJson, candidatesJson, strictParse);
-
-  const internal = validation.errors.some((e) => e.code === "INTERNAL_ERROR");
-  let repairable = mode === "mock" && !internal && !validation.all_passed && repairCount === 0;
-
-  if (repairable) {
-    /* 全局唯一一次自动业务修订（推荐阶段用掉，呈现阶段就不能再用） */
-    const batch = parseJsonOrNull(candidatesJson);
-    const items = batch && Array.isArray(batch.candidates) ? batch.candidates : [];
-    // 模型输出损坏时，修订也拿到同样的损坏输入：不伪造“已修复”，如实停在错误态。
-    const revised =
-      demo === "model_error"
-        ? { candidates_json: buildBrokenModelOutput().candidates_json, changed: [], notice: "模拟模型两次都输出损坏 JSON。" }
-        : buildMockRevision(request, items, validation);
+  let overBudgetObservations = [];
+  const evaluate = () => evaluateRecommendationBatch({ requestJson, request, candidatesJson, retrieval, productReferences, referenceReferences, inputParse: nlParse, overBudgetObservations });
+  let evaluated = evaluate();
+  overBudgetObservations = evaluated.candidates.filter(c => c && evaluated.optionalEvidence.knownOverBudget.includes(c.id)).map(c => ({ id: c.id, name: c.name }));
+  const preRepairValidation = structuredClone(evaluated.validation);
+  validation = evaluated.validation;
+  const internal = validation.errors.some(e => e.code === "INTERNAL_ERROR");
+  if (!internal && !validation.all_passed && repairCount < GLOBAL_REPAIR_LIMIT && mode !== "dify") {
+    const preserved = preservedCandidates(evaluated);
+    // Occupy the shared quota before transport. Failure/cancellation never refunds it.
+    repairCount += 1;
     callCounts.recommend_revision += 1;
-    repairCount = 1;
-    const revisedValidation = validateForDecision(requestJson, revised.candidates_json, strictParse);
-    // N6 状态保护：已通过候选必须逐字节不变，否则整次修订不得用于选择。
-    const previousPassed = new Map(
-      items
-        .map((candidate, index) => [validation.candidate_results[index], candidate])
-        .filter(([result]) => result && result.passed)
-        .map(([result, candidate]) => [result.id, candidate]),
-    );
-    if (previousPassed.size > 0) {
-      const revisedBatch = parseJsonOrNull(revised.candidates_json);
-      const revisedItems = revisedBatch && Array.isArray(revisedBatch.candidates) ? revisedBatch.candidates : [];
-      for (const [cid, previous] of previousPassed) {
-        const matches = revisedItems.filter((c) => c && typeof c === "object" && c.id === cid);
-        if (matches.length !== 1 || canonical(matches[0]) !== canonical(previous)) {
-          workflowErrors.push({
-            code: "PASSED_CANDIDATE_CHANGED",
-            path: cid,
-            message: "修订改动了已通过候选，整次修订拒绝用于选择",
-          });
-        }
+    let call;
+    try {
+      if (mode === "mock") {
+        const revised = demo === "model_error" ? { candidates_json: buildBrokenModelOutput().candidates_json } : buildMockRevision(request, evaluated.candidates, validation);
+        call = { ok: true, outputs: revised };
+        if (revised.notice) notices.push(revised.notice);
+      } else {
+        call = await (services.requestCandidateRevision ?? llmProvider.requestCandidateRevision)({
+          requestJson, intakeJson: input.intake === undefined ? null : dump(input.intake),
+          candidatesJson, validation: structuredClone(validation), preservedCandidates: structuredClone(preserved),
+          retrieval, productReferences, referenceReferences, inputParse: nlParse, signal: input.signal,
+        });
       }
+    } catch {
+      call = { ok: false, code: "RECOMMENDATION_REPAIR_FAILED" };
     }
-    candidatesJson = revised.candidates_json;
-    validation = revisedValidation;
-    notices.push(revised.notice);
-  } else if (mode === "mock" && !validation.all_passed && repairCount >= GLOBAL_REPAIR_LIMIT) {
-    workflowErrors.push({
-      code: "REPAIR_NOT_ALLOWED",
-      path: "repair_count",
-      message: "当前无法自动调整候选，请重新生成。",
-    });
+    if (!call.ok || typeof call.outputs?.candidates_json !== "string") {
+      workflowErrors.push({ code: call.code ?? "RECOMMENDATION_REPAIR_FAILED", path: "recommend_revision", message: "候选调整未完成。" });
+    } else {
+      const revisedJson = call.outputs.candidates_json;
+      const revised = parseJsonOrNull(revisedJson);
+      const items = Array.isArray(revised?.candidates) ? revised.candidates : [];
+      for (const previous of preserved) {
+        const matches = items.filter(c => c?.id === previous.id);
+        if (matches.length !== 1 || canonical(matches[0]) !== canonical(previous)) workflowErrors.push({ code: "PASSED_CANDIDATE_CHANGED", path: previous.id, message: "修订改动了已通过候选，整次修订拒绝用于选择。" });
+      }
+      productReferences = protectReferences(productReferences, parseJsonOrNull(call.outputs.product_references_json || "null"), preserved, workflowErrors, "product_references");
+      referenceReferences = protectReferences(referenceReferences, parseJsonOrNull(call.outputs.reference_references_json || "null"), preserved, workflowErrors, "reference_references");
+      candidatesJson = revisedJson;
+      evaluated = evaluate();
+      validation = evaluated.validation;
+    }
   }
-
-  let evidenceBindings = new Map();
-  const optionalEvidence=bindOptionalCandidateEvidence(retrieval,(parseJsonOrNull(candidatesJson)||{}).candidates??[],productReferences,request.budget_amount);
-  evidenceBindings=optionalEvidence.bindings;
-  const optionalReferences=bindReferenceEvidence(retrieval.references??[],(parseJsonOrNull(candidatesJson)||{}).candidates??[],referenceReferences);
-  for(const id of optionalEvidence.knownOverBudget){const result=validation.candidate_results.find(r=>r.id===id);if(result){result.passed=false;pushError(result.errors,'OVER_BUDGET',id+'.estimated_total','所选商品的无附加条件观察价超过预算上限');}}
-
-  /* ---- 追加规则 1：独特性启发式（warning 级，绝不硬错）------------------- */
-  const candidateList = (parseJsonOrNull(candidatesJson) || {}).candidates || [];
-  attachUniquenessWarnings(validation, candidateList);
-  /* 履约方式（受控枚举）+ 关系假定门禁：只影响**那一个**候选，不牵连其他两个。 */
-  const fulfillmentByCandidate = new Map();
-  const relationId = request?.recipient_relation_id ?? request?.recipient_relation ?? null;
-  validation.candidate_results.forEach((result, index) => {
-    const candidate = candidateList[index];
-    const verdict = fulfillmentOf(candidate, index);
-    fulfillmentByCandidate.set(result.id ?? `candidates[${index}]`, verdict);
-    result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
-    const gateErrors = [...verdict.errors, ...relationAssumptionErrors(candidate, index, { relation_id: relationId })];
-    if (gateErrors.length && result.passed) {
-      result.passed = false;
-      result.errors = [...result.errors, ...gateErrors];
-    }
-  });
+  const { candidates: candidateList, optionalEvidence, optionalReferences, fulfillmentByCandidate } = evaluated;
+  const evidenceBindings = optionalEvidence.bindings;
+  const batchComplete = validation.all_passed && workflowErrors.length === 0;
 
   /* 先匹配真实商品，以页面物流字段补充时间提示。 */
   const catalogEnabled = mode !== "mock" || services.catalogEnabled === true;
@@ -413,7 +401,7 @@ async function runRecommendationCore(input, services = {}) {
     results: [],
     accounting: { candidates: candidateList.length, library_hits: 0, fallback_hits: 0, degraded: candidateList.length, scrape_calls: 0, scrape_total_elapsed_ms: 0, fallback_skipped_reason: catalogEnabled ? null : "SCRAPE_DISABLED", scrape_enabled: false },
   };
-  if (catalogEnabled) {
+  if (catalogEnabled && batchComplete) {
     const passable = candidateList.filter((candidate) => evidenceBindings.has(candidate.id) && evidenceBindings.get(candidate.id).reference_kind!=='public_reference' && validation.candidate_results.some((result) => result.id === candidate.id && result.passed));
     // External tool work already followed the model's pre-generation decision. Do not blind-scrape again.
     const scrapeEnabled = false;
@@ -520,30 +508,21 @@ async function runRecommendationCore(input, services = {}) {
     }
     result.warnings = [...(result.warnings ?? []), ...verdict.warnings];
   });
-  /* 第 1 步解析约束：预算与喜好沿用原契约，时间仅作提示。 */
-  const inputParseAudit = applyInputParseGates({ inputParse: nlParse, validation, candidates: candidateList, delivery, notices });
-  if (inputParseAudit) {
-    validation.input_parse_gates = inputParseAudit;
-    if (inputParseAudit.findings.length > 0) {
-      notices.push(`有${inputParseAudit.findings.length}条与你的需求相关的提示，请结合方案查看。`);
-    }
-  }
-  validation.all_passed = validation.errors.length === 0 && validation.candidate_results.length === LIMITS.candidatesPerBatch && validation.candidate_results.every((item) => item.passed);
-  if (!validation.all_passed && ["passed"].includes(validation.status)) validation.status = "failed";
-
   /* ---- 追加规则 3：第 3–4 步的包装风格与色彩视觉方向（与 intake 一致、可追溯）----
      ⚠️ 这一段的 `llm_text` 通道会发起**真实**大模型调用（`services.visualDirectionProvider`
      可注入替身；测试必须注入，否则会真的出站）。 */
   let directionOutcome = null;
   try {
-    const provider = services.visualDirectionProvider ?? visualDirectionProviderFactory({ llm: llmProvider, imageTransport: mediaProvider.transport ?? null });
-    directionOutcome = await deriveVisualDirection({
-      intake: input.intake,
-      request,
-      candidates: candidateList.filter((candidate) => validation.candidate_results.some((result) => result.id === candidate.id && result.passed)),
-      runId: null,
-      provider,
-    });
+    if (batchComplete) {
+      const provider = services.visualDirectionProvider ?? visualDirectionProviderFactory({ llm: llmProvider, imageTransport: mediaProvider.transport ?? null });
+      directionOutcome = await deriveVisualDirection({
+        intake: input.intake,
+        request,
+        candidates: candidateList,
+        runId: null,
+        provider,
+      });
+    }
   } catch (error) {
     directionOutcome = { ok: false, code: error?.code ?? "DIRECTION_FAILED", notices: [`⚠ 第 3–4 步的视觉方向未能产出（${error?.message ?? "未知原因"}）；后续步骤不会用模拟方向顶替。`] };
   }
@@ -576,6 +555,7 @@ async function runRecommendationCore(input, services = {}) {
     idempotency_key: key,
     nl_parse: nlParse,
   });
+  run.pre_repair_validation = preRepairValidation;
   run.retrieval = retrieval;
   run.retrieval_audit = {protocol:useAgentTools?'model_tool_calls':mode==='dify'?'remote_workflow_tools_not_exposed':'disabled',tool_calls:agentTools.audit,plan:searchPlan,coverage:retrieval.coverage??[],warnings:retrieval.warnings??[],references:productReferences,reference_references:referenceReferences,rejected_references:[...optionalEvidence.rejected,...optionalReferences.rejected]};
   run.product_bindings = evidenceBindings;
@@ -619,7 +599,7 @@ async function runRecommendationCore(input, services = {}) {
     if(existing)Object.assign(existing,observed);else run.retrieval.products.push(observed);
   }
   run.media = mediaProvider.candidates([...new Map(mediaBindings.map(b=>[b.candidate_id,b])).values()]);
-  if(useAgentTools)run.retrieval_audit.persistence=agentTools.finalize({runId:run.run_id,status:'completed',bindings:run.media.candidates,rejected:run.retrieval_audit.rejected_references,candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
+  if(useAgentTools)run.retrieval_audit.persistence=agentTools.finalize({runId:run.run_id,status:batchComplete?'completed':'failed',errorCode:batchComplete?null:'RECOMMENDATION_INCOMPLETE',bindings:run.media.candidates,rejected:run.retrieval_audit.rejected_references,candidateIds:run.candidates.map(c=>c.id),references:run.retrieval.references??[]});
   run.delivery = delivery;
   run.uniqueness = { warnings: validation.warnings ?? [], note: "独特性是主观的：这里只用可检验的启发式降低大众化倾向，不声明「保证独特」。" };
   run.visual_direction = directionOutcome?.ok ? directionOutcome.direction : null;
@@ -629,7 +609,7 @@ async function runRecommendationCore(input, services = {}) {
   /* 第 1 步自然语言解析的审计块（null＝本次没有自由文本/未解析）。
      账本口径更正（产品负责人 2026-10-31 独立验收）：一次**成功**的完整交互＝
      recommend 1 次 + style_direction 1 次 + present 1 次（repair_count=0）＝**3 次**模型调用 + 1 次生图；
-     首轮输出不合格触发一次修复时才是 5 次。生图**没有** JSONL 账本（recordRealCall 只在 web/server/llm/），
+     推荐业务修订最多追加 1 次，工具轮次及既有传输/格式重试另按实际记账。生图**没有** JSONL 账本（recordRealCall 只在 web/server/llm/），
      它的硬证据是 media-store 新增 task+asset 与响应里的 generation 块。 */
   run.nl_parse = nlParse
     ? { ...nlParse, call_ledger_kind: "intake_parse", note: "解析调用同样写服务端账本（kind=intake_parse），与 recommend/style_direction/present 分别计数。" }
@@ -637,12 +617,16 @@ async function runRecommendationCore(input, services = {}) {
   run.initial_candidates = (parseJsonOrNull(initialCandidatesJson) || {}).candidates || [];
   run.initial_candidate_ids = initialValidation.candidate_results.map((r) => r.id);
 
+  if (selectable.length !== LIMITS.candidatesPerBatch) run.recommendation_failure = {
+    kind: "recommendation_failed", status: "failed", mode,
+    errors: [{ code: "RECOMMENDATION_INCOMPLETE", path: "candidates", message: "未能完成三个可选方案，请调整需求后重新生成。" }],
+    notices,
+  };
   const referenceImagesEnabled=services.referenceImagesEnabled??(useAgentTools&&!process.env.NODE_TEST_CONTEXT);
-  if(referenceImagesEnabled&&useAgentTools&&validation.all_passed&&workflowErrors.length===0&&run.candidates.length===3){
+  if(!run.recommendation_failure&&batchComplete&&referenceImagesEnabled&&useAgentTools&&run.candidates.length===LIMITS.candidatesPerBatch){
     startReferenceImages(run,{session:agentTools,requestJson,intakeJson:dump(effectiveIntake),signal:input.signal,isCurrent:()=>getRun(run.run_id)===run,requestImages:services.requestReferenceImages??llmProvider.requestReferenceImages});
   }
-
-  return { kind: "report", status, run, report: publicReport(run) };
+  return recommendationOutcome(run);
 }
 
 /* ------------------------------------------------------------ 呈现阶段 */

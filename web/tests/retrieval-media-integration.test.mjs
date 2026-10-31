@@ -69,9 +69,10 @@ test('无资料仍经tool后final；无工具直接final不要求兴趣或三条
  assert.equal((await runPresentation({runId:a.run.run_id,selectedCandidateId:'c1',ownerScope:'direct-B'})).kind,'not_found');
 });
 
-test('已知预算越界仍拒绝单个方案；历史商品规格不符或跨任务ID拒绑而非整批不可选',async()=>{
+test('已知预算越界必须修订或整批失败；历史规格不符或跨任务ID只拒绝来源绑定',async()=>{
  reset();const over=controlledServices({useTool:false,mutate:candidates=>{candidates[0].estimated_total='601.00';}});
- const outcome=await runRecommendation({intake:intake(),mode:'llm'},over.services);assert.deepEqual(report(outcome).selectable_candidate_ids,['c2','c3']);assert.ok(outcome.run.validation.candidate_results[0].errors.some(e=>e.code==='OVER_BUDGET'));
+ over.services.requestCandidateRevision=async()=>({ok:false,code:'CONTROLLED_REPAIR_UNAVAILABLE'});
+ const outcome=await runRecommendation({intake:intake(),mode:'llm'},over.services);assert.equal(outcome.kind,'recommendation_failed');assert.equal(outcome.errors[0].code,'RECOMMENDATION_INCOMPLETE');assert.deepEqual(outcome.run.selectable_candidate_ids,[]);assert.ok(outcome.run.validation.candidate_results[0].errors.some(e=>e.code==='OVER_BUDGET'));assert.ok(outcome.run.validation.candidate_results.slice(1).every(r=>r.passed));assert.equal(outcome.run.repair_count,1);
  // Pure legacy-evidence fixtures test non-time binding constraints; no commerce adapter is called.
  const historical={product_id:'legacy-one-item',name:'历史杯具',variant:'四只装',price_amount:'50',price_conditions:[],price_source:'seed',observed_at:null};
  const candidate={id:'c1',name:'另一件物品',description:'独立方案',estimated_total:'50'};

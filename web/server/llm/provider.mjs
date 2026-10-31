@@ -31,6 +31,7 @@ import {
   buildPresentMessages,
   buildRecommendEnvelope,
   buildRecommendMessages,
+  buildRepairMessages,
   buildExclusionsMessages,
 } from "./prompt.mjs";
 import { buildLocalPresentation } from "./presentation.mjs";
@@ -155,6 +156,7 @@ export class LlmProvider {
     // 这个坑由 web/tools/llm-selftest.mjs 的真实 HTTP 链路发现（单测因箭头包装而漏过）。
     this.requestCandidates = this.requestCandidates.bind(this);
     this.requestReferenceImages = this.requestReferenceImages.bind(this);
+    this.requestCandidateRevision = this.requestCandidateRevision.bind(this);
     this.requestPresentation = this.requestPresentation.bind(this);
     this.recognizeExclusions = this.recognizeExclusions.bind(this);
     this.requestIntakeParse = this.requestIntakeParse.bind(this);
@@ -247,6 +249,24 @@ export class LlmProvider {
    *   inputParse：第 1 步自然语言解析出的**用户硬约束**（原文/±带宽/城市），
    *   由 buildRecommendEnvelope 放进 input_constraints，不改变 request_json。
    */
+  async requestCandidateRevision(input) {
+    if (!this.available()) return llmError('LLM_NOT_CONFIGURED', { attempts: 0, transport: 'live' });
+    const guard = assertIntakeHasNoDerivedFields(input.intakeJson);
+    if (!guard.ok) return llmError('LLM_INTAKE_DERIVED_FIELD', { fields: guard.fields, attempts: 0 });
+    // One business repair, without tools or an additional output-format retry loop.
+    const cfg = this.config();
+    const reply = await this.invoke({ kind: 'recommend_revision', messages: buildRepairMessages(input), maxTokens: cfg.maxTokens, signal: input.signal });
+    if (!reply.ok) return { ...reply, model_calls: 1 };
+    const parsed = parseModelJson(reply.text, { requireKey: 'candidates', finishReason: reply.finish_reason, usage: reply.usage, maxTokens: cfg.maxTokens });
+    if (!parsed.ok) return { ...parsed, model_calls: 1 };
+    const { product_references, reference_references, ...candidates } = parsed.value;
+    return { ok: true, model_calls: 1, outputs: {
+      candidates_json: dump(candidates),
+      ...(product_references !== undefined ? { product_references_json: dump(product_references) } : {}),
+      ...(reference_references !== undefined ? { reference_references_json: dump(reference_references) } : {}),
+    } };
+  }
+
   async requestCandidates({ requestJson, intakeJson = null, retrieval = null, library = null, inputParse = null, tools = [], executeTool, signal, maxToolRounds = 4 }) {
     if (!this.available()) return llmError('LLM_NOT_CONFIGURED', {attempts:0,transport:'live'});
     const guard = assertIntakeHasNoDerivedFields(intakeJson);
