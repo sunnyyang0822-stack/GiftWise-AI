@@ -24,25 +24,7 @@ export function error(errors, code, path, message) {
   errors.push({ code, path, message });
 }
 
-/* ================================================================== 接入层新增规则
- *
- * 下面两块**不是** validator/rules.py 的镜像，而是本接入层按产品负责人 2026-10-31
- * 追加要求实现的新规则。刻意不放进镜像函数体（`candidate()`），原因是
- * `web/tools/parity-check.mjs:157-173` 会逐项比对 JS 与 Python 的 `errors` / `passed`；
- * 把新错误码塞进镜像函数会让 parity 出现**假差异**。warnings 不在 parity 比对范围内，
- * 但为了口径统一，这里仍然用同一套 `{code, path, message}` 结构。
- *
- * ── 一、运输时间（要求：准备 + 运输 <= 可用天数）─────────────────────────
- * `estimated_shipping_days` 允许未知。未知时用 SHIPPING_CONFIG.defaultDays 参与判定，
- * 并一律标注为估算。绝不把运输时间写成保证，也绝不假装知道物流。
- *
- * ── 二、独特性启发式（warning 级，绝不硬错）───────────────────────────────
- * 独特性是主观的，因此这里只说「用可检验的启发式**降低**大众化倾向」，
- * 不声明任何「保证独特」。三个码：
- *   TOO_GENERIC            命中大众品类黑名单；
- *   NOT_GROUNDED           没有指回用户任何一条具体输入（换一个人也成立）；
- *   HOMOGENEOUS_CANDIDATES 三个方案同质（同品类换皮）。
- */
+/* 接入层时间提示与独特性启发式均为 warning，不改变底层镜像规则。 */
 
 /**
  * 从页面原文里解析时长（天）。中文电商的写法很多，这里只做**保守**解析：
@@ -80,152 +62,43 @@ export function parseDurationDays(text) {
   return { days: null, source_text: raw, upper_bound: false };
 }
 
-/**
- * 「网购时长」解析（产品负责人 2026-10-31 裁定：拿不到时长一律按 3~5 天，判定取上界 5 天）。
- *
- * 不重复计算：页面**同时**给了发货时效与配送时效 ⇒ 两者相加；只给其一 ⇒ 不与默认值相加，
- * 而是取「观测值」与保守默认下界（3 天）的较大者；两者都没有 ⇒ 用默认上界 5 天。
- *
- * ⚠️ 档位规则（补充裁定）：用户可用时长正好落在「3–5 天」这一档（上界 5 天）且网购时长未知时，
- * 默认快递时长视为**已包含在该档内**，不再额外叠加 ⇒ 判定简化为 `准备 <= 5 - 3 = 2 天`。
- * `tier_inclusive: true` 会写进数据层，便于追溯。
- *
- * @returns {{days:number|null, source:'page_observed'|'default_estimate', detail:object, tier_inclusive:boolean, default:object|null}}
- */
+/** 物流观察值与估算区间。days 仅为区间上界，不能当作实测时长。 */
 export function resolvePurchaseWindow({
-  ships_within_days = null,
-  shipping_days = null,
-  purchase_days = null,
-  is_preorder = null,
-  presale_days = null,
-  available_days = null,
-  default_window = PURCHASE_WINDOW_CONFIG,
-  presale_default_days = PRESALE_CONFIG.defaultDays,
+  ships_within_days = null, shipping_days = null, purchase_days = null,
+  is_preorder = null, presale_days = null,
 } = {}) {
   const known = (value) => typeof value === "number" && Number.isFinite(value) && value >= 0;
   const base = { tier_inclusive: false, default: null, detail: {} };
-  if (known(purchase_days)) {
-    return { ...base, days: purchase_days, source: "page_observed", detail: { purchase_days } };
+  if (known(purchase_days)) return { ...base, days: purchase_days, min: purchase_days, max: purchase_days, source: "page_observed", detail: { purchase_days } };
+  const dispatch = known(ships_within_days) ? ships_within_days : known(presale_days) ? presale_days : null;
+  if (dispatch !== null && known(shipping_days)) {
+    const days = dispatch + shipping_days;
+    return { ...base, days, min: days, max: days, source: "page_observed", detail: { ships_within_days: dispatch, shipping_days, summed: true } };
   }
-  const hasShips = known(ships_within_days);
-  const hasShipping = known(shipping_days);
-  // 明确标着预售但页面没给时长：按预售未知的保守值处理（不套 5 天默认，见 config 里的风险说明）。
-  if (is_preorder === true && !hasShips && !hasShipping && !known(presale_days)) {
-    return {
-      ...base,
-      days: presale_default_days,
-      source: "default_estimate",
-      detail: { presale_unknown: true, presale_default_days, reason: "is_preorder_unknown_duration" },
-      default: { ...default_window, used: presale_default_days, day_type: default_window.day_type, basis: "预售未给时长时的保守值" },
-    };
-  }
-  if (known(presale_days) && !hasShips) {
-    return { ...base, days: hasShipping ? presale_days + shipping_days : Math.max(presale_days, default_window.used), source: "page_observed", detail: { presale_days, shipping_days: hasShipping ? shipping_days : null, presale_as_ships_within: true, floor_applied: !hasShipping && Math.max(presale_days, default_window.used) !== presale_days } };
-  }
-  if (hasShips && hasShipping) {
-    return { ...base, days: ships_within_days + shipping_days, source: "page_observed", detail: { ships_within_days, shipping_days, summed: true } };
-  }
-  if (hasShips || hasShipping) {
-    const observed = hasShips ? ships_within_days : shipping_days;
-    return {
-      ...base,
-      days: Math.max(observed, default_window.used),
-      source: "page_observed",
-      detail: { only: hasShips ? "ships_within_days" : "shipping_days", observed, floor_applied: Math.max(observed, default_window.used) !== observed, floor_basis: "页面只给了发货或配送其中一段，另一段未知 ⇒ 不与默认值相加，取「观测值」与整包默认上界(5)的较大者" },
-    };
-  }
-  const tierInclusive = available_days === default_window.max;
-  return {
-    days: tierInclusive ? null : default_window.used,
-    source: "default_estimate",
-    tier_inclusive: tierInclusive,
-    detail: tierInclusive
-      ? { reason: "tier_inclusive_3_5_days", reserved_for_shipping: default_window.min, available_days }
-      : { reason: "no_page_duration", used_upper_bound: default_window.used },
-    default: { ...default_window },
-  };
+  // 发货已知、配送未知：在发货之后估算快递3~5天。
+  // 仅配送已知时不猜发货等待时长，完整时长保留未知。
+  const observed = dispatch ?? (known(shipping_days) ? shipping_days : null);
+  const onlyShipping = dispatch === null && known(shipping_days);
+  const min = onlyShipping ? null : (dispatch ?? 0) + PURCHASE_WINDOW_CONFIG.min;
+  const max = onlyShipping ? null : (dispatch ?? 0) + PURCHASE_WINDOW_CONFIG.max;
+  return { ...base, days: max, min, max, source: "default_estimate", default: { ...PURCHASE_WINDOW_CONFIG },
+    detail: { observed, only: dispatch !== null ? "ships_within_days" : known(shipping_days) ? "shipping_days" : null, presale_unknown: is_preorder === true && dispatch === null, reason: observed === null ? "no_page_duration" : "partial_page_duration", used_upper_bound: max } };
 }
 
-/**
- * 交付时间判据（准备 + 网购时长 <= 可用天数）。**纯函数、可单测**。
- *
- * 段时长各自「已知 / 未知」独立处理；未知一律按保守默认值参与判定，并在数据层标来源：
- *   - 网购时长未知 → `SHIPPING_TIME_UNKNOWN`（warning）+ 默认上界 5 天；
- *     「3–5 天」这一档 ⇒ 默认已含在档内，只留 3 天给快递（`tier_inclusive`）；
- *   - 预售未知 → `PRESALE_TIME_UNKNOWN`（warning）+ 预售保守值；
- *   - 商品标记为预售 → `PRESALE_ITEM`（warning）如实显著标注，**不因此排除**；
- *   - 超时 → `PREPARATION_TOO_LONG`（仅准备就超）/ `DELIVERY_TOO_LONG`（合计超）。
- */
+/** 时间仅保留中性事实元数据，不向推荐卡追加时间风险警告。 */
 export function deliveryDeadline({
-  prep_days = null,
-  presale_days = undefined,
-  ships_within_days = undefined,
-  shipping_days = undefined,
-  purchase_days = undefined,
-  available_days = null,
-  is_preorder = null,
-  fulfillment = 'online',
-  path = "candidates[0]",
-  declared = false,
-  presale_declared = false,
-  default_days = undefined,
-  presale_default_days = PRESALE_CONFIG.defaultDays,
+  prep_days = null, presale_days = null, ships_within_days = null,
+  shipping_days = null, purchase_days = null, available_days = null,
+  is_preorder = null, fulfillment = 'online', path = "candidates[0]",
 } = {}) {
   const errors = [];
   const warnings = [];
   const known = (value) => typeof value === "number" && Number.isFinite(value) && value >= 0;
-  if (fulfillment === 'offline' || fulfillment === 'experience') {
-    /* 线下自购 / 体验课程：**不计快递**，只判「准备（含预约）时间 <= 可用天数」。
-       → 「明天」这一档因此可以放行线下可购或可预约的体验类（撤销"必然不通过"）。 */
-    const total = known(prep_days) ? prep_days : null;
-    if (known(prep_days) && known(available_days) && prep_days > available_days) {
-      error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, fulfillment === 'experience' ? "预约/准备所需时间超过可用天数" : "准备时间超过可用天数");
-    }
-    return { errors, warnings, effective_shipping_days: null, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: "not_applicable", shipping_days_source: "not_applicable", fulfillment, fulfillment_confidence: FULFILLMENT_CONFIG.confidence, tier_inclusive: false, total_days: total, purchase_window: null };
-  }
-  const window = resolvePurchaseWindow({
-    ships_within_days: declared === true && known(shipping_days) && ships_within_days === undefined ? null : ships_within_days ?? null,
-    shipping_days: known(shipping_days) ? shipping_days : null,
-    purchase_days: known(purchase_days) ? purchase_days : null,
-    is_preorder,
-    presale_days: known(presale_days) ? presale_days : null,
-    available_days,
-    presale_default_days,
-    ...(default_days === undefined ? {} : { default_window: { ...PURCHASE_WINDOW_CONFIG, used: default_days === null ? PURCHASE_WINDOW_CONFIG.used : default_days, min: PURCHASE_WINDOW_CONFIG.min, max: PURCHASE_WINDOW_CONFIG.max } }),
-  });
-  const effective = window.tier_inclusive ? PURCHASE_WINDOW_CONFIG.min : window.days;
-  const presaleBasis = known(presale_days) ? "collected_field" : window.detail?.presale_unknown ? "conservative_default" : "not_declared";
-  if (window.detail?.presale_unknown) {
-    error(warnings, "PRESALE_TIME_UNKNOWN", `${path}.presale_days`, `页面标为预售但未给出时长，已按预售保守值 ${presale_default_days} 天参与判定（不代表该商品没有预售）`);
-  }
-  if (is_preorder === true) {
-    error(warnings, "PRESALE_ITEM", `${path}.is_preorder`, `该商品为预售：预售/发货时长按 ${effective} 天计入时间判定（已如实标注，不因此排除）`);
-  }
-  if (window.source === "default_estimate") {
-    if (default_days === null && !window.detail?.presale_unknown) {
-      error(errors, "SHIPPING_TIME_UNKNOWN", `${path}.estimated_shipping_days`, "页面没有给出任何时长且不允许使用保守默认值：按如实未知处理，无法判定能否按时送达");
-      return { errors, warnings, effective_shipping_days: null, effective_presale_days: null, shipping_basis: "unknown", shipping_days_source: "unknown", tier_inclusive: false, total_days: null, purchase_window: window };
-    }
-    error(warnings, "SHIPPING_TIME_UNKNOWN", `${path}.estimated_shipping_days`, `页面未给出网购时长，已按保守默认值参与判定（shipping_days_source=default_estimate）`);
-  }
-  if (prep_days === null) {
-    return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: null, purchase_window: window };
-  }
-  const total = prep_days + effective;
-  if (available_days === null) {
-    return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: total, purchase_window: window };
-  }
-  if (prep_days > available_days) {
-    error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, "估算准备时间超过可用天数");
-  } else if (total > available_days) {
-    error(
-      errors,
-      "DELIVERY_TOO_LONG",
-      `${path}.estimated_shipping_days`,
-      `准备 ${prep_days} 天 + 网购时长 ${effective} 天${window.tier_inclusive ? "（3–5 天档位已含默认快递，档内预留 3 天）" : ""} = ${total} 天，超过可用天数 ${available_days} 天（shipping_days_source=${window.source === "page_observed" ? "page_observed" : "default_estimate"}）`,
-    );
-  }
-  return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window.source, shipping_days_source: window.source === "page_observed" ? "page_observed" : "default_estimate", tier_inclusive: window.tier_inclusive, total_days: total, purchase_window: window };
+  const online = fulfillment !== 'offline' && fulfillment !== 'experience';
+  const window = online ? resolvePurchaseWindow({ ships_within_days, shipping_days, purchase_days, is_preorder, presale_days }) : null;
+  const effective = window?.days ?? null;
+  const total = known(prep_days) && (!online || known(effective)) ? prep_days + (online ? effective : 0) : null;
+  return { errors, warnings, effective_shipping_days: effective, effective_presale_days: known(presale_days) ? presale_days : null, shipping_basis: window?.source ?? "not_applicable", shipping_days_source: window?.source ?? "not_applicable", fulfillment, fulfillment_confidence: FULFILLMENT_CONFIG.confidence, tier_inclusive: false, total_days: total, purchase_window: window };
 }
 
 /** 大众品类黑名单（命中即 warning，不硬错）。 */
@@ -504,13 +377,13 @@ function parseJson(raw, path, errors, strictParseFn) {
 
 /* --------------------------------------------------------------- request */
 
-function request(request, errors) {
+function request(request, errors, { optionalTime = false } = {}) {
   if (request === null || typeof request !== "object" || Array.isArray(request)) {
     error(errors, "INVALID_REQUEST", "request", "请求根节点必须为对象");
     return null;
   }
   limits(Object.fromEntries(Object.entries(request).filter(([key]) => key !== "budget_range")), "request", errors);
-  required(request, ["recipient_relation", "occasion", "budget_amount", "currency", "available_days"], "request", errors);
+  required(request, ["recipient_relation", "occasion", "budget_amount", "currency", ...(optionalTime ? [] : ["available_days"])], "request", errors);
   for (const field of ["recipient_relation", "occasion", "currency", "notes"]) {
     if (Object.prototype.hasOwnProperty.call(request, field)) {
       text(request[field], `request.${field}`, errors, field === "notes");
@@ -525,7 +398,7 @@ function request(request, errors) {
   const budget = Object.prototype.hasOwnProperty.call(request, "budget_amount")
     ? amount(request.budget_amount, "request.budget_amount", errors)
     : null;
-  const availableDays = Object.prototype.hasOwnProperty.call(request, "available_days")
+  const availableDays = Object.prototype.hasOwnProperty.call(request, "available_days") && !(optionalTime && request.available_days === null)
     ? days(request.available_days, "request.available_days", errors)
     : null;
   // 请求侧范围**只在调用点**检查：amount()/days() 与候选侧共用，范围约束不得进入共用函数
@@ -667,7 +540,7 @@ function candidate(item, index, context) {
     if (total !== null && context.budgetMin !== null && total < context.budgetMin) {
       error(result.warnings, "BELOW_BUDGET_RANGE", `${path}.estimated_total`, "礼物估价低于预算区间下限，仍可选择");
     }
-    if (prep !== null && prep > context.days) {
+    if (prep !== null && context.days !== null && prep > context.days) {
       error(errors, "PREPARATION_TOO_LONG", `${path}.estimated_preparation_days`, "估算准备时间超过可用天数");
     }
     if (stringValue(item.currency) && item.currency !== context.currency) {
@@ -757,6 +630,10 @@ function batch(value, context, errors) {
  * @param {(raw: string, maxBytes?: number) => any} strictParseFn
  */
 export function validate(requestJson, candidatesJson, strictParseFn) {
+  return validateCore(requestJson, candidatesJson, strictParseFn);
+}
+
+function validateCore(requestJson, candidatesJson, strictParseFn, options = {}) {
   const result = {
     status: "failed",
     all_passed: false,
@@ -769,7 +646,7 @@ export function validate(requestJson, candidatesJson, strictParseFn) {
     const batchErrors = [];
     const parsedRequest = parseJson(requestJson, "request_json", requestErrors, strictParseFn);
     const parsedBatch = parseJson(candidatesJson, "candidates_json", batchErrors, strictParseFn);
-    const context = parsedRequest !== undefined ? request(parsedRequest, requestErrors) : null;
+    const context = parsedRequest !== undefined ? request(parsedRequest, requestErrors, options) : null;
     if (parsedBatch !== undefined) {
       result.candidate_results = batch(parsedBatch, context, batchErrors);
     }
@@ -801,7 +678,15 @@ export function validate(requestJson, candidatesJson, strictParseFn) {
 
 /** 纯请求检查，用于把「输入问题」与「候选问题」分开（对齐 workflow/runtime.py:14）。 */
 export function validateRequestOnly(requestJson, strictParseFn) {
-  return validate(requestJson, "{}", strictParseFn);
+  return validateForDecision(requestJson, "{}", strictParseFn);
+}
+
+/** 可选送礼时间的服务端入口：完整重跑所有检查，不过滤原始请求错误来伪装通过。 */
+export function validateForDecision(requestJson, candidatesJson, strictParseFn) {
+  const raw = validate(requestJson, candidatesJson, strictParseFn);
+  const result = withTimeAdvisories(validateCore(requestJson, candidatesJson, strictParseFn, { optionalTime: true }));
+  result.raw_validation = raw;
+  return result;
 }
 
 export function requestIsValid(requestCheck) {
@@ -809,6 +694,31 @@ export function requestIsValid(requestCheck) {
     requestCheck.status === "failed" &&
     !requestCheck.errors.some((e) => e.path.startsWith("request") || e.code === "INTERNAL_ERROR")
   );
+}
+
+/** 服务端时间策略：保留原始规则结果，准备超期不进入决策或用户警告。
+ * 字段缺失、类型错误、预算与批次错误仍是硬错误；不修改 Python/JS 镜像规则。
+ */
+export function withTimeAdvisories(raw) {
+  const result = structuredClone(raw);
+  result.raw_validation = structuredClone(raw);
+  const soften = (item) => {
+    const timed = item.errors.filter((e) => e.code === "PREPARATION_TOO_LONG" &&
+      /^(?:candidates\[\d+\]\.estimated_preparation_days|presentation\.revised_estimated_preparation_days)$/.test(e.path));
+    item.errors = item.errors.filter((e) => !timed.includes(e));
+    item.warnings = [...(item.warnings ?? [])];
+    return timed.length;
+  };
+  if (Array.isArray(result.candidate_results)) {
+    for (const item of result.candidate_results) {
+      if (soften(item)) item.passed = item.errors.length === 0 && result.errors.length === 0;
+    }
+    result.all_passed = result.errors.length === 0 && result.candidate_results.length === LIMITS.candidatesPerBatch && result.candidate_results.every((item) => item.passed);
+    if (!["error", "needs_input"].includes(result.status)) result.status = result.all_passed ? "passed" : "failed";
+  } else if (soften(result)) {
+    result.passed = result.errors.length === 0;
+  }
+  return result;
 }
 
 /* ------------------------------------------------- 呈现阶段复核（P3，本层新增） */
@@ -901,6 +811,17 @@ function checkLegacyPresentation(request, candidate, presentation) {
 
 /** 新版只复核冻结礼物价；呈现不得携带任何报价或旧包装教程。 */
 export function checkPresentation(requestData, selectedCandidate, presentation) {
+  return checkPresentationCore(requestData, selectedCandidate, presentation);
+}
+
+export function checkPresentationForDecision(requestData, selectedCandidate, presentation) {
+  const raw = checkPresentation(requestData, selectedCandidate, presentation);
+  const result = withTimeAdvisories(checkPresentationCore(requestData, selectedCandidate, presentation, { optionalTime: true }));
+  result.raw_validation = raw;
+  return result;
+}
+
+function checkPresentationCore(requestData, selectedCandidate, presentation, options = {}) {
   const object = (v) => v !== null && typeof v === "object" && !Array.isArray(v) && !(v instanceof JsonFloat);
   if (!object(presentation)) {
     return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation", message: "呈现内容必须为对象" }] };
@@ -910,7 +831,16 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
     if (Object.hasOwn(presentation, "contract_version") || Object.hasOwn(presentation, "style") || requestData?.contract_version === CONTRACT_VERSION) {
       return { passed: false, errors: [{ code: "PRESENTATION_INVALID", path: "presentation.contract_version", message: "请使用明确的新版呈现契约，不能混读新旧结构" }] };
     }
-    return checkLegacyPresentation(requestData, selectedCandidate, presentation);
+    const legacy = checkLegacyPresentation(requestData, selectedCandidate, presentation);
+    if (options.optionalTime) {
+      const requestErrors = [];
+      const context = request(requestData, requestErrors, options);
+      const gift = candidate(selectedCandidate, 0, context);
+      legacy.errors.push(...requestErrors, ...gift.errors);
+      legacy.warnings = gift.warnings;
+      legacy.passed = legacy.errors.length === 0;
+    }
+    return legacy;
   }
   const errors = [];
   const invalid = (path, message) => error(errors, "PRESENTATION_INVALID", path, message);
@@ -954,7 +884,7 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
   if (Object.hasOwn(presentation, "selected_candidate_id") && presentation.selected_candidate_id !== selectedCandidate?.id) {
     invalid("presentation.selected_candidate_id", "呈现须对应用户选中的冻结候选");
   }
-  const context = request(requestData, errors);
+  const context = request(requestData, errors, options);
   const checkedGift = candidate(selectedCandidate, 0, context);
   errors.push(...checkedGift.errors);
   if (typeof presentation.currency === "string" && presentation.currency !== "CNY") {
@@ -962,7 +892,7 @@ export function checkPresentation(requestData, selectedCandidate, presentation) 
   }
   const prepared = days(presentation.revised_estimated_preparation_days, "presentation.revised_estimated_preparation_days", errors);
   if (context !== null) {
-    if (prepared !== null && prepared > context.days) {
+    if (prepared !== null && context.days !== null && prepared > context.days) {
       error(errors, "PREPARATION_TOO_LONG", "presentation.revised_estimated_preparation_days", "完整方案准备时间超过可用天数");
     }
     const texts = Object.fromEntries(Object.entries(presentation).filter(([key]) => !["contract_version", "currency", "selected_candidate_id", "revised_estimated_preparation_days"].includes(key)));

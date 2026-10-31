@@ -11,12 +11,12 @@
 
 /** 稳定错误码 → 面向用户的中文说明。 */
 export const LLM_ERROR_MESSAGES = Object.freeze({
-  LLM_NOT_CONFIGURED: "服务端未配置直连大模型凭证，无法发起真实调用；未生成任何候选，也没有用模拟数据顶替。",
-  LLM_HTTP: "大模型接口返回非 2xx 状态，未采用该次输出。",
-  LLM_TIMEOUT: "大模型接口在超时上限内未返回，未采用该次输出。这是**超时**，不是业务失败，也不是模型答错。",
-  LLM_REQUEST_FAILED: "大模型接口调用失败（网络或服务不可用），未采用该次输出。",
-  LLM_BAD_RESPONSE: "大模型接口响应不是符合 OpenAI 兼容约定的严格 JSON，未采用该次输出。",
-  LLM_OUTPUT_INVALID: "大模型输出的内容不是合法且无重复键的严格 JSON，未采用该次输出。",
+  LLM_NOT_CONFIGURED: "服务端尚未配置文本模型，请配置后重试。",
+  LLM_HTTP: "模型服务暂时不可用，请稍后重试。",
+  LLM_TIMEOUT: "模型响应超时，请稍后重试。",
+  LLM_REQUEST_FAILED: "无法连接模型服务，请稍后重试。",
+  LLM_BAD_RESPONSE: "模型服务返回格式异常，请重试。",
+  LLM_OUTPUT_INVALID: "模型返回的内容格式有误，请重试。",
   /**
    * 「被截断」与「非法 JSON」是**两种不同的故障**，必须分成两个码：
    *   - LLM_OUTPUT_TRUNCATED：finish_reason=length 且还留有一部分正文 ⇒ 上限偏小；
@@ -25,10 +25,10 @@ export const LLM_ERROR_MESSAGES = Object.freeze({
    * 两者都不是「接口坏了」，也都不是业务失败；分开才能一眼看出该调哪个旋钮。
    */
   LLM_OUTPUT_TRUNCATED:
-    "大模型输出被输出上限（max_tokens）截断（finish_reason=length），本次输出不完整、未采用；请调大 LLM_MAX_TOKENS 后重试。这不是超时，也不是接口失败。",
+    "模型返回的内容不完整，请提高输出额度后重试。",
   LLM_OUTPUT_REASONING_EXHAUSTED:
-    "大模型的最大输出额度被推理过程（reasoning_tokens）全部吃光，正文为空（finish_reason=length）⇒ 判定为**被截断**而不是「接口返回损坏」；更不是超时或业务失败。请调大 LLM_MAX_TOKENS（本机默认已提到 16384）后重试，本次输出未采用。",
-  LLM_BUDGET_EXHAUSTED: "真实调用次数已达到本次设定的额度上限，已拒绝继续发起调用；本次没有发出请求，也没有用模拟数据顶替。",
+    "模型推理已用完输出额度，尚未返回正文，请提高输出额度后重试。",
+  LLM_BUDGET_EXHAUSTED: "本次模型调用额度已用完，请调整额度后重试。",
   LLM_RETRY_EXHAUSTED: "大模型接口连续失败，已用尽重试上限。",
   LLM_INTAKE_DERIVED_FIELD: "拒绝把适配层派生字段（收礼关系机器值/可用天数/facts 等）当作原始输入发送；这些字段只能由服务端适配层产出。",
   LLM_MODE_INVALID: "运行模式不合法。",
