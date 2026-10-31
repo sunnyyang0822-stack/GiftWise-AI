@@ -439,6 +439,7 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
 .guide-step__title { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-family: var(--gw-font-display); font-size: 18px; font-weight: 500; }
 .guide-step__title .gw-icon { color: var(--gw-color-accent); }
 .guide-step .list { margin: 0; font-size: 15px; }
+.guide-step__hint { margin: 0; font-size: 15px; line-height: 1.7; color: var(--gw-color-text-secondary); }
 
 /* 结果页内等待：光环与短句严格居中 */
 .page-wait { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; width: 100%; padding: 28px 16px; text-align: center; }

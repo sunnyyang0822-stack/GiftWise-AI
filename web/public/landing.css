@@ -250,7 +250,11 @@ body { overflow-x: clip; }
 .lp-brand--footer .lp-brand__name { font-size: 15px; }
 .lp-footer__hand { margin: 0; font-family: var(--gw-font-hand); font-size: 24px; color: var(--gw-color-accent); }
 .lp-footer__copy { margin: 0; font-size: 14px; }
-.gw-flow-active .app-footer.lp-footer { padding-bottom: 190px; }
+/* 流程页：页脚紧跟内容，内容不足一屏时贴底（不再留 190px 空白） */
+.gw-flow-active .app-footer.lp-footer { margin-top: auto; padding-bottom: 32px; }
+body.gw-flow-active:not(.gw-chat-active) { display: flex; flex-direction: column; }
+body.gw-flow-active:not(.gw-chat-active) > #view { flex: 1 0 auto; width: 100%; }
+body.gw-flow-active:not(.gw-chat-active) > .actions { width: 100%; }
 /* 落地页：页脚并入深色收束屏底部；进入流程（gw-flow-active）后恢复浅色 */
 body:not(.gw-flow-active) .app-footer.lp-footer { --gw-color-bg: #0f0f10; position: relative; margin-top: -1px; padding-top: 0; background: #0f0f10; color: #a9a39c; }
 body:not(.gw-flow-active) .lp-footer__inner { border-top-color: rgb(255 255 255 / 12%); }

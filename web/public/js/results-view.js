@@ -230,8 +230,10 @@ export function createResultViews(ctx) {
     mediaSlot = packagingMedia(view, mediaOptions(view, poll));
     const sections = view.sections || [];
     const card = sections.find(sec => sec.title.includes("贺卡"));
-    // 空段不占位；其余几段读成一条「照着这样准备」的时间线，而不是几张等宽的格子。
-    const steps = sections.filter(sec => sec !== card && sec.items?.some(Boolean));
+    // 贺卡之外的段落按原顺序读成一条「照着这样准备」的时间线；某段暂无条目时仍保留这一步，只给一句指引，不编造材料。
+    const steps = sections.filter(sec => sec !== card);
+    const hasImage = ["ready", "pending"].includes(view.media?.status) && view.media?.selected?.candidate_id === view.selected_candidate_id;
+    const emptyHint = title => title.includes("包装") ? (hasImage ? "照着上面效果图的感觉来包，颜色参考上一步的配色。" : "颜色参考上一步的配色就好。") : "这一步按你们平时的习惯来就好。";
     const main = el("div", { class: "present-main" }, [
       mediaSlot,
       card ? el("article", { class: "greeting-card", "aria-label": "贺卡" }, [
@@ -245,7 +247,9 @@ export function createResultViews(ctx) {
           el("span", { class: "guide-step__no", "aria-hidden": "true", text: String(i + 1).padStart(2, "0") }),
           el("div", { class: "guide-step__body" }, [
             el("h3", { class: "guide-step__title" }, [icon(sectionIcon(sec.title), { size: 20 }), cleanTitle(sec.title)]),
-            el("ul", { class: "list" }, sec.items.filter(Boolean).map(item => el("li", { text: item }))),
+            (sec.items || []).some(Boolean)
+              ? el("ul", { class: "list" }, sec.items.filter(Boolean).map(item => el("li", { text: item })))
+              : el("p", { class: "guide-step__hint", text: emptyHint(sec.title) }),
           ]),
         ]))),
       ]) : null,
