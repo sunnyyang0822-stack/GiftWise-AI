@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>03 整体方案</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { position: absolute; left: 96px; top: 140px; }
+  .head h2 { margin-top: 14px; font-size: 56px; line-height: 1.2; }
+  /* 一条缎带串起五个阶段 */
+  .track { position: absolute; left: 96px; right: 96px; top: 330px; height: 330px; }
+  .band { position: absolute; left: 40px; right: 40px; top: 74px; height: 14px; border-radius: 999px; background: linear-gradient(90deg, var(--red) 0%, var(--coral) 45%, var(--blue) 100%); box-shadow: 0 10px 24px -10px rgb(160 28 35 / 50%); }
+  .stage { position: absolute; top: 0; width: 300px; text-align: center; }
+  .stage .num { position: relative; display: grid; place-items: center; width: 162px; height: 162px; margin: 0 auto; border-radius: 50%; background: #fff; box-shadow: 0 24px 50px -26px rgb(16 16 17 / 45%), 0 0 0 10px rgb(255 255 255 / 70%); }
+  .stage .num svg { width: 56px; height: 56px; color: var(--red); }
+  .stage.blue .num svg { color: var(--blue); }
+  .stage .no { position: absolute; top: -14px; right: -6px; font-family: var(--hand); font-size: 44px; color: var(--red); transform: rotate(8deg); }
+  .stage.blue .no { color: var(--blue); }
+  .stage h3 { margin-top: 26px; font-size: 32px; }
+  .stage p { margin: 8px auto 0; width: 270px; font-size: 21px; line-height: 1.55; color: var(--ink-2); }
+  .stage .who { display: inline-block; margin-top: 12px; padding: 2px 14px; border-radius: 999px; font-size: 17px; letter-spacing: .1em; }
+  .who.llm { background: rgb(33 67 122 / 9%); color: var(--blue); }
+  .who.code { background: rgb(16 16 17 / 8%); color: var(--ink); }
+  .who.user { background: rgb(160 28 35 / 9%); color: var(--red); }
+  .who.img { background: rgb(201 161 90 / 18%); color: #7a5a1c; }
+  /* 下方：为什么这样拆 + 三方职责 */
+  .why { position: absolute; left: 96px; top: 732px; width: 980px; padding: 34px 40px; }
+  .why h4 { display: flex; align-items: center; gap: 14px; margin: 0 0 16px; font-size: 30px; font-weight: 500; }
+  .why ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .why li { display: flex; align-items: center; gap: 14px; font-size: 24px; }
+  .why li svg { flex: none; color: var(--red); }
+  .roles { position: absolute; left: 1120px; top: 732px; right: 96px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .role { padding: 26px 22px; border-radius: 24px; background: #fff; box-shadow: var(--shadow); text-align: center; }
+  .role .ico { margin: 0 auto 14px; }
+  .role b { display: block; font-weight: 500; font-size: 26px; }
+  .role > span:not(.ico) { display: block; margin-top: 6px; font-size: 19px; color: var(--ink-2); line-height: 1.5; }
+  .roles-note { position: absolute; z-index: 5; margin: 0; right: 110px; top: 690px; font-family: var(--hand); font-size: 36px; color: var(--blue); transform: rotate(-3deg); }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome" data-page="03"></div>
+  <div class="head"><span class="eyebrow"><i data-icon="compass" data-size="22"></i>整体方案</span><h2>生成、检查、决定，三件事分开做。</h2></div>
+
+  <div class="track">
+    <div class="band"></div>
+    <div class="stage" style="left:0"><div class="num"><i data-icon="chat"></i><span class="no">01</span></div><h3>对话解析</h3><p>原话映射成固定字段，没说清的再追问</p><span class="who llm">模型</span></div>
+    <div class="stage blue" style="left:357px"><div class="num"><i data-icon="lightbulb"></i><span class="no">02</span></div><h3>三个思路</h3><p style="width:318px;margin-left:-9px">公开网络文字与合法历史观察 →<br>模型结合用户语境形成三方案</p><span class="who llm">模型</span></div>
+    <div class="stage" style="left:714px"><div class="num"><i data-icon="scale"></i><span class="no">03</span></div><h3>独立校验</h3><p>预算、禁忌、结构逐项检查；时间只作信息</p><span class="who code">代码</span></div>
+    <div class="stage blue" style="left:1071px"><div class="num"><i data-icon="hand"></i><span class="no">04</span></div><h3>用户选定</h3><p>只能在通过检查的方案里选一个</p><span class="who user">用户</span></div>
+    <div class="stage" style="left:1428px"><div class="num"><i data-icon="gift"></i><span class="no">05</span></div><h3>选后呈现</h3><p>贺卡、包装与赠送方式先到，效果图后台补齐</p><span class="who img">模型 + 生图</span></div>
+  </div>
+
+  <div class="why glass">
+    <h4><span class="ico"><i data-icon="question" data-size="28"></i></span>为什么这样拆</h4>
+    <ul>
+      <li><i data-icon="shield" data-size="26"></i>硬约束交给代码检查，不让模型给自己打分</li>
+      <li><i data-icon="camera" data-size="26"></i>效果图只为用户选中的那一个生成，不浪费调用</li>
+      <li><i data-icon="refresh" data-size="26"></i>跨推荐与呈现最多一次自动修订，结果可预期</li>
+    </ul>
+  </div>
+  <div class="roles">
+    <div class="role"><span class="ico ico--blue"><i data-icon="sparkles"></i></span><b>大模型</b><span>理解需求<br>推理与表达</span></div>
+    <div class="role"><span class="ico" style="color:var(--ink)"><i data-icon="shield"></i></span><b>代码规则</b><span>预算、禁忌<br>结构把关</span></div>
+    <div class="role"><span class="ico"><i data-icon="heart"></i></span><b>用户</b><span>比较之后<br>亲手选定</span></div>
+  </div>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

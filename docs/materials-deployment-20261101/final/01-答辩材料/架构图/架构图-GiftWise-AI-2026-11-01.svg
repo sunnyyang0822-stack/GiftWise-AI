@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="810" viewBox="0 0 1440 810" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+<defs><marker id="a4338CA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#4338CA"/></marker><marker id="a0F766E" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#0F766E"/></marker><marker id="a1D4ED8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#1D4ED8"/></marker></defs>
+<rect width="1440" height="810" fill="#FFFFFF"/>
+<rect x="16" y="44" width="1408" height="128" rx="16" fill="#ECF5F2"/>
+<text x="28" y="36" font-size="17" font-weight="700" fill="#0F766E">用户交互 · 浏览器（不可信区）</text>
+<rect x="16" y="196" width="1408" height="400" rx="16" fill="#F3F7F6" stroke="#0F766E" stroke-width="1.5" stroke-dasharray="7 5"/>
+<rect x="16" y="616" width="1408" height="150" rx="16" fill="#EEF3FB"/>
+<text x="34" y="656" font-size="17" font-weight="700" fill="#0F766E">外部服务</text>
+<text x="190" y="218" font-size="17" fill="#0F766E" font-weight="700">可信服务端 · Compshare Ubuntu 22.04.4 单实例</text>
+<text x="190" y="240" font-size="13" fill="#334155">Nginx 公网 :80 → Node v24.16.0 · 127.0.0.1:8787 · systemd 守护</text>
+<text x="28" y="790" font-size="13" fill="#475569">运维通道：OpenCLI 仅用于部署操作，不在用户请求链路　·　推荐阶段不抓取网图　·　部署 19b6819 · 证据 6e92a9e</text>
+<polyline points="155,158 155,256" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<text x="166" y="191" font-size="14" fill="#0F766E">HTTP :80 · 未配置 HTTPS</text>
+<polyline points="280,310 300,310" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<polyline points="570,310 590,310" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<polyline points="710,256 710,158" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<text x="720" y="227" font-size="14" fill="#0F766E">三个可选方案</text>
+<polyline points="830,112 850,112" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<polyline points="970,158 970,256" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<text x="980" y="227" font-size="14" fill="#0F766E">选择事件</text>
+<polyline points="1090,310 1110,310" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<polyline points="1200,256 1200,158" fill="none" stroke="#0F766E" stroke-width="2" marker-end="url(#a0F766E)"/>
+<text x="1210" y="227" font-size="14" fill="#0F766E">文字先返回</text>
+<polyline points="1380,158 1380,256" fill="none" stroke="#4338CA" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#a4338CA)"/>
+<text x="1300" y="241" font-size="14" fill="#4338CA">只读 GET</text>
+<polyline points="1260,364 1260,452" fill="none" stroke="#4338CA" stroke-width="2" marker-end="url(#a4338CA)"/>
+<text x="1270" y="417" font-size="14" fill="#4338CA">异步启动</text>
+<polyline points="1110,508 1090,508" fill="none" stroke="#4338CA" stroke-width="2" marker-end="url(#a4338CA)"/>
+<polyline points="435,364 435,640" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#a1D4ED8)" marker-start="url(#a1D4ED8)"/>
+<text x="445" y="417" font-size="14" fill="#1D4ED8">按需工具调用</text>
+<polyline points="840,596 840,640" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#a1D4ED8)" marker-start="url(#a1D4ED8)"/>
+<text x="850" y="625" font-size="14" fill="#1D4ED8">模型调用 · HTTPS</text>
+<polyline points="1260,564 1260,640" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#a1D4ED8)" marker-start="url(#a1D4ED8)"/>
+<text x="1270" y="611" font-size="14" fill="#1D4ED8">HTTPS</text>
+<rect x="30" y="66" width="250" height="92" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="44" y="108" font-size="18" font-weight="700" fill="#0F172A">需求输入</text>
+<text x="44" y="130" font-size="14" fill="#334155">自然描述 · 排除项确认</text>
+<rect x="590" y="66" width="240" height="92" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="604" y="98" font-size="18" font-weight="700" fill="#0F172A">三方案比较</text>
+<text x="604" y="120" font-size="14" fill="#334155">依据 · 估价 · 校验结果</text>
+<text x="604" y="140" font-size="14" fill="#334155">推荐卡不配网图</text>
+<rect x="850" y="66" width="240" height="92" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="864" y="108" font-size="18" font-weight="700" fill="#0F172A">用户明确选择</text>
+<text x="864" y="130" font-size="14" fill="#334155">只能选通过检查的方案</text>
+<rect x="1110" y="66" width="300" height="92" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="1124" y="98" font-size="18" font-weight="700" fill="#0F172A">赠送指南与效果图</text>
+<text x="1124" y="120" font-size="14" fill="#334155">文字先展示 · 图片原位补入</text>
+<text x="1124" y="140" font-size="14" fill="#334155">纯体验不强加包装章节</text>
+<rect x="30" y="256" width="250" height="108" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="44" y="296" font-size="18" font-weight="700" fill="#0F172A">解析与可信上下文</text>
+<text x="44" y="318" font-size="14" fill="#334155">自然澄清 · 保留原话</text>
+<text x="44" y="338" font-size="14" fill="#334155">服务端固定已确认约束</text>
+<rect x="300" y="256" width="270" height="108" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="314" y="296" font-size="18" font-weight="700" fill="#0F172A">候选生成</text>
+<text x="314" y="318" font-size="14" fill="#334155">模型按需调用检索工具</text>
+<text x="314" y="338" font-size="14" fill="#334155">公开文字依据 → 三方案</text>
+<rect x="590" y="256" width="240" height="108" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="604" y="296" font-size="18" font-weight="700" fill="#0F172A">独立代码校验</text>
+<text x="604" y="318" font-size="14" fill="#334155">预算 · 禁忌 · 结构</text>
+<text x="604" y="338" font-size="14" fill="#334155">时间不影响可选性</text>
+<rect x="850" y="256" width="240" height="108" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="864" y="296" font-size="18" font-weight="700" fill="#0F172A">选择后生成与复核</text>
+<text x="864" y="318" font-size="14" fill="#334155">包装 · 配色 · 贺卡 · 赠送</text>
+<text x="864" y="338" font-size="14" fill="#334155">全局最多一次业务修订</text>
+<rect x="1110" y="256" width="300" height="108" rx="9" fill="#FFFFFF" stroke="#0F766E" stroke-width="1.5"/>
+<text x="1124" y="296" font-size="18" font-weight="700" fill="#0F172A">文字响应与媒体任务 API</text>
+<text x="1124" y="318" font-size="14" fill="#334155">立即返回文字 + task_id</text>
+<text x="1124" y="338" font-size="14" fill="#334155">只读 GET 状态与图片 · 归属校验</text>
+<rect x="30" y="452" width="250" height="112" rx="9" fill="#FFFBEB" stroke="#B45309" stroke-width="1.5"/>
+<text x="44" y="494" font-size="18" font-weight="700" fill="#0F172A">内存状态</text>
+<text x="44" y="516" font-size="14" fill="#334155">run · analysis · selection · 签名</text>
+<text x="44" y="536" font-size="14" fill="#334155">重启后旧流程失效</text>
+<rect x="590" y="452" width="240" height="112" rx="9" fill="#F5F3FF" stroke="#4338CA" stroke-width="1.5"/>
+<text x="604" y="494" font-size="18" font-weight="700" fill="#0F172A">独立数据库</text>
+<text x="604" y="516" font-size="14" fill="#334155">/var/lib/giftwise/db</text>
+<text x="604" y="536" font-size="14" fill="#334155">独立 SQLite · 不用演示库</text>
+<rect x="850" y="452" width="240" height="112" rx="9" fill="#F5F3FF" stroke="#4338CA" stroke-width="1.5"/>
+<text x="864" y="494" font-size="18" font-weight="700" fill="#0F172A">独立落盘 runtime</text>
+<text x="864" y="516" font-size="14" fill="#334155">/var/lib/giftwise/runtime</text>
+<text x="864" y="536" font-size="14" fill="#334155">文字缓存 · 媒体 · 审计 · 账本</text>
+<rect x="1110" y="452" width="300" height="112" rx="9" fill="#F5F3FF" stroke="#4338CA" stroke-width="1.5"/>
+<text x="1124" y="494" font-size="18" font-weight="700" fill="#0F172A">后台效果图任务</text>
+<text x="1124" y="516" font-size="14" fill="#334155">仅为所选方案生成 1 张</text>
+<text x="1124" y="536" font-size="14" fill="#334155">pending → ready / failed / unknown</text>
+<rect x="300" y="640" width="270" height="104" rx="9" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="314" y="678" font-size="18" font-weight="700" fill="#0F172A">公开文字检索 · 匿名 HTTP</text>
+<text x="314" y="700" font-size="14" fill="#334155">真实公开文字 + 合法历史摘要</text>
+<text x="314" y="720" font-size="14" fill="#334155">保留观察时间</text>
+<rect x="590" y="640" width="500" height="104" rx="9" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="604" y="678" font-size="18" font-weight="700" fill="#0F172A">文字模型 API · HTTPS</text>
+<text x="604" y="700" font-size="14" fill="#334155">解析 · 三方案 · 修订 · 赠送指南</text>
+<text x="604" y="720" font-size="14" fill="#334155">密钥只在服务端</text>
+<rect x="1110" y="640" width="300" height="104" rx="9" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="1.5"/>
+<text x="1124" y="678" font-size="18" font-weight="700" fill="#0F172A">Seedream API · HTTPS</text>
+<text x="1124" y="700" font-size="14" fill="#334155">仅在用户明确选择后调用</text>
+<text x="1124" y="720" font-size="14" fill="#334155">无参考图输入</text>
+</svg>

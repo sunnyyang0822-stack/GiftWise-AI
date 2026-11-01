@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>02 问题与目标</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .slide { background: linear-gradient(90deg, #f3efea 0 47%, var(--bg) 47%); }
+  .head { position: absolute; left: 96px; top: 150px; width: 780px; }
+  .head h2 { margin: 18px 0 0; font-size: 60px; line-height: 1.25; }
+  /* 左：求助帖拼贴，像钉在软木板上的便签 */
+  .board { position: absolute; left: 90px; top: 360px; width: 800px; height: 660px; }
+  .post { position: absolute; width: 380px; padding: 16px 16px 14px; border-radius: 14px; background: #fff; box-shadow: 0 24px 40px -22px rgb(16 16 17 / 45%), 0 0 0 1px rgb(16 16 17 / 5%); }
+  .post img { display: block; width: 100%; border-radius: 8px; }
+  .post p { display: flex; align-items: baseline; gap: 10px; margin: 12px 4px 0; font-size: 22px; line-height: 1.35; }
+  .post p b { font-family: var(--hand); font-weight: 400; font-size: 30px; color: var(--red); }
+  .post::before { content: ""; position: absolute; top: -12px; left: 50%; width: 90px; height: 26px; margin-left: -45px; background: rgb(201 161 90 / 35%); transform: rotate(-3deg); border-radius: 3px; }
+  .p1 { left: 0; top: 0; transform: rotate(-2.5deg); }
+  .p2 { left: 410px; top: 20px; transform: rotate(2deg); }
+  .p3 { left: 20px; top: 330px; transform: rotate(1.5deg); }
+  .p4 { left: 420px; top: 310px; transform: rotate(-2deg); }
+  .src { position: absolute; left: 96px; bottom: 34px; font-size: 18px; color: var(--ink-2); }
+
+  /* 右：我们的回答 */
+  .right { position: absolute; left: 1010px; top: 150px; width: 820px; }
+  .right h3 { display: flex; align-items: center; gap: 16px; font-size: 40px; }
+  .priority { display: flex; gap: 14px; margin: 22px 0 34px; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 22px 8px 12px; border-radius: 999px; background: #fff; box-shadow: 0 6px 16px -10px rgb(16 16 17 / 35%); font-size: 22px; }
+  .pill svg { color: var(--red); }
+  .pill--2 svg { color: var(--blue); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .tile { padding: 28px 30px; }
+  .tile h4 { display: flex; align-items: center; gap: 16px; margin: 0 0 12px; font-size: 30px; font-weight: 500; }
+  .tile p { margin: 0; font-size: 22px; line-height: 1.6; color: var(--ink-2); }
+  .tile .ico { width: 56px; height: 56px; }
+  .goal { position: relative; margin-top: 30px; padding: 26px 34px; border-radius: 24px; background: var(--ink); color: #fff; box-shadow: 0 30px 60px -30px rgb(16 16 17 / 60%); }
+  .goal span.k { font-family: var(--hand); font-size: 32px; color: #f0b8b0; }
+  .goal .line { display: flex; align-items: center; gap: 14px; margin-top: 6px; font-size: 28px; }
+  .goal .line svg { color: rgb(255 255 255 / 45%); }
+  .goal .ribbon { right: 34px; top: -10px; height: 96px; }
+  .divider-note { position: absolute; left: 880px; top: 520px; font-family: var(--hand); font-size: 38px; color: var(--blue); transform: rotate(-6deg); white-space: nowrap; }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a2"></i></div>
+  <div class="chrome" data-page="02"></div>
+
+  <div class="head">
+    <span class="eyebrow"><i data-icon="question" data-size="22"></i>问题与目标</span>
+    <h2>送礼难，<br>不只难在找商品。</h2>
+  </div>
+  <div class="board">
+    <figure class="post p1"><img src="assets/quotes/q1.png" alt=""><p><b>01</b>预算有限，怕送了用不上</p></figure>
+    <figure class="post p2"><img src="assets/quotes/q2.png" alt=""><p><b>02</b>知道兴趣，依然难选</p></figure>
+    <figure class="post p3"><img src="assets/quotes/q3.png" alt=""><p><b>03</b>想表达心意，又怕审美不同</p></figure>
+    <figure class="post p4"><img src="assets/quotes/q4.png" alt=""><p><b>04</b>排除了很多，还是没方向</p></figure>
+  </div>
+  <p class="src">用户求助帖节选，已去除账号信息</p>
+
+  <section class="right">
+    <h3><span class="ico"><i data-icon="sparkles" data-size="30"></i></span>我们的回答</h3>
+    <div class="priority">
+      <span class="pill"><i data-icon="hearts" data-size="22"></i>恋人与追求对象优先</span>
+      <span class="pill pill--2"><i data-icon="users" data-size="22"></i>其次是朋友</span>
+    </div>
+    <div class="grid">
+      <div class="tile glass"><h4><span class="ico"><i data-icon="heart"></i></span>关系有分寸</h4><p>追求不等于恋爱，表达低压力，不做过重承诺。</p></div>
+      <div class="tile glass"><h4><span class="ico ico--blue"><i data-icon="shield"></i></span>约束交给代码</h4><p>预算、禁忌、结构由代码检查；时间只作信息，不影响可选性。</p></div>
+      <div class="tile glass"><h4><span class="ico ico--blue"><i data-icon="search"></i></span>推荐有依据</h4><p>你说的、模型推断的、还不确定的，分开写清楚。</p></div>
+      <div class="tile glass"><h4><span class="ico"><i data-icon="hand"></i></span>选择权在你</h4><p>三个思路摆在一起比较，由用户亲手选定一个。</p></div>
+    </div>
+    <div class="goal">
+      <span class="ribbon"></span>
+      <span class="k">目标</span>
+      <div class="line">三个思路<i data-icon="arrow-right" data-size="26"></i>独立检查<i data-icon="arrow-right" data-size="26"></i>用户选定<i data-icon="arrow-right" data-size="26"></i>赠送指南</div>
+    </div>
+  </section>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

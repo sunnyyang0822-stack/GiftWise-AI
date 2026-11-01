@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>GiftWise AI 系统架构设计</title>
+<link rel="stylesheet" href="arch.css">
+<style>
+/* ---------- P1 封面 ---------- */
+.cover .hero { position: absolute; left: 56px; top: 180px; width: 420px; }
+.cover .hero .eyebrow { margin-bottom: 18px; }
+.cover h1 { font-size: 45px; line-height: 1.2; }
+.cover h1 em { font-style: normal; color: var(--red); }
+.cover .sub { margin: 14px 0 0; font-family: var(--hand); font-size: 30px; color: var(--blue); transform: rotate(-2deg); transform-origin: left; }
+.cover .intro { margin-top: 22px; font-size: 13.5px; color: var(--ink-2); line-height: 1.75; }
+.stack { position: absolute; right: 52px; top: 200px; width: 250px; height: 330px; }
+.layer { position: absolute; left: 0; width: 250px; height: 92px; border-radius: 22px; transform: skewY(-10deg); display: flex; align-items: center; gap: 12px; padding: 0 20px; box-shadow: 0 24px 40px -22px rgb(16 16 17 / 45%); }
+.layer span { transform: skewY(10deg); display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.layer .ico { width: 30px; height: 30px; }
+.l1 { top: 0; background: rgb(255 255 255 / 86%); border: 1px solid #fff; }
+.l2 { top: 104px; background: var(--ink); color: #fff; }
+.l2 .ico { background: #2a2a2c; color: #f0b8b0; box-shadow: none; }
+.l3 { top: 208px; background: linear-gradient(120deg, #fff 0%, #f5ede8 100%); border: 1px solid #fff; }
+.stack .hand { position: absolute; right: 4px; top: -62px; font-size: 21px; transform: rotate(-6deg); }
+.toc { position: absolute; left: 56px; right: 56px; top: 560px; padding: 26px 30px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 34px; row-gap: 2px; }
+.toc h4 { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 15px; }
+.toc a { display: grid; grid-template-columns: 30px 1fr auto; align-items: baseline; padding: 6px 0; border-bottom: 1px dashed rgb(16 16 17 / 10%); color: var(--ink); text-decoration: none; font-size: 13px; }
+.toc a i { font-style: normal; font-family: var(--hand); font-size: 18px; color: var(--red); }
+.toc a small { color: var(--ink-3); font-size: 11px; }
+.cover .meta { position: absolute; left: 56px; right: 56px; bottom: 54px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 11.5px; color: var(--ink-2); }
+.cover .meta b { display: block; font-size: 14px; color: var(--ink); }
+.cover .ribbon { left: 470px; top: 0; }
+.cover .live { margin: 16px 0 0; display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; padding: 8px 14px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px rgb(16 16 17 / 6%); font-size: 11px; color: var(--ink-2); }
+.cover .live span { color: var(--red); letter-spacing: .1em; }
+.cover .live b { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.cover .live small { flex-basis: 100%; font-size: 10.5px; color: var(--ink-3); }
+
+/* ---------- P2 一页读懂 ---------- */
+.p2 .sum { margin-top: 18px; padding: 18px 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.p2 .sum div { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: var(--ink-2); }
+.p2 .sum b { display: block; color: var(--ink); font-size: 13.5px; }
+.qa { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.qa .q { position: relative; padding: 18px 20px 34px; min-height: 262px; }
+.qa .q .k { position: absolute; right: 16px; top: 8px; font-family: var(--hand); font-size: 34px; color: rgb(160 28 35 / 22%); }
+.qa .q h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; }
+.qa .q .ans { margin: 12px 0 10px; font-size: 14.5px; line-height: 1.5; }
+.qa .q .ans em { font-style: normal; color: var(--red); }
+.qa .q.blue .ans em { color: var(--blue); }
+.qa .q ul { font-size: 11.8px; color: var(--ink-2); }
+.qa .q .go { position: absolute; left: 20px; bottom: 12px; font-size: 10.5px; color: var(--ink-3); letter-spacing: .06em; }
+.kpis { margin-top: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.kpi { padding: 12px 14px; }
+.kpi b { display: block; font-size: 24px; line-height: 1.1; }
+.kpi span { font-size: 10.8px; color: var(--ink-2); }
+.kpi-note { margin: 8px 0 0; font-size: 10.4px; color: var(--ink-2); letter-spacing: .02em; }
+
+/* ---------- P3 架构总览 ---------- */
+.diag { position: relative; margin-top: 16px; }
+.zone { position: relative; border-radius: 18px; padding: 14px 16px 14px; }
+.zone > .zl { display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .12em; }
+.zone > .zl small { margin-left: auto; letter-spacing: 0; font-size: 10.5px; }
+.z-user { background: rgb(255 255 255 / 75%); border: 1px solid #fff; box-shadow: var(--shadow); }
+.z-user .row { margin-top: 10px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.pill { padding: 7px 8px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px rgb(16 16 17 / 6%); font-size: 11px; text-align: center; line-height: 1.35; }
+.pill b { display: block; font-size: 12px; }
+.z-srv { margin-top: 0; background: var(--ink); color: #f5f2ee; box-shadow: 0 26px 50px -26px rgb(16 16 17 / 70%); }
+.z-srv .zl small { color: #a9a39c; }
+.z-srv .grid { margin-top: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mod { padding: 9px 10px; border-radius: 11px; background: #1d1d1f; border: 1px solid #2c2c2f; font-size: 10.6px; color: #bdb6ae; line-height: 1.42; }
+.mod b { display: flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; margin-bottom: 2px; }
+.mod b svg { width: 13px; height: 13px; color: #f0b8b0; }
+.mod.hot { background: linear-gradient(150deg, #3a1517, #1d1d1f 70%); border-color: #5a2226; }
+.mod.cool { background: linear-gradient(150deg, #16233a, #1d1d1f 70%); border-color: #26385a; }
+.mod code { background: rgb(255 255 255 / 8%); color: #f0d6d2; }
+.deploy { margin-top: 9px; display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 11px; border: 1px dashed rgb(240 184 176 / 35%); font-size: 10.4px; color: #bdb6ae; }
+.deploy span b { color: #fff; font-weight: 500; margin-right: 5px; font-size: 11.4px; }
+.deploy i { font-style: normal; color: #f0b8b0; }
+.ops { margin-top: 8px; font-size: 10.6px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.ops b { color: var(--ink); font-weight: 500; }
+.z-bottom { margin-top: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.z-ext { background: rgb(33 67 122 / 6%); border: 1px solid rgb(33 67 122 / 14%); }
+.z-sto { background: rgb(201 161 90 / 9%); border: 1px solid rgb(201 161 90 / 26%); }
+.z-bottom .items { margin-top: 8px; display: grid; gap: 7px; }
+.it { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: center; padding: 7px 9px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px rgb(16 16 17 / 5%); font-size: 10.8px; color: var(--ink-2); line-height: 1.38; }
+.it b { display: block; color: var(--ink); font-size: 12px; }
+.it .ico { width: 28px; height: 28px; } .it .ico svg { width: 14px; height: 14px; }
+.flowrow { display: flex; justify-content: center; margin: 7px 0; }
+.flow { display: flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; background: var(--bg); font-size: 10.5px; color: var(--red); z-index: 2; white-space: nowrap; }
+.flow svg { width: 13px; height: 13px; }
+.flow.b { color: var(--blue); }
+.legend3 { margin-top: 12px; display: flex; gap: 18px; font-size: 10.8px; color: var(--ink-2); }
+.legend3 span { display: inline-flex; align-items: center; gap: 6px; }
+.legend3 i { width: 14px; height: 9px; border-radius: 3px; }
+.p3 .note { position: absolute; right: 0; bottom: 0; width: 300px; font-family: var(--hand); font-size: 19px; color: var(--blue); transform: rotate(-2deg); text-align: right; }
+
+/* ---------- P4 为什么这样设计 ---------- */
+.dec { margin-top: 20px; display: grid; gap: 13px; }
+.d { display: grid; grid-template-columns: 54px 1fr 1fr 1fr; gap: 0; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 10px 24px -18px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 4%); }
+.d .no { display: grid; place-items: center; background: var(--red); color: #fff; font-family: var(--hand); font-size: 24px; }
+.d:nth-child(even) .no { background: var(--blue); }
+.d > div { padding: 14px 15px; font-size: 11.6px; color: var(--ink-2); line-height: 1.5; }
+.d > div + div { border-left: 1px dashed rgb(16 16 17 / 10%); }
+.d h5 { margin: 0 0 3px; font-size: 10px; letter-spacing: .14em; font-weight: 500; color: var(--ink-3); }
+.d .pick { color: var(--ink); font-size: 13px; line-height: 1.4; }
+.d .cost { background: #fbf8f5; }
+.p4 .principle { margin-top: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; background: var(--ink); color: #f5f2ee; border-radius: 16px; font-size: 13px; }
+.p4 .principle .hand { color: #f0b8b0; font-size: 22px; flex: none; }
+
+/* ---------- P5 生命周期 ---------- */
+.life { position: relative; margin-top: 16px; padding-left: 70px; }
+.life::before { content: ""; position: absolute; left: 26px; top: 10px; bottom: 30px; width: 4px; border-radius: 4px; background: linear-gradient(180deg, var(--red), var(--coral) 50%, var(--blue)); }
+.st { position: relative; margin-bottom: 16px; padding: 20px 18px 20px 20px; display: grid; grid-template-columns: 1fr 160px; gap: 14px; }
+.st .dot { position: absolute; left: -62px; top: 18px; width: 40px; height: 40px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--red); box-shadow: 0 0 0 5px var(--bg), 0 8px 18px -10px rgb(16 16 17 / 50%); }
+.st .dot svg { width: 18px; height: 18px; }
+.st.b .dot { color: var(--blue); }
+.st h4 { display: flex; align-items: center; gap: 8px; font-size: 14.5px; }
+.st h4 .tag { font-size: 9.5px; }
+.st p { margin: 6px 0 0; font-size: 12.2px; color: var(--ink-2); line-height: 1.5; }
+.st .side { border-left: 1px dashed rgb(16 16 17 / 12%); padding-left: 12px; font-size: 10.6px; color: var(--ink-2); line-height: 1.5; }
+.st .side b { display: block; font-size: 17px; color: var(--ink); line-height: 1.2; }
+.st .side b small { font-size: 11px; color: var(--ink-3); }
+.st.async { border: 1.5px dashed rgb(33 67 122 / 35%); background: rgb(255 255 255 / 55%); box-shadow: none; }
+.p5 .tail2 { margin: -4px 0 0; font-size: 10.6px; color: var(--ink-2); line-height: 1.5; }
+
+/* ---------- P6 负载 ---------- */
+.p6 .top { margin-top: 16px; display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; }
+.bars { padding: 16px 18px; }
+.bars h4, .gates h4, .knobs h4 { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 4px; }
+.bars .k { font-size: 10.6px; color: var(--ink-2); margin-bottom: 10px; }
+.br { display: grid; grid-template-columns: 74px 1fr; align-items: center; height: 40px; font-size: 11.5px; }
+.br .tr { position: relative; height: 100%; border-bottom: 1px dashed rgb(16 16 17 / 8%); }
+.br i { position: absolute; top: 8px; height: 18px; border-radius: 6px; font-style: normal; color: #fff; font-size: 10px; display: flex; align-items: center; padding: 0 7px; white-space: nowrap; }
+.br .lbl { position: absolute; top: 9px; font-size: 10.5px; color: var(--ink-2); white-space: nowrap; }
+.split { padding: 16px 18px; display: flex; flex-direction: column; }
+.split .ring { position: relative; width: 130px; height: 130px; margin: 8px auto 6px; border-radius: 50%; background: conic-gradient(from 200deg, var(--blue), #4a6aa3, var(--blue)); }
+.split .ring::after { content: ""; position: absolute; inset: 18px; border-radius: 50%; background: #fff; }
+.split .ring > span { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; text-align: center; font-size: 10.5px; color: var(--ink-2); line-height: 1.3; }
+.split .ring span b { display: block; font-size: 20px; color: var(--ink); }
+.split p { margin: 6px 0 0; font-size: 11.4px; color: var(--ink-2); line-height: 1.5; }
+.gates { margin-top: 16px; padding: 18px 20px; }
+.gate-row { margin-top: 8px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.gate { position: relative; padding: 14px 12px 16px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px rgb(16 16 17 / 6%); font-size: 10.7px; color: var(--ink-2); line-height: 1.45; }
+.gate b { display: block; font-size: 18px; color: var(--ink); line-height: 1.2; margin: 6px 0 2px; }
+.gate b small { font-size: 11px; color: var(--ink-3); }
+.gate .ico { width: 26px; height: 26px; } .gate .ico svg { width: 13px; height: 13px; }
+.knobs { margin-top: 16px; padding: 18px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; font-size: 11.5px; color: var(--ink-2); }
+.knobs h4 { grid-column: 1 / -1; }
+.knobs div { display: flex; gap: 8px; align-items: baseline; }
+.knobs div svg { flex: none; color: var(--green); position: relative; top: 2px; }
+
+/* ---------- P7 状态 ---------- */
+.tiers { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tier { padding: 12px 14px; border-radius: 14px; color: #fff; font-size: 11px; line-height: 1.45; }
+.tier b { display: flex; align-items: center; gap: 7px; font-size: 14px; margin-bottom: 3px; }
+.tier b svg { width: 15px; height: 15px; }
+.tier.t1 { background: linear-gradient(140deg, var(--red), #7d141a); }
+.tier.t2 { background: linear-gradient(140deg, #8a6420, #b88a3e); }
+.tier.t3 { background: linear-gradient(140deg, var(--blue), #16305a); }
+table.state { margin-top: 12px; width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 24px -18px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 5%); }
+table.state th { text-align: left; font-weight: 500; font-size: 10px; letter-spacing: .1em; color: var(--ink-3); padding: 8px 10px; background: #f6f3f0; }
+table.state td { padding: 10px 10px; border-top: 1px solid #f0ece7; vertical-align: top; color: var(--ink-2); line-height: 1.45; }
+table.state td:first-child { color: var(--ink); font-size: 12px; white-space: nowrap; }
+table.state td:last-child, table.state th:last-child { white-space: nowrap; }
+table.state td .bar { display: inline-block; width: 4px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.ok { color: var(--green); } .lose { color: var(--red); }
+.p7 .fn { margin: 8px 2px 0; font-size: 10.4px; color: var(--ink-2); line-height: 1.5; }
+.p7 .rules { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.p7 .rules div { padding: 11px 13px; font-size: 11px; color: var(--ink-2); line-height: 1.5; }
+.p7 .rules b { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink); margin-bottom: 3px; }
+
+/* ---------- P8 扩缩容 ---------- */
+.stairs { position: relative; margin-top: 18px; height: 470px; }
+.step { position: absolute; width: 162px; padding: 12px 13px; border-radius: 14px; font-size: 10.8px; color: var(--ink-2); line-height: 1.48; }
+.step .s { font-family: var(--hand); font-size: 22px; color: var(--red); line-height: 1; }
+.step h4 { font-size: 14px; color: var(--ink); margin: 3px 0 4px; }
+.step ul.dots { gap: 3px; } .step ul.dots li { padding-left: 13px; }
+.step .trig { margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgb(16 16 17 / 12%); font-size: 10.3px; }
+.step .trig b { color: var(--blue); }
+.step.now { background: var(--ink); color: #cfc8c0; box-shadow: 0 20px 40px -20px rgb(16 16 17 / 70%); }
+.step.now h4 { color: #fff; } .step.now .s { color: #f0b8b0; } .step.now ul.dots li::before { border-color: #f0b8b0; }
+.step.now .trig { border-color: rgb(255 255 255 / 16%); } .step.now .trig b { color: #b9c8e6; }
+.stairs .riser { position: absolute; left: 0; right: 0; bottom: 0; height: 100%; pointer-events: none; }
+.stairs .hand { position: absolute; font-size: 19px; }
+.scalebox { margin-top: 14px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+.exp { padding: 14px 16px; }
+.exp h4, .sig h4 { display: flex; align-items: center; gap: 8px; font-size: 13.5px; margin-bottom: 8px; }
+.exp .g { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.exp .g div { padding: 8px 10px; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1px rgb(16 16 17 / 5%); font-size: 10.4px; color: var(--ink-2); }
+.exp .g b { display: block; font-size: 18px; color: var(--ink); line-height: 1.2; }
+.sig { padding: 14px 16px; font-size: 11.2px; color: var(--ink-2); }
+.sig .row { display: grid; grid-template-columns: 22px 1fr; gap: 6px; margin-bottom: 6px; align-items: start; }
+.sig .row svg { color: var(--blue); margin-top: 2px; }
+.sig .row b { color: var(--ink); }
+
+/* ---------- P9 故障恢复 ---------- */
+table.fm { margin-top: 14px; width: 100%; border-collapse: separate; border-spacing: 0 6px; font-size: 10.9px; }
+table.fm th { text-align: left; font-weight: 500; font-size: 9.8px; letter-spacing: .12em; color: var(--ink-3); padding: 0 10px 2px; }
+table.fm td { background: #fff; padding: 8px 10px; vertical-align: top; color: var(--ink-2); line-height: 1.45; box-shadow: 0 1px 0 rgb(16 16 17 / 4%); }
+table.fm td:first-child { border-radius: 12px 0 0 12px; color: var(--ink); width: 128px; }
+table.fm td:first-child span { display: flex; align-items: center; gap: 7px; font-size: 11.6px; }
+table.fm td:last-child { border-radius: 0 12px 12px 0; color: var(--ink); background: #fbf8f5; width: 150px; }
+table.fm .grp td { background: none; box-shadow: none; padding: 6px 2px 0; font-size: 10.5px; letter-spacing: .16em; color: var(--red); }
+table.fm .grp.b td { color: var(--blue); }
+.p9 .prin { margin-top: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.p9 .prin div { display: flex; gap: 9px; align-items: center; padding: 10px 12px; font-size: 11px; color: var(--ink-2); line-height: 1.4; }
+.p9 .prin b { display: block; color: var(--ink); font-size: 12.5px; }
+
+/* ---------- P10 深色收束 ---------- */
+.dark { background: #0f0f10; color: #f5f2ee; }
+.dark .glow { position: absolute; inset: 0; z-index: -1; background: radial-gradient(55% 40% at 10% 12%, rgb(160 28 35 / 38%), transparent 70%), radial-gradient(50% 40% at 95% 92%, rgb(33 67 122 / 45%), transparent 70%); }
+.dark .brand { color: #f5f2ee; } .dark .brand svg path[fill="#fbf9f7"] { fill: #0f0f10; }
+.dark .pageno { color: #f0b8b0; } .dark .pageno small { color: #a9a39c; }
+.dark .eyebrow { background: rgb(240 184 176 / 14%); color: #f0b8b0; }
+.dark .lead { color: #bdb6ae; }
+.dark .foot { border-color: rgb(255 255 255 / 12%); color: #8a847e; }
+.obs { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ob { padding: 16px 16px; border-radius: 14px; background: rgb(255 255 255 / 6%); border: 1px solid rgb(255 255 255 / 10%); font-size: 10.8px; color: #cfc8c0; line-height: 1.5; }
+.ob b { display: flex; align-items: center; gap: 7px; font-size: 13.5px; color: #fff; margin-bottom: 4px; }
+.ob b svg { width: 15px; height: 15px; color: #f0b8b0; }
+.ob code { background: rgb(255 255 255 / 10%); color: #f0d6d2; }
+.secu { margin-top: 12px; padding: 14px 16px; border-radius: 14px; background: rgb(255 255 255 / 4%); border: 1px solid rgb(255 255 255 / 9%); display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px 20px; font-size: 11px; color: #cfc8c0; }
+.secu h4 { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #fff; }
+.secu h4 svg { color: #f0b8b0; }
+.secu div { display: flex; gap: 8px; align-items: baseline; } .secu div svg { flex: none; color: #b9c8e6; position: relative; top: 2px; }
+.deploy10 { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.deploy10 div { padding: 10px 11px; border-radius: 12px; background: rgb(255 255 255 / 6%); border: 1px solid rgb(240 184 176 / 22%); font-size: 10.2px; color: #cfc8c0; line-height: 1.45; }
+.deploy10 b { display: block; font-size: 12.5px; color: #fff; font-weight: 500; margin-bottom: 2px; }
+.road { margin-top: 14px; }
+.road h4 { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #fff; margin-bottom: 10px; }
+.road h4 svg { color: #f0b8b0; }
+.road .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.rc { position: relative; padding: 13px 14px; border-radius: 14px; background: #f5f2ee; color: var(--ink); font-size: 10.8px; line-height: 1.5; }
+.rc .no { position: absolute; right: 12px; top: 4px; font-family: var(--hand); font-size: 24px; color: var(--red); }
+.rc b { display: block; font-size: 13.5px; margin: 6px 0 3px; }
+.rc span { color: var(--ink-2); }
+.rc .ico { width: 30px; height: 30px; }
+.closing { position: absolute; right: 56px; bottom: 58px; font-family: var(--hand); font-size: 26px; color: #f0b8b0; transform: rotate(-2deg); transform-origin: right; }
+.dark .sign { position: absolute; left: 56px; bottom: 34px; font-size: 10.5px; color: #8a847e; }
+.recap { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rq { position: relative; padding: 12px 18px 12px 60px; border-radius: 16px; background: rgb(255 255 255 / 5%); border: 1px solid rgb(255 255 255 / 10%); }
+.rq .n { position: absolute; left: 18px; top: 10px; font-family: var(--hand); font-size: 34px; color: #f0b8b0; }
+.rq:nth-child(even) .n { color: #b9c8e6; }
+.rq small { display: block; font-size: 10.5px; letter-spacing: .18em; color: #8a847e; }
+.rq p { margin: 3px 0 0; font-size: 13.5px; line-height: 1.5; color: #f5f2ee; }
+.recap-h { margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 14px; color: #fff; }
+.recap-h svg { color: #f0b8b0; }
+</style></head>
+<body>
+
+<!-- ============ 01 封面 ============ -->
+<section class="page cover">
+  <div class="aura"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  <span class="ribbon"></span>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">01<small> / 10</small></span></div>
+  <div class="hero">
+    <span class="eyebrow"><i data-icon="compass" data-size="13"></i>系统架构设计文档</span>
+    <h1>一个可信服务端，<br>把心意<em>稳稳</em>送到。</h1>
+    <p class="sub">让心意，送得刚刚好</p>
+    <p class="intro">本文说明 GiftWise AI 的整体架构：由哪些部分组成、为什么这样拆分，以及它如何承载当前的负载、管理状态、扩缩容和从故障中恢复。</p>
+    <p class="live"><span>公网单实例</span><b>http://117.50.83.57/</b><small>Compshare · Nginx · systemd · 仅 HTTP</small></p>
+  </div>
+  <div class="stack">
+    <p class="hand">三层，各管一段</p>
+    <div class="layer l1"><span><span class="ico"><i data-icon="chat" data-size="15"></i></span>浏览器 · 对话与选择</span></div>
+    <div class="layer l2"><span><span class="ico"><i data-icon="shield" data-size="15"></i></span>可信服务端 · 编排与校验</span></div>
+    <div class="layer l3"><span><span class="ico ico--blue"><i data-ext="cloud" data-size="15"></i></span>模型 · 检索 · 生图 · 存储</span></div>
+  </div>
+  <nav class="toc glass">
+    <h4><span class="ico ico--sm"><i data-icon="book" data-size="14"></i></span>目录</h4>
+    <a><i>02</i>一页读懂：四个问题的答案<small>概览</small></a>
+    <a><i>07</i>状态管理：什么在哪里、活多久<small>状态</small></a>
+    <a><i>03</i>架构总览：组件与边界<small>结构</small></a>
+    <a><i>08</i>扩缩容：从单实例到多实例<small>伸缩</small></a>
+    <a><i>04</i>为什么这样设计<small>取舍</small></a>
+    <a><i>09</i>故障恢复：每类故障怎么接住<small>韧性</small></a>
+    <a><i>05</i>一次请求的生命周期<small>流程</small></a>
+    <a><i>10</i>可观测、安全与演进<small>运维</small></a>
+    <a><i>06</i>负载：时间花在哪、闸门在哪<small>负载</small></a>
+  </nav>
+  <div class="meta"><div><b>GiftWise AI · 送礼决策助手</b>系统架构设计 · 部署版本 19b6819，基于同版 QA eceef056</div><div style="text-align:right"><b>版本 v2.0 · 2026-11-01</b>运行 19b6819 · 证据 6e92a9e · 材料 4a35e18<br>v1.0（eceef056）为上一版</div></div>
+</section>
+
+<!-- ============ 02 一页读懂 ============ -->
+<section class="page p2">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">02<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="eye" data-size="13"></i>一页读懂</span>
+    <h2 class="sec-title">四个问题，四个答案。</h2>
+    <p class="lead">GiftWise 是一个“模型负责理解与表达、代码负责把关、用户负责决定”的送礼决策助手。架构围绕这条分工展开。</p>
+    <div class="sum glass">
+      <div><span class="ico ico--sm"><i data-icon="shield" data-size="14"></i></span><span><b>一个可信服务端</b>密钥、状态、校验与修订额度全部只在服务端</span></div>
+      <div><span class="ico ico--sm ico--blue"><i data-icon="scale" data-size="14"></i></span><span><b>生成与校验分开</b>模型出方案，独立代码逐项检查，最多修订一次</span></div>
+      <div><span class="ico ico--sm ico--gold"><i data-icon="camera" data-size="14"></i></span><span><b>慢任务异步化</b>文字先到，效果图后台生成、原位补上</span></div>
+    </div>
+    <div class="qa">
+      <div class="q glass"><span class="k">负载</span>
+        <h3><span class="ico"><i data-icon="bolt" data-size="17"></i></span>当前负载怎么承载？</h3>
+        <p class="ans">负载是<em>等待型</em>的：时间几乎都花在上游模型上，本机 CPU 很轻。</p>
+        <ul class="dots"><li>Compshare 单实例：Nginx :80 反代到 Node 单进程，systemd 守护</li><li>请求体 256 KB、有界检索队列、单次模型尝试 120 s 等闸门</li><li>只为选中的方案生成 1 张图，控制最贵的调用</li></ul>
+        <span class="go">→ 详见 05 · 06</span></div>
+      <div class="q glass blue"><span class="k">状态</span>
+        <h3><span class="ico ico--blue"><i data-ext="db" data-size="17"></i></span>状态放在哪里？</h3>
+        <p class="ans">决策流程在<em>内存</em>，产物与账本<em>独立落盘</em>，浏览器只持签名会话。</p>
+        <ul class="dots blue"><li>运行、排除分析、选择与会话签名在内存，重启后旧流程失效</li><li>SQLite、文字缓存、媒体、审计与账本落到 /var/lib/giftwise</li><li>落盘文件保留，但不能据此恢复旧会话</li></ul>
+        <span class="go">→ 详见 07</span></div>
+      <div class="q glass blue"><span class="k">伸缩</span>
+        <h3><span class="ico ico--blue"><i data-ext="layers" data-size="17"></i></span>怎么扩缩容？</h3>
+        <p class="ans">现在是<em>单实例</em>；多副本是<em>后续计划</em>，需先外置状态、签名、幂等与执行归属。</p>
+        <ul class="dots blue"><li>公网单实例已跑通一条真实流程，容量未测</li><li>扩展信号看在途模型调用与排队，而不是 CPU</li><li>历史规则容器实验不代表全站多副本</li></ul>
+        <span class="go">→ 详见 08</span></div>
+      <div class="q glass"><span class="k">恢复</span>
+        <h3><span class="ico"><i data-icon="refresh" data-size="17"></i></span>出故障怎么恢复？</h3>
+        <p class="ans">每类故障都<em>就地接住</em>：可重试的重试，不可重试的明确告知，生图失败不影响文字指南。</p>
+        <ul class="dots"><li>网络错误有限重试，业务修订全链路最多一次</li><li>检索受阻时复用合法历史文字；没有可用素材就如实返回</li><li>重启后不自动重发生图，任务标为“执行未知”</li></ul>
+        <span class="go">→ 详见 09</span></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi card"><b class="num">39.391 <small style="font-size:13px">s</small></b><span>【实测·公网单样本】三个可选方案返回</span></div>
+      <div class="kpi card"><b class="num">12.797 <small style="font-size:13px">s</small></b><span>【实测·公网单样本】选定后文字先返回</span></div>
+      <div class="kpi card"><b class="num">10.960 <small style="font-size:13px">s</small></b><span>【实测·公网单样本】后台生图 2304×1728</span></div>
+      <div class="kpi card"><b class="num">0.35 <small style="font-size:13px">元</small></b><span>【推算】典型任务预算 · 100 次约 35.22 元</span></div>
+    </div>
+    <p class="kpi-note">三段分别计时，不相加为端到端，不推断 P95　【推算】为预算，不是账单实付　【实测·隔离fixture】Node 峰值 86.54 MiB，8/8 用例</p>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>一页读懂</span></div>
+</section>
+
+<!-- ============ 03 架构总览 ============ -->
+<section class="page p3">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">03<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-ext="layers" data-size="13"></i>架构总览</span>
+    <h2 class="sec-title">三层结构，一条可信边界。</h2>
+    <p class="lead">浏览器只负责对话、展示与选择；判断和状态都在 Compshare 上的可信服务端；模型、检索、生图和存储在它之下按需调用。</p>
+    <div class="diag">
+      <div class="zone z-user">
+        <div class="zl"><span class="ico ico--sm"><i data-icon="laptop" data-size="14"></i></span>① 浏览器 · 不可信区<small>桌面与手机同一套页面，不持有密钥与可信状态</small></div>
+        <div class="row">
+          <div class="pill"><b>和小礼聊</b>说出需求</div>
+          <div class="pill"><b>确认避开</b>排除项澄清</div>
+          <div class="pill"><b>看三个方案</b>理由与依据</div>
+          <div class="pill"><b>亲手选定</b>只能选通过的</div>
+          <div class="pill"><b>读指南</b>效果图原位补入</div>
+        </div>
+      </div>
+      <div class="flowrow"><span class="flow"><i data-icon="arrow-down" data-size="13"></i>HTTP :80 · http://117.50.83.57/ · JSON · 签名会话 Cookie（未配置 HTTPS）</span></div>
+      <div class="zone z-srv">
+        <div class="zl"><span class="ico ico--sm" style="background:#2a2a2c;color:#f0b8b0;box-shadow:none"><i data-icon="shield" data-size="14"></i></span>② 可信服务端 · Compshare Ubuntu 22.04.4 单实例<small>部署 19b6819</small></div>
+        <div class="deploy"><span><b>Nginx</b>公网 :80</span><i>→</i><span><b>Node v24.16.0</b>127.0.0.1:8787 · 单进程 · 内置模块</span><i>·</i><span><b>systemd</b>守护与自动重启</span></div>
+        <div class="grid">
+          <div class="mod"><b><i data-icon="link" data-size="13"></i>路由与会话</b>HMAC 签名会话、请求体上限、统一中文错误</div>
+          <div class="mod hot"><b><i data-icon="chat" data-size="13"></i>需求解析</b>原话映射为固定字段，缺失时追问</div>
+          <div class="mod hot"><b><i data-icon="ban" data-size="13"></i>排除项分析</b>识别并确认“不要什么”</div>
+          <div class="mod hot"><b><i data-icon="lightbulb" data-size="13"></i>推荐编排</b>三个可选方案 · 模型调用检索工具取公开文字</div>
+          <div class="mod"><b><i data-icon="scale" data-size="13"></i>独立校验</b>预算、禁忌、结构逐项检查；时间不影响可选性</div>
+          <div class="mod"><b><i data-icon="edit" data-size="13"></i>修订控制</b>全链路业务修订最多 1 次</div>
+          <div class="mod cool"><b><i data-icon="gift" data-size="13"></i>选后呈现</b>明确选择后生成指南并复核，文字先返回</div>
+          <div class="mod cool"><b><i data-icon="camera" data-size="13"></i>媒体任务</b>后台生图 pending→ready / failed / unknown</div>
+          <div class="mod"><b><i data-icon="search" data-size="13"></i>检索工作队列</b>有界队列与超时；匿名 HTTP 公开文字</div>
+          <div class="mod"><b><i data-ext="db" data-size="13"></i>运行快照</b>候选、校验、修订计数、选择（内存）</div>
+          <div class="mod"><b><i data-icon="eye" data-size="13"></i>账本与审计</b>模型调用、工具调用、媒体记录</div>
+          <div class="mod"><b><i data-icon="bag" data-size="13"></i>同源媒体读取</b>只读 GET 任务与图片，校验会话归属</div>
+        </div>
+      </div>
+      <div class="flowrow"><span class="flow b"><i data-icon="arrow-down" data-size="13"></i>按需调用 · 外部模型与生图 API 走 HTTPS · 密钥只在服务端</span></div>
+      <div class="z-bottom">
+        <div class="zone z-ext">
+          <div class="zl"><span class="ico ico--sm ico--blue"><i data-ext="cloud" data-size="14"></i></span>③ 外部能力</div>
+          <div class="items">
+            <div class="it"><span class="ico ico--blue"><i data-icon="sparkles"></i></span><span><b>文字模型 API · HTTPS</b>解析、三个方案、修订、赠送指南</span></div>
+            <div class="it"><span class="ico ico--blue"><i data-icon="search"></i></span><span><b>公开文字检索 · 匿名 HTTP</b>真实公开文字 + 合法历史摘要（保留观察时间）</span></div>
+            <div class="it"><span class="ico"><i data-icon="camera"></i></span><span><b>Seedream API · HTTPS</b>仅在用户明确选择后生成 1 张效果图</span></div>
+          </div>
+        </div>
+        <div class="zone z-sto">
+          <div class="zl"><span class="ico ico--sm ico--gold"><i data-ext="db" data-size="14"></i></span>④ 本地存储</div>
+          <div class="items">
+            <div class="it"><span class="ico ico--gold"><i data-ext="cpu"></i></span><span><b>进程内存</b>运行 · 排除分析 · 选择 · 会话签名；重启旧流程失效</span></div>
+            <div class="it"><span class="ico ico--gold"><i data-ext="file"></i></span><span><b>/var/lib/giftwise/runtime</b>文字缓存 · 媒体任务与图片 · 审计 · LLM 账本</span></div>
+            <div class="it"><span class="ico ico--gold"><i data-ext="db"></i></span><span><b>/var/lib/giftwise/db</b>独立 SQLite，不用演示库；商品读取为兼容能力</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="legend3">
+      <span><i style="background:linear-gradient(90deg,#3a1517,#5a2226)"></i>生成阶段（模型参与）</span>
+      <span><i style="background:#1d1d1f;border:1px solid #444"></i>确定性代码</span>
+      <span><i style="background:linear-gradient(90deg,#16233a,#26385a)"></i>选后阶段</span>
+    </div>
+    <p class="ops"><span class="ico ico--sm ico--ink"><i data-icon="tool" data-size="12"></i></span><b>运维通道</b>OpenCLI 用于部署操作，不在用户请求链路中</p>
+    <p class="note">模型在下面干活，<br>代码在中间把关</p>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>架构总览</span></div>
+</section>
+
+<!-- ============ 04 为什么这样设计 ============ -->
+<section class="page p4">
+  <div class="aura"><i class="a1"></i><i class="a3"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">04<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="question" data-size="13"></i>为什么这样设计</span>
+    <h2 class="sec-title">每个选择，都换来一样东西。</h2>
+    <p class="lead">下面六个关键决定，逐条写清我们选了什么、为什么选、付出了什么代价。</p>
+    <div class="dec">
+      <div class="d"><span class="no">01</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">单一可信服务端：Node.js 24 单进程，Nginx 反代、systemd 守护</p></div>
+        <div><h5>理由</h5>业务是“等模型”的 I/O 型负载，异步单进程即可承载当前使用；只用内置模块，部署只需 Node + Nginx + systemd，不引入 Docker / K8s，密钥只有一个落点。</div>
+        <div class="cost"><h5>代价</h5>单点运行；流程状态在进程内存，横向扩展前需要先外置（见 08）。</div></div>
+      <div class="d"><span class="no">02</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">生成、检查、决定三件事分开</p></div>
+        <div><h5>理由</h5>模型不给自己打分：预算、禁忌、结构交给独立代码；用户只能在通过检查的方案里选，选择权始终在人。</div>
+        <div class="cost"><h5>代价</h5>多一道校验与可能的一次修订，换来结果可预期。</div></div>
+      <div class="d"><span class="no">03</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">全链路业务修订最多 1 次，输出格式重试最多 1 次</p></div>
+        <div><h5>理由</h5>把最坏情况的调用次数和耗时封顶，成本与等待都可预测，不会陷入“越修越多”的循环。</div>
+        <div class="cost"><h5>代价</h5>极少数情况一次修不好，就明确告知，不硬凑结果。</div></div>
+      <div class="d"><span class="no">04</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">选定后才生图，且异步：文字先返回</p></div>
+        <div><h5>理由</h5>出图是最慢、最贵的一步。只为选中的方案生成一张；指南复核通过即返回，效果图在后台生成、原位补上，读指南不用等图。</div>
+        <div class="cost"><h5>代价</h5>需要任务状态与幂等机制：状态刷新只读，不会重新付费。</div></div>
+      <div class="d"><span class="no">05</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">推荐有据：模型调用检索工具，真实素材先进入模型</p></div>
+        <div><h5>理由</h5>查什么由模型结合上下文决定；服务端用 HTTP 获取公开文字素材并复用来源缓存，同一批素材可支撑多个思路，减少重复检索。</div>
+        <div class="cost"><h5>代价</h5>多一轮工具往返；没有可用素材或依据无法确认时，如实返回而不硬凑方案。</div></div>
+      <div class="d"><span class="no">06</span>
+        <div><h5>选择</h5><p class="pick" style="margin:0">可信状态只留服务端，浏览器只持签名会话</p></div>
+        <div><h5>理由</h5>修订计数、候选、选择都不能被前端篡改；任务和图片按会话隔离，他人不可读。</div>
+        <div class="cost"><h5>代价</h5>会话密钥随进程生成，重启后需要重新开始一次会话。</div></div>
+    </div>
+    <div class="principle"><span class="hand">一句话</span>模型负责理解与表达，代码负责把关，用户负责决定；慢的、贵的、会失败的，都放到不挡路的位置。</div>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>设计取舍</span></div>
+</section>
+
+<!-- ============ 05 生命周期 ============ -->
+<section class="page p5">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">05<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="send" data-size="13"></i>一次请求的生命周期</span>
+    <h2 class="sec-title">从一句话，到一份指南。</h2>
+    <p class="lead">一次完整的送礼决策会经过六步。右侧是每一步的调用次数、公网单样本耗时与它写入的状态。</p>
+    <div class="life">
+      <div class="st glass"><span class="dot"><i data-icon="chat"></i></span>
+        <div><h4>需求解析 <span class="tag t-blue">模型</span></h4><p>用户和小礼聊天，模型把原话映射为固定字段，保留喜好原话；缺的关键信息自然追问。解析失败时用表单原值继续，不卡住用户。</p></div>
+        <div class="side"><b>0–1 次</b>写入：解析审计块（只做交代，不参与校验）</div></div>
+      <div class="st glass"><span class="dot"><i data-icon="ban"></i></span>
+        <div><h4>确认要避开的 <span class="tag t-red">用户</span></h4><p>识别“不要什么”并请用户确认，得到排除分析记录，后续推荐与校验都以它为准。</p></div>
+        <div class="side"><b>分析 ID</b>写入：排除分析（内存，10 分钟）</div></div>
+      <div class="st glass b"><span class="dot"><i data-icon="lightbulb"></i></span>
+        <div><h4>三个方案 <span class="tag t-blue">模型 + 工具</span></h4><p>模型结合完整上下文生成三个方案；调用检索工具，用匿名 HTTP 获取公开文字并复用合法历史摘要，素材先进入模型，再形成创意。推荐卡不配网络图片。</p></div>
+        <div class="side"><b>39.391 <small>s</small></b>公网单样本，含一次修订<br>写入：运行快照、文字缓存</div></div>
+      <div class="st glass"><span class="dot"><i data-icon="scale"></i></span>
+        <div><h4>独立校验与一次修订 <span class="tag t-ink">代码</span></h4><p>独立代码逐项检查预算、禁忌、结构；时间只作信息，不影响可选性。有可修问题时让模型修订一次，已通过项受保护。成功时返回三个可选方案。</p></div>
+        <div class="side"><b>≤ 1 次</b>写入：校验结果、修订计数、可选列表</div></div>
+      <div class="st glass b"><span class="dot"><i data-icon="hand"></i></span>
+        <div><h4>用户选定，生成指南 <span class="tag t-red">用户</span><span class="tag t-blue">模型</span></h4><p>服务端核对选择属于本会话且在可选列表内，生成贺卡、包装与赠送方式并复核；文字立即返回。纯体验没有实体交付时不输出包装章节。</p></div>
+        <div class="side"><b>12.797 <small>s</small></b>公网单样本，文字先到<br>写入：选择、呈现与复核结果</div></div>
+      <div class="st async"><span class="dot"><i data-icon="camera"></i></span>
+        <div><h4>效果图后台生成 <span class="tag t-gold">异步</span></h4><p>以“运行 + 候选 + 计划版本”的哈希为任务 ID 独占创建，后台调用 Seedream 4.5；页面只读查询状态，完成后原位补图，失败不影响文字。</p></div>
+        <div class="side"><b>10.960 <small>s</small></b>1 张 2304×1728，无参考图输入<br>写入：任务文件、图片文件</div></div>
+    </div>
+    <p class="tail2">【实测·公网单样本】从结构化输入开始，文本模型 5 次、29,513 tokens；三段分别计时，不相加为端到端　【推算】典型任务约 0.35 元</p>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>请求生命周期</span></div>
+</section>
+
+<!-- ============ 06 负载 ============ -->
+<section class="page p6">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">06<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="bolt" data-size="13"></i>负载</span>
+    <h2 class="sec-title">时间花在等待上，闸门守在入口。</h2>
+    <p class="lead">GiftWise 的负载是“少量请求、长时间等待上游”。因此架构的重点不是算力，而是控制并发、超时和最贵的调用。</p>
+    <div class="top">
+      <div class="bars glass">
+        <h4><span class="ico ico--sm ico--blue"><i data-icon="coins" data-size="14"></i></span>一次典型任务的预算 <span class="tag t-gold">推算</span></h4>
+        <p class="k">ModelVerse 刊例：文本输入 2 元 / 输出 8 元每百万 tokens，Seedream 4.5 每张 0.25 元</p>
+        <div class="br"><span>文本 7 次</span><div class="tr"><i style="left:0;width:29%;background:var(--ink)">0.102 元</i><span class="lbl" style="left:31%">25,763 入 / 6,334 出</span></div></div>
+        <div class="br"><span>效果图 1 张</span><div class="tr"><i style="left:0;width:71%;background:rgb(160 28 35/82%)">0.25 元 · 仅为选中方案生成</i></div></div>
+        <div class="br"><span>合计</span><div class="tr"><i style="left:0;width:100%;background:rgb(33 67 122/78%)">0.352 元 / 次 · 100 次约 35.22 元</i></div></div>
+        <p style="margin:8px 0 0;font-size:11px;line-height:1.55;color:var(--blue)">【实测·隔离fixture】Node 峰值工作集 86.54 MiB；并发 2 的 20/20 mock 任务完成；异步、幂等与会话隔离等 8/8 用例通过</p>
+      </div>
+      <div class="split glass">
+        <h4 style="display:flex;align-items:center;gap:8px;font-size:14px"><span class="ico ico--sm"><i data-ext="cpu" data-size="14"></i></span>负载的性质</h4>
+        <div class="ring"><span><span><b>等待型</b>主要耗时<br>在上游模型</span></span></div>
+        <p>耗时主要是模型推理与检索的网络等待，服务端异步处理。部署机购买配置为 8 核 / 64 GB / P40，模型与生图走远端 API，配置不代表实耗；公网单样本不推断吞吐或 P95。</p>
+      </div>
+    </div>
+    <div class="gates glass">
+      <h4><span class="ico ico--sm"><i data-icon="shield" data-size="14"></i></span>入口与上游的闸门</h4>
+      <div class="gate-row">
+        <div class="gate"><span class="ico"><i data-ext="file"></i></span><b>256 <small>KB</small></b>请求体上限，超出立即拒绝</div>
+        <div class="gate"><span class="ico ico--blue"><i data-icon="search"></i></span><b>4 <small>/ 3 并行</small></b>有界检索队列；不等于全站硬并发容量</div>
+        <div class="gate"><span class="ico"><i data-icon="hourglass"></i></span><b>120 <small>s</small></b>单次模型尝试；前端普通 120 s、解析 60 s，Nginx 读 900 s，分别设置，不是统一 SLA</div>
+        <div class="gate"><span class="ico ico--blue"><i data-icon="refresh"></i></span><b>≤ 2 <small>次</small></b>网络重试，硬上限 3；线性退避 250 ms 递增</div>
+        <div class="gate"><span class="ico ico--gold"><i data-ext="db"></i></span><b>200 <small>条</small></b>运行快照上限，超出淘汰最旧，10 分钟过期</div>
+        <div class="gate"><span class="ico"><i data-icon="camera"></i></span><b>1 <small>张</small></b>每次选择只生成一张图；生图默认关闭，需显式开启</div>
+        <div class="gate"><span class="ico ico--blue"><i data-icon="x"></i></span><b>断开取消</b>推荐阶段取消在途模型与检索；解析、呈现与后台图不保证随退出停止</div>
+        <div class="gate"><span class="ico ico--gold"><i data-icon="wallet"></i></span><b>调用预算</b>可配置调用计数上限，默认未设；不是严格费用封顶</div>
+      </div>
+    </div>
+    <div class="knobs glass">
+      <h4><span class="ico ico--sm ico--green"><i data-icon="check" data-size="14"></i></span>控制手段</h4>
+      <div><i data-icon="check" data-size="13"></i>重复提交同一请求命中幂等键，不会再跑一遍生成</div>
+      <div><i data-icon="check" data-size="13"></i>素材缓存复用同批真实资料，减少重复检索</div>
+      <div><i data-icon="check" data-size="13"></i>修订封顶，最坏情况的调用次数可算</div>
+      <div><i data-icon="check" data-size="13"></i>所有阈值集中在配置层，可按环境变量调整</div>
+    </div>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>负载</span></div>
+</section>
+
+<!-- ============ 07 状态管理 ============ -->
+<section class="page p7">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">07<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-ext="db" data-size="13"></i>状态管理</span>
+    <h2 class="sec-title">按寿命分层，按会话隔离。</h2>
+    <p class="lead">每一份状态都回答三个问题：放在哪里、活多久、重启之后还在不在。流程状态在内存，产物在独立目录；文件还在，不等于旧会话还能读取。</p>
+    <div class="tiers">
+      <div class="tier t1"><b><i data-ext="cpu"></i>热 · 进程内存</b>运行、排除分析、选择与会话签名：快、可淘汰；重启后旧流程失效。</div>
+      <div class="tier t2"><b><i data-ext="file"></i>温 · /var/lib/giftwise/runtime</b>文字缓存、媒体任务与图片、审计、LLM 账本：独立落盘，文件跨重启保留。</div>
+      <div class="tier t3"><b><i data-ext="db"></i>独立 · /var/lib/giftwise/db</b>本次独立 SQLite，启动器建表；不使用、不写原演示库。</div>
+    </div>
+    <table class="state">
+      <thead><tr><th>状态</th><th>放在哪里</th><th>生命周期与上限</th><th>一致性手段</th><th>重启后</th></tr></thead>
+      <tbody>
+        <tr><td><span class="bar" style="background:var(--red)"></span>会话身份</td><td>浏览器 Cookie（HttpOnly · SameSite=Strict）</td><td>随浏览器会话；签名密钥由进程随机生成</td><td>HMAC-SHA256 签名，恒定时间比较</td><td class="lose">重新签发</td></tr>
+        <tr><td><span class="bar" style="background:var(--red)"></span>推荐运行快照</td><td>内存 Map</td><td>10 分钟过期，最多 200 条，淘汰最旧</td><td>候选、校验、修订计数只在服务端；选择须命中可选列表</td><td class="lose">重新推荐</td></tr>
+        <tr><td><span class="bar" style="background:var(--red)"></span>排除项分析</td><td>内存 Map</td><td>10 分钟过期，最多 200 条</td><td>绑定会话；推荐时校验归属</td><td class="lose">重新确认</td></tr>
+        <tr><td><span class="bar" style="background:var(--red)"></span>选择与呈现缓存</td><td>运行快照内</td><td>随运行快照</td><td>同一选择重复点击返回同一份结果</td><td class="lose">随快照</td></tr>
+        <tr><td><span class="bar" style="background:#b88a3e"></span>生图任务</td><td>runtime <code>tasks/&lt;id&gt;.json</code></td><td>长期保留</td><td>ID＝sha256(运行, 候选, 计划版本)；独占创建，临时文件 + 重命名</td><td class="ok">文件保留 *</td></tr>
+        <tr><td><span class="bar" style="background:#b88a3e"></span>效果图</td><td>runtime <code>assets/&lt;sha256&gt;</code></td><td>长期保留</td><td>内容寻址；读取时重算哈希，不一致即拒绝</td><td class="ok">文件保留 *</td></tr>
+        <tr><td><span class="bar" style="background:#b88a3e"></span>素材缓存</td><td>runtime 文件</td><td>最多 80 条，7 天过期</td><td>按来源去重，写入前脱敏，保留观察时间</td><td class="ok">保留</td></tr>
+        <tr><td><span class="bar" style="background:#b88a3e"></span>模型调用账本</td><td>runtime JSONL</td><td>长期保留</td><td>逐行追加（非事务）；测试进程自动改道</td><td class="ok">保留</td></tr>
+        <tr><td><span class="bar" style="background:var(--blue)"></span>独立数据库</td><td>db 目录 SQLite（node:sqlite）</td><td>本次部署新建</td><td>启动器建表；在线备份 integrity_check=ok</td><td class="ok">保留</td></tr>
+      </tbody>
+    </table>
+    <p class="fn">* 图片与任务文件留在磁盘，但读取仍要求内存中的运行与会话归属；重启后旧流程失效，重启恢复未验收。runtime 备份为同盘逐文件复制，非事务、未异地。</p>
+    <div class="rules">
+      <div class="glass"><b><span class="ico ico--sm"><i data-icon="shield" data-size="13"></i></span>可信状态不出服务端</b>浏览器提交修订计数等派生字段会被直接拒绝，只能提交需求与“选哪一个”。</div>
+      <div class="glass"><b><span class="ico ico--sm ico--blue"><i data-icon="users" data-size="13"></i></span>按会话隔离</b>运行快照、生图任务、图片读取都校验会话归属，别人的任务一律 404。</div>
+      <div class="glass"><b><span class="ico ico--sm ico--gold"><i data-icon="coins" data-size="13"></i></span>花钱的落盘</b>生图任务先落盘再执行；重启后未完成的任务标“执行未知”，不自动重发。</div>
+    </div>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>状态管理</span></div>
+</section>
+
+<!-- ============ 08 扩缩容 ============ -->
+<section class="page p8">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">08<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-ext="layers" data-size="13"></i>扩缩容</span>
+    <h2 class="sec-title">先纵向，再横向，一级一级上。</h2>
+    <p class="lead">现在是 Compshare 单实例，已跑通一条公网真实流程，容量未测。L1–L3 是计划，尚未实现；每一级都要先完成共享状态、签名、幂等与执行归属的复核，才能声明安全。</p>
+    <div class="stairs">
+      <div class="step now" style="left:0;top:222px"><span class="s">L0 · 现在</span><h4>单实例 · 已部署</h4><ul class="dots"><li>Compshare · Nginx · systemd</li><li>Node 单进程异步 I/O</li><li>流程在内存，产物独立落盘</li></ul><p class="trig"><b>现状</b>：一条公网流程已验收，容量未测</p></div>
+      <div class="step glass" style="left:173px;top:148px"><span class="s">L1 · 计划</span><h4>多实例 · 会话粘滞</h4><ul class="dots"><li>负载均衡按会话 Cookie 粘滞</li><li>会话签名密钥改为共享配置</li><li>媒体文件挂共享卷</li></ul><p class="trig"><b>触发</b>：在途模型调用长期接近配额上限</p></div>
+      <div class="step glass" style="left:346px;top:74px"><span class="s" style="color:var(--coral)">L2 · 计划</span><h4>状态外置 · 无状态</h4><ul class="dots"><li>运行、排除分析、选择放入带 TTL 的共享存储</li><li>签名密钥共享；媒体任务条件写入与执行归属</li><li>原子费用控制后，任意副本接任意请求</li></ul><p class="trig"><b>触发</b>：需要滚动发布不中断、重启不丢会话</p></div>
+      <div class="step glass" style="left:520px;top:0"><span class="s" style="color:var(--blue)">L3 · 计划</span><h4>弹性伸缩 · 队列解耦</h4><ul class="dots blue"><li>生图与检索进任务队列，独立工作者</li><li>按排队深度与在途调用数扩缩</li><li>模型调用走统一限流</li></ul><p class="trig"><b>触发</b>：峰值明显、生图排队超过分钟级</p></div>
+      <p class="hand" style="left:4px;top:160px;color:var(--red);transform:rotate(-4deg)">从这里出发 ↓</p>
+      <p class="hand hand--blue" style="left:4px;top:20px;transform:rotate(-3deg)">每一级只改必须改的 ↗</p>
+    </div>
+    <div class="scalebox">
+      <div class="exp glass">
+        <h4><span class="ico ico--sm ico--gold"><i data-icon="book" data-size="14"></i></span>历史参考 · 规则校验容器本地双副本</h4>
+        <div class="g">
+          <div><b>60 / 60</b>轮询分发全部通过，两副本各承担一半</div>
+          <div><b>≈ 20 MiB</b>单副本常驻内存</div>
+          <div><b>0.668 s</b>容器冷启动到健康检查通过</div>
+          <div><b>5.97 s</b>副本下线后被健康检查发现并摘除</div>
+        </div>
+        <p style="margin:8px 0 0;font-size:10.2px;color:var(--ink-2);line-height:1.5">出自 2026-10-31 独立 Python 规则 API 的本地实验，不代表当前全站云端多副本。</p>
+      </div>
+      <div class="sig glass">
+        <h4><span class="ico ico--sm ico--blue"><i data-icon="compass" data-size="14"></i></span>扩缩信号怎么选</h4>
+        <div class="row"><i data-icon="check" data-size="14"></i><span><b>看在途模型调用与排队深度</b>：这才是用户等待的来源</span></div>
+        <div class="row"><i data-icon="check" data-size="14"></i><span><b>不以 CPU 为主信号</b>：等待型负载下 CPU 长期偏低</span></div>
+        <div class="row"><i data-icon="check" data-size="14"></i><span><b>缩容先排空</b>：等在途请求与生图任务完成再下线</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>扩缩容</span></div>
+</section>
+
+<!-- ============ 09 故障恢复 ============ -->
+<section class="page p9">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">09<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="refresh" data-size="13"></i>故障恢复</span>
+    <h2 class="sec-title">每一类故障，都有接住它的地方。</h2>
+    <p class="lead">按“怎么发现 → 怎么处理 → 用户看到什么”逐条排开。原则：可重试的有限重试，不可重试的明确告知，生图失败不挡文字指南。systemd 自动重启已配置；故障注入、重启恢复与回滚演练未测。</p>
+    <table class="fm">
+      <thead><tr><th>故障</th><th>怎么发现</th><th>怎么处理</th><th>用户看到</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">上游模型</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-icon="hourglass" data-size="13"></i></span>超时 / 限流 / 5xx</span></td><td>120 s 超时；状态码 408 409 425 429 5xx</td><td>最多重试 2 次，线性退避；仍失败返回明确错误码</td><td>中文提示，可直接重试</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-icon="x" data-size="13"></i></span>输出不合法</span></td><td>严格 JSON 解析与结构校验</td><td>格式重试最多 1 次；截断或推理耗尽直接停止</td><td>明确失败，不展示残缺结果</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-icon="scale" data-size="13"></i></span>违反预算或禁忌</span></td><td>独立代码逐项校验</td><td>业务修订 1 次，已通过项保护；仍不通过则不进入可选列表</td><td>只看到通过检查的方案</td></tr>
+        <tr class="grp b"><td colspan="4">检索与外部资料</td></tr>
+        <tr><td><span><span class="ico ico--sm ico--blue"><i data-icon="search" data-size="13"></i></span>来源受限 / 超时 / 队列满</span></td><td>队列超时与上限；受限来源自动暂停</td><td>模型换来源再查一轮，复用合法历史文字</td><td>有合法素材且模型确认依据时继续</td></tr>
+        <tr><td><span><span class="ico ico--sm ico--blue"><i data-icon="ban" data-size="13"></i></span>没有可用依据</span></td><td>无可用素材，或模型不确认依据</td><td>返回 RETRIEVAL_NO_MATERIAL / BASIS_UNCONFIRMED，不凭空生成</td><td>简短提示，稍后再试</td></tr>
+        <tr class="grp"><td colspan="4">效果图</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-icon="camera" data-size="13"></i></span>生图失败 / 超时</span></td><td>任务状态变为 failed / unknown</td><td>文字指南不受影响；状态刷新只读，unknown 不盲目重发；重新生成是另一次付费调用</td><td>指南可读，图位显示当前状态</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-icon="refresh" data-size="13"></i></span>刷新 / 重复点击</span></td><td>任务 ID 由运行与候选确定</td><td>独占创建命中已有任务；状态查询只读</td><td>同一张图，不重复付费</td></tr>
+        <tr><td><span><span class="ico ico--sm"><i data-ext="file" data-size="13"></i></span>图片文件损坏</span></td><td>读取时重算 sha256</td><td>哈希不一致即拒绝返回</td><td>不展示错误图片</td></tr>
+        <tr class="grp b"><td colspan="4">进程与连接</td></tr>
+        <tr><td><span><span class="ico ico--sm ico--blue"><i data-ext="cpu" data-size="13"></i></span>进程重启</span></td><td>systemd 拉起新进程；任务记录的执行实例与当前进程不同</td><td>未完成的生图任务标为“执行未知”，不自动重发；内存中的流程清空</td><td>需重新开始一次推荐</td></tr>
+        <tr><td><span><span class="ico ico--sm ico--blue"><i data-icon="x" data-size="13"></i></span>用户中途离开</span></td><td>连接关闭事件</td><td>推荐阶段取消在途模型与检索；解析、排除分析、呈现与后台图不保证随之停止</td><td>部分阶段仍可能计费</td></tr>
+        <tr><td><span><span class="ico ico--sm ico--blue"><i data-icon="shield" data-size="13"></i></span>未预期异常</span></td><td>顶层异常捕获</td><td>返回 500，不暴露堆栈，不记录密钥</td><td>“服务暂时不可用”</td></tr>
+      </tbody>
+    </table>
+    <div class="prin">
+      <div class="glass"><span class="ico ico--sm"><i data-icon="refresh" data-size="13"></i></span><span><b>有限重试</b>每一层都有上限</span></div>
+      <div class="glass"><span class="ico ico--sm ico--blue"><i data-icon="skip" data-size="13"></i></span><span><b>推荐有据</b>素材先进模型；生图不挡文字</span></div>
+      <div class="glass"><span class="ico ico--sm ico--gold"><i data-icon="coins" data-size="13"></i></span><span><b>不重复付费</b>宁可标“未知”，不盲目重试</span></div>
+    </div>
+  </div>
+  <div class="foot"><span>GiftWise AI · 系统架构设计</span><span>故障恢复</span></div>
+</section>
+
+<!-- ============ 10 可观测 · 安全 · 演进 ============ -->
+<section class="page dark">
+  <div class="glow"></div>
+  <div class="chrome"><span class="brand" data-logo-brand></span><span class="pageno">10<small> / 10</small></span></div>
+  <div class="body">
+    <span class="eyebrow"><i data-icon="sparkles" data-size="13"></i>可观测、安全与演进</span>
+    <h2 class="sec-title">看得见，守得住，走得远。</h2>
+    <p class="lead">运行时留下可回查的记录，边界上只开必要的口子，下一步沿着扩展路径往前走。</p>
+    <div class="obs">
+      <div class="ob"><b><i data-icon="eye"></i>模型调用账本</b>每次真实调用一行：用途、模型、耗时、HTTP 状态、重试次数、token 用量。不记密钥与提示词正文。</div>
+      <div class="ob"><b><i data-icon="camera"></i>媒体与工具记录</b>生图任务、产物与内容哈希；检索工具调用写入脱敏审计，可按运行回查。</div>
+      <div class="ob"><b><i data-icon="bolt"></i>运行状态与日志</b><code>/healthz</code> 返回模式、运行数与进程自证；journald 与 Nginx 访问日志留存运行记录。</div>
+    </div>
+    <div class="secu">
+      <h4><i data-icon="shield" data-size="15"></i>安全边界</h4>
+      <div><i data-icon="check" data-size="13"></i>模型与生图密钥只在服务端环境变量，从不写入响应或日志</div>
+      <div><i data-icon="check" data-size="13"></i>会话 Cookie 签名、HttpOnly、SameSite=Strict</div>
+      <div><i data-icon="check" data-size="13"></i>任务、图片按会话校验归属，越权读取一律 404</div>
+      <div><i data-icon="check" data-size="13"></i>图片与媒体路由附带 CSP 与 nosniff（按路由设置）</div>
+      <div><i data-icon="check" data-size="13"></i>前端提交的派生字段直接拒绝，校验只信服务端数据</div>
+      <div><i data-icon="check" data-size="13"></i>公网入口为 HTTP，未配置 HTTPS；外部模型与生图 API 走 HTTPS</div>
+    </div>
+    <div class="deploy10">
+      <div><b>Compshare 单实例</b>Ubuntu 22.04.4 · Nginx · systemd · 部署 19b6819</div>
+      <div><b>0.38 元/小时</b>【推算】两天约 18.24 元；供应商实付未测</div>
+      <div><b>备份</b>在线 SQLite integrity_check=ok；runtime 同盘非事务归档</div>
+      <div><b>2026-11-03 05:11</b>北京时间平台定时关机，网站随之停止</div>
+    </div>
+    <div class="road">
+      <h4><i data-icon="arrow-right" data-size="15"></i>下一步</h4>
+      <div class="cards">
+        <div class="rc"><span class="no">01</span><span class="ico ico--blue"><i data-icon="refresh" data-size="15"></i></span><b>恢复与回滚</b><span>做重启恢复与实际版本回滚演练；状态外置后再评估多副本。</span></div>
+        <div class="rc"><span class="no">02</span><span class="ico"><i data-icon="bolt" data-size="15"></i></span><b>容量与稳定性</b><span>压测与长时运行，测出单实例容量、真实端到端延迟分布。</span></div>
+        <div class="rc"><span class="no">03</span><span class="ico ico--gold"><i data-icon="wallet" data-size="15"></i></span><b>实付核验与 HTTPS</b><span>用供应商账单校准预算；配置域名与 TLS。</span></div>
+      </div>
+    </div>
+    <h4 class="recap-h"><i data-icon="refresh" data-size="15"></i>回到开头的四个问题</h4>
+    <div class="recap" style="margin-top:12px">
+      <div class="rq"><span class="n">负</span><small>负载</small><p>等待型负载，异步单进程 + 入口闸门，最贵的调用只做一次。</p></div>
+      <div class="rq"><span class="n">状</span><small>状态</small><p>流程在内存、产物独立落盘；可信状态不出服务端。</p></div>
+      <div class="rq"><span class="n">伸</span><small>扩缩容</small><p>单实例已在线；多副本需先外置状态、签名与执行归属，属于计划。</p></div>
+      <div class="rq"><span class="n">复</span><small>故障恢复</small><p>有限重试、推荐有据、生图独立，宁标未知也不重复付费。</p></div>
+    </div>
+  </div>
+  <p class="sign">GiftWise AI · 系统架构设计 v2.0 · 部署 19b6819 · 证据 6e92a9e · 同版 QA eceef056</p>
+  <p class="closing">准备礼物的人，先感到幸福。</p>
+</section>
+
+<script type="module">
+import { icon } from "./assets/icons.js";
+const LOGO = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M23 2c2 13 6 17 20 20-14 3-18 7-20 23C20 29 16 25 2 22 16 19 20 15 23 2Z"/><path fill="#fbf9f7" d="m23 16 2 6-2 7-3-7Z"/><path fill="currentColor" d="m41 5 1.5 4.5L47 11l-4.5 1.5L41 17l-1.5-4.5L35 11l4.5-1.5Z"/></svg>';
+// 产品图标集里没有的几枚，按同样的 24×24 圆头描边自绘
+const EXT = {
+  db: '<ellipse cx="12" cy="5.5" rx="7" ry="2.8"/><path d="M5 5.5v13c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-13"/><path d="M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/>',
+  layers: '<path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 12.5 9 5 9-5"/><path d="m3 17 9 5 9-5"/>',
+  cloud: '<path d="M7 18.5h10a4 4 0 0 0 .6-8A5.5 5.5 0 0 0 7 9.2a4.7 4.7 0 0 0 0 9.3Z"/>',
+  cpu: '<rect x="6" y="6" width="12" height="12" rx="2.5"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>',
+  file: '<path d="M7 3h7l5 5v11.5A1.5 1.5 0 0 1 17.5 21h-10A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7.5 3Z"/><path d="M14 3v5h5M9 13h6M9 16.5h4"/>',
+};
+document.querySelectorAll("[data-icon]").forEach(n => n.replaceWith(icon(n.dataset.icon, { size: +(n.dataset.size || 17) })));
+document.querySelectorAll("[data-ext]").forEach(n => { const s = +(n.dataset.size || 17); n.outerHTML = `<svg class="gw-icon" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${EXT[n.dataset.ext]}</svg>`; });
+document.querySelectorAll("[data-logo-brand]").forEach(n => { n.innerHTML = LOGO + "GIFTWISE AI"; });
+document.fonts.ready.then(() => { document.body.dataset.ready = "1"; });
+</script>
+</body></html>

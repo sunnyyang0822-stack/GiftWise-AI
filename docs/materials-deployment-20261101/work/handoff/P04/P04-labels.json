@@ -1,0 +1,184 @@
+[
+ {
+  "id": "input",
+  "title": "需求输入",
+  "lines": [
+   "自然描述 · 排除项确认"
+  ]
+ },
+ {
+  "id": "compare",
+  "title": "三方案比较",
+  "lines": [
+   "依据 · 估价 · 校验结果",
+   "推荐卡不配网图"
+  ]
+ },
+ {
+  "id": "select",
+  "title": "用户明确选择",
+  "lines": [
+   "只能选通过检查的方案"
+  ]
+ },
+ {
+  "id": "guide",
+  "title": "赠送指南与效果图",
+  "lines": [
+   "文字先展示 · 图片原位补入",
+   "纯体验不强加包装章节"
+  ]
+ },
+ {
+  "id": "parse",
+  "title": "解析与可信上下文",
+  "lines": [
+   "自然澄清 · 保留原话",
+   "服务端固定已确认约束"
+  ]
+ },
+ {
+  "id": "cand",
+  "title": "候选生成",
+  "lines": [
+   "模型按需调用检索工具",
+   "公开文字依据 → 三方案"
+  ]
+ },
+ {
+  "id": "check",
+  "title": "独立代码校验",
+  "lines": [
+   "预算 · 禁忌 · 结构",
+   "时间不影响可选性"
+  ]
+ },
+ {
+  "id": "post",
+  "title": "选择后生成与复核",
+  "lines": [
+   "包装 · 配色 · 贺卡 · 赠送",
+   "全局最多一次业务修订"
+  ]
+ },
+ {
+  "id": "api",
+  "title": "文字响应与媒体任务 API",
+  "lines": [
+   "立即返回文字 + task_id",
+   "只读 GET 状态与图片 · 归属校验"
+  ]
+ },
+ {
+  "id": "mem",
+  "title": "内存状态",
+  "lines": [
+   "run · analysis · selection · 签名",
+   "重启后旧流程失效"
+  ]
+ },
+ {
+  "id": "db",
+  "title": "独立数据库",
+  "lines": [
+   "/var/lib/giftwise/db",
+   "独立 SQLite · 不用演示库"
+  ]
+ },
+ {
+  "id": "runtime",
+  "title": "独立落盘 runtime",
+  "lines": [
+   "/var/lib/giftwise/runtime",
+   "文字缓存 · 媒体 · 审计 · 账本"
+  ]
+ },
+ {
+  "id": "img",
+  "title": "后台效果图任务",
+  "lines": [
+   "仅为所选方案生成 1 张",
+   "pending → ready / failed / unknown"
+  ]
+ },
+ {
+  "id": "web",
+  "title": "公开文字检索 · 匿名 HTTP",
+  "lines": [
+   "真实公开文字 + 合法历史摘要",
+   "保留观察时间"
+  ]
+ },
+ {
+  "id": "llm",
+  "title": "文字模型 API · HTTPS",
+  "lines": [
+   "解析 · 三方案 · 修订 · 赠送指南",
+   "密钥只在服务端"
+  ]
+ },
+ {
+  "id": "seed",
+  "title": "Seedream API · HTTPS",
+  "lines": [
+   "仅在用户明确选择后调用",
+   "无参考图输入"
+  ]
+ },
+ {
+  "id": "e-in",
+  "edge_label": "HTTP :80 · 未配置 HTTPS"
+ },
+ {
+  "id": "e-k-cmp",
+  "edge_label": "三个可选方案"
+ },
+ {
+  "id": "e-sel-post",
+  "edge_label": "选择事件"
+ },
+ {
+  "id": "e-api-guide",
+  "edge_label": "文字先返回"
+ },
+ {
+  "id": "e-guide-api",
+  "edge_label": "只读 GET"
+ },
+ {
+  "id": "e-api-img",
+  "edge_label": "异步启动"
+ },
+ {
+  "id": "e-c-web",
+  "edge_label": "按需工具调用"
+ },
+ {
+  "id": "e-srv-llm",
+  "edge_label": "模型调用 · HTTPS"
+ },
+ {
+  "id": "e-img-seed",
+  "edge_label": "HTTPS"
+ },
+ {
+  "id": "t-srv1",
+  "text": "可信服务端 · Compshare Ubuntu 22.04.4 单实例"
+ },
+ {
+  "id": "t-srv2",
+  "text": "Nginx 公网 :80 → Node v24.16.0 · 127.0.0.1:8787 · systemd 守护"
+ },
+ {
+  "id": "t-foot",
+  "text": "运维通道：OpenCLI 仅用于部署操作，不在用户请求链路　·　推荐阶段不抓取网图　·　部署 19b6819 · 证据 6e92a9e"
+ },
+ {
+  "id": "lane-user",
+  "text": "用户交互 · 浏览器（不可信区）"
+ },
+ {
+  "id": "lane-ext",
+  "text": "外部服务"
+ }
+]

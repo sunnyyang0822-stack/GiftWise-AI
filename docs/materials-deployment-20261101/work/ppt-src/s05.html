@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>05 结果与证据</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { position: absolute; left: 96px; top: 140px; }
+  .head h2 { margin-top: 14px; font-size: 56px; line-height: 1.2; }
+  .grid { position: absolute; left: 96px; right: 96px; top: 320px; bottom: 80px; display: grid; grid-template-columns: 500px 1fr 560px; gap: 28px; }
+  .card { position: relative; padding: 32px 34px; }
+  .card h4 { display: flex; align-items: center; gap: 14px; margin: 0; font-size: 28px; font-weight: 500; }
+  .card .k { margin: 6px 0 0; font-size: 19px; color: var(--ink-2); }
+  /* 左：一句话需求 → 选定 */
+  .said { position: relative; margin: 24px 0 0 26px; padding: 16px 20px; border-radius: 20px 20px 6px 20px; background: rgb(33 67 122 / 9%); color: var(--blue); font-size: 21px; line-height: 1.6; }
+  .said::before { content: "你说"; position: absolute; left: -26px; top: 6px; writing-mode: vertical-rl; font-size: 15px; letter-spacing: .2em; color: var(--ink-2); }
+  .filled { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 14px 5px 10px; border-radius: 999px; background: #fff; font-size: 18px; box-shadow: 0 6px 14px -10px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 5%); }
+  .chip small { font-size: 15px; color: var(--ink-2); }
+  .chip svg { color: var(--red); }
+  .chip.ban svg { color: var(--ink); }
+  .fillnote { margin: 12px 0 0; font-family: var(--hand); font-size: 30px; color: var(--red); transform: rotate(-2deg); }
+  .picked { position: absolute; left: 34px; right: 34px; bottom: 30px; padding: 18px 22px; border-radius: 18px; background: var(--ink); color: #fff; }
+  .picked p { margin: 0; font-size: 16px; letter-spacing: .14em; color: #f0b8b0; }
+  .picked b { display: block; margin-top: 4px; font-size: 25px; font-weight: 500; }
+  .picked span { position: absolute; right: 22px; bottom: 20px; font-size: 20px; color: #d9d3cc; }
+  /* 中：真实接口耗时 */
+  .steps { margin-top: 26px; display: grid; gap: 16px; }
+  .st { display: grid; grid-template-columns: 172px 1fr; align-items: center; gap: 16px; font-size: 21px; }
+  .st > span { display: flex; align-items: center; gap: 10px; }
+  .st > span svg { color: var(--red); flex: none; }
+  .bar { position: relative; height: 44px; border-radius: 13px; background: rgb(16 16 17 / 5%); }
+  .bar i { position: absolute; top: 0; bottom: 0; border-radius: 13px; display: flex; align-items: center; padding: 0 14px; color: #fff; font-style: normal; font-size: 19px; white-space: nowrap; }
+  .b-parse { background: var(--blue); }
+  .b-rec { background: var(--ink); }
+  .b-guide { background: var(--red); }
+  .b-img { background: repeating-linear-gradient(135deg, rgb(33 67 122 / 80%) 0 12px, rgb(33 67 122 / 62%) 12px 24px); }
+  .bar em { position: absolute; top: 10px; font-style: normal; font-size: 19px; color: var(--ink-2); white-space: nowrap; }
+  .handnote { position: absolute; right: 36px; top: 28px; font-family: var(--hand); font-size: 34px; color: var(--red); transform: rotate(4deg); }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
+  .fact { padding: 16px 18px; border-radius: 18px; background: #fff; box-shadow: 0 10px 24px -16px rgb(16 16 17 / 35%); }
+  .fact b { display: block; font-size: 30px; font-weight: 500; line-height: 1.2; }
+  .fact span { font-size: 17px; color: var(--ink-2); line-height: 1.45; display: block; }
+  /* 右：本次真实效果图 */
+  .stack { display: grid; gap: 22px; align-content: start; }
+  .photo { padding: 18px 18px 24px; background: #fff; border-radius: 22px; box-shadow: 0 40px 70px -36px rgb(16 16 17 / 50%); transform: rotate(2deg); }
+  .photo img { display: block; width: 100%; border-radius: 14px; }
+  .photo p { margin: 14px 6px 0; font-family: var(--hand); font-size: 32px; color: var(--blue); }
+  .photo small { display: block; margin: 2px 6px 0; font-size: 18px; color: var(--ink-2); }
+  .mini { display: flex; gap: 16px; align-items: center; padding: 18px 24px; }
+  .mini b { font-weight: 500; font-size: 23px; }
+  .mini div span { display: block; font-size: 18px; color: var(--ink-2); }
+  /* 左：三类证据 */
+  .ev { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+  .evt { padding: 16px 18px; border-radius: 18px; background: #fff; box-shadow: 0 10px 24px -16px rgb(16 16 17 / 35%); }
+  .evt b { display: block; font-size: 36px; font-weight: 500; line-height: 1.15; }
+  .evt b small { font-size: 22px; color: var(--ink-2); margin-left: 4px; }
+  .evt span { display: block; margin-top: 4px; font-size: 17px; line-height: 1.45; color: var(--ink-2); }
+  .evt em { font-style: normal; display: inline-block; margin-bottom: 6px; padding: 0 10px; border-radius: 999px; font-size: 14px; letter-spacing: .1em; background: rgb(33 67 122 / 9%); color: var(--blue); }
+  .evt.pub em { background: rgb(160 28 35 / 9%); color: var(--red); }
+  .sep3 { margin: 16px 0 0; font-family: var(--hand); font-size: 28px; color: var(--red); transform: rotate(-2deg); }
+  .bar .val { position: absolute; top: 9px; font-style: normal; font-size: 19px; white-space: nowrap; color: var(--ink); }
+  .st2 { display: grid; grid-template-columns: 172px 1fr; align-items: center; gap: 16px; font-size: 21px; }
+  .st2 > span { display: flex; flex-direction: column; }
+  .st2 > span small { font-size: 16px; color: var(--ink-2); }
+  .axis { display: grid; grid-template-columns: 172px 1fr; gap: 16px; margin-top: 4px; font-size: 15px; color: var(--ink-2); }
+  .axis div { display: flex; justify-content: space-between; }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome" data-page="05"></div>
+  <div class="head"><span class="eyebrow"><i data-icon="check" data-size="22"></i>结果与证据</span><h2>公网真实流程：三个方案，一张图。</h2></div>
+
+  <div class="grid">
+    <section class="card glass">
+      <h4><span class="ico"><i data-icon="check" data-size="28"></i></span>三类证据，分列不相加</h4>
+      <p class="k">同版交接 · 部署迁移 · 公网实测</p>
+      <div class="ev">
+        <div class="evt"><em>交接 QA</em><b>51/51<small>+ 1/1</small></b><span>同版离线用例<br>+ 受控 HTTP</span></div>
+        <div class="evt"><em>迁移自测</em><b>18/18</b><span>Windows、Linux<br>各一轮</span></div>
+        <div class="evt pub"><em>公网静态</em><b>40/40</b><span>状态、大小、<br>哈希逐一比对</span></div>
+        <div class="evt pub"><em>会话隔离</em><b>404</b><span>另一会话读 run /<br>task / asset 均拒绝</span></div>
+      </div>
+      <div class="picked"><p>公网入口 · 部署 19b6819</p><b>http://117.50.83.57/</b><span>仅 HTTP</span></div>
+    </section>
+    <section class="card glass">
+      <h4><span class="ico ico--blue"><i data-icon="clock" data-size="28"></i></span>公网真实流程 · 三段分开看</h4>
+      <p class="k">一条虚构追求对象样本 · 结构化输入起步 · 单位秒</p>
+      <div class="steps">
+        <div class="st2"><span><b style="font-weight:500">推荐</b><small>三个方案均可选</small></span><div class="bar"><i class="b-rec" style="width:98.5%">39.391 s</i></div></div>
+        <div class="st2"><span><b style="font-weight:500">选后文字</b><small>指南先返回</small></span><div class="bar"><i class="b-guide" style="width:32%">12.797 s</i><em style="left:calc(32% + 14px)">图片仍在 pending</em></div></div>
+        <div class="st2"><span><b style="font-weight:500">后台生图</b><small>完成后原位补入</small></span><div class="bar"><i class="b-img" style="width:27.4%"></i><em style="left:calc(27.4% + 12px);color:var(--ink);font-size:18px">10.960 s<span style="color:var(--ink-2)"> · ready · 同源下载</span></em></div></div>
+      </div>
+      <div class="axis"><span></span><div><span>0</span><span>10</span><span>20</span><span>30</span><span>40 s</span></div></div>
+      <div class="facts">
+        <div class="fact"><b>2304×1728</b><span>效果图<br>原始尺寸</span></div>
+        <div class="fact"><b>877,634</b><span>图片<br>字节数（B）</span></div>
+        <div class="fact"><b>0 张</b><span>参考图输入<br>纯文字生成</span></div>
+      </div>
+    </section>
+    <div class="stack">
+      <figure class="photo" style="margin:0"><img src="assets/shots/deploy-ai-image.jpg" alt=""><p>选定后生成的包装效果图</p><small>公网真实生成 · AI 效果示意</small></figure>
+      <div class="mini glass"><span class="ico"><i data-icon="camera" data-size="28"></i></span><div><b>只为选中的方案生成 1 张</b><span>推荐阶段不配网图，选定后才调用 Seedream</span></div></div>
+    </div>
+  </div>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

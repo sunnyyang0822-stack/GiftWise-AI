@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>06 工程化设计</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { position: absolute; left: 96px; top: 140px; }
+  .head h2 { margin-top: 14px; font-size: 56px; line-height: 1.2; }
+  /* 中心徽记 + 四象限 */
+  .hub { position: absolute; left: 50%; top: 631px; z-index: 3; width: 250px; height: 250px; margin: -125px 0 0 -125px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: #fff; text-align: center; box-shadow: 0 40px 80px -30px rgb(16 16 17 / 70%), 0 0 0 16px rgb(255 255 255 / 80%), 0 0 0 17px rgb(16 16 17 / 6%); }
+  .hub svg { width: 64px; height: 64px; color: #f0b8b0; }
+  .hub b { display: block; margin-top: 8px; font-weight: 500; font-size: 28px; letter-spacing: .08em; }
+  .hub small { display: block; font-family: var(--hand); font-size: 26px; color: #f0b8b0; }
+  .q { position: absolute; width: 760px; height: 288px; padding: 34px 40px; }
+  .q1 { left: 96px; top: 318px; } .q2 { right: 96px; top: 318px; } .q3 { left: 96px; top: 656px; } .q4 { right: 96px; top: 656px; }
+  .q1, .q3 { padding-right: 150px; } .q2, .q4 { padding-left: 150px; }
+  .q h4 { display: flex; align-items: center; gap: 16px; margin: 0 0 16px; font-size: 32px; font-weight: 500; }
+  .q h4 em { font-style: normal; font-family: var(--hand); font-size: 36px; color: var(--red); margin-left: auto; }
+  .q2 h4 em, .q4 h4 em { color: var(--blue); }
+  .q ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .q li { position: relative; padding-left: 26px; font-size: 22px; line-height: 1.5; color: var(--ink-2); }
+  .q li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--red); }
+  .q2 li::before, .q4 li::before { border-color: var(--blue); }
+  .q li b { font-weight: 500; color: var(--ink); }
+  .next { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; align-items: center; gap: 30px; padding: 12px 30px 12px 14px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 21px; white-space: nowrap; box-shadow: 0 18px 40px -22px rgb(16 16 17 / 60%); }
+  .next .k { padding: 4px 16px; border-radius: 999px; background: rgb(240 184 176 / 18%); color: #f0b8b0; letter-spacing: .14em; }
+  .next span { display: inline-flex; align-items: center; gap: 8px; } .next svg { color: #f0b8b0; }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  <div class="chrome" data-page="06"></div>
+  <div class="head"><span class="eyebrow"><i data-icon="tool" data-size="22"></i>工程化设计</span><h2>可复现、可兜底、可追溯。</h2></div>
+
+  <section class="q q1 glass"><h4><span class="ico"><i data-icon="refresh" data-size="28"></i></span>可复现<em>01</em></h4>
+    <ul><li><b>源码 ZIP 固定 19b6819</b>，随材料提交</li><li>Node 24.16 + Nginx + systemd，<b>Compshare 单实例</b></li><li>独立 SQLite，不写演示库</li></ul></section>
+  <section class="q q2 glass"><h4><span class="ico ico--blue"><i data-icon="shield" data-size="28"></i></span>异常处理<em>02</em></h4>
+    <ul><li>模型输出先过<b>结构校验</b>，再过业务规则</li><li>业务修订全链路<b>最多一次</b>，重试与修订分开计</li><li>效果图失败或超时，<b>文字指南照常可用</b></li></ul></section>
+  <section class="q q3 glass"><h4><span class="ico ico--blue"><i data-icon="link" data-size="28"></i></span>状态与可靠性<em>03</em></h4>
+    <ul><li>独立 db / runtime 落盘，<b>在线备份 integrity_check=ok</b></li><li>流程、选择与会话签名在内存，<b>重启后旧流程失效</b></li><li>图片任务绑定用户、运行与所选候选，他人不可读</li></ul></section>
+  <section class="q q4 glass"><h4><span class="ico"><i data-icon="search" data-size="28"></i></span>可观测<em>04</em></h4>
+    <ul><li><b>LLM 账本</b>：用途、模型、耗时、token</li><li><b>媒体记录</b>：任务、产物与内容哈希</li><li>systemd journal 与 Nginx 日志，工具调用留审计</li></ul></section>
+
+  <div class="next"><span class="k">下一步</span><span><i data-icon="refresh" data-size="22"></i>重启恢复演练</span><span><i data-icon="arrow-left" data-size="22"></i>实际版本回滚</span><span><i data-icon="users" data-size="22"></i>共享状态后再上多副本</span></div>
+  <div class="hub"><div><i data-icon="shield"></i><b>可信服务端</b><small>密钥只在这里</small></div></div>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

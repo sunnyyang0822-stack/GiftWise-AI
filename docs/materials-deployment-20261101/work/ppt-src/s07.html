@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>07 成本、性能与取舍</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { position: absolute; left: 96px; top: 140px; }
+  .head h2 { margin-top: 14px; font-size: 56px; line-height: 1.2; }
+  /* 左：三张工程证据卡 */
+  .cards { position: absolute; left: 96px; top: 330px; width: 1040px; height: 676px; display: grid; grid-template-rows: repeat(3, 1fr); gap: 20px; }
+  .ec { position: relative; display: grid; grid-template-columns: 64px 1fr 300px; gap: 26px; align-items: center; padding: 26px 34px; border-radius: 26px; }
+  .ec h4 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 28px; font-weight: 500; }
+  .ec .lab { padding: 2px 12px; border-radius: 999px; font-size: 16px; letter-spacing: .1em; font-weight: 400; }
+  .lab--est { background: rgb(201 161 90 / 20%); color: #7a5a1c; }
+  .lab--real { background: rgb(35 116 75 / 11%); color: var(--green); }
+  .lab--done { background: rgb(33 67 122 / 10%); color: var(--blue); }
+  .ec p { margin: 8px 0 0; font-size: 20px; line-height: 1.55; color: var(--ink-2); }
+  .ec p b { font-weight: 500; color: var(--ink); }
+  .ec .big { text-align: right; border-left: 1px dashed var(--line); padding-left: 22px; }
+  .ec .big b { display: block; font-size: 52px; font-weight: 500; line-height: 1.1; letter-spacing: -.01em; }
+  .ec .big b small { font-size: 24px; margin-left: 4px; color: var(--ink-2); }
+  .ec .big span { display: block; margin-top: 4px; font-size: 18px; color: var(--ink-2); }
+  .ec .big span em { font-style: normal; color: var(--ink); font-size: 22px; }
+  .c1 .big b { color: var(--blue); font-size: 46px; } .c2 .big b { color: var(--red); } .c3 .big b { color: var(--green); font-size: 46px; }
+  /* 右：取舍——我们选 vs 没选 */
+  .trade { position: absolute; left: 1180px; right: 96px; top: 330px; display: grid; gap: 18px; }
+  .t { display: grid; grid-template-columns: 1fr; padding: 22px 28px; border-radius: 22px; background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--shadow); }
+  .t .pick { display: flex; align-items: center; gap: 12px; font-size: 24px; }
+  .t .pick svg { color: var(--green); flex: none; }
+  .t .not { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 19px; color: var(--ink-2); text-decoration: line-through; text-decoration-color: rgb(160 28 35 / 50%); }
+  .t .not svg { color: rgb(160 28 35 / 60%); flex: none; }
+  .trade .hand { position: absolute; right: 6px; top: -56px; font-size: 34px; transform: rotate(-4deg); }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome" data-page="07"></div>
+  <div class="head"><span class="eyebrow"><i data-icon="coins" data-size="22"></i>成本、性能与取舍</span><h2>成本算得清，体验守得住。</h2></div>
+
+  <div class="cards">
+    <section class="ec c1 glass"><span class="ico ico--blue"><i data-icon="clock" data-size="28"></i></span>
+      <div><h4>本轮公网实测<span class="lab lab--real">实测</span></h4>
+        <p><b>5 次文本调用 · 1 次业务修订 · 1 张图</b>。推荐 39.391 s、选后文字 12.797 s、后台生图 10.960 s，三段分别计时。</p></div>
+      <div class="big"><b>29,513<small>tokens</small></b><span>文本模型 <em>5 次</em>全部成功</span></div></section>
+    <section class="ec c2 glass"><span class="ico"><i data-icon="coins" data-size="28"></i></span>
+      <div><h4>成本有预算<span class="lab lab--est">推算</span></h4>
+        <p>典型任务 7 次文本调用 + 1 张图，按 ModelVerse 刊例：文本 2／8 元每百万 tokens，Seedream 4.5 每张 0.25 元。云资源 <b>0.38 元／小时，两天约 18.24 元</b>。</p></div>
+      <div class="big"><b>0.35<small>元／次</small></b><span>100 次约 <em>35.22 元</em></span></div></section>
+    <section class="ec c3 glass"><span class="ico ico--blue" style="color:var(--green)"><i data-icon="shield" data-size="28"></i></span>
+      <div><h4>资源有底数<span class="lab lab--real">实测</span></h4>
+        <p>隔离 fixture：20 个任务、并发 2，异步图片、幂等、会话隔离等用例 <b>8/8 通过</b>。</p></div>
+      <div class="big"><b>86.54<small>MiB</small></b><span>Node 峰值工作集 · <em>8/8</em></span></div></section>
+  </div>
+  <section class="trade">
+    <p class="hand">我们的选择</p>
+    <div class="t"><span class="pick"><i data-icon="check" data-size="24"></i>选定后才生图，且只生成一张</span><span class="not"><i data-icon="x" data-size="20"></i>三个方案都先出图</span></div>
+    <div class="t"><span class="pick"><i data-icon="check" data-size="24"></i>文字先返回，图片后台补齐</span><span class="not"><i data-icon="x" data-size="20"></i>整页等图片一起出来</span></div>
+    <div class="t"><span class="pick"><i data-icon="check" data-size="24"></i>模型按需调用检索工具，HTTP 获取真实素材</span><span class="not"><i data-icon="x" data-size="20"></i>每次请求都先全量抓取</span></div>
+    <div class="t"><span class="pick"><i data-icon="check" data-size="24"></i>复用来源缓存，同批素材支撑多个思路</span><span class="not"><i data-icon="x" data-size="20"></i>每个思路都重新检索一遍</span></div>
+    <div class="t"><span class="pick"><i data-icon="check" data-size="24"></i>商品数据走授权的官方 API（规划）</span><span class="not"><i data-icon="x" data-size="20"></i>把爬取结果当唯一事实</span></div>
+  </section>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

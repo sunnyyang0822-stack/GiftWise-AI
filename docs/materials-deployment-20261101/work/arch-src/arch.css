@@ -1,0 +1,61 @@
+/* GiftWise 架构文档：A4 竖版，沿用答辩 PPT 的视觉体系（产品同款 tokens / 字体 / 图标） */
+@font-face { font-family: "GW WenKai"; src: url("assets/fonts/wenkai-regular.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "GW WenKai"; src: url("assets/fonts/wenkai-medium.woff2") format("woff2"); font-weight: 500 900; }
+@font-face { font-family: "GW LongCang"; src: url("assets/fonts/longcang-ext.woff2") format("woff2"); unicode-range: U+3000-303F, U+4E00-9FFF, U+FF00-FFEF; }
+@font-face { font-family: "GW LongCang"; src: url("assets/fonts/longcang.woff2") format("woff2"); }
+@page { size: A4; margin: 0; }
+:root {
+  --bg: #fbf9f7; --bg-deep: #f3f0ec; --ink: #101011; --ink-2: #5b5a5a; --ink-3: #8a8784; --line: #e4e0db;
+  --red: #a01c23; --coral: #e0584a; --blue: #21437a; --gold: #c9a15a; --pink: #f6d9d7; --lilac: #d6deef; --green: #23744b;
+  --glass: rgb(255 255 255 / 72%); --glass-border: rgb(255 255 255 / 85%);
+  --shadow: 0 1px 0 rgb(255 255 255 / 90%) inset, 0 14px 34px -18px rgb(16 16 17 / 28%), 0 1px 4px rgb(16 16 17 / 5%);
+  --display: "GW WenKai", "PingFang SC", "Microsoft YaHei", serif;
+  --hand: "GW LongCang", "GW WenKai", cursive;
+  --mono: "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; background: #d9d4ce; }
+body { font-family: var(--display); color: var(--ink); font-size: 12.5px; line-height: 1.62; -webkit-font-smoothing: antialiased; }
+.page { position: relative; width: 794px; height: 1123px; margin: 0 auto; overflow: hidden; isolation: isolate; background: var(--bg); break-after: page; }
+.page:last-child { break-after: auto; }
+@media screen { .page { margin: 24px auto; box-shadow: 0 20px 50px -20px rgb(0 0 0 / 35%); } }
+.aura { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.aura i { position: absolute; border-radius: 50%; filter: blur(46px); }
+.aura .a1 { width: 420px; height: 420px; left: -150px; top: -170px; background: radial-gradient(circle, var(--pink), transparent 68%); }
+.aura .a2 { width: 480px; height: 480px; right: -190px; bottom: -200px; background: radial-gradient(circle, var(--lilac), transparent 66%); }
+.aura .a3 { width: 300px; height: 300px; right: -80px; top: 30%; background: radial-gradient(circle, rgb(246 217 215 / 60%), transparent 70%); }
+
+/* 页眉页脚 */
+.chrome { position: absolute; left: 56px; right: 56px; top: 30px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-family: Arial, "Helvetica Neue", sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .16em; }
+.brand svg { width: 20px; height: 20px; }
+.pageno { font-family: var(--hand); font-size: 19px; color: var(--red); transform: rotate(-3deg); }
+.pageno small { font-size: 13px; color: var(--ink-2); }
+.foot { position: absolute; left: 56px; right: 56px; bottom: 26px; display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--line); font-size: 10px; color: var(--ink-3); letter-spacing: .08em; }
+
+.body { position: absolute; left: 56px; right: 56px; top: 78px; bottom: 60px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px 3px 9px; border-radius: 999px; background: rgb(160 28 35 / 7%); color: var(--red); font-size: 10.5px; letter-spacing: .18em; }
+.eyebrow svg { width: 13px; height: 13px; }
+h1, h2, h3, h4 { margin: 0; font-weight: 500; letter-spacing: .01em; }
+.sec-title { margin-top: 10px; font-size: 27px; line-height: 1.28; }
+.lead { margin: 8px 0 0; font-size: 13.5px; color: var(--ink-2); max-width: 600px; }
+.hand { font-family: var(--hand); color: var(--red); }
+.hand--blue { color: var(--blue); }
+.glass { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--shadow); }
+.card { background: #fff; border-radius: 14px; box-shadow: 0 10px 24px -18px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 4%); }
+.ico { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--red); box-shadow: 0 6px 14px -8px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 5%); }
+.ico svg { width: 17px; height: 17px; }
+.ico--blue { color: var(--blue); } .ico--ink { color: var(--ink); } .ico--gold { color: #8a6420; } .ico--green { color: var(--green); }
+.ico--sm { width: 26px; height: 26px; } .ico--sm svg { width: 14px; height: 14px; }
+.gw-icon { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ribbon { position: absolute; width: 18px; height: 70px; background: linear-gradient(180deg, var(--red), #7d141a); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%); }
+.tag { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 10px; letter-spacing: .08em; line-height: 18px; }
+.t-red { background: rgb(160 28 35 / 9%); color: var(--red); } .t-blue { background: rgb(33 67 122 / 9%); color: var(--blue); }
+.t-ink { background: rgb(16 16 17 / 7%); color: var(--ink); } .t-gold { background: rgb(201 161 90 / 20%); color: #7a5a1c; } .t-green { background: rgb(35 116 75 / 10%); color: var(--green); }
+code, .mono { font-family: var(--mono); font-size: .86em; background: rgb(16 16 17 / 5%); padding: 0 4px; border-radius: 4px; }
+.num { font-family: var(--display); font-weight: 500; letter-spacing: -.01em; }
+ul.dots { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+ul.dots li { position: relative; padding-left: 15px; }
+ul.dots li::before { content: ""; position: absolute; left: 1px; top: .62em; width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--red); }
+ul.dots.blue li::before { border-color: var(--blue); }
+b, strong { font-weight: 500; }
