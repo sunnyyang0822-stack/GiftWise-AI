@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>04 核心实现</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { position: absolute; left: 96px; top: 140px; display: flex; align-items: flex-end; gap: 40px; }
+  .head h2 { margin-top: 14px; font-size: 54px; line-height: 1.2; }
+  .head .hand { font-size: 38px; transform: rotate(-3deg); margin-bottom: 6px; }
+  .lane { position: absolute; left: 96px; right: 96px; border-radius: 30px; }
+  .lane__label { position: absolute; left: 26px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; width: 92px; font-size: 22px; letter-spacing: .12em; text-align: center; }
+  .lane__label svg { color: var(--red); }
+  .l-user { top: 296px; height: 190px; background: rgb(255 255 255 / 55%); border: 1px dashed rgb(160 28 35 / 25%); }
+  .l-srv { top: 516px; height: 262px; background: linear-gradient(100deg, rgb(16 16 17 / 94%), rgb(30 30 34 / 94%)); color: #fff; box-shadow: 0 40px 80px -40px rgb(16 16 17 / 70%); }
+  .l-srv .lane__label svg { color: #f0b8b0; }
+  .l-data { top: 806px; height: 186px; background: rgb(214 222 239 / 35%); border: 1px dashed rgb(33 67 122 / 25%); }
+  .l-data .lane__label svg { color: var(--blue); }
+  .node { position: absolute; width: 284px; padding: 18px 20px; border-radius: 20px; z-index: 2; }
+  .node h4 { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 25px; font-weight: 500; line-height: 1.3; }
+  .node p { margin: 8px 0 0; font-size: 18px; line-height: 1.5; color: var(--ink-2); }
+  .node .ico { flex: none; width: 46px; height: 46px; }
+  .node .ico svg { width: 24px; height: 24px; }
+  .n-user { background: #fff; box-shadow: 0 16px 34px -20px rgb(16 16 17 / 40%), 0 0 0 1px rgb(16 16 17 / 4%); }
+  .n-srv { color: #fff; background: rgb(255 255 255 / 7%); border: 1px solid rgb(255 255 255 / 14%); }
+  .n-srv p { color: rgb(255 255 255 / 66%); }
+  .n-srv .ico { background: rgb(255 255 255 / 10%); color: #f0b8b0; box-shadow: none; }
+  .n-data { background: rgb(255 255 255 / 80%); border: 1px solid rgb(33 67 122 / 14%); }
+  .n-data .ico { color: var(--blue); }
+  .key { border: 2px solid var(--red); }
+  svg.wires { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: visible; }
+  .wires path { fill: none; stroke-width: 2.6; stroke-linecap: round; }
+  .w-main { stroke: var(--red); }
+  .w-async { stroke: var(--blue); stroke-dasharray: 8 9; }
+  .w-opt { stroke: rgb(33 67 122 / 55%); stroke-dasharray: 3 8; }
+  .tag { position: absolute; z-index: 3; padding: 2px 12px; border-radius: 999px; background: #fff; font-size: 17px; color: var(--blue); box-shadow: 0 4px 12px -6px rgb(16 16 17 / 30%); white-space: nowrap; }
+  .tag--red { color: var(--red); }
+  .gw { position: absolute; left: 257px; width: 1524px; top: 532px; height: 38px; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 18px; border-radius: 12px; background: #2a2a2e; border: 1px solid rgb(255 255 255 / 16%); color: #fff; font-size: 19px; letter-spacing: .02em; }
+  .gw b { font-weight: 500; color: #f0b8b0; } .gw i { width: 5px; height: 5px; border-radius: 50%; background: rgb(255 255 255 / 40%); }
+  .gw .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 18px; color: #d9e2f5; }
+  .tag--dark { background: var(--ink); color: #fff; }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 34px; display: flex; gap: 34px; font-size: 20px; color: var(--ink-2); }
+  .foot span { display: inline-flex; align-items: center; gap: 10px; }
+  .foot i.sw { display: inline-block; width: 38px; height: 0; border-top: 3px solid var(--red); }
+  .foot i.sw2 { display: inline-block; width: 38px; height: 0; border-top: 3px dashed var(--blue); }
+  .foot svg { color: var(--red); }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i></div>
+  <div class="chrome" data-page="04"></div>
+  <div class="head">
+    <div><span class="eyebrow"><i data-icon="wand" data-size="22"></i>核心实现</span><h2>模型负责想，代码负责查，你来选。</h2></div>
+    <p class="hand">文字先到，图随后补齐</p>
+  </div>
+
+  <div class="lane l-user"><span class="lane__label"><i data-icon="user" data-size="30"></i>用户</span></div>
+  <div class="lane l-srv"><span class="lane__label" style="top:58%"><i data-icon="shield" data-size="30"></i>可信<br>服务端</span></div>
+  <div class="lane l-data"><span class="lane__label"><i data-icon="compass" data-size="30"></i>状态<br>与外部</span></div>
+  <div class="gw"><b>Nginx 公网 :80</b><span>→</span><span>Node v24.16.0</span><span class="mono">127.0.0.1:8787</span><i></i><span>systemd 守护</span><i></i><span>Compshare Ubuntu 22.04.4 单实例</span></div>
+
+  <!-- 用户 -->
+  <div class="node n-user" id="u1" style="left:257px;top:326px"><h4><span class="ico"><i data-icon="chat"></i></span>和小礼聊需求</h4><p>自然描述，原话优先</p></div>
+  <div class="node n-user" id="u2" style="left:567px;top:326px"><h4><span class="ico"><i data-icon="ban"></i></span>确认要避开的</h4><p>拆成具体项，一次确认</p></div>
+  <div class="node n-user" id="u3" style="left:877px;top:326px"><h4><span class="ico ico--blue"><i data-icon="lightbulb"></i></span>比较三个思路</h4><p>依据 · 估价 · 校验结果</p></div>
+  <div class="node n-user key" id="u4" style="left:1187px;top:326px"><h4><span class="ico"><i data-icon="hand"></i></span>亲手选定一个</h4><p>只能选通过检查的</p></div>
+  <div class="node n-user" id="u5" style="left:1497px;top:326px"><h4><span class="ico"><i data-icon="gift"></i></span>看指南与效果图</h4><p>文字先展示，图片原位补入</p></div>
+
+  <!-- 服务端 -->
+  <div class="node n-srv" id="s1" style="left:257px;top:592px"><h4><span class="ico"><i data-icon="sparkles"></i></span>解析与上下文</h4><p>保留原话，固定已确认约束</p></div>
+  <div class="node n-srv" id="s2" style="left:567px;top:592px"><h4><span class="ico"><i data-icon="ban"></i></span>排除项理解</h4><p>按语义拆成可检查的禁忌项</p></div>
+  <div class="node n-srv" id="s3" style="left:877px;top:592px"><h4><span class="ico"><i data-icon="scale"></i></span>生成 + 独立校验</h4><p>公开文字依据 → 三方案；预算、禁忌、结构由代码校验</p></div>
+  <div class="node n-srv" id="s4" style="left:1187px;top:592px"><h4><span class="ico"><i data-icon="check"></i></span>记录可信选择</h4><p>选择与会话绑定，只认通过项</p></div>
+  <div class="node n-srv" id="s5" style="left:1497px;top:592px"><h4><span class="ico"><i data-icon="card"></i></span>赠送指南</h4><p>生成并复核；最多一次修订</p></div>
+
+  <!-- 状态与外部 -->
+  <div class="node n-data" id="d0" style="left:257px;top:828px"><h4><span class="ico"><i data-icon="bolt"></i></span>内存状态</h4><p>run · analysis · selection · 会话签名；重启后旧流程失效</p></div>
+  <div class="node n-data" id="d1" style="left:567px;top:828px"><h4><span class="ico"><i data-icon="sparkles"></i></span>文字模型 API</h4><p>HTTPS · 解析、三方案、修订、指南</p></div>
+  <div class="node n-data" id="d2" style="left:877px;top:828px"><h4><span class="ico"><i data-icon="search"></i></span>公开文字检索</h4><p>匿名 HTTP · 公开文字 + 合法历史摘要</p></div>
+  <div class="node n-data" id="d3" style="left:1187px;top:828px"><h4><span class="ico"><i data-icon="book"></i></span>独立落盘</h4><p>db：独立 SQLite；runtime：缓存、媒体、审计、账本</p></div>
+  <div class="node n-data" id="d4" style="left:1497px;top:828px"><h4><span class="ico"><i data-icon="camera"></i></span>Seedream API</h4><p>HTTPS · 选定后异步生成 1 张</p></div>
+
+  <svg class="wires" id="wires"></svg>
+  <span class="tag tag--red" id="t-sel" style="display:none">选择事件</span>
+
+  <div class="foot">
+    <span><i class="sw"></i>主流程</span>
+    <span><i class="sw2"></i>按需 / 异步</span>
+    <span><i data-icon="shield" data-size="20"></i>模型密钥只在服务端</span>
+    <span><i data-icon="x" data-size="20"></i>推荐阶段不抓取网图</span>
+    <span style="margin-left:auto">部署 19b6819 · 证据 6e92a9e</span>
+  </div>
+</div>
+<script type="module">
+import { hydrate } from "./common.js";
+await hydrate();
+const svg = document.getElementById("wires");
+const r = id => document.getElementById(id).getBoundingClientRect();
+const add = (d, cls) => { const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", d); p.setAttribute("class", cls); svg.append(p); return p; };
+const head = (x, y, ang, cls) => { const s = 11; add(`M ${x - Math.cos(ang - .5) * s} ${y - Math.sin(ang - .5) * s} L ${x} ${y} L ${x - Math.cos(ang + .5) * s} ${y - Math.sin(ang + .5) * s}`, cls.replace(/w-async|w-opt/, "w-main").replace("w-main", cls.includes("async") ? "w-async-head" : "w-main")); };
+const arrowH = (a, b, cls = "w-main") => { const A = r(a), B = r(b); const y = A.top + A.height / 2; add(`M ${A.right + 6} ${y} L ${B.left - 6} ${y}`, cls); head(B.left - 6, y, 0, cls); };
+const arrowV = (a, b, cls = "w-main", dx = 0) => { const A = r(a), B = r(b); const x = A.left + A.width / 2 + dx; const down = B.top > A.top; const y1 = down ? A.bottom + 6 : A.top - 6, y2 = down ? B.top - 6 : B.bottom + 6; add(`M ${x} ${y1} L ${x} ${y2}`, cls); head(x, y2, down ? Math.PI / 2 : -Math.PI / 2, cls); };
+const style = document.createElement("style"); style.textContent = ".w-async-head{fill:none;stroke:var(--blue);stroke-width:2.6;stroke-linecap:round}"; document.head.append(style);
+const tag = (x, y, text, cls = "") => { const t = document.createElement("span"); t.className = "tag " + cls; t.textContent = text; t.style.left = x + "px"; t.style.top = y + "px"; document.querySelector(".slide").append(t); };
+// 用户 → 服务端 → 用户
+arrowV("u1", "s1"); arrowH("s1", "s2"); arrowV("s2", "u2", "w-main", -40); arrowV("u2", "s2", "w-main", 40);
+arrowH("s2", "s3"); arrowV("s3", "u3"); arrowV("u4", "s4"); arrowH("s4", "s5"); arrowV("s5", "u5", "w-main", -60);
+arrowH("u3", "u4");
+// 状态与外部
+arrowV("s1", "d0", "w-opt"); arrowV("s2", "d1", "w-async"); arrowV("s3", "d2", "w-async"); arrowV("s4", "d3", "w-opt"); arrowV("s5", "d4", "w-async");
+{ const A = r("s5"); const U = r("u5"); const x = A.right + 34; add(`M ${A.right + 4} ${A.top + A.height / 2} C ${x + 40} ${A.top + A.height / 2}, ${x + 40} ${U.top + 60}, ${U.right + 6} ${U.top + 60}`, "w-async"); head(U.right + 6, U.top + 60, Math.PI, "w-async"); }
+// 协议与事件标签
+const R = id => r(id);
+tag(R("u1").left + 150, 494, "HTTP :80 · 未配置 HTTPS", "tag--dark");
+tag(R("u3").left + 150, 494, "三个可选方案", "tag--red");
+tag(R("u4").left + 150, 494, "选择事件", "tag--red");
+tag(R("u5").left - 40, 494, "文字先返回", "tag--red");
+tag(R("s2").left + 150, 784, "模型调用 · HTTPS");
+tag(R("s3").left + 150, 784, "按需工具调用");
+tag(R("s5").left + 150, 784, "异步启动 · HTTPS");
+tag(R("u5").right - 52, 490, "只读 GET · 同源");
+document.body.dataset.ready = "1";
+</script>
+</body></html>

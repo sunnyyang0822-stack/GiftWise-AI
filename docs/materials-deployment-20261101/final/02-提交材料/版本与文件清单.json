@@ -1,0 +1,120 @@
+{
+ "change_number": 8,
+ "generated_for": "codex/materials-deployment-final-20261101",
+ "versions": {
+  "deploy_run": "19b6819fe80787717571beb7cc0d17f89587c2d9",
+  "deploy_evidence": "6e92a9e076d5989f7ad510bebf3639a9dd2dadf8",
+  "materials_base": "4a35e18373e5225829f3d17d32ad97afc0bd8b09",
+  "qa_base": "eceef056",
+  "cost_analysis": "1a6a49bf5f51454a5541d4fce03e90d1f15d6113"
+ },
+ "entry": "http://117.50.83.57/",
+ "files_count": 21,
+ "files": [
+  {
+   "path": "01-答辩材料/Demo脚本-3分钟.md",
+   "bytes": 890,
+   "sha256": "fecf3084696faeff08ff088d9bac8f7b522e5a5678dec58122367b4fd464bd8b"
+  },
+  {
+   "path": "01-答辩材料/GiftWise-AI-答辩.pdf",
+   "bytes": 7486193,
+   "sha256": "99eb895288acf3e4cd0292f88b08521d62ace90711832375c24916869675be36"
+  },
+  {
+   "path": "01-答辩材料/GiftWise-AI-答辩.pptx",
+   "bytes": 8120462,
+   "sha256": "692ca886d05b1e1e3f797695992fca56fb9c2c389b541df6f0249f08ceebb199"
+  },
+  {
+   "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-11-01.drawio",
+   "bytes": 18101,
+   "sha256": "49d64fa1a1c8bfd8b8cde4267afb06f0d24e0aee3bb43202002301d1ce858f23"
+  },
+  {
+   "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-11-01.png",
+   "bytes": 400325,
+   "sha256": "9a88c6b4def6eb6d253b9b7e01713e2fd0457217ae3d8d0635bc3b67d826020f"
+  },
+  {
+   "path": "01-答辩材料/架构图/架构图-GiftWise-AI-2026-11-01.svg",
+   "bytes": 10128,
+   "sha256": "9483c46b494c039449c5cc764cc63100d9138fbddfc19da63d12b05999d2b312"
+  },
+  {
+   "path": "02-提交材料/专项材料/Agent执行流程-2026-11-01.md",
+   "bytes": 17317,
+   "sha256": "9fbd4e85d374b6fa25efbcbfd798990ae10fa3d60fa07534ee1b9f5a712ecf04"
+  },
+  {
+   "path": "02-提交材料/专项材料/Demo与代码仓库-2026-11-01.md",
+   "bytes": 27281,
+   "sha256": "7b709e4f608779ad91460584783c5392bd900be107664ea513b5222390e61f5f"
+  },
+  {
+   "path": "02-提交材料/专项材料/GiftWise-AI-系统架构设计.pdf",
+   "bytes": 5431113,
+   "sha256": "9444c1b0f80c83bf87214301eeef497f02440854d6d8a969117b37438cb7ad76"
+  },
+  {
+   "path": "02-提交材料/专项材料/可观测性证据-2026-11-01.md",
+   "bytes": 29016,
+   "sha256": "e7b041232ba4da9e64b629d80abea4e077c4f67a8c37d2242eee7bde06179897"
+  },
+  {
+   "path": "02-提交材料/专项材料/场景与价值分析-2026-11-01.md",
+   "bytes": 26327,
+   "sha256": "b98b1ffac9a8cf4399110efcd557ca5830b872020a9146bf57c64a55379d072f"
+  },
+  {
+   "path": "02-提交材料/专项材料/异常处理说明-2026-11-01.md",
+   "bytes": 25917,
+   "sha256": "5258e545fbe4660b81b56780efb7fd4d6ad833280b0d1ad6f390ea6ff7aacdd0"
+  },
+  {
+   "path": "02-提交材料/专项材料/成本与性能分析-2026-11-01.md",
+   "bytes": 34424,
+   "sha256": "3c75c26f451ffc930b819672cbb958d5c853872c417840ad0fce82c9103f9e94"
+  },
+  {
+   "path": "02-提交材料/专项材料/系统架构设计-部署更新说明.md",
+   "bytes": 4124,
+   "sha256": "2aa72196d18f1d7edb2af71e8c821d1320d31ed894cf169492eeb6bfbdb9a630"
+  },
+  {
+   "path": "02-提交材料/代码快照/GiftWise-AI-代码快照-19b6819.zip",
+   "bytes": 44584767,
+   "sha256": "772608e55b889226e5e636a230dfced45955aa29124c67fd8341c38eb6b381a5"
+  },
+  {
+   "path": "02-提交材料/代码快照/README.md",
+   "bytes": 329,
+   "sha256": "7f7c047f5acd6b7c6ff1f5ab070e32dd5c0b09d3c69a1d459a81e1b5ff37ef3f"
+  },
+  {
+   "path": "02-提交材料/代码快照与材料变更声明.md",
+   "bytes": 4051,
+   "sha256": "bc6d2aa77d36a069bb6fe1cd010cfb216954a958635ecd757a476ab68f9ac578"
+  },
+  {
+   "path": "02-提交材料/规则依据/AI比赛评分规则-v2.md",
+   "bytes": 8822,
+   "sha256": "3f823706f2ed62150cbff3a0f2d5e0252226fa1deb00fc7f15cac28bcd0c6180"
+  },
+  {
+   "path": "README.md",
+   "bytes": 1004,
+   "sha256": "c379f4f66159dbffc12a140be52356f8fbb29c9d3de012318cd6841806353518"
+  },
+  {
+   "path": "演讲稿-5分钟.md",
+   "bytes": 3039,
+   "sha256": "cb2f0c7a65c8ba108daa27939db3415681971c8495906a6e40c3ba31b952cb59"
+  },
+  {
+   "path": "答辩问答-30题.md",
+   "bytes": 14666,
+   "sha256": "0eef79cc7bc6e6d23a3a4d78a3671d53b31815cf346938aaa4882ce5dea67279"
+  }
+ ]
+}

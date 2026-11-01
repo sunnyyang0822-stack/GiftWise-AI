@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>08 总结与下一步</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* 收束页：与产品落地页的深色收束屏同一语言 */
+  body, .slide { background: #0f0f10; color: #f5f2ee; }
+  .glow { position: absolute; inset: 0; z-index: -1; background: radial-gradient(50% 60% at 18% 30%, rgb(160 28 35 / 35%), transparent 70%), radial-gradient(45% 55% at 85% 80%, rgb(33 67 122 / 40%), transparent 70%); }
+  .chrome .brand { color: #f5f2ee; }
+  .chrome .brand svg path[fill="#fbf9f7"] { fill: #0f0f10; }
+  .chrome .pageno { color: #f0b8b0; } .chrome .pageno small { color: #a9a39c; }
+  .eyebrow { background: rgb(240 184 176 / 14%); color: #f0b8b0; }
+  .head { position: absolute; left: 96px; top: 140px; }
+  .head h2 { margin-top: 14px; font-size: 56px; line-height: 1.2; }
+  .nums { position: absolute; left: 96px; top: 330px; display: grid; grid-template-columns: repeat(3, 340px); gap: 26px; }
+  .n { position: relative; padding: 30px 32px; border-radius: 28px; background: rgb(255 255 255 / 6%); border: 1px solid rgb(255 255 255 / 10%); }
+  .n b { display: block; font-size: 120px; font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+  .n b small { font-size: 34px; margin-left: 8px; color: #a9a39c; letter-spacing: 0; }
+  .n p { margin: 14px 0 0; font-size: 24px; line-height: 1.5; color: #d9d3cc; }
+  .n:nth-child(1) b { color: #f0b8b0; } .n:nth-child(2) b { color: #fff; } .n:nth-child(3) b { color: #b9c8e6; }
+  .next { position: absolute; left: 96px; top: 712px; width: 1072px; }
+  .next h4 { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; font-size: 30px; font-weight: 500; }
+  .next h4 svg { color: #f0b8b0; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .step { position: relative; padding: 24px 26px 24px; border-radius: 22px; background: #f5f2ee; color: var(--ink); }
+  .step .no { position: absolute; right: 20px; top: 10px; font-family: var(--hand); font-size: 40px; color: var(--red); }
+  .step .ico { width: 54px; height: 54px; margin-bottom: 12px; }
+  .step b { display: block; font-weight: 500; font-size: 25px; }
+  .step > span:not(.ico):not(.no) { display: block; margin-top: 4px; font-size: 19px; color: var(--ink-2); line-height: 1.5; }
+  /* 右：Demo 入口卡 */
+  .demo { position: absolute; right: 96px; top: 330px; width: 560px; height: 620px; padding: 46px 48px; border-radius: 6px 26px 26px 6px; background: linear-gradient(105deg, #fffdfa 0%, #ffffff 46%, #faf7f3 100%); color: var(--ink); box-shadow: 0 40px 90px -30px rgb(0 0 0 / 70%); overflow: hidden; }
+  .demo::before { content: ""; position: absolute; inset: 16px; border: 1px solid rgb(160 28 35 / 30%); border-radius: 4px 16px 16px 4px; }
+  .demo .ribbon { right: 44px; top: -10px; }
+  .demo p.e { margin: 0; font-size: 20px; letter-spacing: .2em; color: var(--red); }
+  .demo h3 { margin: 14px 0 22px; font-size: 44px; line-height: 1.22; }
+  .demo ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .demo li { display: flex; align-items: center; gap: 16px; font-size: 23px; line-height: 1.35; }
+  .demo li b { display: block; font-weight: 500; }
+  .demo li small { display: block; font-size: 17px; color: var(--ink-2); }
+  .demo li .ico { width: 48px; height: 48px; flex: none; }
+  .demo .sign { position: absolute; right: 52px; bottom: 30px; font-family: var(--hand); font-size: 40px; color: var(--blue); transform: rotate(-2deg); }
+  .closing { position: absolute; margin: 0; right: 110px; bottom: 50px; font-family: var(--hand); font-size: 40px; color: #f0b8b0; transform: rotate(-2deg); transform-origin: right; }
+  .live { position: absolute; left: 96px; top: 622px; display: inline-flex; align-items: center; gap: 14px; padding: 10px 24px 10px 18px; border-radius: 999px; background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 16%); color: #f5f2ee; text-decoration: none; font-size: 22px; }
+  .live .pulse { width: 12px; height: 12px; border-radius: 50%; background: #3fbf7f; box-shadow: 0 0 0 5px rgb(63 191 127 / 22%); }
+  .live .t { color: #f0b8b0; letter-spacing: .1em; }
+  .live b { font-family: Arial, sans-serif; font-weight: 700; color: #fff; }
+  .live em { font-style: normal; font-size: 18px; color: #a9a39c; }
+</style></head>
+<body><div class="slide">
+  <div class="glow"></div>
+  <div class="chrome" data-page="08"></div>
+  <div class="head"><span class="eyebrow"><i data-icon="sparkles" data-size="22"></i>总结与下一步</span><h2>想清楚送什么，再好好送出去。</h2></div>
+
+  <div class="nums">
+    <div class="n"><b>3<small>个</small></b><p>有依据的礼物思路<br>理由、参考价写清楚</p></div>
+    <div class="n"><b>1<small>个</small></b><p>由用户亲手选定<br>系统不替用户做决定</p></div>
+    <div class="n"><b>1<small>次</small></b><p>全链路最多一次修订<br>结果稳定可预期</p></div>
+  </div>
+
+  <a class="live" href="http://117.50.83.57/"><span class="pulse"></span><span class="t">已公网部署</span><b>http://117.50.83.57/</b><em>仅 HTTP · 试运行至 11-03 05:11</em></a>
+  <section class="next">
+    <h4><i data-icon="arrow-right" data-size="30"></i>下一步</h4>
+    <div class="steps">
+      <div class="step"><span class="no">01</span><span class="ico"><i data-icon="refresh" data-size="26"></i></span><b>恢复演练</b><span>重启恢复与实际回滚，共享状态后再上多实例</span></div>
+      <div class="step"><span class="no">02</span><span class="ico ico--blue"><i data-icon="bolt" data-size="26"></i></span><b>压测与稳定性</b><span>容量、长时间运行与账单实付核验</span></div>
+      <div class="step"><span class="no">03</span><span class="ico"><i data-icon="users" data-size="26"></i></span><b>用户验证</b><span>真实用户的比较、选择与送后反馈</span></div>
+    </div>
+  </section>
+
+  <aside class="demo">
+    <span class="ribbon"></span>
+    <p class="e">产品规划</p>
+    <h3>让小礼<br>走得更远</h3>
+    <ol>
+      <li><span class="ico"><i data-icon="bag" data-size="24"></i></span><div><b>接入真实电商 API</b><small>官方商品、价格与可下单链接</small></div></li>
+      <li><span class="ico ico--blue"><i data-icon="smile" data-size="24"></i></span><div><b>「小礼」发展为 IP</b><small>固定形象与语气，贺卡与周边</small></div></li>
+      <li><span class="ico"><i data-icon="calendar" data-size="24"></i></span><div><b>送礼日历提醒</b><small>生日、纪念日前提前提醒</small></div></li>
+      <li><span class="ico ico--blue"><i data-icon="heart" data-size="24"></i></span><div><b>送后反馈</b><small>记住 TA 喜不喜欢，下次更懂</small></div></li>
+    </ol>
+    <p class="sign">—— 写给 TA</p>
+  </aside>
+  <p class="closing">准备礼物的人，先感到幸福。</p>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>

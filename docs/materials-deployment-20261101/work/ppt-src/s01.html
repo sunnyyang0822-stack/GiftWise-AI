@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>01 封面</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .left { position: absolute; left: 140px; top: 210px; width: 820px; }
+  .chip { display: inline-flex; align-items: center; gap: 12px; padding: 10px 24px 10px 16px; border-radius: 999px; background: rgb(255 255 255 / 75%); border: 1px solid var(--glass-border); box-shadow: 0 4px 14px rgb(16 16 17 / 6%); font-size: 22px; color: var(--ink-2); }
+  .chip svg { color: var(--red); }
+  .hero { margin: 40px 0 0; font-size: 128px; line-height: 1.14; font-weight: 500; letter-spacing: .02em; }
+  .hero .mark { position: relative; white-space: nowrap; }
+  .hero .mark::after { content: ""; position: absolute; left: -4px; right: -8px; bottom: 6px; height: 26px; z-index: -1; border-radius: 4px; background: linear-gradient(100deg, rgb(160 28 35 / 22%), rgb(224 88 74 / 18%)); transform: rotate(-1.5deg); }
+  .sub { margin: 30px 0 0; font-family: var(--hand); font-size: 46px; color: var(--ink-2); transform: rotate(-1.5deg); transform-origin: left; }
+  .flow { display: flex; align-items: center; gap: 14px; margin: 70px 0 0; }
+  .step { display: flex; white-space: nowrap; align-items: center; gap: 14px; padding: 14px 26px 14px 14px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--glass-border); box-shadow: var(--shadow); font-size: 26px; }
+  .step .ico { width: 52px; height: 52px; }
+  .flow > svg { color: rgb(16 16 17 / 30%); }
+  .meta { position: absolute; left: 140px; bottom: 78px; display: flex; gap: 40px; align-items: center; font-size: 22px; color: var(--ink-2); }
+  .meta b { font-weight: 500; color: var(--ink); letter-spacing: .08em; }
+  .meta { flex-direction: column; align-items: flex-start; gap: 14px; bottom: 56px; }
+  .live { display: inline-flex; align-items: center; gap: 14px; padding: 12px 26px 12px 20px; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none; font-size: 24px; box-shadow: 0 16px 34px -18px rgb(16 16 17 / 60%); }
+  .live b { font-family: Arial, sans-serif; font-weight: 700; letter-spacing: .02em; color: #fff; }
+  .live em { font-style: normal; font-size: 18px; padding: 2px 12px; border-radius: 999px; background: rgb(240 184 176 / 18%); color: #f0b8b0; letter-spacing: .1em; }
+  .live .pulse { width: 12px; height: 12px; border-radius: 50%; background: #3fbf7f; box-shadow: 0 0 0 5px rgb(63 191 127 / 22%); }
+  .dep { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 20px; color: var(--ink-2); }
+  .dep svg { color: var(--red); }
+  .dep .sep { width: 5px; height: 5px; border-radius: 50%; background: var(--red); margin: 0 8px; }
+  .meta .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+  /* 右侧：产品界面叠放 */
+  .w-main { left: 1040px; top: 200px; width: 820px; transform: rotate(1.2deg); }
+  .w-main .crop { height: 500px; overflow: hidden; }
+  .w-main .crop img { margin-top: 0; }
+  .w-chat { left: 1000px; top: 500px; width: 520px; transform: rotate(-3deg); }
+  .w-chat .crop { height: 350px; overflow: hidden; }
+  .w-chat .crop img { width: 936px; margin: -150px 0 0 -106px; }
+  .note { position: absolute; font-family: var(--hand); font-size: 40px; line-height: 1.2; white-space: nowrap; }
+  .note--a { left: 1500px; top: 840px; color: var(--blue); transform: rotate(-4deg); }
+  .note--b { left: 1180px; top: 128px; color: var(--red); transform: rotate(-2deg); }
+  .arrow { position: absolute; fill: none; stroke-width: 2.4; stroke-linecap: round; }
+  .sticker { position: absolute; display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 16px; background: #fff; box-shadow: 0 16px 34px -18px rgb(16 16 17 / 40%); font-size: 21px; }
+  .sticker svg { color: var(--red); }
+  .st1 { left: 1660px; top: 700px; transform: rotate(5deg); }
+  .st2 { left: 1530px; top: 960px; transform: rotate(-2deg); }
+  .rb { left: 1770px; top: 190px; transform: rotate(1.2deg); }
+</style></head>
+<body><div class="slide">
+  <div class="aura"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+  <div class="chrome" data-page="01"></div>
+
+  <section class="left">
+    <span class="chip"><i data-icon="chat" data-size="24"></i>聊几句，就知道送什么</span>
+    <h1 class="hero">让心意，<br>送得<span class="mark">刚刚好</span></h1>
+    <p class="sub">准备礼物的人，先感到幸福。</p>
+    <div class="flow">
+      <span class="step"><span class="ico"><i data-icon="chat" data-size="26"></i></span>和小礼聊需求</span>
+      <i data-icon="arrow-right" data-size="30"></i>
+      <span class="step"><span class="ico ico--blue"><i data-icon="lightbulb" data-size="26"></i></span>三个思路</span>
+      <i data-icon="arrow-right" data-size="30"></i>
+      <span class="step"><span class="ico"><i data-icon="gift" data-size="26"></i></span>选后赠送指南</span>
+    </div>
+  </section>
+
+  <div class="window w-main"><div class="window__bar"><i></i><i></i><i></i></div><div class="crop"><img src="assets/shots/home-hero.png" alt=""></div></div>
+  <span class="ribbon rb"></span>
+  <div class="window w-chat"><div class="window__bar"><i></i><i></i><i></i></div><div class="crop"><img src="assets/shots/chat-budget.png" alt=""></div></div>
+  <p class="note note--b">打开就能开始挑</p>
+  <p class="note note--a">一题一题聊，不用填表</p>
+
+  <div class="meta">
+    <a class="live" href="http://117.50.83.57/"><span class="pulse"></span>公网入口 <b>http://117.50.83.57/</b><em>仅 HTTP</em></a>
+    <p class="dep"><i data-icon="shield" data-size="20"></i>Compshare 公网真实服务 · 部署 19b6819 · 真实模型<span class="sep"></span>试运行至北京时间 2026-11-03 05:11</p>
+  </div>
+</div>
+<script type="module">import { hydrate } from "./common.js"; hydrate();</script>
+</body></html>
