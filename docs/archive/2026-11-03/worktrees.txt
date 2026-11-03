@@ -1,0 +1,252 @@
+worktree C:/Users/lenovo/Desktop/giftwise
+HEAD 9e2fa359b13aea8d5c3ee346a218454a177502a5
+branch refs/heads/release/2026-11-01-submission
+
+worktree C:/Users/lenovo/AppData/Local/Temp/giftwise-backend-c573-fc9c41fbe02e499c96753d333bf5a075
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+detached
+
+worktree C:/Users/lenovo/AppData/Local/Temp/giftwise-qa-c573-4eca66e3938f4ba2a32a9af583e90647
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+detached
+
+worktree C:/Users/lenovo/AppData/Local/Temp/giftwise-recheck-ca3ffdf39d2243ee8e58e1a782ad567f
+HEAD 9e2fa359b13aea8d5c3ee346a218454a177502a5
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/.worktrees/backend-api-c5736
+HEAD 5aa844db19c63b06b0ed07d9422504b25b686216
+branch refs/heads/codex/backend-api-integration-20261031
+
+worktree C:/Users/lenovo/Desktop/giftwise/.worktrees/backend-api-c5736/.worktrees/baseline-c5736
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/.worktrees/retrieval-media
+HEAD 46d18c4b627a5ef811bab64762813855e793fd3b
+branch refs/heads/codex/retrieval-media
+
+worktree C:/Users/lenovo/Desktop/giftwise/.worktrees/seed-catalog-59-60
+HEAD a4d639bb757cc99315ca9acc633d45192d20c15a
+branch refs/heads/codex/seed-catalog-59-60
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-final-c5736
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-final-f080
+HEAD f080ad51e0f22ca7384ce3a93f75d0dba91d0508
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-pinned-1031
+HEAD 902cbd4071d49a1acacce5841347452bb0512f75
+branch refs/heads/codex/final-qa-pinned-1031
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-retrieval-media
+HEAD b07f37bbc386ddf58280f01ff6c269935e5f51da
+branch refs/heads/codex/qa-retrieval-media-prep
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-backend-0346
+HEAD 0346f5364a0fdaeb0e6290b425892b1970f7eb89
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-backend-e034
+HEAD e034aa53a38ea1f41af64a779a18a3e66f310ee8
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-frontend-dd50
+HEAD dd50fefc6ab9cf86a11e23a93a43e9fd7b3c6b53
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-seed-a4d6
+HEAD a4d639bb757cc99315ca9acc633d45192d20c15a
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-workflow-277b
+HEAD 277b71d0042163a808a39b513edac684fb694747
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise/qa-rm-workflow-db4a
+HEAD db4ad9435e384d7e3e1897097a8ca7eb5110c453
+detached
+
+worktree C:/Users/lenovo/Desktop/giftwise-final-qa
+HEAD 9a2fdb353c5f7ef799d41a15b9cae9573d24bc6f
+branch refs/heads/codex/rev-qa-001-backend-ce5fd11
+
+worktree C:/Users/lenovo/Desktop/giftwise-integration-20261031
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/codex/integration-20261031
+
+worktree C:/Users/lenovo/Desktop/giftwise-qa-migration
+HEAD 48904eb99261ed1186481af795f9dd7a4c696a3d
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-ai-safe
+HEAD 4eda975570f374198b7114f456b9ec8867448cd7
+branch refs/heads/line/design-ai-exclusion
+
+worktree C:/Users/lenovo/Desktop/gw-api-nov01
+HEAD 56bf6b6538e3c245de54819993d572dc664e1802
+branch refs/heads/line/nov01-api
+
+worktree C:/Users/lenovo/Desktop/gw-baseline
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-be-parse
+HEAD ad92243466dc4233028e44fe0ccf2cf79ba1a455
+branch refs/heads/fix/backend-parse-semantics
+
+worktree C:/Users/lenovo/Desktop/gw-budget
+HEAD a971704a8397678108e9938327a966b86f6e347b
+branch refs/heads/line/design-budget
+
+worktree C:/Users/lenovo/Desktop/gw-context-nov01
+HEAD 2d833381e30a62312878b126c070b3a508a80054
+branch refs/heads/codex/workflow-avoid-history
+
+worktree C:/Users/lenovo/Desktop/gw-contract-nov01
+HEAD b2b49bdfc61eb9ad3beddc8cbf92a64abde264a7
+branch refs/heads/line/nov01-contract
+
+worktree C:/Users/lenovo/Desktop/gw-cost-perf-publish-20261101
+HEAD 1a6a49bf5f51454a5541d4fce03e90d1f15d6113
+branch refs/heads/codex/cost-perf-analysis-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-defense-copy
+HEAD b8e5cfd33de54817822a6e9dbde127fa010a5508
+branch refs/heads/codex/defense-status-handoff-20261031
+
+worktree C:/Users/lenovo/Desktop/gw-defense-retrieval
+HEAD 6aec71e8c4af206f2b65b49e68108a0015d6b348
+branch refs/heads/codex/defense-retrieval-media
+
+worktree C:/Users/lenovo/Desktop/gw-demo-rules
+HEAD 09cec1ad8c06e3750b5ca43d9ec95b894e9a3693
+branch refs/heads/line/demo-rules-no-mock-banner
+
+worktree C:/Users/lenovo/Desktop/gw-exclusions-nov01
+HEAD 77308caa0b5539f4dd9d40c856fa9b35c4416a5d
+branch refs/heads/line/nov01-exclusions
+
+worktree C:/Users/lenovo/Desktop/gw-fe-baseline-eeefe74
+HEAD eeefe745ac7f1a6777cb47d6310b4e5b4f124f42
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-fe-candidate
+HEAD 12842554f47fb898594a4021842e8b2df3014122
+branch refs/heads/codex/frontend-intake-chat-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-fe-web
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/frontend-real-integration
+
+worktree C:/Users/lenovo/Desktop/gw-fe-web-2
+HEAD c109bfacc0cc2c137b44ee317367f479de168846
+branch refs/heads/feat/frontend-real-integration-2
+
+worktree C:/Users/lenovo/Desktop/gw-final-fe-pm1101
+HEAD aa3369c1c91e87207a45d5ab832f3bea84bb3534
+branch refs/heads/codex/final-fe-review-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-final-integrated-pm1101
+HEAD 307c5ebe24c30a6bcddc791dc1a0de355b5a1922
+branch refs/heads/codex/final-integrated-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-final-parse-pm1101
+HEAD 4ba427d6e20f43adcfef67bdc900fe78acc34a83
+branch refs/heads/codex/final-parse-contract-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-final-qa-pm1101/baseline
+HEAD eeefe745ac7f1a6777cb47d6310b4e5b4f124f42
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-final-qa-pm1101/candidate
+HEAD 12842554f47fb898594a4021842e8b2df3014122
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-final-qa-pm1101/final-307c5eb
+HEAD 307c5ebe24c30a6bcddc791dc1a0de355b5a1922
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-final-qa-pm1101/integrated
+HEAD 307c5ebe24c30a6bcddc791dc1a0de355b5a1922
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-fix-backend
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/fix/backend-exclusion-and-runs
+
+worktree C:/Users/lenovo/Desktop/gw-flow
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/backend-flow-e2e
+
+worktree C:/Users/lenovo/Desktop/gw-frontend-new
+HEAD bd1b17e5a9232ee3ced1987990531f84bfeccd2a
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-frozen-snapshot-pm1101
+HEAD 98875721e4d0e25a32c402ef569e0a177c74e6ca
+branch refs/heads/codex/frozen-live-snapshot-20261101
+
+worktree C:/Users/lenovo/Desktop/gw-imagegen
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/imagegen-packaging
+
+worktree C:/Users/lenovo/Desktop/gw-issue-review-20261101
+HEAD 0ad650b3ce7af8fc6679a7c66c20f9e8a57e49e6
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-live
+HEAD eeefe745ac7f1a6777cb47d6310b4e5b4f124f42
+branch refs/heads/feat/frontend-handover-2026-11-01
+
+worktree C:/Users/lenovo/Desktop/gw-llm-direct
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/direct-llm-provider
+
+worktree C:/Users/lenovo/Desktop/gw-opencli-db
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/scene-image-pool
+
+worktree C:/Users/lenovo/Desktop/gw-pdd-adapter
+HEAD c5736c2c6776cca8068718f53908a86748bc3268
+branch refs/heads/feat/pdd-adapter-20261031
+
+worktree C:/Users/lenovo/Desktop/gw-pm-revision-plan
+HEAD 9845d677426bd18d0fd36adecc20dbf34b03e534
+branch refs/heads/line/pm-revision-plan
+
+worktree C:/Users/lenovo/Desktop/gw-qa-nov01
+HEAD 311d154fc6e66745f76f894816a5a15e895a4f45
+branch refs/heads/line/nov01-qa
+
+worktree C:/Users/lenovo/Desktop/gw-rule-fix
+HEAD cdee5149d60b53e50fa58a2c1ad619ce7cb58788
+branch refs/heads/fix/timing-advisory-not-blocking
+
+worktree C:/Users/lenovo/Desktop/gw-rulefix-baseline
+HEAD ff0b35a36dd41e7c4441e75a659fd6131dc48e47
+detached
+
+worktree C:/Users/lenovo/Desktop/gw-rules-nov01
+HEAD ca836bf53f5d104ae8a02a899784791748d4d51b
+branch refs/heads/line/nov01-rules
+
+worktree C:/Users/lenovo/Desktop/gw-ui-nov01
+HEAD dd50fefc6ab9cf86a11e23a93a43e9fd7b3c6b53
+branch refs/heads/codex/frontend-final-legal
+
+worktree C:/Users/lenovo/Desktop/gw-uibaseline
+HEAD 252c07bf395661643b3b2e07ec12ecbb173522ca
+branch refs/heads/line/design-ui-baseline
+
+worktree C:/Users/lenovo/Desktop/gw-workflow-nov01
+HEAD 81dff08fef01b5c190cd096955c278bf7d382549
+branch refs/heads/line/nov01-workflow-final
+
+worktree C:/Users/lenovo/Desktop/gw-workflow-qa51
+HEAD ff27871dcfe1d335cdabfe77ecabb802b38e7f00
+branch refs/heads/line/nov01-workflow-qa51
+
