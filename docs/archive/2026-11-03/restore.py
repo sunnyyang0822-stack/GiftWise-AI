@@ -9,10 +9,14 @@ zips=[zipfile.ZipFile(assets/x['name']) for x in m['parts']];lookup={}
 for z in zips:
  assert z.testzip() is None
  for n in z.namelist():lookup[n.split('/')[-1]]=(z,n)
-home=PureWindowsPath(m['original_home']);count=0
+home=PureWindowsPath(m['original_home']);count=0;verified_contents=set()
 for row in m['files']:
  relative=PureWindowsPath(row['path']).relative_to(home);target=dest.joinpath(*relative.parts)
  if a.select and not relative.as_posix().lower().startswith(a.select.replace('\\','/').rstrip('/').lower()+'/'):continue
+ signature=(row['sha256'],row['bytes'],tuple(row['blocks']))
+ if a.verify_only and signature in verified_contents:
+  count+=1
+  continue
  assert target.is_relative_to(dest)
  if not a.verify_only:target.parent.mkdir(parents=True,exist_ok=True)
  h=hashlib.sha256();size=0;f=None if a.verify_only else target.open('wb')
@@ -23,7 +27,7 @@ for row in m['files']:
    if f:f.write(b)
  finally:
   if f:f.close()
- assert size==row['bytes'] and h.hexdigest()==row['sha256'],row['path'];count+=1
+ assert size==row['bytes'] and h.hexdigest()==row['sha256'],row['path'];count+=1;verified_contents.add(signature)
  if count%5000==0:print('verified/restored',count,flush=True)
 if not a.verify_only:
  old=str(home);new=str(dest)
