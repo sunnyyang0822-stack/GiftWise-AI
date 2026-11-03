@@ -1,0 +1,142 @@
+{
+  "encryption": "AES-256-GCM",
+  "files": [
+    {
+      "name": "archive-001.zip.enc",
+      "bytes": 38504479,
+      "sha256": "b1f686b62a704ea61e319744e338e044128770e2cb0d35bac9d0a888ee17c87c"
+    },
+    {
+      "name": "archive-002.zip.enc",
+      "bytes": 41339529,
+      "sha256": "aa0ab20518ba6cd7f56345f7fb5812438955938b0e90f8ac90f74aae885774b2"
+    },
+    {
+      "name": "archive-003.zip.enc",
+      "bytes": 50347258,
+      "sha256": "3f794b77c9e9e49ad57f4b9ddf0fe379893826b622f38f2ac8645b108d7afff0"
+    },
+    {
+      "name": "archive-004.zip.enc",
+      "bytes": 46259085,
+      "sha256": "59fbb776bfff9a562cd5c650c3bae1594bfe5ca798d5b74cc239269d01b395f8"
+    },
+    {
+      "name": "archive-005.zip.enc",
+      "bytes": 47336720,
+      "sha256": "7c90fdf14d61819b1166b1c875b4f05d2325897fc4e214ee0dfa0b21128092f2"
+    },
+    {
+      "name": "archive-006.zip.enc",
+      "bytes": 49634394,
+      "sha256": "f307b7fb96fa2cc84f50ab54621722d8551a169279aa8da5e8e2ebbd4018f4c1"
+    },
+    {
+      "name": "archive-007.zip.enc",
+      "bytes": 50269101,
+      "sha256": "797d70b611dc509c9a25ae3e08d4e1f1ca2501a320ca4292a864eba38c6abcd8"
+    },
+    {
+      "name": "archive-008.zip.enc",
+      "bytes": 50255901,
+      "sha256": "783a3f8495e68e0316cb450b96056f490023b8f569a2282615fcdcc52f2e56a1"
+    },
+    {
+      "name": "archive-009.zip.enc",
+      "bytes": 47556367,
+      "sha256": "ed25e888c2158d8b48df1818823ec94211de7e7377950e1117f1c34996efc14c"
+    },
+    {
+      "name": "archive-010.zip.enc",
+      "bytes": 36473372,
+      "sha256": "fdb44586647c3a1d40ce5b136aa7857720840d97a2984301b134dbb4ff5aedf9"
+    },
+    {
+      "name": "archive-011.zip.enc",
+      "bytes": 30929886,
+      "sha256": "4c227b3a1ec30f877dc217deb6d92fbdaa117647ea58d792369a977405ba18f8"
+    },
+    {
+      "name": "archive-012.zip.enc",
+      "bytes": 17548803,
+      "sha256": "0d41a7ecc104e98e43cf3a12364c8d37ec9f0e6da2e50d170aaf01c05fc87770"
+    },
+    {
+      "name": "archive-013.zip.enc",
+      "bytes": 27520638,
+      "sha256": "ecffb55a9c7d5456750016ea4d380acbbbb94208fbd6586e714ffb1e1a34a2d4"
+    },
+    {
+      "name": "archive-014.zip.enc",
+      "bytes": 27314121,
+      "sha256": "91747255d886691913b4c67e77a30b4131ea7c8d20c19660699e0762df0d99b9"
+    },
+    {
+      "name": "archive-015.zip.enc",
+      "bytes": 29569059,
+      "sha256": "0443f459a767adcf7838ba7c64dd23358e7c359fa3b90fe941203858025d39aa"
+    },
+    {
+      "name": "archive-016.zip.enc",
+      "bytes": 47170136,
+      "sha256": "4c924a84b67ace850104d508eebdd611e08150e2b1e7b2fbd3eead0cc244d02c"
+    },
+    {
+      "name": "archive-017.zip.enc",
+      "bytes": 50186502,
+      "sha256": "bd10d1ae1e2111e04062039625e6aa2ca56e321c040167bd267ff08b82ef8083"
+    },
+    {
+      "name": "archive-018.zip.enc",
+      "bytes": 36377711,
+      "sha256": "b327eedcd4bc84a804db7f4661411e82f85e23e111b64e2a825fc93e9662a888"
+    },
+    {
+      "name": "archive-019.zip.enc",
+      "bytes": 26428374,
+      "sha256": "f412762cf1d3898c5e8472c32cc7a40e4e676a18b6d99b97df56d806ab7edc92"
+    },
+    {
+      "name": "archive-020.zip.enc",
+      "bytes": 49997153,
+      "sha256": "4de512c0a6db1f89257b89ceddcd43f329bae90ded3dc572ef935d876e48ae79"
+    },
+    {
+      "name": "archive-021.zip.enc",
+      "bytes": 25434006,
+      "sha256": "bd4ff458a5978d257fa278ced590cf17fd3588fabd47dbdc3af1da8d3d20fc47"
+    },
+    {
+      "name": "archive-022.zip.enc",
+      "bytes": 31596295,
+      "sha256": "526bb26cbdc70f5a8a5a1d36885b23196bff909dd69455b8b1e8d15306151e1f"
+    },
+    {
+      "name": "archive-023.zip.enc",
+      "bytes": 45031348,
+      "sha256": "b79cabbe148e8bf786b6372dd58e2231d5f761f0c67ceecaaa8460b88f40dc42"
+    },
+    {
+      "name": "archive-024.zip.enc",
+      "bytes": 42655555,
+      "sha256": "9affeb16e5681cb22593d8454a1eb4f33c30e0aba436873ad0b8b8272824fcab"
+    },
+    {
+      "name": "archive-025.zip.enc",
+      "bytes": 27052661,
+      "sha256": "60961c81e714d325b01fc416e474a644fee903bb71fe380c3724ed587f0fccbe"
+    },
+    {
+      "name": "archive-026.zip.enc",
+      "bytes": 1019429,
+      "sha256": "e6e80dc183462e059708bfcab01aa967e1bfe94b50d7456ae3914c263eec1e4d"
+    },
+    {
+      "name": "manifest.json.gz.enc",
+      "bytes": 1262542,
+      "sha256": "a0c8fa0d26cc55a7ce04154b792aa60f640c67bbb4ec8363f2d7df65340e3a8b"
+    }
+  ],
+  "recovery_key": "provided separately; never committed to GitHub",
+  "plaintext_files": 26157
+}

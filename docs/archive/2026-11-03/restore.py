@@ -35,7 +35,7 @@ if not a.verify_only:
   rel=PureWindowsPath(row['path']).relative_to(home);q=dest.joinpath(*rel.parts)
   if not q.exists():continue
   # Repair worktree pointers and Git alternate object paths after relocation.
-  if q.name in ['.git','gitdir','alternates'] and q.is_file() and q.stat().st_size<65536:
+  if q.name in ['.git','gitdir','alternates','config','config.worktree'] and q.is_file() and q.stat().st_size<65536:
    try:
     text=q.read_text(encoding='utf-8');changed=text.replace(old,new).replace(old.replace('\\','/'),new.replace('\\','/'))
     if changed!=text:q.write_text(changed,encoding='utf-8')

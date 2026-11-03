@@ -21,7 +21,17 @@ python docs/archive/2026-11-03/restore.py --assets restore-assets --destination 
 - 本地各工作树原始分支和 HEAD 见 `worktrees.txt`；工作文件快照保留未提交改动，不能把所有候选都视为已集成或验收。
 - 完整工作文件清单及哈希保存在附件 `manifest.json.gz`。
 
-公有归档不附密钥、浏览器登录态、原始运行数据库和未脱敏的私有运行文件，也不复制 `.git` 内部数据及可重建依赖缓存。Git 历史以原仓库已公开提交为准。恢复工作文件后，按所选基线克隆仓库再覆盖相应工作目录，重新配置服务端凭据和依赖。
+公开工作文件不附明文密钥、登录态、原始运行数据库或 `.git` 内部数据。需要保留的私有资料另存为 AES-256-GCM 加密附件，解密密钥不在 GitHub，单独交付项目负责人。可重建的依赖、安装包和浏览器模型缓存不保存。
+
+## 可选：恢复加密的私有资料与本地 Git 历史
+
+```sh
+python -m pip install cryptography==50.0.2
+python docs/archive/2026-11-03/recover_encrypted.py --assets restore-assets --output decrypted-assets
+python docs/archive/2026-11-03/restore.py --assets decrypted-assets --destination D:/GiftWise-restored
+```
+
+第一条恢复命令会安全提示输入单独保存的恢复密钥，不要把密钥提交或粘贴进 Issue。附件 `encrypted-index.json` 记录加密文件 SHA256；每个加密文件有独立随机 nonce 与认证标签。解密后再用恢复器验证原文件 SHA256，恢复本地 Git 元数据、数据库和运行资料。若只恢复公开源码，不需要此密钥。
 
 比赛相关文件仅作为历史资料，不代表今天的运行状态。归档上传不等于部署。后续继续项目时，先阅读交接说明和测试记录，核对实际代码，再决定集成哪些改动。
 
