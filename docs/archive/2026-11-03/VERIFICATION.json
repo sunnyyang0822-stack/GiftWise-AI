@@ -1,0 +1,12 @@
+{
+  "repository": "sunnyyang0822-stack/GiftWise-AI",
+  "release_tag": "project-archive-20261103",
+  "public_files_verified": 180184,
+  "release_assets_verified": 22,
+  "downloaded_sha256_matches": 22,
+  "restored_files_verified": "all manifest rows",
+  "restored_gw_live_entry_syntax": "passed",
+  "private_runtime_not_published": true,
+  "cleanup_status": "not_executed; local review service active",
+  "private_repository_deletion": "requires delete_repo permission or manual deletion"
+}
