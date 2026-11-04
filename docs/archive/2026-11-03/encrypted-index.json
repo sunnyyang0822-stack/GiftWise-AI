@@ -132,11 +132,16 @@
       "sha256": "e6e80dc183462e059708bfcab01aa967e1bfe94b50d7456ae3914c263eec1e4d"
     },
     {
+      "name": "archive-027.zip.enc",
+      "bytes": 10542,
+      "sha256": "4859ac93bdc9926dce2dc05db8914dee1e78c2aaa979a4b526ee7dddbe9e34aa"
+    },
+    {
       "name": "manifest.json.gz.enc",
-      "bytes": 1262542,
-      "sha256": "a0c8fa0d26cc55a7ce04154b792aa60f640c67bbb4ec8363f2d7df65340e3a8b"
+      "bytes": 1263010,
+      "sha256": "f251958389c6827b3a749f82cb9c0ec79ce7bb2cfd08f573d27a84c76cd76a70"
     }
   ],
   "recovery_key": "provided separately; never committed to GitHub",
-  "plaintext_files": 26157
+  "plaintext_files": 26162
 }

@@ -1,0 +1,8 @@
+{
+  "encrypted_files_verified": 26162,
+  "encrypted_attachments_verified": 28,
+  "authenticated_decryption": "passed for all downloaded attachments",
+  "private_file_sha256_verification": "passed",
+  "main_git_commit_recovery": "9e2fa359b13aea8d5c3ee346a218454a177502a5",
+  "key_uploaded_to_github": false
+}
