@@ -1,0 +1,16 @@
+{
+  "original_inventoried_project_files_remaining": 0,
+  "original_empty_directory_remaining": "C:/Users/lenovo/Desktop/giftwise",
+  "empty_directory_reason": "Directory is in use; subsequent removal was blocked by execution policy",
+  "temporary_archive_directory_remaining": "C:\\Users\\lenovo\\AppData\\Local\\Temp\\GiftWise-archive-20261103",
+  "temporary_archive_reason": "Final recursive cleanup command rejected by execution policy; no bypass attempted",
+  "remote_backups_and_recovery_verification": "complete",
+  "recovery_key": "delivered separately to the project owner; never uploaded",
+  "private_repository_deletion": "HTTP 403; delete_repo authorization unavailable",
+  "manual_actions": [
+    "Save the separately delivered recovery key",
+    "Delete the temporary archive directory after saving the key",
+    "Close the current chat and remove the empty Desktop/giftwise directory",
+    "Delete the old private archive repository via GitHub settings"
+  ]
+}

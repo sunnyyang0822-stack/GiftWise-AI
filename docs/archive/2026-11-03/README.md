@@ -43,3 +43,6 @@ python docs/archive/2026-11-03/restore.py --assets decrypted-assets --destinatio
 公开工作文件 180,184 个、加密私有文件 26,162 个已完成远端下载、SHA256 校验与恢复核验；加密附件全部通过 AES-GCM 认证解密。已恢复并检查主仓库 Git 提交 `9e2fa359b13aea8d5c3ee346a218454a177502a5`。删除前最终比对没有未备份的新文件、改动或读取错误，清单中的本地项目文件已清空。仅桌面 `giftwise` 空目录仍被当前聊天进程占用，关闭聊天后可手动移除。详细结果见 `VERIFICATION.json` 与 `CLEANUP-REPORT.json`。
 
 Release 中的 `recovery-guide-and-verification.zip` 是最终恢复工具和核验记录的独立副本；可直接解压使用。首次完整恢复可先运行公开资料恢复，再解密并恢复私有资料到同一目标目录。共享系统工具、其他项目与非项目用户文件没有纳入清理。
+
+
+最终补记：原项目文件已清空。归档与恢复验证产生的临时目录 `C:/Users/lenovo/AppData/Local/Temp/GiftWise-archive-20261103` 在最终删除时被执行策略拦截，需负责人保存恢复密钥后手动移除；桌面 `giftwise` 空目录需关闭当前聊天后移除。旧私有仓库删除受 GitHub `delete_repo` 权限限制。详情见 `FINAL-CLEANUP-STATUS.json`。
