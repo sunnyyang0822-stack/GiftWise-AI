@@ -1,4 +1,4 @@
-"""Restore a verified GiftWise archive downloaded from the private GitHub release."""
+"""Restore a verified GiftWise archive downloaded from the public GitHub project archive release."""
 from pathlib import Path,PureWindowsPath
 import argparse,json,gzip,zipfile,hashlib,os
 p=argparse.ArgumentParser();p.add_argument('--assets',default='.');p.add_argument('--destination',required=True);p.add_argument('--verify-only',action='store_true');p.add_argument('--select',help='Optional relative original-home prefix, e.g. Desktop/gw-live');a=p.parse_args()
